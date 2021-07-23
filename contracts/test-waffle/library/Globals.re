@@ -42,7 +42,8 @@ let (
     lt,
   );
 
-let (twoBn, oneBn, tenToThe18) = CONSTANTS.(twoBn, oneBn, tenToThe18);
+let (zeroBn, twoBn, oneBn, tenToThe18) =
+  CONSTANTS.(zeroBn, twoBn, oneBn, tenToThe18);
 
 let describeIntegration =
   Config.dontRunIntegrationTests ? describe_skip : describe;

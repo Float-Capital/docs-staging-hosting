@@ -80,12 +80,12 @@ let generateTestData =
               let%AwaitThen shortValue =
                 longShort->LongShort.syntheticTokenPoolValue(
                   marketIndex,
-                  false/*short*/,
+                  false /*short*/,
                 );
               let%AwaitThen longValue =
                 longShort->LongShort.syntheticTokenPoolValue(
                   marketIndex,
-                  true/*long*/,
+                  true /*long*/,
                 );
 
               (
@@ -146,12 +146,12 @@ let generateTestData =
               let%AwaitThen shortValue =
                 longShort->LongShort.syntheticTokenPoolValue(
                   marketIndex,
-                  false/*short*/,
+                  false /*short*/,
                 );
               let%AwaitThen longValue =
                 longShort->LongShort.syntheticTokenPoolValue(
                   marketIndex,
-                  true/*long*/,
+                  true /*long*/,
                 );
 
               (
@@ -192,7 +192,7 @@ describeSkippable("Float System", () => {
 
   before_each(() => {
     let%Await deployedContracts =
-      Helpers.inititialize(
+      Helpers.initialize(
         ~admin=accounts.contents->Array.getUnsafe(0),
         ~exposeInternals=false,
       );

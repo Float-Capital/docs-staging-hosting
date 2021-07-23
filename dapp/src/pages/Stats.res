@@ -96,7 +96,8 @@ let floatProtocolCard = (
 let syntheticAssetsCard = (~totalSynthValue) =>
   <Card>
     <Header>
-      {`Synthetic Assets`->React.string} <img className="inline h-5 ml-2" src="/img/coin.png" />
+      {`Synthetic Assets`->React.string}
+      <img className="inline h-5 ml-2" src="/icons/dollar-coin.png" />
     </Header>
     <div className="p-6 py-4 text-center">
       <div>

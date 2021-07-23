@@ -182,6 +182,7 @@ fragment CurrentStakeHighLevel on CurrentStake {
     accumulativeFloatPerTokenShort
   }
   currentStake {
+    withdrawn
     amount
   }
   syntheticMarket {

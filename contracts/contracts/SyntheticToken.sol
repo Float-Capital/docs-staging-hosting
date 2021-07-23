@@ -8,16 +8,16 @@ import "./interfaces/ILongShort.sol";
 import "./interfaces/ISyntheticToken.sol";
 
 contract SyntheticToken is ISyntheticToken {
-  ILongShort public longShort;
-  IStaker public staker;
+  address public longShort;
+  address public staker;
   uint32 public marketIndex;
   bool public isLong;
 
   constructor(
     string memory name,
     string memory symbol,
-    ILongShort _longShort,
-    IStaker _staker,
+    address _longShort,
+    address _staker,
     uint32 _marketIndex,
     bool _isLong
   ) ERC20PresetMinterPauser(name, symbol) {
@@ -37,7 +37,7 @@ contract SyntheticToken is ISyntheticToken {
     //       amount exceeds balance" if amount exceeds users balance.
     _transfer(msg.sender, address(staker), amount);
 
-    staker.stakeFromUser(msg.sender, amount);
+    IStaker(staker).stakeFromUser(msg.sender, amount);
   }
 
   /*╔══════════════════════════════════════════════════════╗
@@ -69,7 +69,7 @@ contract SyntheticToken is ISyntheticToken {
     uint256
   ) internal override {
     if (sender != address(longShort)) {
-      longShort.executeOutstandingNextPriceSettlementsUser(sender, marketIndex);
+      ILongShort(longShort).executeOutstandingNextPriceSettlementsUser(sender, marketIndex);
     }
   }
 
@@ -78,7 +78,7 @@ contract SyntheticToken is ISyntheticToken {
    */
   function balanceOf(address account) public view virtual override returns (uint256) {
     return
-      longShort.getUsersConfirmedButNotSettledBalance(account, marketIndex, isLong) +
+      ILongShort(longShort).getUsersConfirmedButNotSettledBalance(account, marketIndex, isLong) +
       ERC20.balanceOf(account);
   }
 }

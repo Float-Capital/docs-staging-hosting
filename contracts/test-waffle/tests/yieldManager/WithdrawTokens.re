@@ -1,64 +1,45 @@
-open LetOps;
 open Mocha;
+open LetOps;
 
-describe("YieldManagerAave", () => {
-  describe("WithdrawTokens", () => {
-    describe("WithdrawWmaticToTreasury mocks", () => {
-      let accounts: ref(array(Ethers.Wallet.t)) = ref(None->Obj.magic);
-      let contracts = ref(None->Obj.magic);
+let testUnit =
+    (
+      ~contracts: ref(Contract.YieldManagerAaveHelpers.contractsType),
+      ~accounts: ref(array(Ethers.Wallet.t)),
+    ) => {
+  describe_only("Withdrawing tokens", () => {
+    describe("withdrawErc20TokenToTreasuryTxPromise", () => {
       let amountOfWMaticInYieldManager = Helpers.randomTokenAmount();
 
-      before_each(() => {
-        let%AwaitThen loadedAccounts = Ethers.getSigners();
-        accounts := loadedAccounts;
-
-        let admin = loadedAccounts->Array.getUnsafe(0);
-        let treasury = loadedAccounts->Array.getUnsafe(1);
-
-        let longShortAddress = Ethers.Wallet.createRandom().address;
-        let lendingPoolAddress = Ethers.Wallet.createRandom().address;
-        let fundTokenAddress = Ethers.Wallet.createRandom().address;
-        let%AwaitThen paymentTokenMock = ERC20Mock.make(~name="Payment Token Mock", ~symbol="PaymentToken");
-        let paymentTokenAddress = paymentTokenMock.address;
-
-        let%AwaitThen erc20Mock =
-          ERC20Mock.make(~name="Test APaymentToken", ~symbol="APaymentToken");
-        let%AwaitThen yieldManagerAave =
-          YieldManagerAave.make(
-            ~admin=admin.address,
-            ~longShort=longShortAddress,
-            ~treasury=treasury.address,
-            ~paymentToken=paymentTokenAddress,
-            ~aToken=fundTokenAddress,
-            ~lendingPool=lendingPoolAddress,
-            ~aaveReferalCode=6543,
-          );
+      let setup = () => {
         let%Await _ =
-          erc20Mock->ERC20Mock.mint(
-            ~_to=yieldManagerAave.address,
-            ~amount=amountOfWMaticInYieldManager,
-          );
-        contracts :=
-          {"erc20Mock": erc20Mock, "yieldManagerAave": yieldManagerAave};
-      });
+          (contracts.contents)#erc20Mock
+          ->ERC20Mock.mint(
+              ~_to=(contracts.contents)#yieldManagerAave.address,
+              ~amount=amountOfWMaticInYieldManager,
+            );
+        ();
+      };
 
       it(
         "allows treasury to call 'transfer' function on any erc20 to transfer it to the treasury",
         () => {
-          let treasury = (accounts^)->Array.getUnsafe(1);
+          let%AwaitThen _ = setup();
+
+          let treasury = accounts.contents->Array.getUnsafe(1);
+
           let withdrawErc20TokenToTreasuryTxPromise =
-            contracts.contents##yieldManagerAave
+            (contracts.contents)#yieldManagerAave
             ->ContractHelpers.connect(~address=treasury)
             ->YieldManagerAave.withdrawErc20TokenToTreasury(
-                ~erc20Token=contracts.contents##erc20Mock.address,
+                ~erc20Token=(contracts.contents)#erc20Mock.address,
               );
           Chai.callEmitEvents(
             ~call=withdrawErc20TokenToTreasuryTxPromise,
             ~eventName="TransferCalled",
-            ~contract=contracts.contents##erc20Mock->Obj.magic,
+            ~contract=(contracts.contents)#erc20Mock->Obj.magic,
           )
           ->Chai.withArgs3(
-              contracts.contents##yieldManagerAave.address,
+              (contracts.contents)#yieldManagerAave.address,
               treasury.address,
               amountOfWMaticInYieldManager,
             );
@@ -74,5 +55,5 @@ describe("YieldManagerAave", () => {
         JsPromise.resolve()
       );
     })
-  })
-});
+  });
+};

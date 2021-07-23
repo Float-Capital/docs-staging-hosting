@@ -35,7 +35,11 @@ let recordEqualFlat: ('a, 'a) => unit = (expected, actual) => {
   a(expected, actual)
 }
 let recordArrayEqualFlat: (array<'a>, array<'a>) => unit = (expected, actual) => {
-  intEqual(expected->Array.length, actual->Array.length)
+  intEqual(
+    ~message="cannot compare arrays of integers with different lengths",
+    expected->Array.length,
+    actual->Array.length,
+  )
   expected->Array.forEachWithIndex((i, expectedResult) =>
     recordEqualFlat(expectedResult, actual->Array.getUnsafe(i))
   )
@@ -101,8 +105,16 @@ let callEmitEvents: (
 @send
 external withArgs8: (eventCheck, 'a, 'b, 'c, 'd, 'e, 'f, 'g, 'h) => JsPromise.t<unit> = "withArgs"
 
-let expectToNotEmit: eventCheck => JsPromise.t<unit> = _eventCheck =>
-  %raw(`_eventCheck.then(() => assert.fail('An event was emitted when it should not have been')).catch(() => {})`)
+let expectToNotEmit: eventCheck => JsPromise.t<
+  unit,
+> = %raw(`eventCheck => {  let shouldRevert = true;
+  return (eventCheck
+    .catch(() =>
+      shouldRevert = false
+    ))
+    .then(() => { if (shouldRevert) { require("chai").assert.fail('An event was emitted when it should not have been') } }
+    );
+}`)
 
 let expectRevertNoReason: (
   ~transaction: JsPromise.t<ContractHelpers.transaction>,
@@ -114,7 +126,7 @@ let expectRevert: (
   unit,
 > = %raw(`(transaction, reason) => expect(transaction).to.be.revertedWith(reason)`)
 
-let changeBallance: (
+let changeBalance: (
   ~transaction: unit => JsPromise.t<ContractHelpers.transaction>,
   ~token: ContractHelpers.t,
   ~to_: Ethers.ethAddress,
@@ -122,8 +134,8 @@ let changeBallance: (
 ) => JsPromise.t<
   unit,
 > = %raw(`(transaction, token, to, amount) => expect(transaction).to.changeTokenBalance(token, to, amount)`)
-// TODO: implement changeBallanceMulti to test transactions that change the balance of multiple accounts
-// let changeBallanceMulti = %raw(`expect(transaction).to.changeTokenBalance(token, wallets, amounts)`)
+// TODO: implement changeBalanceMulti to test transactions that change the balance of multiple accounts
+// let changeBalanceMulti = %raw(`expect(transaction).to.changeTokenBalance(token, wallets, amounts)`)
 
 let expectToBeAddress: (
   ~address: Ethers.ethAddress,

@@ -8,185 +8,436 @@ let testUnit =
       ~accounts as _: ref(array(Ethers.Wallet.t)),
     ) => {
   describeUnit("Batched Settlement", () => {
+    let marketIndex = Helpers.randomJsInteger();
     describe("_performOustandingBatchedSettlements", () => {
-      let marketIndex = Helpers.randomJsInteger();
       let syntheticTokenPriceLong = Helpers.randomTokenAmount();
       let syntheticTokenPriceShort = Helpers.randomTokenAmount();
 
       let setup =
           (
-            ~amountPaymentTokenDepositPerSide,
-            ~amountPaymentTokenRedeemPerSide,
+            ~batchedAmountOfTokensToDepositLong,
+            ~batchedAmountOfTokensToDepositShort,
+            ~batchedAmountOfSynthTokensToRedeemLong,
+            ~batchedAmountOfSynthTokensToRedeemShort,
           ) => {
         let {longShort} = contracts.contents;
-
-        let%Await _ =
+        let%AwaitThen _ =
           longShort->LongShortSmocked.InternalMock.setupFunctionForUnitTesting(
             ~functionName="_performOustandingBatchedSettlements",
           );
-        LongShortSmocked.InternalMock.mock_handleBatchedDepositSettlementToReturn(
-          amountPaymentTokenDepositPerSide,
-        );
-        LongShortSmocked.InternalMock.mock_handleBatchedRedeemSettlementToReturn(
-          amountPaymentTokenRedeemPerSide,
-        );
-        let%Await _ =
-          longShort->LongShort.Exposed._performOustandingBatchedSettlementsExposed(
+
+        LongShortSmocked.InternalMock.mock_handleTotalValueChangeForMarketWithYieldManagerToReturn();
+        LongShortSmocked.InternalMock.mock_handleChangeInSynthTokensTotalSupplyToReturn();
+
+        let%AwaitThen _ =
+          longShort->LongShort.Exposed.setPerformOustandingBatchedSettlementsGlobals(
             ~marketIndex,
-            ~syntheticTokenPriceLong,
-            ~syntheticTokenPriceShort,
+            ~batchedAmountOfTokensToDepositLong,
+            ~batchedAmountOfTokensToDepositShort,
+            ~batchedAmountOfSynthTokensToRedeemLong,
+            ~batchedAmountOfSynthTokensToRedeemShort,
           );
-        ();
+
+        longShort->LongShort.Exposed._performOustandingBatchedSettlementsExposedCall(
+          ~marketIndex,
+          ~syntheticTokenPriceLong,
+          ~syntheticTokenPriceShort,
+        );
       };
 
-      it(
-        "Should call `_handleBatchedDepositSettlement` and `_handleBatchedRedeemSettlement` for both long and short",
-        () => {
-          let amountPaymentTokenDepositPerSide = Helpers.randomTokenAmount();
-          let amountPaymentTokenRedeemPerSide = Helpers.randomTokenAmount();
+      let runTest =
+          (
+            ~batchedAmountOfTokensToDepositLong,
+            ~batchedAmountOfTokensToDepositShort,
+            ~batchedAmountOfSynthTokensToRedeemLong,
+            ~batchedAmountOfSynthTokensToRedeemShort,
+          ) => {
+        let batchedAmountOfSynthTokensToMintLong = ref(None->Obj.magic);
+        let batchedAmountOfSynthTokensToMintShort = ref(None->Obj.magic);
+        let batchedAmountOfPaymentTokensToBurnLong = ref(None->Obj.magic);
+        let batchedAmountOfPaymentTokensToBurnShort = ref(None->Obj.magic);
+        let calculatedValueChangeForLong = ref(None->Obj.magic);
+        let calculatedValueChangeForShort = ref(None->Obj.magic);
+        let calculatedValueChangeInSynthSupplyLong = ref(None->Obj.magic);
+        let calculatedValueChangeInSynthSupplyShort = ref(None->Obj.magic);
+        let returnOfPerformOustandingBatchedSettlements =
+          ref(None->Obj.magic);
 
-          let%Await _ =
+        before_each(() => {
+          let%Await functionCallReturn =
             setup(
-              ~amountPaymentTokenDepositPerSide,
-              ~amountPaymentTokenRedeemPerSide,
+              ~batchedAmountOfTokensToDepositLong,
+              ~batchedAmountOfTokensToDepositShort,
+              ~batchedAmountOfSynthTokensToRedeemLong,
+              ~batchedAmountOfSynthTokensToRedeemShort,
             );
-          let batchedDepositSettlementCalls =
-            LongShortSmocked.InternalMock._handleBatchedDepositSettlementCalls();
-          let batchedRedeemSettlementCalls =
-            LongShortSmocked.InternalMock._handleBatchedRedeemSettlementCalls();
 
-          let batchedCallArguments = [|
+          batchedAmountOfSynthTokensToMintLong :=
+            Contract.LongShortHelpers.calcAmountSynthToken(
+              ~amountPaymentToken=batchedAmountOfTokensToDepositLong,
+              ~price=syntheticTokenPriceLong,
+            );
+          batchedAmountOfSynthTokensToMintShort :=
+            Contract.LongShortHelpers.calcAmountSynthToken(
+              ~amountPaymentToken=batchedAmountOfTokensToDepositShort,
+              ~price=syntheticTokenPriceShort,
+            );
+          batchedAmountOfPaymentTokensToBurnLong :=
+            Contract.LongShortHelpers.calcAmountPaymentToken(
+              ~amountSynthToken=batchedAmountOfSynthTokensToRedeemLong,
+              ~price=syntheticTokenPriceLong,
+            );
+          batchedAmountOfPaymentTokensToBurnShort :=
+            Contract.LongShortHelpers.calcAmountPaymentToken(
+              ~amountSynthToken=batchedAmountOfSynthTokensToRedeemShort,
+              ~price=syntheticTokenPriceShort,
+            );
+
+          calculatedValueChangeForLong :=
+            batchedAmountOfTokensToDepositLong->sub(
+              batchedAmountOfPaymentTokensToBurnLong.contents,
+            );
+          calculatedValueChangeForShort :=
+            batchedAmountOfTokensToDepositShort->sub(
+              batchedAmountOfPaymentTokensToBurnShort.contents,
+            );
+
+          calculatedValueChangeInSynthSupplyLong :=
+            batchedAmountOfSynthTokensToMintLong.contents
+            ->sub(batchedAmountOfSynthTokensToRedeemLong);
+          calculatedValueChangeInSynthSupplyShort :=
+            batchedAmountOfSynthTokensToMintShort.contents
+            ->sub(batchedAmountOfSynthTokensToRedeemShort);
+          returnOfPerformOustandingBatchedSettlements := functionCallReturn;
+        });
+        it(
+          "call handleChangeInSynthTokensTotalSupply with the correct parameters",
+          () => {
+          let handleChangeInSynthTokensTotalSupplyCalls =
+            LongShortSmocked.InternalMock._handleChangeInSynthTokensTotalSupplyCalls();
+
+          Chai.recordArrayDeepEqualFlat(
+            handleChangeInSynthTokensTotalSupplyCalls,
+            [|
+              {
+                marketIndex,
+                isLong: true,
+                changeInSynthTokensTotalSupply:
+                  calculatedValueChangeInSynthSupplyLong.contents,
+              },
+              {
+                marketIndex,
+                isLong: false,
+                changeInSynthTokensTotalSupply:
+                  calculatedValueChangeInSynthSupplyShort.contents,
+              },
+            |],
+          );
+        });
+        it(
+          "call handleTotalValueChangeForMarketWithYieldManager with the correct parameters",
+          () => {
+            let handleTotalValueChangeForMarketWithYieldManagerCalls =
+              LongShortSmocked.InternalMock._handleTotalValueChangeForMarketWithYieldManagerCalls();
+
+            let totalValueChangeForMarket =
+              calculatedValueChangeForLong.contents
+              ->add(calculatedValueChangeForShort.contents);
+            Chai.recordArrayDeepEqualFlat(
+              handleTotalValueChangeForMarketWithYieldManagerCalls,
+              [|{marketIndex, totalValueChangeForMarket}|],
+            );
+          },
+        );
+        it("should return the correct values", () => {
+          Chai.recordEqualDeep(
+            returnOfPerformOustandingBatchedSettlements.contents,
             {
-              "marketIndex": marketIndex,
-              "isLong": true,
-              "syntheticTokenPrice": syntheticTokenPriceLong,
+              valueChangeForLong: calculatedValueChangeForLong.contents,
+              valueChangeForShort: calculatedValueChangeForShort.contents,
             },
-            {
-              "marketIndex": marketIndex,
-              "isLong": false,
-              "syntheticTokenPrice": syntheticTokenPriceShort,
-            },
-          |];
+          )
+        });
+      };
 
-          Chai.recordArrayDeepEqualFlat(
-            batchedDepositSettlementCalls,
-            batchedCallArguments->Obj.magic,
-          );
-          Chai.recordArrayDeepEqualFlat(
-            batchedRedeemSettlementCalls,
-            batchedCallArguments->Obj.magic,
-          );
-        },
-      );
-      it(
-        "Should deposit the correct amount into the yield manager if batchedDeposits > batchedRedeems",
+      describe("there are no actions in the batch", () => {
+        runTest(
+          ~batchedAmountOfTokensToDepositLong=zeroBn,
+          ~batchedAmountOfTokensToDepositShort=zeroBn,
+          ~batchedAmountOfSynthTokensToRedeemLong=zeroBn,
+          ~batchedAmountOfSynthTokensToRedeemShort=zeroBn,
+        )
+      });
+      describe("there is 1 deposit long", () => {
+        runTest(
+          ~batchedAmountOfTokensToDepositLong=Helpers.randomTokenAmount(),
+          ~batchedAmountOfTokensToDepositShort=zeroBn,
+          ~batchedAmountOfSynthTokensToRedeemLong=zeroBn,
+          ~batchedAmountOfSynthTokensToRedeemShort=zeroBn,
+        )
+      });
+      describe("there is 1 deposit short", () => {
+        runTest(
+          ~batchedAmountOfTokensToDepositLong=zeroBn,
+          ~batchedAmountOfTokensToDepositShort=Helpers.randomTokenAmount(),
+          ~batchedAmountOfSynthTokensToRedeemLong=zeroBn,
+          ~batchedAmountOfSynthTokensToRedeemShort=zeroBn,
+        )
+      });
+      describe("there is 1 withdraw long", () => {
+        runTest(
+          ~batchedAmountOfTokensToDepositLong=zeroBn,
+          ~batchedAmountOfTokensToDepositShort=zeroBn,
+          ~batchedAmountOfSynthTokensToRedeemLong=Helpers.randomTokenAmount(),
+          ~batchedAmountOfSynthTokensToRedeemShort=zeroBn,
+        )
+      });
+      describe("there is 1 withdraw short", () => {
+        runTest(
+          ~batchedAmountOfTokensToDepositLong=zeroBn,
+          ~batchedAmountOfTokensToDepositShort=zeroBn,
+          ~batchedAmountOfSynthTokensToRedeemLong=zeroBn,
+          ~batchedAmountOfSynthTokensToRedeemShort=Helpers.randomTokenAmount(),
+        )
+      });
+      describe(
+        "there random deposits and withdrawals (we could be more specific with this test possibly?)",
         () => {
-          let amountPaymentTokenRedeemPerSide = Helpers.randomTokenAmount();
-          let amountPaymentTokenDepositPerSide =
-            // Ensure that batchedDeposits > batchedRedeems
-            amountPaymentTokenRedeemPerSide->add(Helpers.randomTokenAmount());
-          let calculatedAmountToDeposit =
-            amountPaymentTokenDepositPerSide
-            ->sub(amountPaymentTokenRedeemPerSide)
-            ->mul(twoBn);
+        runTest(
+          ~batchedAmountOfTokensToDepositLong=Helpers.randomTokenAmount(),
+          ~batchedAmountOfTokensToDepositShort=Helpers.randomTokenAmount(),
+          ~batchedAmountOfSynthTokensToRedeemLong=Helpers.randomTokenAmount(),
+          ~batchedAmountOfSynthTokensToRedeemShort=Helpers.randomTokenAmount(),
+        )
+      });
+    });
+    describe("_handleChangeInSynthTokensTotalSupply", () => {
+      let longSynthToken = ref("Not Set Yet"->Obj.magic);
+      let shortSynthToken = ref("Not Set Yet"->Obj.magic);
+
+      before_each(() => {
+        let {longShort, markets} = contracts.contents;
+        let {longSynth, shortSynth} = markets->Array.getUnsafe(0);
+
+        let%Await smockedSynthLong = SyntheticTokenSmocked.make(longSynth);
+        let%Await smockedSynthShort = SyntheticTokenSmocked.make(shortSynth);
+
+        longSynthToken := smockedSynthLong;
+        shortSynthToken := smockedSynthShort;
+
+        let _ = smockedSynthLong->SyntheticTokenSmocked.mockMintToReturn;
+        let _ = smockedSynthLong->SyntheticTokenSmocked.mockBurnToReturn;
+        let _ = smockedSynthShort->SyntheticTokenSmocked.mockMintToReturn;
+        let _ = smockedSynthShort->SyntheticTokenSmocked.mockBurnToReturn;
+
+        longShort->LongShort.Exposed.setHandleChangeInSynthTokensTotalSupplyGlobals(
+          ~marketIndex,
+          ~longSynthToken=smockedSynthLong.address,
+          ~shortSynthToken=smockedSynthShort.address,
+        );
+      });
+      let testHandleChangeInSynthTokensTotalSupply = (~isLong, ~synthTokenRef) => {
+        describe("changeInSynthTokensTotalSupply > 0", () => {
+          let changeInSynthTokensTotalSupply = Helpers.randomTokenAmount();
+          before_each(() => {
+            let {longShort} = contracts.contents;
+
+            longShort->LongShort.Exposed._handleChangeInSynthTokensTotalSupplyExposed(
+              ~marketIndex,
+              ~isLong,
+              ~changeInSynthTokensTotalSupply,
+            );
+          });
+          it(
+            "should call the mint function on the correct synthetic token with correct arguments.",
+            () => {
+              let mintCalls =
+                synthTokenRef.contents->SyntheticTokenSmocked.mintCalls;
+              Chai.recordArrayDeepEqualFlat(
+                mintCalls,
+                [|
+                  {
+                    _to: contracts.contents.longShort.address,
+                    amount: changeInSynthTokensTotalSupply,
+                  },
+                |],
+              );
+            },
+          );
+          it("should NOT call the burn function.", () => {
+            let burnCalls =
+              synthTokenRef.contents->SyntheticTokenSmocked.burnCalls;
+            Chai.recordArrayDeepEqualFlat(burnCalls, [||]);
+          });
+        });
+        describe("changeInSynthTokensTotalSupply < 0", () => {
+          let changeInSynthTokensTotalSupply =
+            zeroBn->sub(Helpers.randomTokenAmount());
+          before_each(() => {
+            let {longShort} = contracts.contents;
+
+            longShort->LongShort.Exposed._handleChangeInSynthTokensTotalSupplyExposed(
+              ~marketIndex,
+              ~isLong,
+              ~changeInSynthTokensTotalSupply,
+            );
+          });
+          it(
+            "should NOT call the mint function on the correct synthetic token.",
+            () => {
+            let mintCalls =
+              synthTokenRef.contents->SyntheticTokenSmocked.mintCalls;
+            Chai.recordArrayDeepEqualFlat(mintCalls, [||]);
+          });
+          it(
+            "should call the burn function on the correct synthetic token with correct arguments.",
+            () => {
+              let burnCalls =
+                synthTokenRef.contents->SyntheticTokenSmocked.burnCalls;
+              Chai.recordArrayDeepEqualFlat(
+                burnCalls,
+                [|{amount: zeroBn->sub(changeInSynthTokensTotalSupply)}|],
+              );
+            },
+          );
+        });
+        describe("changeInSynthTokensTotalSupply == 0", () => {
+          it("should call NEITHER the mint NOR burn function.", () => {
+            let changeInSynthTokensTotalSupply = zeroBn;
+            let {longShort} = contracts.contents;
+
+            let%Await _ =
+              longShort->LongShort.Exposed._handleChangeInSynthTokensTotalSupplyExposed(
+                ~marketIndex,
+                ~isLong,
+                ~changeInSynthTokensTotalSupply,
+              );
+            let mintCalls =
+              synthTokenRef.contents->SyntheticTokenSmocked.mintCalls;
+            let burnCalls =
+              synthTokenRef.contents->SyntheticTokenSmocked.burnCalls;
+            Chai.recordArrayDeepEqualFlat(mintCalls, [||]);
+            Chai.recordArrayDeepEqualFlat(burnCalls, [||]);
+          })
+        });
+      };
+      describe("LongSide", () => {
+        testHandleChangeInSynthTokensTotalSupply(
+          ~isLong=true,
+          ~synthTokenRef=longSynthToken,
+        );
+        testHandleChangeInSynthTokensTotalSupply(
+          ~isLong=false,
+          ~synthTokenRef=shortSynthToken,
+        );
+      });
+    });
+    describe("_handleTotalValueChangeForMarketWithYieldManager", () => {
+      let yieldManagerRef = ref("Not Set Yet"->Obj.magic);
+
+      before_each(() => {
+        let {longShort, markets} = contracts.contents;
+        let {yieldManager} = markets->Array.getUnsafe(0);
+
+        let%Await smockedYieldManager =
+          YieldManagerMockSmocked.make(yieldManager);
+
+        yieldManagerRef := smockedYieldManager;
+
+        let _ =
+          smockedYieldManager->YieldManagerMockSmocked.mockDepositPaymentTokenToReturn;
+        let _ =
+          smockedYieldManager->YieldManagerMockSmocked.mockWithdrawPaymentTokenToReturn;
+
+        longShort->LongShort.Exposed.setHandleTotalValueChangeForMarketWithYieldManagerGlobals(
+          ~marketIndex,
+          ~yieldManager=smockedYieldManager.address,
+        );
+      });
+      describe("totalValueChangeForMarket > 0", () => {
+        let totalValueChangeForMarket = Helpers.randomTokenAmount();
+        before_each(() => {
+          let {longShort} = contracts.contents;
+
+          longShort->LongShort.Exposed._handleTotalValueChangeForMarketWithYieldManagerExposed(
+            ~marketIndex,
+            ~totalValueChangeForMarket,
+          );
+        });
+        it(
+          "should call the depositPaymentToken function on the correct synthetic token with correct arguments.",
+          () => {
+            let mintCalls =
+              yieldManagerRef.contents
+              ->YieldManagerMockSmocked.depositPaymentTokenCalls;
+            Chai.recordArrayDeepEqualFlat(
+              mintCalls,
+              [|{amount: totalValueChangeForMarket}|],
+            );
+          },
+        );
+        it("should NOT call the withdrawPaymentToken function.", () => {
+          let burnCalls =
+            yieldManagerRef.contents
+            ->YieldManagerMockSmocked.withdrawPaymentTokenCalls;
+          Chai.recordArrayDeepEqualFlat(burnCalls, [||]);
+        });
+      });
+      describe("totalValueChangeForMarket < 0", () => {
+        let totalValueChangeForMarket =
+          zeroBn->sub(Helpers.randomTokenAmount());
+        before_each(() => {
+          let {longShort} = contracts.contents;
+
+          longShort->LongShort.Exposed._handleTotalValueChangeForMarketWithYieldManagerExposed(
+            ~marketIndex,
+            ~totalValueChangeForMarket,
+          );
+        });
+        it(
+          "should NOT call the depositPaymentToken function on the correct synthetic token.",
+          () => {
+            let mintCalls =
+              yieldManagerRef.contents
+              ->YieldManagerMockSmocked.depositPaymentTokenCalls;
+            Chai.recordArrayDeepEqualFlat(mintCalls, [||]);
+          },
+        );
+        it(
+          "should call the withdrawPaymentToken function on the correct synthetic token with correct arguments.",
+          () => {
+            let burnCalls =
+              yieldManagerRef.contents
+              ->YieldManagerMockSmocked.withdrawPaymentTokenCalls;
+            Chai.recordArrayDeepEqualFlat(
+              burnCalls,
+              [|{amount: zeroBn->sub(totalValueChangeForMarket)}|],
+            );
+          },
+        );
+      });
+      describe("totalValueChangeForMarket == 0", () => {
+        it(
+          "should call NEITHER the depositPaymentToken NOR withdrawPaymentToken function.",
+          () => {
+          let totalValueChangeForMarket = zeroBn;
+          let {longShort} = contracts.contents;
 
           let%Await _ =
-            setup(
-              ~amountPaymentTokenDepositPerSide,
-              ~amountPaymentTokenRedeemPerSide,
+            longShort->LongShort.Exposed._handleTotalValueChangeForMarketWithYieldManagerExposed(
+              ~marketIndex,
+              ~totalValueChangeForMarket,
             );
-          let transferFundsToYieldManagerCalls =
-            LongShortSmocked.InternalMock._transferFundsToYieldManagerCalls();
-          let transferFromYieldManagerCalls =
-            LongShortSmocked.InternalMock._transferFromYieldManagerCalls();
-
-          Chai.recordArrayDeepEqualFlat(
-            transferFundsToYieldManagerCalls,
-            [|{marketIndex, amount: calculatedAmountToDeposit}|],
-          );
-          Chai.intEqual(transferFromYieldManagerCalls->Array.length, 0);
-        },
-      );
-      it(
-        "Should withdraw the correct amount into the yield manager if batchedDeposits < batchedRedeems",
-        () => {
-          let amountPaymentTokenDepositPerSide = Helpers.randomTokenAmount();
-          let amountPaymentTokenRedeemPerSide =
-            // Ensure that batchedDeposits < batchedRedeems
-            amountPaymentTokenDepositPerSide->add(
-              Helpers.randomTokenAmount(),
-            );
-          let calculatedAmountToWithdraw =
-            amountPaymentTokenRedeemPerSide
-            ->sub(amountPaymentTokenDepositPerSide)
-            ->mul(twoBn);
-
-          let%Await _ =
-            setup(
-              ~amountPaymentTokenDepositPerSide,
-              ~amountPaymentTokenRedeemPerSide,
-            );
-          let transferFundsToYieldManagerCalls =
-            LongShortSmocked.InternalMock._transferFundsToYieldManagerCalls();
-          let transferFromYieldManagerCalls =
-            LongShortSmocked.InternalMock._transferFromYieldManagerCalls();
-
-          Chai.recordArrayDeepEqualFlat(
-            transferFromYieldManagerCalls,
-            [|{marketIndex, amount: calculatedAmountToWithdraw}|],
-          );
-          Chai.intEqual(transferFundsToYieldManagerCalls->Array.length, 0);
-        },
-      );
-    });
-    describe("_handleBatchedDepositSettlement", () => {
-      // TODO: should repeat these tests for long and short
-      it(
-        "should do nothing and return zero if amountPaymentTokensToDepositToYieldManager == 0",
-        () =>
-        Js.log("TODO")
-      );
-      it(
-        "should mint the correct amount of synthetic tokens for itself (call the mint function on the synth token contract)",
-        () =>
-        Js.log("TODO")
-      );
-      it(
-        "should reset `batchedAmountOfTokensToDeposit` to zero (if not zero already)",
-        () =>
-        Js.log("TODO")
-      );
-      it(
-        "should increase the `syntheticTokenPoolValue` by the batched deposit amount",
-        () =>
-        Js.log("TODO")
-      );
-    });
-    describe("_handleBatchedRedeemSettlement", () => {
-      // TODO: should repeat these tests for long and short
-      it("should do nothing and return zero if amountSynthToRedeem == 0", () =>
-        Js.log("TODO")
-      );
-      it(
-        "should redeemBurn the correct amount of synthetic tokens for itself (call the `synthRedeemBurn` function on the synth token contract)",
-        () =>
-        Js.log("TODO")
-      );
-      it(
-        "should reset `batchedAmountOfSynthTokensToRedeem` to zero (if not zero already)",
-        () =>
-        Js.log("TODO")
-      );
-      it(
-        "should reduce the `syntheticTokenPoolValue` by the batched redeem amount",
-        () =>
-        Js.log("TODO")
-      );
-      it(
-        "should revert (without reason - assert) if `syntheticTokenPoolValue` >= `amountOfPaymentTokenToRedeemFromYieldManager`",
-        () =>
-        Js.log("TODO")
-      );
+          let mintCalls =
+            yieldManagerRef.contents
+            ->YieldManagerMockSmocked.depositPaymentTokenCalls;
+          let burnCalls =
+            yieldManagerRef.contents
+            ->YieldManagerMockSmocked.withdrawPaymentTokenCalls;
+          Chai.recordArrayDeepEqualFlat(mintCalls, [||]);
+          Chai.recordArrayDeepEqualFlat(burnCalls, [||]);
+        })
+      });
     });
   });
 };

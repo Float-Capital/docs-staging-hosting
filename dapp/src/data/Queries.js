@@ -972,6 +972,7 @@ var query$13 = ((frag_0) => require("@apollo/client").gql`
     }
     currentStake  {
       __typename
+      withdrawn
       amount
     }
     syntheticMarket  {
@@ -1010,6 +1011,7 @@ function parse$13(value) {
           },
           currentStake: {
             __typename: value$5.__typename,
+            withdrawn: value$5.withdrawn,
             amount: GqlConverters.$$BigInt.parse(value$5.amount)
           },
           syntheticMarket: parse$5(value.syntheticMarket)
@@ -1022,53 +1024,55 @@ function serialize$13(value) {
   var value$2 = value.currentStake;
   var value$3 = value$2.amount;
   var value$4 = GqlConverters.$$BigInt.serialize(value$3);
-  var value$5 = value$2.__typename;
+  var value$5 = value$2.withdrawn;
+  var value$6 = value$2.__typename;
   var currentStake = {
-    __typename: value$5,
+    __typename: value$6,
+    withdrawn: value$5,
     amount: value$4
   };
-  var value$6 = value.lastMintState;
-  var value$7 = value$6.accumulativeFloatPerTokenShort;
-  var value$8 = GqlConverters.$$BigInt.serialize(value$7);
-  var value$9 = value$6.accumulativeFloatPerTokenLong;
-  var value$10 = GqlConverters.$$BigInt.serialize(value$9);
-  var value$11 = value$6.shortToken;
-  var value$12 = value$11.id;
-  var value$13 = value$11.__typename;
+  var value$7 = value.lastMintState;
+  var value$8 = value$7.accumulativeFloatPerTokenShort;
+  var value$9 = GqlConverters.$$BigInt.serialize(value$8);
+  var value$10 = value$7.accumulativeFloatPerTokenLong;
+  var value$11 = GqlConverters.$$BigInt.serialize(value$10);
+  var value$12 = value$7.shortToken;
+  var value$13 = value$12.id;
+  var value$14 = value$12.__typename;
   var shortToken = {
-    __typename: value$13,
-    id: value$12
+    __typename: value$14,
+    id: value$13
   };
-  var value$14 = value$6.longToken;
-  var value$15 = value$14.id;
-  var value$16 = value$14.__typename;
+  var value$15 = value$7.longToken;
+  var value$16 = value$15.id;
+  var value$17 = value$15.__typename;
   var longToken = {
-    __typename: value$16,
-    id: value$15
+    __typename: value$17,
+    id: value$16
   };
-  var value$17 = value$6.timestamp;
-  var value$18 = GqlConverters.$$BigInt.serialize(value$17);
-  var value$19 = value$6.__typename;
+  var value$18 = value$7.timestamp;
+  var value$19 = GqlConverters.$$BigInt.serialize(value$18);
+  var value$20 = value$7.__typename;
   var lastMintState = {
-    __typename: value$19,
-    timestamp: value$18,
+    __typename: value$20,
+    timestamp: value$19,
     longToken: longToken,
     shortToken: shortToken,
-    accumulativeFloatPerTokenLong: value$10,
-    accumulativeFloatPerTokenShort: value$8
+    accumulativeFloatPerTokenLong: value$11,
+    accumulativeFloatPerTokenShort: value$9
   };
-  var value$20 = value.syntheticToken;
-  var value$21 = value$20.id;
-  var value$22 = value$20.__typename;
+  var value$21 = value.syntheticToken;
+  var value$22 = value$21.id;
+  var value$23 = value$21.__typename;
   var syntheticToken = {
-    __typename: value$22,
-    id: value$21
+    __typename: value$23,
+    id: value$22
   };
-  var value$23 = value.id;
-  var value$24 = value.__typename;
+  var value$24 = value.id;
+  var value$25 = value.__typename;
   return {
-          __typename: value$24,
-          id: value$23,
+          __typename: value$25,
+          id: value$24,
           syntheticToken: syntheticToken,
           lastMintState: lastMintState,
           currentStake: currentStake,

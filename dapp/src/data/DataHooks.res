@@ -66,7 +66,9 @@ let useTotalClaimableFloatForUser = (~userId, ~synthTokens) => {
         switch curState {
         | Loading => Loading
         | GraphError(msg) => GraphError(msg)
-        | Response((totalClaimable, totalPredicted)) => {
+        | Response((totalClaimable, totalPredicted)) => if stake.currentStake.withdrawn {
+            Response((totalClaimable, totalPredicted))
+          } else {
             let amount = stake.currentStake.amount
             let timestamp = stake.lastMintState.timestamp
             let isLong = stake.syntheticToken.id == stake.lastMintState.longToken.id
@@ -120,7 +122,8 @@ let useStakesForUser = (~userId) => {
   })
 
   switch activeStakesQuery {
-  | {data: Some({currentStakes})} => Response(currentStakes)
+  | {data: Some({currentStakes})} =>
+    Response(currentStakes->Array.keep(x => x.currentStake.withdrawn == false))
   | {error: Some({message})} => GraphError(message)
   | _ => Loading
   }

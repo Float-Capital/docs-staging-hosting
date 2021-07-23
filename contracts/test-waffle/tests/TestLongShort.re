@@ -12,7 +12,7 @@ describe("Float System", () => {
       accounts := loadedAccounts;
 
       let%AwaitThen deployedContracts =
-        Helpers.inititialize(
+        Helpers.initialize(
           ~admin=accounts.contents->Array.getUnsafe(0),
           ~exposeInternals=false,
         );
@@ -30,8 +30,8 @@ describe("Float System", () => {
 
     UpdateSystemState.testIntegration(~contracts, ~accounts);
 
-    LazyDeposit.testIntegration(~contracts, ~accounts);
-    LazyRedeem.testIntegration(~contracts, ~accounts);
+    MintNextPrice.testIntegration(~contracts, ~accounts);
+    RedeemNextPrice.testIntegration(~contracts, ~accounts);
     InitializeMarket.testIntegration(~contracts, ~accounts);
   });
 
@@ -44,7 +44,7 @@ describe("Float System", () => {
       accounts := loadedAccounts;
 
       let%Await deployedContracts =
-        Helpers.inititialize(
+        Helpers.initialize(
           ~admin=accounts.contents->Array.getUnsafe(0),
           ~exposeInternals=false,
         );
@@ -173,7 +173,7 @@ describe("Float System", () => {
 
     before_each(() => {
       let%Await deployedContracts =
-        Helpers.inititialize(
+        Helpers.initialize(
           ~admin=accounts.contents->Array.getUnsafe(0),
           ~exposeInternals=true,
         );
@@ -191,11 +191,12 @@ describe("Float System", () => {
     });
     InitializeMarket.testUnit(~contracts, ~accounts);
     UpdateSystemState.testUnit(~contracts, ~accounts);
-    ClaimAndDistributeYield.testUnit(~contracts, ~accounts);
-    AdjustMarketBasedOnNewAssetPrice.testUnit(~contracts, ~accounts);
     UtilsHelpers.testUnit(~contracts, ~accounts);
     GetUsersConfirmedButNotSettledBalance.testUnit(~contracts, ~accounts);
     PriceCalculationFunctions.testUnit(~contracts, ~accounts);
     BatchedSettlement.testUnit(~contracts, ~accounts);
+    MintNextPrice.testUnit(~contracts, ~accounts);
+    ExecuteNextPriceAction.testUnit(~contracts, ~accounts);
+    ExecuteOutstandingNextPriceSettlements.testUnit(~contracts, ~accounts);
   });
 });
