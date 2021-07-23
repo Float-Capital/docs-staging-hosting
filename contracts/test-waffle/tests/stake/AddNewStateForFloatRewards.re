@@ -43,6 +43,7 @@ let test =
             ~shortPrice,
             ~longValue,
             ~shortValue,
+            ~longShortMarketPriceSnapshotIndexIfShiftExecuted=zeroBn,
           );
       let%Await _ = promiseRef^;
       ();

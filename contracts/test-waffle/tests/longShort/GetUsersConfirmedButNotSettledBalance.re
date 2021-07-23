@@ -7,7 +7,7 @@ let testUnit =
       ~contracts: ref(Helpers.coreContracts),
       ~accounts as _: ref(array(Ethers.Wallet.t)),
     ) => {
-  describe("getUsersConfirmedButNotSettledBalance", () => {
+  describe("getUsersConfirmedButNotSettledSynthBalance", () => {
     it(
       "should call the _getAmountSynthToken function with the correct parameters and return its result",
       () => {
@@ -40,7 +40,7 @@ let testUnit =
 
         let%Await actualResult =
           contracts^.longShort
-          ->LongShort.getUsersConfirmedButNotSettledBalance(
+          ->LongShort.getUsersConfirmedButNotSettledSynthBalance(
               ~user,
               ~marketIndex,
               ~isLong,
@@ -48,7 +48,7 @@ let testUnit =
 
         Chai.bnEqual(
           ~message=
-            "expected result was different to actual result for getUsersConfirmedButNotSettledBalance call",
+            "expected result was different to actual result for getUsersConfirmedButNotSettledSynthBalance call",
           expectedResult,
           actualResult,
         );

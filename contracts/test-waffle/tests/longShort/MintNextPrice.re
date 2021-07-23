@@ -204,7 +204,10 @@ let testUnit =
 
         let%AwaitThen updatedBatchedAmountOfTokensToDeposit =
           contracts.contents.longShort
-          ->LongShort.batchedAmountOfTokensToDeposit(marketIndex, isLong);
+          ->LongShort.batchedAmountOfPaymentTokenTokensToDeposit(
+              marketIndex,
+              isLong,
+            );
 
         let%AwaitThen updatedUserNextPriceDepositAmount =
           contracts.contents.longShort
@@ -222,7 +225,8 @@ let testUnit =
             );
 
         Chai.bnEqual(
-          ~message="batchedAmountOfTokensToDeposit not updated correctly",
+          ~message=
+            "batchedAmountOfPaymentTokenTokensToDeposit not updated correctly",
           updatedBatchedAmountOfTokensToDeposit,
           amount,
         );
