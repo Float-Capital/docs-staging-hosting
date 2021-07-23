@@ -1,5 +1,5 @@
 /*
-  Put any global setup that you need done before mocha runs here.
+  Put any synchronous global setup that you need done before mocha runs here.
 */
 
 module SeedRandom = {
@@ -14,35 +14,62 @@ module Random = {
   @module("random") external replaceJsRng: unit => unit = "patch"
 }
 
-module Crypto = {
-  module Bytes = {
-    type t
+module Wallet = {
+  type mnemonic = {phrase: string}
+  type t = {mnemonic: mnemonic}
 
-    @module("crypto") external random: int => t = "randomBytes"
+  @module("ethers") @scope("Wallet") @val
+  external createRandom: unit => t = "createRandom"
 
-    @send external toString: (t, string) => string = "toString"
+  @module("ethers") @scope("Wallet") @val
+  external fromMnemonic: (string, string, string) => t = "fromMnemonic"
 
-    let toHexString = bytes => bytes->toString("Hex")
+  module Generator = {
+    let fromMnemonic = mnemonic => {
+      let counter = ref(-1)
+      () => {
+        counter := counter.contents + 1
+        fromMnemonic(mnemonic, `m/44'/60'/${counter.contents->Int.toString}'/0/0`, "en")
+      }
+    }
   }
 
-  let randomString = strLengthDiv2 => Bytes.random(strLengthDiv2)->Bytes.toHexString
+  let replaceCreateRandom: (unit => t) => unit = %raw("(fn) => {
+    require('ethers').Wallet.createRandom = fn;
+  }")
+}
+
+let seedTestRng = seed => {
+  // Limitation:
+  //  if you run only some tests, then you'll
+  //  be lucky to get the same random value for a particular random val
+  //  as if you ran all of them (number of global calls matters)
+
+  // Replace Math.random with a seeded one.
+  Random.use(seed->SeedRandom.make)
+  Random.replaceJsRng()
+
+  // Make ethers.Wallet.createRandom use the mnemonic
+  Wallet.Generator.fromMnemonic(seed)->Wallet.replaceCreateRandom
 }
 
 // called in hardhat.config.js
 let mochaSetup = () => {
-  // 1. Replace Math.random with a seeded one.
-  let seed = Crypto.randomString(20)
-  Js.log(`Running tests with random seed: ${seed}`)
+  // 1. replace rng sources with seeded ones
 
-  // replace seed->SeedRandom.make with "<seed-str>"->SeedRandom.make if testing a particular seed
-  Random.use(seed->SeedRandom.make)
+  let seed =
+    Node.Process.process["env"]
+    ->Js.Dict.get("TEST_SEED_MNEMONIC") // set this in the shell if wanting to test a particular seed, or hardcode it here
+    ->Option.flatMap(str =>
+      if str->String.length > 0 {
+        Some(str)
+      } else {
+        None
+      }
+    )
+    ->Option.getWithDefault(Wallet.createRandom().mnemonic.phrase)
 
-  // limitations:
-  //  if you run only some tests, then you'll
-  //  be lucky to get the same random value
-  //  as if you ran all of them (order of call matters for seed)
+  seedTestRng(seed)
 
-  //  random addresses/wallets use crypto.randomBytes -> unaffected by this
-
-  Random.replaceJsRng()
+  Js.log(`Running tests with random seed: "${seed}"`)
 }
