@@ -62,7 +62,8 @@ contract Staker is IStaker, Initializable {
   mapping(uint32 => mapping(address => uint256)) public shiftIndex;
   // This value is an `int256` so it can represent shifts in either direction.
   // Possitive is a shift from long, negative is a shift from short.
-  mapping(uint32 => mapping(address => int256)) public amountToShiftUser;
+  mapping(uint32 => mapping(address => uint256)) public amountToShiftFromLongUser;
+  mapping(uint32 => mapping(address => uint256)) public amountToShiftFromShortUser;
 
   /*╔════════════════════════════╗
     ║           EVENTS           ║
@@ -611,25 +612,29 @@ contract Staker is IStaker, Initializable {
       );
 
       // Update the users balances
-      if (amountToShiftUser[marketIndex][user] > 0) {
+      if (amountToShiftFromLongUser[marketIndex][user] > 0) {
         amountStakedShort += ILongShort(longShort).getAmountSynthTokenShifted(
           marketIndex,
-          uint256(amountToShiftUser[marketIndex][user]),
+          amountToShiftFromLongUser[marketIndex][user],
           true,
           longShortMarketPriceSnapshotIndex[usersShiftIndex]
         );
 
-        amountStakedLong -= uint256(amountToShiftUser[marketIndex][user]);
-      } else {
+        amountStakedLong -= amountToShiftFromLongUser[marketIndex][user];
+        amountToShiftFromLongUser[marketIndex][user] = 0;
+      }
+
+      if (amountToShiftFromShortUser[marketIndex][user] > 0) {
         amountStakedLong += ILongShort(longShort).getAmountSynthTokenShifted(
           marketIndex,
-          uint256(-amountToShiftUser[marketIndex][user]),
+          amountToShiftFromShortUser[marketIndex][user],
           false,
           longShortMarketPriceSnapshotIndex[usersShiftIndex]
         );
 
         // TODO: investigate how casting negative numbers works in solidity
-        amountStakedShort -= uint256(-amountToShiftUser[marketIndex][user]);
+        amountStakedShort -= amountToShiftFromShortUser[marketIndex][user];
+        amountToShiftFromShortUser[marketIndex][user] = 0;
       }
 
       // Save the users updated staked amounts
@@ -644,7 +649,6 @@ contract Staker is IStaker, Initializable {
         latestRewardIndex[marketIndex]
       );
 
-      amountToShiftUser[marketIndex][user] = 0;
       shiftIndex[marketIndex][user] = 0;
     } else {
       floatReward = _calculateAccumulatedFloatInRange(
@@ -777,12 +781,6 @@ contract Staker is IStaker, Initializable {
       "Not enough tokens to shift"
     );
 
-    // For simplicity, avoid this edge case!
-    require(
-      shiftIndex[marketIndex][msg.sender] == nextTokenShiftIndex[marketIndex],
-      "cannot have multiple pending token shifts"
-    );
-
     // If the user has outstanding token shift that have already been confirmed in the LongShort
     // contract, execute them first.
     if (shiftIndex[marketIndex][msg.sender] < nextTokenShiftIndex[marketIndex]) {
@@ -791,10 +789,10 @@ contract Staker is IStaker, Initializable {
 
     if (isShiftFromLong) {
       ILongShort(longShort).shiftPositionFromLongNextPrice(marketIndex, synthTokensToShift);
-      amountToShiftUser[marketIndex][msg.sender] = int256(synthTokensToShift);
+      amountToShiftFromLongUser[marketIndex][msg.sender] += synthTokensToShift;
     } else {
       ILongShort(longShort).shiftPositionFromShortNextPrice(marketIndex, synthTokensToShift);
-      amountToShiftUser[marketIndex][msg.sender] = -int256(synthTokensToShift);
+      amountToShiftFromShortUser[marketIndex][msg.sender] += synthTokensToShift;
     }
 
     shiftIndex[marketIndex][msg.sender] = nextTokenShiftIndex[marketIndex];
