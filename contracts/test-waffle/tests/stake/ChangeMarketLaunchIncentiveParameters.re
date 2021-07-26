@@ -84,7 +84,7 @@ let test =
     };
 
     describe("passing transaction", () => {
-      before_once'(() => {setup(~initialMultiplier=initialMultiplierFine)});
+      before_each(() => {setup(~initialMultiplier=initialMultiplierFine)});
 
       it("mutates marketLaunchIncentivePeriod", () => {
         let%Await setPeriod =
