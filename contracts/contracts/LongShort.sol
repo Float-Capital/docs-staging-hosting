@@ -181,12 +181,11 @@ contract LongShort is ILongShort, Initializable {
     ╚═════════════════════════════╝*/
 
   /// @notice
-  /// @dev
-  /// @param _admin
-  /// @param _treasury
-  /// @param _tokenFactory
-  /// @param _staker
-  /// @return
+  /// @dev TODO TODO
+  /// @param _admin TODO
+  /// @param _treasury TODO
+  /// @param _tokenFactory TODO
+  /// @param _staker TODO
   function initialize(
     address _admin,
     address _treasury,
@@ -206,26 +205,23 @@ contract LongShort is ILongShort, Initializable {
     ╚═════════════════════════════╝*/
 
   /// @notice
-  /// @dev
-  /// @param _admin
-  /// @return
+  /// @dev TODO TODO
+  /// @param _admin TODO
   function changeAdmin(address _admin) external adminOnly {
     admin = _admin;
   }
 
   /// @notice
-  /// @dev
-  /// @param _treasury
-  /// @return
+  /// @dev TODO TODO
+  /// @param _treasury TODO
   function changeTreasury(address _treasury) external adminOnly {
     treasury = _treasury;
   }
 
   /// @notice Update oracle for a market
-  /// @dev
-  /// @param marketIndex
-  /// @param _newOracleManager
-  /// @return
+  /// @dev TODO
+  /// @param marketIndex TODO
+  /// @param _newOracleManager TODO
   function updateMarketOracle(uint32 marketIndex, address _newOracleManager) external adminOnly {
     // If not a oracle contract this would break things.. Test's arn't validating this
     // Ie require isOracle interface - ERC165
@@ -239,11 +235,11 @@ contract LongShort is ILongShort, Initializable {
     ╚═════════════════════════════╝*/
 
   /// @notice Creates an entirely new long/short market tracking an underlying oracle price. Make sure the synthetic names/symbols are unique.
-  /// @dev This does not make the market active. That `initializeMarket` function was split out separately to this function to reduce costs.
-  /// @param syntheticName Name of the synthetic asset
-  /// @param syntheticSymbol Symbol for the synthetic asset
-  /// @param _paymentToken The address of the erc20 token used to buy this synthetic asset
-  /// @param _oracleManager The address of the oracle manager that provides the price feed for this market
+  /// @dev This does not make the market active. That `initializeMarket` function was split out separately to this function to reduce costs. TODO
+  /// @param syntheticName Name of the synthetic asset TODO
+  /// @param syntheticSymbol Symbol for the synthetic asset TODO
+  /// @param _paymentToken The address of the erc20 token used to buy this synthetic asset TODO
+  /// @param _oracleManager The address of the oracle manager that provides the price feed for this market TODO
   /// @param _yieldManager The contract that manages depositing the paymentToken into a yield bearing protocol
   function newSyntheticMarket(
     string calldata syntheticName,
@@ -293,10 +289,9 @@ contract LongShort is ILongShort, Initializable {
   }
 
   /// @notice
-  /// @dev
-  /// @param initialMarketSeed
-  /// @param marketIndex
-  /// @return
+  /// @dev TODO TODO
+  /// @param initialMarketSeed TODO
+  /// @param marketIndex TODO
   function _seedMarketInitially(uint256 initialMarketSeed, uint32 marketIndex) internal virtual {
     require(
       // You require at least 10^17 of the underlying payment token to seed the market.
@@ -316,15 +311,14 @@ contract LongShort is ILongShort, Initializable {
   }
 
   /// @notice
-  /// @dev
-  /// @param marketIndex
-  /// @param kInitialMultiplier
-  /// @param kPeriod
-  /// @param unstakeFeeBasisPoints
-  /// @param initialMarketSeed
-  /// @param balanceIncentiveCurveExponent
-  /// @param balanceIncentiveCurveEquilibriumOffset
-  /// @return
+  /// @dev TODO TODO
+  /// @param marketIndex TODO
+  /// @param kInitialMultiplier TODO
+  /// @param kPeriod TODO
+  /// @param unstakeFeeBasisPoints TODO
+  /// @param initialMarketSeed TODO
+  /// @param balanceIncentiveCurveExponent TODO
+  /// @param balanceIncentiveCurveEquilibriumOffset TODO
   function initializeMarket(
     uint32 marketIndex,
     uint256 kInitialMultiplier,
@@ -359,10 +353,9 @@ contract LongShort is ILongShort, Initializable {
     ╚══════════════════════════════╝*/
 
   /// @notice
-  /// @dev
-  /// @param amountPaymentToken
-  /// @param amountSynthToken
-  /// @return
+  /// @dev TODO TODO
+  /// @param amountPaymentToken TODO
+  /// @param amountSynthToken TODO
   function _getSyntheticTokenPrice(uint256 amountPaymentToken, uint256 amountSynthToken)
     internal
     pure
@@ -373,10 +366,9 @@ contract LongShort is ILongShort, Initializable {
   }
 
   /// @notice
-  /// @dev
-  /// @param amountSynthToken
-  /// @param price
-  /// @return
+  /// @dev TODO TODO
+  /// @param amountSynthToken TODO
+  /// @param price TODO
   function _getAmountPaymentToken(uint256 amountSynthToken, uint256 price)
     internal
     pure
@@ -387,10 +379,9 @@ contract LongShort is ILongShort, Initializable {
   }
 
   /// @notice
-  /// @dev
-  /// @param amountPaymentToken
-  /// @param price
-  /// @return
+  /// @dev TODO TODO
+  /// @param amountPaymentToken TODO
+  /// @param price TODO
   function _getAmountSynthToken(uint256 amountPaymentToken, uint256 price)
     internal
     pure
@@ -401,12 +392,11 @@ contract LongShort is ILongShort, Initializable {
   }
 
   /// @notice
-  /// @dev
-  /// @param marketIndex
-  /// @param amountSynthTokenShifted
-  /// @param isShiftFromLong
-  /// @param priceSnapshotIndex
-  /// @return
+  /// @dev TODO TODO
+  /// @param marketIndex TODO
+  /// @param amountSynthTokenShifted TODO
+  /// @param isShiftFromLong TODO
+  /// @param priceSnapshotIndex TODO
   function getAmountSynthTokenShifted(
     uint32 marketIndex,
     uint256 amountSynthTokenShifted,
@@ -436,11 +426,10 @@ contract LongShort is ILongShort, Initializable {
     */
 
   /// @notice
-  /// @dev
-  /// @param user
-  /// @param marketIndex
-  /// @param isLong
-  /// @return
+  /// @dev TODO TODO
+  /// @param user TODO
+  /// @param marketIndex TODO
+  /// @param isLong TODO
   function getUsersConfirmedButNotSettledSynthBalance(
     address user,
     uint32 marketIndex,
@@ -496,10 +485,9 @@ contract LongShort is ILongShort, Initializable {
   }
 
   /// @notice Return the minimum of the 2 parameters. If they are equal return the first parameter.
-  /// @dev
-  /// @param a
-  /// @param b
-  /// @return
+  /// @dev TODO
+  /// @param a TODO
+  /// @param b TODO
   function _getMin(uint256 a, uint256 b) internal pure virtual returns (uint256) {
     if (a > b) {
       return b;
@@ -514,11 +502,10 @@ contract LongShort is ILongShort, Initializable {
    * proportion to how imbalanced the market is.
    */
   /// @notice
-  /// @dev
-  /// @param longValue
-  /// @param shortValue
-  /// @param totalValueLockedInMarket
-  /// @return
+  /// @dev TODO TODO
+  /// @param longValue TODO
+  /// @param shortValue TODO
+  /// @param totalValueLockedInMarket TODO
   function _getYieldSplit(
     uint256 longValue,
     uint256 shortValue,
@@ -548,11 +535,10 @@ contract LongShort is ILongShort, Initializable {
     ╚══════════════════════════════╝*/
 
   /// @notice
-  /// @dev
-  /// @param marketIndex
-  /// @param newAssetPrice
-  /// @param oldAssetPrice
-  /// @return
+  /// @dev TODO TODO
+  /// @param marketIndex TODO
+  /// @param newAssetPrice TODO
+  /// @param oldAssetPrice TODO
   function _claimAndDistributeYieldThenRebalanceMarket(
     uint32 marketIndex,
     int256 newAssetPrice,
@@ -605,9 +591,8 @@ contract LongShort is ILongShort, Initializable {
     ╚═══════════════════════════════╝*/
 
   /// @notice
-  /// @dev Updates the value of the long and short sides within the system.
-  /// @param marketIndex
-  /// @return
+  /// @dev Updates the value of the long and short sides within the system. TODO
+  /// @param marketIndex TODO
   function _updateSystemStateInternal(uint32 marketIndex)
     internal
     virtual
@@ -705,17 +690,15 @@ contract LongShort is ILongShort, Initializable {
   }
 
   /// @notice
-  /// @dev
-  /// @param marketIndex
-  /// @return
+  /// @dev TODO TODO
+  /// @param marketIndex TODO
   function updateSystemState(uint32 marketIndex) external override {
     _updateSystemStateInternal(marketIndex);
   }
 
   /// @notice
-  /// @dev
-  /// @param marketIndexes
-  /// @return
+  /// @dev TODO TODO
+  /// @param marketIndexes TODO
   function updateSystemStateMulti(uint32[] calldata marketIndexes) external override {
     for (uint256 i = 0; i < marketIndexes.length; i++) {
       _updateSystemStateInternal(marketIndexes[i]);
@@ -727,10 +710,9 @@ contract LongShort is ILongShort, Initializable {
     ╚════════════════════════════════╝*/
 
   /// @notice
-  /// @dev
-  /// @param marketIndex
-  /// @param amount
-  /// @return
+  /// @dev TODO TODO
+  /// @param marketIndex TODO
+  /// @param amount TODO
   function _depositFunds(uint32 marketIndex, uint256 amount) internal virtual {
     require(IERC20(paymentTokens[marketIndex]).transferFrom(msg.sender, address(this), amount));
   }
@@ -746,11 +728,10 @@ contract LongShort is ILongShort, Initializable {
     ╚═══════════════════════════╝*/
 
   /// @notice
-  /// @dev
-  /// @param marketIndex
-  /// @param amount
-  /// @param isLong
-  /// @return
+  /// @dev TODO TODO
+  /// @param marketIndex TODO
+  /// @param amount TODO
+  /// @param isLong TODO
   function _mintNextPrice(
     uint32 marketIndex,
     uint256 amount,
@@ -777,19 +758,17 @@ contract LongShort is ILongShort, Initializable {
   }
 
   /// @notice
-  /// @dev
-  /// @param marketIndex
-  /// @param amount
-  /// @return
+  /// @dev TODO TODO
+  /// @param marketIndex TODO
+  /// @param amount TODO
   function mintLongNextPrice(uint32 marketIndex, uint256 amount) external {
     _mintNextPrice(marketIndex, amount, true);
   }
 
   /// @notice
-  /// @dev
-  /// @param marketIndex
-  /// @param amount
-  /// @return
+  /// @dev TODO TODO
+  /// @param marketIndex TODO
+  /// @param amount TODO
   function mintShortNextPrice(uint32 marketIndex, uint256 amount) external {
     _mintNextPrice(marketIndex, amount, false);
   }
@@ -799,11 +778,10 @@ contract LongShort is ILongShort, Initializable {
     ╚═══════════════════════════╝*/
 
   /// @notice
-  /// @dev
-  /// @param marketIndex
-  /// @param tokensToRedeem
-  /// @param isLong
-  /// @return
+  /// @dev TODO TODO
+  /// @param marketIndex TODO
+  /// @param tokensToRedeem TODO
+  /// @param isLong TODO
   function _redeemNextPrice(
     uint32 marketIndex,
     uint256 tokensToRedeem,
@@ -837,19 +815,17 @@ contract LongShort is ILongShort, Initializable {
   }
 
   /// @notice
-  /// @dev
-  /// @param marketIndex
-  /// @param tokensToRedeem
-  /// @return
+  /// @dev TODO TODO
+  /// @param marketIndex TODO
+  /// @param tokensToRedeem TODO TODO
   function redeemLongNextPrice(uint32 marketIndex, uint256 tokensToRedeem) external {
     _redeemNextPrice(marketIndex, tokensToRedeem, true);
   }
 
   /// @notice
-  /// @dev
-  /// @param marketIndex
-  /// @param tokensToRedeem
-  /// @return
+  /// @dev TODO TODO
+  /// @param marketIndex TODO
+  /// @param tokensToRedeem TODO
   function redeemShortNextPrice(uint32 marketIndex, uint256 tokensToRedeem) external {
     _redeemNextPrice(marketIndex, tokensToRedeem, false);
   }
@@ -859,11 +835,10 @@ contract LongShort is ILongShort, Initializable {
     ╚═══════════════════════════╝*/
 
   /// @notice
-  /// @dev
-  /// @param marketIndex
-  /// @param synthTokensToShift
-  /// @param isShiftFromLong
-  /// @return
+  /// @dev TODO TODO
+  /// @param marketIndex TODO
+  /// @param synthTokensToShift TODO
+  /// @param isShiftFromLong TODO
   function _shiftPositionNextPrice(
     uint32 marketIndex,
     uint256 synthTokensToShift,
@@ -899,10 +874,9 @@ contract LongShort is ILongShort, Initializable {
   }
 
   /// @notice
-  /// @dev
-  /// @param marketIndex
-  /// @param synthTokensToShift
-  /// @return
+  /// @dev TODO TODO
+  /// @param marketIndex TODO
+  /// @param synthTokensToShift TODO
   function shiftPositionFromLongNextPrice(uint32 marketIndex, uint256 synthTokensToShift)
     external
     override
@@ -911,10 +885,9 @@ contract LongShort is ILongShort, Initializable {
   }
 
   /// @notice
-  /// @dev
-  /// @param marketIndex
-  /// @param synthTokensToShift
-  /// @return
+  /// @dev TODO TODO
+  /// @param marketIndex TODO
+  /// @param synthTokensToShift TODO
   function shiftPositionFromShortNextPrice(uint32 marketIndex, uint256 synthTokensToShift)
     external
     override
@@ -927,11 +900,10 @@ contract LongShort is ILongShort, Initializable {
     ╚════════════════════════════════╝*/
 
   /// @notice
-  /// @dev
-  /// @param marketIndex
-  /// @param user
-  /// @param isLong
-  /// @return
+  /// @dev TODO TODO
+  /// @param marketIndex TODO
+  /// @param user TODO
+  /// @param isLong TODO
   function _executeOutstandingNextPriceMints(
     uint32 marketIndex,
     address user,
@@ -955,11 +927,10 @@ contract LongShort is ILongShort, Initializable {
   }
 
   /// @notice
-  /// @dev
-  /// @param marketIndex
-  /// @param user
-  /// @param isLong
-  /// @return
+  /// @dev TODO TODO
+  /// @param marketIndex TODO
+  /// @param user TODO
+  /// @param isLong TODO
   function _executeOutstandingNextPriceRedeems(
     uint32 marketIndex,
     address user,
@@ -982,11 +953,10 @@ contract LongShort is ILongShort, Initializable {
   }
 
   /// @notice
-  /// @dev
-  /// @param marketIndex
-  /// @param user
-  /// @param isShiftFromLong
-  /// @return
+  /// @dev TODO TODO
+  /// @param marketIndex TODO
+  /// @param user TODO
+  /// @param isShiftFromLong TODO
   function _executeOutstandingNextPriceTokenShifts(
     uint32 marketIndex,
     address user,
@@ -1022,10 +992,9 @@ contract LongShort is ILongShort, Initializable {
   }
 
   /// @notice
-  /// @dev
-  /// @param user
-  /// @param marketIndex
-  /// @return
+  /// @dev TODO TODO
+  /// @param user TODO
+  /// @param marketIndex TODO
   function _executeOutstandingNextPriceSettlements(address user, uint32 marketIndex)
     internal
     virtual
@@ -1046,10 +1015,9 @@ contract LongShort is ILongShort, Initializable {
   }
 
   /// @notice
-  /// @dev
-  /// @param user
-  /// @param marketIndex
-  /// @return
+  /// @dev TODO TODO
+  /// @param user TODO
+  /// @param marketIndex TODO
   function executeOutstandingNextPriceSettlementsUser(address user, uint32 marketIndex)
     external
     override
@@ -1062,10 +1030,9 @@ contract LongShort is ILongShort, Initializable {
     ╚═══════════════════════════════════════════╝*/
 
   /// @notice
-  /// @dev
-  /// @param marketIndex
-  /// @param totalValueChangeForMarket
-  /// @return
+  /// @dev TODO TODO
+  /// @param marketIndex TODO
+  /// @param totalValueChangeForMarket TODO
   function _handleTotalValueChangeForMarketWithYieldManager(
     uint32 marketIndex,
     int256 totalValueChangeForMarket
@@ -1084,11 +1051,10 @@ contract LongShort is ILongShort, Initializable {
   }
 
   /// @notice
-  /// @dev
-  /// @param marketIndex
-  /// @param isLong
-  /// @param changeInSynthTokensTotalSupply
-  /// @return
+  /// @dev TODO TODO
+  /// @param marketIndex TODO
+  /// @param isLong TODO
+  /// @param changeInSynthTokensTotalSupply TODO
   function _handleChangeInSynthTokensTotalSupply(
     uint32 marketIndex,
     bool isLong,
