@@ -7,12 +7,28 @@ import "./interfaces/IStaker.sol";
 import "./interfaces/ILongShort.sol";
 import "./interfaces/ISyntheticToken.sol";
 
+/// @title SyntheticToken
+/// @notice
+/// @dev
 contract SyntheticToken is ISyntheticToken {
+  /// @notice
   address public longShort;
+  /// @notice
   address public staker;
+  /// @notice
   uint32 public marketIndex;
+  /// @notice
   bool public isLong;
 
+  /// @notice
+  /// @dev
+  /// @param name
+  /// @param symbol
+  /// @param _longShort
+  /// @param _staker
+  /// @param _marketIndex
+  /// @param _isLong
+  /// @return
   constructor(
     string memory name,
     string memory symbol,
@@ -27,11 +43,20 @@ contract SyntheticToken is ISyntheticToken {
     isLong = _isLong;
   }
 
+  /// @notice
+  /// @dev
+  /// @param account
+  /// @param amount
+  /// @return
   function _burn(address account, uint256 amount) internal override {
     require(msg.sender == address(longShort), "Only longSHORT contract");
     super._burn(account, amount);
   }
 
+  /// @notice
+  /// @dev
+  /// @param amount
+  /// @return
   function stake(uint256 amount) external override {
     // NOTE: this is safe, this function will throw "ERC20: transfer
     //       amount exceeds balance" if amount exceeds users balance.
@@ -44,10 +69,21 @@ contract SyntheticToken is ISyntheticToken {
     ║    FUNCTIONS INHERITED BY ERC20PresetMinterPauser    ║
     ╚══════════════════════════════════════════════════════╝*/
 
+  /// @notice
+  /// @dev
+  /// @param to
+  /// @param amount
+  /// @return
   function mint(address to, uint256 amount) public override {
     ERC20PresetMinterPauser.mint(to, amount);
   }
 
+  /// @notice
+  /// @dev
+  /// @param sender
+  /// @param recipient
+  /// @param amount
+  /// @return
   function transferFrom(
     address sender,
     address recipient,
@@ -63,6 +99,12 @@ contract SyntheticToken is ISyntheticToken {
     }
   }
 
+  /// @notice
+  /// @dev
+  /// @param sender
+  /// @param
+  /// @param
+  /// @return
   function _beforeTokenTransfer(
     address sender,
     address,

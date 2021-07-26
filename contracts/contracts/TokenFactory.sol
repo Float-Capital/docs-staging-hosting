@@ -6,26 +6,36 @@ import "./SyntheticToken.sol";
 import "./interfaces/ILongShort.sol";
 import "./interfaces/ITokenFactory.sol";
 
+/// @title TokenFactory
+/// @notice
+/// @dev
 contract TokenFactory is ITokenFactory {
   /*╔═══════════════════════════╗
     ║           STATE           ║
     ╚═══════════════════════════╝*/
+  /// @notice
   address public admin;
+  /// @notice
   address public longShort;
 
+  /// @notice
   bytes32 public constant DEFAULT_ADMIN_ROLE = keccak256("DEFAULT_ADMIN_ROLE");
+  /// @notice
   bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
+  /// @notice
   bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
 
   /*╔═══════════════════════════╗
     ║         MODIFIERS         ║
     ╚═══════════════════════════╝*/
 
+  /// @dev
   modifier adminOnly() {
     require(msg.sender == admin);
     _;
   }
 
+  /// @dev
   modifier onlyLongShort() {
     require(msg.sender == address(longShort));
     _;
@@ -35,6 +45,11 @@ contract TokenFactory is ITokenFactory {
     ║           SET-UP           ║
     ╚════════════════════════════╝*/
 
+  /// @notice
+  /// @dev
+  /// @param _admin
+  /// @param _longShort
+  /// @return
   constructor(address _admin, address _longShort) {
     admin = _admin;
     longShort = _longShort;
@@ -44,10 +59,18 @@ contract TokenFactory is ITokenFactory {
     ║    MULTISIG ADMIN FUNCTIONS    ║
     ╚════════════════════════════════╝*/
 
+  /// @notice
+  /// @dev
+  /// @param _admin
+  /// @return
   function changeAdmin(address _admin) external adminOnly {
     admin = _admin;
   }
 
+  /// @notice
+  /// @dev
+  /// @param _longShort
+  /// @return
   function changeFloatAddress(address _longShort) external adminOnly {
     longShort = _longShort;
   }
@@ -56,6 +79,10 @@ contract TokenFactory is ITokenFactory {
     ║       TOKEN CREATION       ║
     ╚════════════════════════════╝*/
 
+  /// @notice
+  /// @dev
+  /// @param tokenContract
+  /// @return
   function setupPermissions(address tokenContract) internal {
     // Give minter roles
     SyntheticToken(tokenContract).grantRole(DEFAULT_ADMIN_ROLE, longShort);
@@ -68,6 +95,13 @@ contract TokenFactory is ITokenFactory {
     SyntheticToken(tokenContract).revokeRole(PAUSER_ROLE, address(this));
   }
 
+  /// @notice
+  /// @dev
+  /// @param syntheticName
+  /// @param syntheticSymbol
+  /// @param staker
+  /// @param marketIndex
+  /// @return
   function createTokenLong(
     string calldata syntheticName,
     string calldata syntheticSymbol,
@@ -88,6 +122,13 @@ contract TokenFactory is ITokenFactory {
     setupPermissions(syntheticToken);
   }
 
+  /// @notice
+  /// @dev
+  /// @param syntheticName
+  /// @param syntheticSymbol
+  /// @param staker
+  /// @param marketIndex
+  /// @return
   function createTokenShort(
     string calldata syntheticName,
     string calldata syntheticSymbol,
