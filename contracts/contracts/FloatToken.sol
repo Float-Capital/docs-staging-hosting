@@ -15,7 +15,16 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/presets/ERC20PresetMinte
 
 import "./interfaces/IFloatToken.sol";
 
+/// @title FloatToken
+/// @notice
+/// @dev
 contract FloatToken is IFloatToken, ERC20PresetMinterPauserUpgradeable {
+  /// @notice
+  /// @dev
+  /// @param name
+  /// @param symbol
+  /// @param stakerAddress
+  /// @return
   function initialize3(
     string calldata name,
     string calldata symbol,
@@ -36,6 +45,11 @@ contract FloatToken is IFloatToken, ERC20PresetMinterPauserUpgradeable {
     ║    FUNCTIONS INHERITED BY ERC20PresetMinterPauserUpgradeable      ║
     ╚═══════════════════════════════════════════════════════════════════╝*/
 
+  /// @notice
+  /// @dev
+  /// @param to
+  /// @param amount
+  /// @return
   function mint(address to, uint256 amount)
     public
     override(IFloatToken, ERC20PresetMinterPauserUpgradeable)
