@@ -196,6 +196,7 @@ describe("Float System", () => {
     PriceCalculationFunctions.testUnit(~contracts, ~accounts);
     BatchedSettlement.testUnit(~contracts, ~accounts);
     MintNextPrice.testUnit(~contracts, ~accounts);
+    ShiftNextPrice.testUnit(~contracts, ~accounts);
     ExecuteNextPriceAction.testUnit(~contracts, ~accounts);
     ExecuteOutstandingNextPriceSettlements.testUnit(~contracts, ~accounts);
   });

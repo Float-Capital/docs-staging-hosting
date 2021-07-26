@@ -743,7 +743,7 @@ contract LongShort is ILongShort, Initializable {
   function _shiftPositionNextPrice(
     uint32 marketIndex,
     uint256 synthTokensToShift,
-    bool isLong
+    bool isShiftFromLong
   )
     internal
     virtual
@@ -751,23 +751,23 @@ contract LongShort is ILongShort, Initializable {
     executeOutstandingNextPriceSettlements(msg.sender, marketIndex)
   {
     require(
-      ISyntheticToken(syntheticTokens[marketIndex][isLong]).transferFrom(
+      ISyntheticToken(syntheticTokens[marketIndex][isShiftFromLong]).transferFrom(
         msg.sender,
         address(this),
         synthTokensToShift
       )
     );
 
-    userNextPrice_amountSynthToShiftFromMarketSide[marketIndex][isLong][
+    userNextPrice_amountSynthToShiftFromMarketSide[marketIndex][isShiftFromLong][
       msg.sender
     ] += synthTokensToShift;
     userCurrentNextPriceUpdateIndex[marketIndex][msg.sender] = marketUpdateIndex[marketIndex] + 1;
 
-    batchedAmountOfSynthTokensToShiftMarketSide[marketIndex][isLong] += synthTokensToShift;
+    batchedAmountOfSynthTokensToShiftMarketSide[marketIndex][isShiftFromLong] += synthTokensToShift;
 
     emit NextPriceSyntheticPositionShift(
       marketIndex,
-      isLong,
+      isShiftFromLong,
       synthTokensToShift,
       msg.sender,
       marketUpdateIndex[marketIndex] + 1
