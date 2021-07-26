@@ -129,6 +129,14 @@ describe("Float System", () => {
 
     // TESTS THAT MAY TEST MULTIPLE THINGS PER DEPLOYMENT
     describe("", () => {
+      before_once'(() => {
+      let%Await deployedContracts =
+        Helpers.initialize(
+        ~admin=accounts.contents->Array.getUnsafe(0),
+        ~exposeInternals=true,
+      );
+      contracts := deployedContracts;
+    });
       ChangeMarketLaunchIncentiveParameters.test(~contracts, ~accounts);
       AddNewStakingFund.test(~contracts, ~accounts);
       GetKValue.test(~contracts, ~accounts);
