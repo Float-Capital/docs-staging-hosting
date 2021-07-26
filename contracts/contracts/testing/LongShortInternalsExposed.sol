@@ -154,6 +154,16 @@ contract LongShortInternalsExposed is LongShortMockable {
     marketUpdateIndex[marketIndex] = _marketUpdateIndex;
   }
 
+  function setRedeemNextPriceGlobals(
+    uint32 marketIndex,
+    uint256 _marketUpdateIndex,
+    address syntheticToken,
+    bool isLong
+  ) external {
+    marketUpdateIndex[marketIndex] = _marketUpdateIndex;
+    syntheticTokens[marketIndex][isLong] = syntheticToken;
+  }
+
   function setShiftNextPriceGlobals(
     uint32 marketIndex,
     uint256 _marketUpdateIndex,
