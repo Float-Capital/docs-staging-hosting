@@ -19,7 +19,8 @@ html {
       rgba(255, 255, 255, 0.3)
     ),
     url("/backgrounds/island.png");
-  @apply font-default min-h-screen w-screen bg-right-top bg-cover bg-gray-50;
+  @apply font-default min-h-screen w-screen bg-right-top
+    bg-cover bg-gray-50;
 }
 
 .purple-moon {

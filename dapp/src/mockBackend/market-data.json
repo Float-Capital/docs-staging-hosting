@@ -1,14 +1,17 @@
 [
 {    
     "name": "EthKillers",
-    "description": "EthKillers is an index comprised of TRON, XRP and EOS. This market is an average of the prices of the tokens of the three protocols seen as alternatives to ethereum. The EthKillers market allows users to gain long or short exposure to an equally weighted basket containing TRON, XRP and EOS." 
+    "description": "EthKillers is an index comprised of TRON, XRP and EOS. This market is an average of the prices of the tokens of the three protocols seen as alternatives to ethereum. The EthKillers market allows users to gain long or short exposure to an equally weighted basket containing TRON, XRP and EOS.",
+    "oracleHeartbeat": 70
 },
 {    
     "name": "The Flippening",
-    "description": "The flippening represents a market between ethereum's market cap in relation to bitcoins market cap. Eth/BTC Dominance" 
+    "description": "The flippening represents a market between ethereum's market cap in relation to bitcoins market cap. Eth/BTC Dominance",
+    "oracleHeartbeat": 70
 },
 {    
     "name": "Doge",
-    "description": "Doge coin is a meme coin market originally created as a joke by engineers Billy Markus and Jackson Palmer. Dogecoin is primarily used as a tipping system on Reddit and Twitter where users tip each other for creating or sharing good content." 
+    "description": "Doge coin is a meme coin market originally created as a joke by engineers Billy Markus and Jackson Palmer. Dogecoin is primarily used as a tipping system on Reddit and Twitter where users tip each other for creating or sharing good content." ,
+    "oracleHeartbeat": 70
 }
 ]

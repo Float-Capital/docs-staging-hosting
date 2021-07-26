@@ -20,6 +20,7 @@ function AmountInput(Props) {
             }, React.createElement("input", {
                   className: "py-2 font-normal text-grey-darkest w-full py-1 px-2 outline-none text-md text-gray-600",
                   id: "amount",
+                  autoComplete: "off",
                   disabled: disabled,
                   placeholder: "0.0",
                   type: "text",

@@ -9,7 +9,8 @@ var marketsInfoData = (require('./market-data.json'));
 function getMarketInfoUnsafe(index) {
   return Belt_Option.getWithDefault(Belt_Array.get(marketsInfoData, index - 1 | 0), {
               name: "",
-              description: ""
+              description: "",
+              oracleHeartbeat: 300
             });
 }
 

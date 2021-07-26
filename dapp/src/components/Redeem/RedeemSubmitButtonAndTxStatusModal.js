@@ -8,14 +8,56 @@ var React = require("react");
 var Button = require("../UI/Base/Button.js");
 var Config = require("../../config/Config.js");
 var Loader = require("../UI/Base/Loader.js");
+var Backend = require("../../mockBackend/Backend.js");
+var Withdraw = require("../Withdraw/Withdraw.js");
+var DataHooks = require("../../data/DataHooks.js");
+var ProgressBar = require("../UI/Base/ProgressBar.js");
+var ViewProfileButton = require("../UI/ViewProfileButton.js");
 var MessageUsOnDiscord = require("../Ethereum/MessageUsOnDiscord.js");
 var ViewOnBlockExplorer = require("../Ethereum/ViewOnBlockExplorer.js");
+
+function RedeemSubmitButtonAndTxStatusModal$ConfirmedTransactionModal(Props) {
+  var marketIndex = Props.marketIndex;
+  var lastOracleTimestamp = DataHooks.useOracleLastUpdate(marketIndex.toString());
+  var match = React.useState(function () {
+        return false;
+      });
+  var oracleHeartBeat = Backend.getMarketInfoUnsafe(marketIndex.toNumber()).oracleHeartbeat;
+  var match$1 = React.useState(function () {
+        return Date.now() / 1000;
+      });
+  var tmp;
+  tmp = typeof lastOracleTimestamp === "number" ? React.createElement(Loader.Tiny.make, {}) : (
+      lastOracleTimestamp.TAG === /* GraphError */0 ? React.createElement("p", undefined, lastOracleTimestamp._0) : (
+          match[0] ? React.createElement(Withdraw.make, {
+                  marketIndex: marketIndex
+                }) : React.createElement(ProgressBar.make, {
+                  txConfirmedTimestamp: match$1[0] | 0,
+                  nextPriceUpdateTimestamp: lastOracleTimestamp._0.toNumber() + oracleHeartBeat | 0,
+                  setTimerFinished: match[1]
+                })
+        )
+    );
+  return React.createElement(React.Fragment, undefined, React.createElement(Modal.make, {
+                  id: 8,
+                  children: React.createElement("div", {
+                        className: "text-center m-3"
+                      }, React.createElement(Tick.make, {}), React.createElement("p", undefined, "Transaction complete 🎉"), React.createElement("p", {
+                            className: "text-xxs text-gray-700"
+                          }, "You can withdraw your " + Config.paymentTokenName + " on the next oracle price update"), tmp, React.createElement(ViewProfileButton.make, {}))
+                }));
+}
+
+var ConfirmedTransactionModal = {
+  make: RedeemSubmitButtonAndTxStatusModal$ConfirmedTransactionModal
+};
 
 function RedeemSubmitButtonAndTxStatusModal(Props) {
   var txStateRedeem = Props.txStateRedeem;
   var resetFormButton = Props.resetFormButton;
   var buttonText = Props.buttonText;
   var buttonDisabled = Props.buttonDisabled;
+  var marketIndex = Props.marketIndex;
   if (typeof txStateRedeem === "number") {
     if (txStateRedeem === /* UnInitialised */0) {
       return React.createElement(Button.make, {
@@ -48,7 +90,9 @@ function RedeemSubmitButtonAndTxStatusModal(Props) {
                               className: "text-center m-3"
                             }, React.createElement("div", {
                                   className: "m-2"
-                                }, React.createElement(Loader.Mini.make, {})), React.createElement("p", undefined, "Redeem transaction pending... "), React.createElement(ViewOnBlockExplorer.make, {
+                                }, React.createElement(Loader.Mini.make, {})), React.createElement("p", undefined, "Redeem transaction pending... "), React.createElement("p", {
+                                  className: "text-xxs text-yellow-600"
+                                }, "⚡ Redeeming your position requires a second withdraw transaction once the oracle price has updated ⚡"), React.createElement(ViewOnBlockExplorer.make, {
                                   txHash: txStateRedeem._0
                                 }))
                       }), React.createElement(Button.make, {
@@ -66,12 +110,9 @@ function RedeemSubmitButtonAndTxStatusModal(Props) {
                             }, React.createElement("p", undefined, "The transaction was rejected by your wallet"), React.createElement(MessageUsOnDiscord.make, {}))
                       }), Curry._1(resetFormButton, undefined));
     case /* Complete */2 :
-        return React.createElement(React.Fragment, undefined, React.createElement(Modal.make, {
-                        id: 8,
-                        children: React.createElement("div", {
-                              className: "text-center m-3"
-                            }, React.createElement(Tick.make, {}), React.createElement("p", undefined, "Transaction complete 🎉"))
-                      }), Curry._1(resetFormButton, undefined));
+        return React.createElement(RedeemSubmitButtonAndTxStatusModal$ConfirmedTransactionModal, {
+                    marketIndex: marketIndex
+                  });
     case /* Failed */3 :
         return React.createElement(React.Fragment, undefined, React.createElement(Modal.make, {
                         id: 10,
@@ -87,5 +128,6 @@ function RedeemSubmitButtonAndTxStatusModal(Props) {
 
 var make = RedeemSubmitButtonAndTxStatusModal;
 
+exports.ConfirmedTransactionModal = ConfirmedTransactionModal;
 exports.make = make;
 /* Tick Not a pure module */

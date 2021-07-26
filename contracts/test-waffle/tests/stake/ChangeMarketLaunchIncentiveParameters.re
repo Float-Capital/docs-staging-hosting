@@ -13,24 +13,27 @@ let test =
 
   describe("changeMarketLaunchIncentiveParameters (external)", () => {
     let initialMultiplier = Helpers.randomInteger();
-    before_once'(() => {
+
+    let setup = () => {
       let%AwaitThen _ =
-        deployAndSetupStakerToUnitTest(
-          ~functionName="changeMarketLaunchIncentiveParameters",
-          ~contracts,
-          ~accounts,
-        );
+        contracts^.staker->StakerSmocked.InternalMock.setup;
+
+      let%AwaitThen _ =
+        contracts^.staker->StakerSmocked.InternalMock.setupFunctionForUnitTesting(
+        ~functionName="changeMarketLaunchIncentiveParameters",
+      );
+
       StakerSmocked.InternalMock.mock_changeMarketLaunchIncentiveParametersToReturn();
 
-      let%Await _ =
-        contracts^.staker
-        ->Staker.Exposed.changeMarketLaunchIncentiveParameters(
-            ~marketIndex,
-            ~period,
-            ~initialMultiplier,
-          );
-      ();
-    });
+      contracts^.staker
+      ->Staker.Exposed.changeMarketLaunchIncentiveParameters(
+          ~marketIndex,
+          ~period,
+          ~initialMultiplier,
+        );
+    };
+
+    before_each(() => setup());
 
     it_skip("calls the onlyAdminModifier", () => {
       // StakerSmocked.InternalMock.onlyAdminCalls()
@@ -41,9 +44,19 @@ let test =
 
     it(
       "calls _changeMarketLaunchIncentiveParameters with correct arguments", () => {
+
       StakerSmocked.InternalMock._changeMarketLaunchIncentiveParametersCalls()
       ->Array.getUnsafe(0)
       ->Chai.recordEqualFlat({marketIndex, period, initialMultiplier})
+    });
+
+    it("emits MarketLaunchIncentiveParametersChanges event", () => {
+      Chai.callEmitEvents(
+        ~call=setup(),
+        ~contract=contracts^.staker->Obj.magic,
+        ~eventName="MarketLaunchIncentiveParametersChanges",
+      )
+      ->Chai.withArgs3(marketIndex, period, initialMultiplier)
     });
   });
 
@@ -63,7 +76,7 @@ let test =
       let {staker} = deployedContracts;
       contracts := deployedContracts;
       changeMarketLaunchIncentiveParametersCall :=
-        staker->Staker.Exposed.changeMarketLaunchIncentiveParameters(
+        staker->Staker.Exposed._changeMarketLaunchIncentiveParametersExposed(
           ~marketIndex,
           ~period,
           ~initialMultiplier,
@@ -71,7 +84,7 @@ let test =
     };
 
     describe("passing transaction", () => {
-      before_once'(() => {setup(~initialMultiplier=initialMultiplierFine)});
+      before_each(() => {setup(~initialMultiplier=initialMultiplierFine)});
 
       it("mutates marketLaunchIncentivePeriod", () => {
         let%Await setPeriod =
@@ -86,15 +99,6 @@ let test =
           ->Staker.marketLaunchIncentiveMultipliers(marketIndex);
 
         initialMultiplierFine->Chai.bnEqual(setMultiplier);
-      });
-
-      it("emits MarketLaunchIncentiveParametersChanges event", () => {
-        Chai.callEmitEvents(
-          ~call=changeMarketLaunchIncentiveParametersCall^,
-          ~contract=contracts^.staker->Obj.magic,
-          ~eventName="MarketLaunchIncentiveParametersChanges",
-        )
-        ->Chai.withArgs3(marketIndex, period, initialMultiplierFine)
       });
     });
 

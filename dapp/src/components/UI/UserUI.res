@@ -11,7 +11,7 @@ module UserContainer = {
 
 module UserTotalValue = {
   @react.component
-  let make = (~totalValueNameSup, ~totalValueNameSub, ~totalValue) => {
+  let make = (~totalValueNameSup, ~totalValueNameSub, ~totalValue, ~tokenIconUrl=None) => {
     let isABaller = totalValue->Ethers.BigNumber.gte(CONSTANTS.oneHundredThousandInWei) // in the 100 000+ range
     let isAWhale = totalValue->Ethers.BigNumber.gte(CONSTANTS.oneMillionInWei) // in the 1 000 000+ range
     let shouldBeSmallerText = isABaller
@@ -23,10 +23,17 @@ module UserTotalValue = {
         <span className=`text-lg font-bold leading-tight`> {totalValueNameSub->React.string} </span>
       </div>
       <div>
-        <span className={`${shouldBeSmallerText ? "text-xl" : "text-2xl"} text-primary`}>
+        <span
+          className={`flex flex-row items-center  ${shouldBeSmallerText
+              ? "text-xl"
+              : "text-2xl"} text-primary`}>
           {`$${totalValue->Misc.NumberFormat.formatEther(
               ~digits={shouldntHaveDecimals ? 1 : 2},
             )}`->React.string}
+          {switch tokenIconUrl {
+          | Some(iconUrl) => <img src={iconUrl} className="h-6 pr-1" />
+          | None => React.null
+          }}
         </span>
       </div>
     </div>
@@ -70,7 +77,7 @@ module UserProfileHeader = {
   let make = (~address: string) => {
     <div className="w-full flex flex-row justify-around">
       <div
-        className="w-24 h-24 rounded-full border-2 border-light-purple flex items-center justify-center">
+        className="w-20 h-20 rounded-full border-2 border-light-purple flex items-center justify-center">
         <img className="inline h-10 rounded" src={Blockies.makeBlockie(address)} />
       </div>
     </div>
@@ -96,7 +103,7 @@ module UserColumnText = {
   let make = (~icon=?, ~head, ~body=``) => {
     <div className=`mb-1`>
       {switch icon {
-      | Some(path) => <img className=`inline mr-1 h-5` src={path} />
+      | Some(path) => <img className=`inline mr-2 h-4` src={path} />
       | None => ""->React.string
       }}
       <span className=`text-sm`> {`${head}: `->React.string} </span>
@@ -331,13 +338,15 @@ module UserPendingBox = {
     ~daiSpend,
     ~txConfirmedTimestamp,
     ~marketIndex,
-    ~rerenderCallback,
+    ~setTimerFinished,
   ) => {
     let lastOracleTimestamp = DataHooks.useOracleLastUpdate(
       ~marketIndex=marketIndex->Ethers.BigNumber.toString,
     )
 
-    let oracleHeartbeatForMarket = 60 //TODO
+    let oracleHeartbeatForMarket = Backend.getMarketInfoUnsafe(
+      marketIndex->Ethers.BigNumber.toNumber,
+    ).oracleHeartbeat
 
     switch lastOracleTimestamp {
     | Response(lastOracleUpdateTimestamp) =>
@@ -355,7 +364,7 @@ module UserPendingBox = {
           txConfirmedTimestamp
           nextPriceUpdateTimestamp={lastOracleUpdateTimestamp->Ethers.BigNumber.toNumber +
             oracleHeartbeatForMarket}
-          rerenderCallback
+          setTimerFinished
         />
       </div>
     | GraphError(error) => <p> {error->React.string} </p>

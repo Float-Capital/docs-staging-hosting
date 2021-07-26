@@ -152,6 +152,31 @@ const mintShortNextPriceWithSystemUpdate = async (
   await longShort.updateSystemState(marketIndex);
 };
 
+const redeemShortNextPriceWithSystemUpdate = async (
+  amount,
+  marketIndex,
+  longShort,
+  user,
+  oracleManager,
+  network
+) => {
+  await longShort.redeemShortNextPrice(
+    marketIndex,
+    new BN(amount).div(new BN(2)), // make sure token prices don't mess with it
+    {
+      from: user,
+    }
+  );
+
+  if (network != "mumbai") {
+    const currentPrice = await oracleManager.getLatestPrice();
+    const nextPrice = currentPrice.mul(new BN(101)).div(new BN(100));
+    await oracleManager.setPrice(nextPrice);
+  }
+
+  await longShort.updateSystemState(marketIndex);
+};
+
 const stakeSynth = async (amount, synth, user) => {
   const usersSynthTokenBalance = new BN(await synth.balanceOf(user));
   if (usersSynthTokenBalance.gt(new BN("0"))) {
@@ -372,6 +397,18 @@ module.exports = async function (deployer, network, accounts) {
       oracleManager,
       network
     );
+
+    if (network != "mumbai") {
+      // if not using oracle manager mock no guarantee they have tokens
+      // to redeem
+      await redeemShortNextPriceWithSystemUpdate(
+        halfTokensMinted,
+        marketIndex,
+        longShort,
+        user3,
+        oracleManager
+      );
+    }
 
     // Increase mock oracle price from 1 (default) to 1.1.
     if (network != "mumbai") {

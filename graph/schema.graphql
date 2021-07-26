@@ -82,7 +82,7 @@ type BatchedNextPriceExec @entity {
 
 enum NextPriceAction {
   Mint
-  Withdraw
+  Redeem
 }
 type UserNextPriceActionComponent @entity {
   id: ID! # actionComponent-<userAddress>-<marketIndex>-<update-index>-<type>-<index-of-type> // the index-of-type is for the case that multiple actions of the same type occur
