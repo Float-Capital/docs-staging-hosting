@@ -18,7 +18,9 @@ describe("Float System", () => {
       let longShortAddress = Ethers.Wallet.createRandom().address;
       let fundTokenAddress = Ethers.Wallet.createRandom().address;
 
-      let lendingPoolAddress = Ethers.Wallet.createRandom().address;
+      let%Await lendingPoolMock = LendingPoolAaveMock.make();
+      let%Await lendingPoolSmocked =
+        LendingPoolAaveMockSmocked.make(lendingPoolMock);
 
       let%Await paymentTokenMock =
         ERC20Mock.make(~name="Payment Token Mock", ~symbol="PaymentToken");
@@ -34,7 +36,7 @@ describe("Float System", () => {
           ~treasury=treasury.address,
           ~paymentToken=paymentTokenSmocked.address,
           ~aToken=fundTokenAddress,
-          ~lendingPool=lendingPoolAddress,
+          ~lendingPool=lendingPoolSmocked.address,
           ~aaveReferalCode=6543,
         );
 
