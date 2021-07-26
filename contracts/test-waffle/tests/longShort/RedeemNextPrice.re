@@ -144,7 +144,62 @@ let testUnit =
       ~contracts: ref(Helpers.coreContracts),
       ~accounts: ref(array(Ethers.Wallet.t)),
     ) => {
-  describe("redeemNextPrice", () => {
+  describe("redeemNextPrice external functions", () => {
+    let marketIndex = 1;
+    let tokensToRedeem = Helpers.randomTokenAmount();
+
+    let setup = () => {
+      contracts.contents.longShort->LongShortSmocked.InternalMock.setup;
+    };
+
+    describe("redeemLongNextPrice", () => {
+      it("calls _redeemNextPrice with isLong==true", () => {
+        let%Await _ = setup();
+
+        let%Await _ =
+          contracts.contents.longShort
+          ->LongShortSmocked.InternalMock.setupFunctionForUnitTesting(
+              ~functionName="redeemLongNextPrice",
+            );
+
+        let%Await _ =
+          contracts.contents.longShort
+          ->LongShort.redeemLongNextPrice(~marketIndex, ~tokensToRedeem);
+
+        let redeemNextPriceCalls =
+          LongShortSmocked.InternalMock._redeemNextPriceCalls();
+
+        redeemNextPriceCalls->Chai.recordArrayDeepEqualFlat([|
+          {marketIndex, tokensToRedeem, isLong: true},
+        |]);
+      })
+    });
+
+    describe("redeemShortNextPrice", () => {
+      it("calls _redeemNextPrice with isLong==false", () => {
+        let%Await _ = setup();
+
+        let%Await _ =
+          contracts.contents.longShort
+          ->LongShortSmocked.InternalMock.setupFunctionForUnitTesting(
+              ~functionName="redeemShortNextPrice",
+            );
+
+        let%Await _ =
+          contracts.contents.longShort
+          ->LongShort.redeemShortNextPrice(~marketIndex, ~tokensToRedeem);
+
+        let redeemNextPriceCalls =
+          LongShortSmocked.InternalMock._redeemNextPriceCalls();
+
+        redeemNextPriceCalls->Chai.recordArrayDeepEqualFlat([|
+          {marketIndex, tokensToRedeem, isLong: false},
+        |]);
+      })
+    });
+  });
+
+  describe("redeemNextPrice internal function", () => {
     let marketIndex = 1;
     let marketUpdateIndex = Helpers.randomInteger();
     let amount = Helpers.randomTokenAmount();
@@ -242,10 +297,7 @@ let testUnit =
 
         let%AwaitThen updatedBatchedAmountOfSynthTokensToRedeem =
           contracts.contents.longShort
-        ->LongShort.batchedAmountOfSynthTokensToRedeem(
-              marketIndex,
-              isLong,
-            );
+          ->LongShort.batchedAmountOfSynthTokensToRedeem(marketIndex, isLong);
 
         let%AwaitThen updatedUserNextPriceRedemptionAmount =
           contracts.contents.longShort
