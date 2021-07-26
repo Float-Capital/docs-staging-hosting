@@ -138,3 +138,155 @@ let testIntegration =
     runLazyRedeemTest(~isLong=true);
     runLazyRedeemTest(~isLong=false);
   });
+
+let testUnit =
+    (
+      ~contracts: ref(Helpers.coreContracts),
+      ~accounts: ref(array(Ethers.Wallet.t)),
+    ) => {
+  describe("redeemNextPrice", () => {
+    let marketIndex = 1;
+    let marketUpdateIndex = Helpers.randomInteger();
+    let amount = Helpers.randomTokenAmount();
+    let smockedSynthToken = ref(SyntheticTokenSmocked.uninitializedValue);
+
+    let setup = (~isLong, ~testWallet: Ethers.walletType) => {
+      let {longSynth} = contracts.contents.markets->Array.getUnsafe(0);
+      let%AwaitThen longSynthSmocked = longSynth->SyntheticTokenSmocked.make;
+      longSynthSmocked->SyntheticTokenSmocked.mockTransferFromToReturn(true);
+      smockedSynthToken := longSynthSmocked;
+
+      let%AwaitThen _ =
+        contracts.contents.longShort->LongShortSmocked.InternalMock.setup;
+
+      let%AwaitThen _ =
+        contracts.contents.longShort
+        ->LongShortSmocked.InternalMock.setupFunctionForUnitTesting(
+            ~functionName="_redeemNextPrice",
+          );
+
+      let%AwaitThen _ =
+        contracts.contents.longShort
+        ->LongShort.Exposed.setRedeemNextPriceGlobals(
+            ~marketIndex,
+            ~marketUpdateIndex,
+            ~syntheticToken=longSynthSmocked.address,
+            ~isLong,
+          );
+
+      let longShort =
+        contracts.contents.longShort
+        ->ContractHelpers.connect(~address=testWallet);
+
+      longShort->LongShort.Exposed._redeemNextPriceExposed(
+        ~marketIndex,
+        ~tokensToRedeem=amount,
+        ~isLong,
+      );
+    };
+
+    let testMarketSide = (~isLong) => {
+      it("calls the executeOutstandingNextPriceSettlements modifier", () => {
+        let testWallet = accounts.contents->Array.getUnsafe(1);
+
+        let%Await _ = setup(~isLong, ~testWallet);
+
+        let executeOutstandingNextPriceSettlementsCalls =
+          LongShortSmocked.InternalMock._executeOutstandingNextPriceSettlementsCalls();
+
+        executeOutstandingNextPriceSettlementsCalls->Chai.recordArrayDeepEqualFlat([|
+          {user: testWallet.address, marketIndex},
+        |]);
+      });
+
+      it("emits the NextPriceRedeem event", () => {
+        let testWallet = accounts.contents->Array.getUnsafe(1);
+
+        Chai.callEmitEvents(
+          ~call=setup(~isLong, ~testWallet),
+          ~eventName="NextPriceRedeem",
+          ~contract=contracts.contents.longShort->Obj.magic,
+        )
+        ->Chai.withArgs5(
+            marketIndex,
+            isLong,
+            amount,
+            testWallet.address,
+            marketUpdateIndex->add(oneBn),
+          );
+      });
+
+      it(
+        "transfers synthetic tokens (calls transferFrom with the correct parameters)",
+        () => {
+        let testWallet = accounts.contents->Array.getUnsafe(1);
+
+        let%Await _ = setup(~isLong, ~testWallet);
+
+        let transferFromCalls =
+          smockedSynthToken.contents->SyntheticTokenSmocked.transferFromCalls;
+
+        transferFromCalls->Chai.recordArrayDeepEqualFlat([|
+          {
+            sender: testWallet.address,
+            recipient: contracts.contents.longShort.address,
+            amount,
+          },
+        |]);
+      });
+
+      it("updates the correct state variables with correct values", () => {
+        let testWallet = accounts.contents->Array.getUnsafe(1);
+
+        let%AwaitThen _ = setup(~isLong, ~testWallet);
+
+        let%AwaitThen updatedBatchedAmountOfSynthTokensToRedeem =
+          contracts.contents.longShort
+        ->LongShort.batchedAmountOfSynthTokensToRedeem(
+              marketIndex,
+              isLong,
+            );
+
+        let%AwaitThen updatedUserNextPriceRedemptionAmount =
+          contracts.contents.longShort
+          ->LongShort.userNextPriceRedemptionAmount(
+              marketIndex,
+              isLong,
+              testWallet.address,
+            );
+
+        let%Await updatedUserCurrentNextPriceUpdateIndex =
+          contracts.contents.longShort
+          ->LongShort.userCurrentNextPriceUpdateIndex(
+              marketIndex,
+              testWallet.address,
+            );
+
+        Chai.bnEqual(
+          ~message="batchedAmountOfSynthTokensToRedeem not updated correctly",
+          updatedBatchedAmountOfSynthTokensToRedeem,
+          amount,
+        );
+
+        Chai.bnEqual(
+          ~message="userNextPriceRedemptionAmount not updated correctly",
+          updatedUserNextPriceRedemptionAmount,
+          amount,
+        );
+
+        Chai.bnEqual(
+          ~message="userCurrentNextPriceUpdateIndex not updated correctly",
+          updatedUserCurrentNextPriceUpdateIndex,
+          marketUpdateIndex->add(oneBn),
+        );
+      });
+    };
+
+    describe("long", () => {
+      testMarketSide(~isLong=true)
+    });
+    describe("short", () => {
+      testMarketSide(~isLong=false)
+    });
+  });
+};
