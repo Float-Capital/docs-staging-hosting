@@ -75,7 +75,7 @@ let test =
     let testHelper = (~longPrice, ~shortPrice, ~longValue, ~shortValue) => {
       let totalLocked = longValue->add(shortValue);
 
-      let requiredBitShifting = bnFromInt(51);
+      let requiredBitShifting = bnFromInt(52);
 
       let%Await result =
         contracts^.staker

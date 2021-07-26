@@ -19,6 +19,7 @@ contract Staker is IStaker, Initializable {
   uint256 public constant FLOAT_ISSUANCE_FIXED_DECIMAL = 1e42;
   // 2^52 ~= 4.5e15
   // With an exponent of 5, the largest total liquidity possible in market (to avoid integer overflow on exponentiation) is ~10^31 or 10 Trillion (10^13)
+  // NOTE: this also means if the total market value is less than 2^52 there will be a division by zero error
   uint256 public constant safeExponentBitShifting = 52;
 
   // Global state
@@ -405,9 +406,10 @@ contract Staker is IStaker, Initializable {
         (safeExponentBitShifting - 1))**balanceIncentiveCurveExponent[marketIndex];
 
       uint256 denominator = ((totalLocked >> safeExponentBitShifting) **
-        balanceIncentiveCurveExponent[marketIndex]) / 1e18;
+        balanceIncentiveCurveExponent[marketIndex]);
 
-      uint256 longRewardUnscaled = (numerator / denominator) / 2;
+      // NOTE: `x * 5e17` == `(x * 10e18) / 2`
+      uint256 longRewardUnscaled = (numerator * 5e17) / denominator;
       uint256 shortRewardUnscaled = 1e18 - longRewardUnscaled;
 
       return (
@@ -425,9 +427,10 @@ contract Staker is IStaker, Initializable {
         (safeExponentBitShifting - 1))**balanceIncentiveCurveExponent[marketIndex];
 
       uint256 denominator = ((totalLocked >> safeExponentBitShifting) **
-        balanceIncentiveCurveExponent[marketIndex]) / 1e18;
+        balanceIncentiveCurveExponent[marketIndex]);
 
-      uint256 shortRewardUnscaled = (numerator / denominator) / 2;
+      // NOTE: `x * 5e17` == `(x * 10e18) / 2`
+      uint256 shortRewardUnscaled = (numerator * 5e17) / denominator;
       uint256 longRewardUnscaled = 1e18 - shortRewardUnscaled;
 
       return (
