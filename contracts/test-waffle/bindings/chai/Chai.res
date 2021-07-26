@@ -45,13 +45,13 @@ let recordArrayEqualFlat: (array<'a>, array<'a>) => unit = (expected, actual) =>
   )
 }
 
-let recordEqualDeep: ('a, 'a) => unit = (expected, actual) => {
-  let a = %raw("(expected, actual) => {
+let recordEqualDeep: (~message: string=?, 'a, 'a) => unit = (~message="", expected, actual) => {
+  let a = %raw("(message, expected, actual) => {
     for(const key of Object.keys(actual)){
-      expect(actual[key]).to.deep.equal(expected[key])
+      expect(actual[key], message + ` at key \"${key}\"`).to.deep.equal(expected[key])
     }
   }")
-  a(expected, actual)
+  a(message, expected, actual)
 }
 let recordArrayDeepEqualFlat: (array<'a>, array<'a>) => unit = (expected, actual) => {
   intEqual(expected->Array.length, actual->Array.length)

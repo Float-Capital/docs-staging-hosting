@@ -17,6 +17,10 @@ contract Staker is IStaker, Initializable {
 
   // Fixed-precision constants
   uint256 public constant FLOAT_ISSUANCE_FIXED_DECIMAL = 1e42;
+  // 2^52 ~= 4.5e15
+  // With an exponent of 5, the largest total liquidity possible in market (to avoid integer overflow on exponentiation) is ~10^31 or 10 Trillion (10^13)
+  // NOTE: this also means if the total market value is less than 2^52 there will be a division by zero error
+  uint256 public constant safeExponentBitShifting = 52;
 
   // Global state
   address public admin;
@@ -49,6 +53,17 @@ contract Staker is IStaker, Initializable {
   // User specific
   mapping(uint32 => mapping(address => uint256)) public userIndexOfLastClaimedReward;
   mapping(address => mapping(address => uint256)) public userAmountStaked;
+
+  // Token shift management
+  mapping(uint32 => uint256) public nextTokenShiftIndex;
+  // TODO: could pack these two into a struct of two uint128 for storage space optimization.
+  mapping(uint256 => uint256) public tokenShiftIndexToStakerStateMapping;
+  mapping(uint256 => uint256) public longShortMarketPriceSnapshotIndex;
+  mapping(uint32 => mapping(address => uint256)) public shiftIndex;
+  // This value is an `int256` so it can represent shifts in either direction.
+  // Possitive is a shift from long, negative is a shift from short.
+  mapping(uint32 => mapping(address => uint256)) public amountToShiftFromLongUser;
+  mapping(uint32 => mapping(address => uint256)) public amountToShiftFromShortUser;
 
   /*╔════════════════════════════╗
     ║           EVENTS           ║
@@ -104,6 +119,8 @@ contract Staker is IStaker, Initializable {
   );
 
   event FloatPercentageUpdated(uint256 floatPercentage);
+
+  event SynthTokensShifted();
 
   /*╔═════════════════════════════╗
     ║          MODIFIERS          ║
@@ -217,7 +234,8 @@ contract Staker is IStaker, Initializable {
     uint256 _balanceIncentiveCurveExponent
   ) internal virtual {
     require(
-      _balanceIncentiveCurveExponent > 0 && _balanceIncentiveCurveExponent < 10000,
+      // The exponent has to be less than 5 in these versions of the contracts.
+      _balanceIncentiveCurveExponent > 0 && _balanceIncentiveCurveExponent < 6,
       "balanceIncentiveCurveExponent out of bounds"
     );
 
@@ -346,24 +364,6 @@ contract Staker is IStaker, Initializable {
     }
   }
 
-  // TODO: turn this into a library.
-  //       make this a simple lookup table with appropriate aproximation
-  function getRequiredAmountOfBitShiftForSafeExponentiation(uint256 number, uint256 exponent)
-    internal
-    pure
-    virtual
-    returns (uint256 amountOfBitShiftRequired)
-  {
-    uint256 targetMaxNumberSizeBinaryDigits = 257 / exponent;
-
-    // Note this can be optimised, this gets a quick easy to compute safe upper bound, not the actuall upper bound.
-    uint256 targetMaxNumber = 2**targetMaxNumberSizeBinaryDigits;
-
-    while (number >> amountOfBitShiftRequired > targetMaxNumber) {
-      ++amountOfBitShiftRequired;
-    }
-  }
-
   /*
    * Computes the current 'r' value, i.e. the number of float tokens a user
    * earns per second for every longshort token they've staked. The returned
@@ -393,11 +393,6 @@ contract Staker is IStaker, Initializable {
     int256 equilibriumOffsetMarketScaled = (balanceIncentiveCurveEquilibriumOffset[marketIndex] *
       int256(totalLocked)) / 1e18;
 
-    uint256 requiredBitShifting = getRequiredAmountOfBitShiftForSafeExponentiation(
-      totalLocked,
-      balanceIncentiveCurveExponent[marketIndex]
-    );
-
     // Float is scaled by the percentage of the total market value held in
     // the opposite position. This incentivises users to stake on the
     // weaker position.
@@ -409,12 +404,13 @@ contract Staker is IStaker, Initializable {
       }
 
       uint256 numerator = (uint256(int256(shortValue) - equilibriumOffsetMarketScaled) >>
-        (requiredBitShifting - 1))**balanceIncentiveCurveExponent[marketIndex];
+        (safeExponentBitShifting - 1))**balanceIncentiveCurveExponent[marketIndex];
 
-      uint256 denominator = ((totalLocked >> requiredBitShifting) **
-        balanceIncentiveCurveExponent[marketIndex]) / 1e18;
+      uint256 denominator = ((totalLocked >> safeExponentBitShifting) **
+        balanceIncentiveCurveExponent[marketIndex]);
 
-      uint256 longRewardUnscaled = (numerator / denominator) / 2;
+      // NOTE: `x * 5e17` == `(x * 10e18) / 2`
+      uint256 longRewardUnscaled = (numerator * 5e17) / denominator;
       uint256 shortRewardUnscaled = 1e18 - longRewardUnscaled;
 
       return (
@@ -429,12 +425,13 @@ contract Staker is IStaker, Initializable {
       }
 
       uint256 numerator = (uint256(int256(longValue) + equilibriumOffsetMarketScaled) >>
-        (requiredBitShifting - 1))**balanceIncentiveCurveExponent[marketIndex];
+        (safeExponentBitShifting - 1))**balanceIncentiveCurveExponent[marketIndex];
 
-      uint256 denominator = ((totalLocked >> requiredBitShifting) **
-        balanceIncentiveCurveExponent[marketIndex]) / 1e18;
+      uint256 denominator = ((totalLocked >> safeExponentBitShifting) **
+        balanceIncentiveCurveExponent[marketIndex]);
 
-      uint256 shortRewardUnscaled = (numerator / denominator) / 2;
+      // NOTE: `x * 5e17` == `(x * 10e18) / 2`
+      uint256 shortRewardUnscaled = (numerator * 5e17) / denominator;
       uint256 longRewardUnscaled = 1e18 - shortRewardUnscaled;
 
       return (
@@ -534,9 +531,23 @@ contract Staker is IStaker, Initializable {
     uint256 longPrice,
     uint256 shortPrice,
     uint256 longValue,
-    uint256 shortValue
+    uint256 shortValue,
+    uint256 longShortMarketPriceSnapshotIndexIfShiftExecuted // This value should be ALWAYS be zero if no shift occured
   ) external override onlyLongShort {
     // Only add a new state point if some time has passed.
+
+    // the `longShortMarketPriceSnapshotIndexIfShiftExecuted` value will be 0 if there is no staker related action in an executed batch
+    if (longShortMarketPriceSnapshotIndexIfShiftExecuted > 0) {
+      longShortMarketPriceSnapshotIndex[
+        nextTokenShiftIndex[marketIndex]
+      ] = longShortMarketPriceSnapshotIndexIfShiftExecuted;
+      tokenShiftIndexToStakerStateMapping[nextTokenShiftIndex[marketIndex]] =
+        latestRewardIndex[marketIndex] +
+        1;
+      nextTokenShiftIndex[marketIndex] += 1;
+
+      emit SynthTokensShifted();
+    }
 
     // Time delta is fetched twice in below code, can pass through? Which is less gas?
     if (_calculateTimeDelta(marketIndex) > 0) {
@@ -548,9 +559,31 @@ contract Staker is IStaker, Initializable {
     ║    USER REWARD STATE FUNCTIONS    ║
     ╚═══════════════════════════════════╝*/
 
+  /// @dev Calculates the accumulated float in a specific range of staker snapshots
+  function _calculateAccumulatedFloatInRange(
+    uint32 marketIndex,
+    uint256 amountStakedLong,
+    uint256 amountStakedShort,
+    uint256 rewardIndexFrom,
+    uint256 rewardIndexTo
+  ) internal view virtual returns (uint256 floatReward) {
+    if (amountStakedLong > 0) {
+      uint256 accumDeltaLong = syntheticRewardParams[marketIndex][rewardIndexTo]
+      .accumulativeFloatPerLongToken -
+        syntheticRewardParams[marketIndex][rewardIndexFrom].accumulativeFloatPerLongToken;
+      floatReward += (accumDeltaLong * amountStakedLong) / FLOAT_ISSUANCE_FIXED_DECIMAL;
+    }
+
+    if (amountStakedShort > 0) {
+      uint256 accumDeltaShort = syntheticRewardParams[marketIndex][rewardIndexTo]
+      .accumulativeFloatPerShortToken -
+        syntheticRewardParams[marketIndex][rewardIndexFrom].accumulativeFloatPerShortToken;
+      floatReward += (accumDeltaShort * amountStakedShort) / FLOAT_ISSUANCE_FIXED_DECIMAL;
+    }
+  }
+
   function _calculateAccumulatedFloat(uint32 marketIndex, address user)
     internal
-    view
     virtual
     returns (uint256 floatReward)
   {
@@ -567,22 +600,65 @@ contract Staker is IStaker, Initializable {
       return 0;
     }
 
-    if (amountStakedLong > 0) {
-      uint256 accumDeltaLong = syntheticRewardParams[marketIndex][latestRewardIndex[marketIndex]]
-      .accumulativeFloatPerLongToken -
-        syntheticRewardParams[marketIndex][userIndexOfLastClaimedReward[marketIndex][user]]
-        .accumulativeFloatPerLongToken;
-      floatReward += (accumDeltaLong * amountStakedLong) / FLOAT_ISSUANCE_FIXED_DECIMAL;
-    }
+    uint256 usersShiftIndex = shiftIndex[marketIndex][user];
+    // if there is a change in the users tokens held due to a token shift (or possibly another action in the future)
+    if (usersShiftIndex > 0 && usersShiftIndex < nextTokenShiftIndex[marketIndex]) {
+      floatReward = _calculateAccumulatedFloatInRange(
+        marketIndex,
+        amountStakedLong,
+        amountStakedShort,
+        usersLastRewardIndex,
+        tokenShiftIndexToStakerStateMapping[usersShiftIndex]
+      );
 
-    if (amountStakedShort > 0) {
-      uint256 accumDeltaShort = syntheticRewardParams[marketIndex][latestRewardIndex[marketIndex]]
-      .accumulativeFloatPerShortToken -
-        syntheticRewardParams[marketIndex][usersLastRewardIndex].accumulativeFloatPerShortToken;
-      floatReward += (accumDeltaShort * amountStakedShort) / FLOAT_ISSUANCE_FIXED_DECIMAL;
-    }
+      // Update the users balances
+      if (amountToShiftFromLongUser[marketIndex][user] > 0) {
+        amountStakedShort += ILongShort(longShort).getAmountSynthTokenShifted(
+          marketIndex,
+          amountToShiftFromLongUser[marketIndex][user],
+          true,
+          longShortMarketPriceSnapshotIndex[usersShiftIndex]
+        );
 
-    return floatReward;
+        amountStakedLong -= amountToShiftFromLongUser[marketIndex][user];
+        amountToShiftFromLongUser[marketIndex][user] = 0;
+      }
+
+      if (amountToShiftFromShortUser[marketIndex][user] > 0) {
+        amountStakedLong += ILongShort(longShort).getAmountSynthTokenShifted(
+          marketIndex,
+          amountToShiftFromShortUser[marketIndex][user],
+          false,
+          longShortMarketPriceSnapshotIndex[usersShiftIndex]
+        );
+
+        // TODO: investigate how casting negative numbers works in solidity
+        amountStakedShort -= amountToShiftFromShortUser[marketIndex][user];
+        amountToShiftFromShortUser[marketIndex][user] = 0;
+      }
+
+      // Save the users updated staked amounts
+      userAmountStaked[longToken][user] = amountStakedLong;
+      userAmountStaked[shortToken][user] = amountStakedShort;
+
+      floatReward += _calculateAccumulatedFloatInRange(
+        marketIndex,
+        amountStakedLong,
+        amountStakedShort,
+        tokenShiftIndexToStakerStateMapping[usersShiftIndex],
+        latestRewardIndex[marketIndex]
+      );
+
+      shiftIndex[marketIndex][user] = 0;
+    } else {
+      floatReward = _calculateAccumulatedFloatInRange(
+        marketIndex,
+        amountStakedLong,
+        amountStakedShort,
+        usersLastRewardIndex,
+        latestRewardIndex[marketIndex]
+      );
+    }
   }
 
   function _mintFloat(address user, uint256 floatToMint) internal virtual {
@@ -691,6 +767,35 @@ contract Staker is IStaker, Initializable {
     userIndexOfLastClaimedReward[marketIndex][user] = latestRewardIndex[marketIndex];
 
     emit StakeAdded(user, address(token), amount, userIndexOfLastClaimedReward[marketIndex][user]);
+  }
+
+  // Token shifting
+  function shiftTokens(
+    uint256 synthTokensToShift,
+    uint32 marketIndex,
+    bool isShiftFromLong
+  ) external virtual {
+    address token = syntheticTokens[marketIndex][isShiftFromLong];
+    require(
+      userAmountStaked[token][msg.sender] >= synthTokensToShift,
+      "Not enough tokens to shift"
+    );
+
+    // If the user has outstanding token shift that have already been confirmed in the LongShort
+    // contract, execute them first.
+    if (shiftIndex[marketIndex][msg.sender] < nextTokenShiftIndex[marketIndex]) {
+      _mintAccumulatedFloat(marketIndex, msg.sender);
+    }
+
+    if (isShiftFromLong) {
+      ILongShort(longShort).shiftPositionFromLongNextPrice(marketIndex, synthTokensToShift);
+      amountToShiftFromLongUser[marketIndex][msg.sender] += synthTokensToShift;
+    } else {
+      ILongShort(longShort).shiftPositionFromShortNextPrice(marketIndex, synthTokensToShift);
+      amountToShiftFromShortUser[marketIndex][msg.sender] += synthTokensToShift;
+    }
+
+    shiftIndex[marketIndex][msg.sender] = nextTokenShiftIndex[marketIndex];
   }
 
   /*╔════════════════════════════╗

@@ -7,11 +7,27 @@ import "./interfaces/IStaker.sol";
 import "./interfaces/ILongShort.sol";
 import "./interfaces/ISyntheticToken.sol";
 
+/// @title SyntheticToken
+/// @notice TODO
+/// @dev
 contract SyntheticToken is ISyntheticToken {
+  /// @notice TODO
   address public longShort;
+  /// @notice TODO
   address public staker;
+  /// @notice TODO
   uint32 public marketIndex;
+  /// @notice TODO
   bool public isLong;
+
+  /// @notice TODO
+  /// @dev TODO
+  /// @param name TODO
+  /// @param symbol TODO
+  /// @param _longShort TODO
+  /// @param _staker TODO
+  /// @param _marketIndex TODO
+  /// @param _isLong TODO
 
   constructor(
     string memory name,
@@ -27,11 +43,18 @@ contract SyntheticToken is ISyntheticToken {
     isLong = _isLong;
   }
 
+  /// @notice TODO
+  /// @dev TODO
+  /// @param account TODO
+  /// @param amount TODO
   function _burn(address account, uint256 amount) internal override {
     require(msg.sender == address(longShort), "Only longSHORT contract");
     super._burn(account, amount);
   }
 
+  /// @notice TODO
+  /// @dev TODO
+  /// @param amount TODO
   function stake(uint256 amount) external override {
     // NOTE: this is safe, this function will throw "ERC20: transfer
     //       amount exceeds balance" if amount exceeds users balance.
@@ -44,10 +67,19 @@ contract SyntheticToken is ISyntheticToken {
     ║    FUNCTIONS INHERITED BY ERC20PresetMinterPauser    ║
     ╚══════════════════════════════════════════════════════╝*/
 
+  /// @notice TODO
+  /// @dev TODO
+  /// @param to TODO
+  /// @param amount TODO
   function mint(address to, uint256 amount) public override {
     ERC20PresetMinterPauser.mint(to, amount);
   }
 
+  /// @notice TODO
+  /// @dev TODO
+  /// @param sender TODO
+  /// @param recipient TODO
+  /// @param amount TODO
   function transferFrom(
     address sender,
     address recipient,
@@ -63,6 +95,11 @@ contract SyntheticToken is ISyntheticToken {
     }
   }
 
+  /// @notice TODO
+  /// @dev TODO
+  /// @param sender TODO
+  /// @param
+  /// @param TODO
   function _beforeTokenTransfer(
     address sender,
     address,
@@ -78,7 +115,11 @@ contract SyntheticToken is ISyntheticToken {
    */
   function balanceOf(address account) public view virtual override returns (uint256) {
     return
-      ILongShort(longShort).getUsersConfirmedButNotSettledBalance(account, marketIndex, isLong) +
-      ERC20.balanceOf(account);
+      ERC20.balanceOf(account) +
+      ILongShort(longShort).getUsersConfirmedButNotSettledSynthBalance(
+        account,
+        marketIndex,
+        isLong
+      );
   }
 }

@@ -19,7 +19,8 @@ abstract contract IStaker {
     uint256 longTokenPrice,
     uint256 shortTokenPrice,
     uint256 longValue,
-    uint256 shortValue
+    uint256 shortValue,
+    uint256 longShortMarketPriceSnapshotIndexIfShiftExecuted
   ) external virtual;
 
   function stakeFromUser(address from, uint256 amount) public virtual;

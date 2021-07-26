@@ -109,17 +109,29 @@ contract LongShortInternalsExposed is LongShortMockable {
 
   function setPerformOustandingBatchedSettlementsGlobals(
     uint32 marketIndex,
-    uint256 batchedAmountOfTokensToDepositLong,
-    uint256 batchedAmountOfTokensToDepositShort,
+    uint256 batchedAmountOfPaymentTokenToDepositLong,
+    uint256 batchedAmountOfPaymentTokenToDepositShort,
     uint256 batchedAmountOfSynthTokensToRedeemLong,
-    uint256 batchedAmountOfSynthTokensToRedeemShort
+    uint256 batchedAmountOfSynthTokensToRedeemShort,
+    uint256 batchedAmountOfSynthTokensToShiftFromLong,
+    uint256 batchedAmountOfSynthTokensToShiftFromShort
   ) external {
-    batchedAmountOfTokensToDeposit[marketIndex][true] = batchedAmountOfTokensToDepositLong;
-    batchedAmountOfTokensToDeposit[marketIndex][false] = batchedAmountOfTokensToDepositShort;
+    batchedAmountOfPaymentTokenToDeposit[marketIndex][
+      true
+    ] = batchedAmountOfPaymentTokenToDepositLong;
+    batchedAmountOfPaymentTokenToDeposit[marketIndex][
+      false
+    ] = batchedAmountOfPaymentTokenToDepositShort;
     batchedAmountOfSynthTokensToRedeem[marketIndex][true] = batchedAmountOfSynthTokensToRedeemLong;
     batchedAmountOfSynthTokensToRedeem[marketIndex][
       false
     ] = batchedAmountOfSynthTokensToRedeemShort;
+    batchedAmountOfSynthTokensToShiftMarketSide[marketIndex][
+      true
+    ] = batchedAmountOfSynthTokensToShiftFromLong;
+    batchedAmountOfSynthTokensToShiftMarketSide[marketIndex][
+      false
+    ] = batchedAmountOfSynthTokensToShiftFromShort;
   }
 
   function setHandleChangeInSynthTokensTotalSupplyGlobals(
@@ -140,6 +152,16 @@ contract LongShortInternalsExposed is LongShortMockable {
 
   function setMintNextPriceGlobals(uint32 marketIndex, uint256 _marketUpdateIndex) external {
     marketUpdateIndex[marketIndex] = _marketUpdateIndex;
+  }
+
+  function setShiftNextPriceGlobals(
+    uint32 marketIndex,
+    uint256 _marketUpdateIndex,
+    address syntheticTokenShiftedFrom,
+    bool isShiftFromLong
+  ) external {
+    marketUpdateIndex[marketIndex] = _marketUpdateIndex;
+    syntheticTokens[marketIndex][isShiftFromLong] = syntheticTokenShiftedFrom;
   }
 
   function setExecuteOutstandingNextPriceMintsGlobals(
@@ -174,6 +196,29 @@ contract LongShortInternalsExposed is LongShortMockable {
       _userCurrentNextPriceUpdateIndex
     ] = _syntheticTokenPriceSnapshot;
     paymentTokens[marketIndex] = paymentToken;
+  }
+
+  function setExecuteOutstandingNextPriceTokenShiftsGlobals(
+    uint32 marketIndex,
+    address user,
+    bool isShiftFromLong,
+    address syntheticTokenShiftedTo,
+    uint256 _userNextPrice_amountSynthToShiftFromMarketSide,
+    uint256 _userCurrentNextPriceUpdateIndex,
+    uint256 _syntheticTokenPriceSnapshotShiftedFrom,
+    uint256 _syntheticTokenPriceSnapshotShiftedTo
+  ) external {
+    userNextPrice_amountSynthToShiftFromMarketSide[marketIndex][isShiftFromLong][
+      user
+    ] = _userNextPrice_amountSynthToShiftFromMarketSide;
+    userCurrentNextPriceUpdateIndex[marketIndex][user] = _userCurrentNextPriceUpdateIndex;
+    syntheticTokenPriceSnapshot[marketIndex][isShiftFromLong][
+      _userCurrentNextPriceUpdateIndex
+    ] = _syntheticTokenPriceSnapshotShiftedFrom;
+    syntheticTokenPriceSnapshot[marketIndex][!isShiftFromLong][
+      _userCurrentNextPriceUpdateIndex
+    ] = _syntheticTokenPriceSnapshotShiftedTo;
+    syntheticTokens[marketIndex][!isShiftFromLong] = syntheticTokenShiftedTo;
   }
 
   function setExecuteOutstandingNextPriceSettlementsGlobals(

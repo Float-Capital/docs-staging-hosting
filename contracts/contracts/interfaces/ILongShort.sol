@@ -7,13 +7,28 @@ abstract contract ILongShort {
 
   function updateSystemStateMulti(uint32[] calldata marketIndex) external virtual;
 
-  function getUsersConfirmedButNotSettledBalance(
+  function getUsersConfirmedButNotSettledSynthBalance(
     address user,
     uint32 marketIndex,
     bool isLong
-  ) external view virtual returns (uint256 pendingBalance);
+  ) external view virtual returns (uint256 confirmedButNotSettledBalance);
 
   function executeOutstandingNextPriceSettlementsUser(address user, uint32 marketIndex)
     external
     virtual;
+
+  function shiftPositionFromLongNextPrice(uint32 marketIndex, uint256 synthTokensToShift)
+    external
+    virtual;
+
+  function shiftPositionFromShortNextPrice(uint32 marketIndex, uint256 synthTokensToShift)
+    external
+    virtual;
+
+  function getAmountSynthTokenShifted(
+    uint32 marketIndex,
+    uint256 amountSynthTokenShifted,
+    bool isShiftFromLong,
+    uint256 priceSnapshotIndex
+  ) public view virtual returns (uint256 amountSynthShiftedToOtherSide);
 }

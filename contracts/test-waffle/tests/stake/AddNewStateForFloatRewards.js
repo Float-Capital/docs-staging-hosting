@@ -33,7 +33,7 @@ function test(contracts, accounts) {
                           return LetOps.AwaitThen.let_(Helpers.getBlock(undefined), (function (param) {
                                         timestampRef.contents = ethers.BigNumber.from(param.timestamp + 1 | 0);
                                         return LetOps.AwaitThen.let_(contracts.contents.staker.setAddNewStateForFloatRewardsParams(longShortAddress.address), (function (param) {
-                                                      promiseRef.contents = contracts.contents.staker.connect(longShortAddress).addNewStateForFloatRewards(marketIndex, longPrice, shortPrice, longValue, shortValue);
+                                                      promiseRef.contents = contracts.contents.staker.connect(longShortAddress).addNewStateForFloatRewards(marketIndex, longPrice, shortPrice, longValue, shortValue, Globals.zeroBn);
                                                       return LetOps.Await.let_(promiseRef.contents, (function (param) {
                                                                     
                                                                   }));

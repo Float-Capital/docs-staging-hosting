@@ -159,4 +159,23 @@ contract StakerInternalsExposed is StakerMockable {
     userAmountStaked[token][user] = _userAmountStaked;
     userIndexOfLastClaimedReward[marketIndex][user] = userLastRewardIndex;
   }
+
+  ///////////////////////////////////////////////////////
+  //////////// Functions for Experimentation ////////////
+  ///////////////////////////////////////////////////////
+
+  function getRequiredAmountOfBitShiftForSafeExponentiationPerfect(uint256 number, uint256 exponent)
+    external
+    pure
+    returns (uint256 amountOfBitShiftRequired)
+  {
+    uint256 targetMaxNumberSizeBinaryDigits = 257 / exponent;
+
+    // Note this can be optimised, this gets a quick easy to compute safe upper bound, not the actuall upper bound.
+    uint256 targetMaxNumber = 2**targetMaxNumberSizeBinaryDigits;
+
+    while (number >> amountOfBitShiftRequired > targetMaxNumber) {
+      ++amountOfBitShiftRequired;
+    }
+  }
 }
