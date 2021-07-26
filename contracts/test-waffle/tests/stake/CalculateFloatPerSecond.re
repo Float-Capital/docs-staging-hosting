@@ -75,15 +75,7 @@ let test =
     let testHelper = (~longPrice, ~shortPrice, ~longValue, ~shortValue) => {
       let totalLocked = longValue->add(shortValue);
 
-      let requiredBitShifting =
-        getRequiredAmountOfBitShiftForSafeExponentiation(
-          totalLocked,
-          balanceIncentiveCurveExponent^,
-        );
-
-      StakerSmocked.InternalMock.mockGetRequiredAmountOfBitShiftForSafeExponentiationToReturn(
-        requiredBitShifting,
-      );
+      let requiredBitShifting = bnFromInt(52);
 
       let%Await result =
         contracts^.staker
@@ -158,9 +150,6 @@ let test =
       },
     );
     it("calls getKValue correctly", () => {
-      StakerSmocked.InternalMock.mockGetRequiredAmountOfBitShiftForSafeExponentiationToReturn(
-        bnFromInt(55) // conservatively high
-      );
       StakerSmocked.InternalMock.mock_getKValueToReturn(kVal);
 
       let%Await _result =

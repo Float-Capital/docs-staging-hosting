@@ -17,6 +17,10 @@ contract Staker is IStaker, Initializable {
 
   // Fixed-precision constants
   uint256 public constant FLOAT_ISSUANCE_FIXED_DECIMAL = 1e42;
+  // 2^52 ~= 4.5e15
+  // With an exponent of 5, the largest total liquidity possible in market (to avoid integer overflow on exponentiation) is ~10^31 or 10 Trillion (10^13)
+  // NOTE: this also means if the total market value is less than 2^52 there will be a division by zero error
+  uint256 public constant safeExponentBitShifting = 52;
 
   // Global state
   address public admin;
@@ -229,7 +233,8 @@ contract Staker is IStaker, Initializable {
     uint256 _balanceIncentiveCurveExponent
   ) internal virtual {
     require(
-      _balanceIncentiveCurveExponent > 0 && _balanceIncentiveCurveExponent < 10000,
+      // The exponent has to be less than 5 in these versions of the contracts.
+      _balanceIncentiveCurveExponent > 0 && _balanceIncentiveCurveExponent < 6,
       "balanceIncentiveCurveExponent out of bounds"
     );
 
@@ -358,24 +363,6 @@ contract Staker is IStaker, Initializable {
     }
   }
 
-  // TODO: turn this into a library.
-  //       make this a simple lookup table with appropriate aproximation
-  function getRequiredAmountOfBitShiftForSafeExponentiation(uint256 number, uint256 exponent)
-    internal
-    pure
-    virtual
-    returns (uint256 amountOfBitShiftRequired)
-  {
-    uint256 targetMaxNumberSizeBinaryDigits = 257 / exponent;
-
-    // Note this can be optimised, this gets a quick easy to compute safe upper bound, not the actuall upper bound.
-    uint256 targetMaxNumber = 2**targetMaxNumberSizeBinaryDigits;
-
-    while (number >> amountOfBitShiftRequired > targetMaxNumber) {
-      ++amountOfBitShiftRequired;
-    }
-  }
-
   /*
    * Computes the current 'r' value, i.e. the number of float tokens a user
    * earns per second for every longshort token they've staked. The returned
@@ -405,11 +392,6 @@ contract Staker is IStaker, Initializable {
     int256 equilibriumOffsetMarketScaled = (balanceIncentiveCurveEquilibriumOffset[marketIndex] *
       int256(totalLocked)) / 1e18;
 
-    uint256 requiredBitShifting = getRequiredAmountOfBitShiftForSafeExponentiation(
-      totalLocked,
-      balanceIncentiveCurveExponent[marketIndex]
-    );
-
     // Float is scaled by the percentage of the total market value held in
     // the opposite position. This incentivises users to stake on the
     // weaker position.
@@ -421,12 +403,13 @@ contract Staker is IStaker, Initializable {
       }
 
       uint256 numerator = (uint256(int256(shortValue) - equilibriumOffsetMarketScaled) >>
-        (requiredBitShifting - 1))**balanceIncentiveCurveExponent[marketIndex];
+        (safeExponentBitShifting - 1))**balanceIncentiveCurveExponent[marketIndex];
 
-      uint256 denominator = ((totalLocked >> requiredBitShifting) **
-        balanceIncentiveCurveExponent[marketIndex]) / 1e18;
+      uint256 denominator = ((totalLocked >> safeExponentBitShifting) **
+        balanceIncentiveCurveExponent[marketIndex]);
 
-      uint256 longRewardUnscaled = (numerator / denominator) / 2;
+      // NOTE: `x * 5e17` == `(x * 10e18) / 2`
+      uint256 longRewardUnscaled = (numerator * 5e17) / denominator;
       uint256 shortRewardUnscaled = 1e18 - longRewardUnscaled;
 
       return (
@@ -441,12 +424,13 @@ contract Staker is IStaker, Initializable {
       }
 
       uint256 numerator = (uint256(int256(longValue) + equilibriumOffsetMarketScaled) >>
-        (requiredBitShifting - 1))**balanceIncentiveCurveExponent[marketIndex];
+        (safeExponentBitShifting - 1))**balanceIncentiveCurveExponent[marketIndex];
 
-      uint256 denominator = ((totalLocked >> requiredBitShifting) **
-        balanceIncentiveCurveExponent[marketIndex]) / 1e18;
+      uint256 denominator = ((totalLocked >> safeExponentBitShifting) **
+        balanceIncentiveCurveExponent[marketIndex]);
 
-      uint256 shortRewardUnscaled = (numerator / denominator) / 2;
+      // NOTE: `x * 5e17` == `(x * 10e18) / 2`
+      uint256 shortRewardUnscaled = (numerator * 5e17) / denominator;
       uint256 longRewardUnscaled = 1e18 - shortRewardUnscaled;
 
       return (
