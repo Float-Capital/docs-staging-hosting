@@ -7,22 +7,22 @@ import "./interfaces/ILongShort.sol";
 import "./interfaces/ITokenFactory.sol";
 
 /// @title TokenFactory
-/// @notice
+/// @notice TODO
 /// @dev
 contract TokenFactory is ITokenFactory {
   /*╔═══════════════════════════╗
     ║           STATE           ║
     ╚═══════════════════════════╝*/
-  /// @notice
+  /// @notice TODO
   address public admin;
-  /// @notice
+  /// @notice TODO
   address public longShort;
 
-  /// @notice
+  /// @notice TODO
   bytes32 public constant DEFAULT_ADMIN_ROLE = keccak256("DEFAULT_ADMIN_ROLE");
-  /// @notice
+  /// @notice TODO
   bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
-  /// @notice
+  /// @notice TODO
   bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
 
   /*╔═══════════════════════════╗
@@ -45,11 +45,11 @@ contract TokenFactory is ITokenFactory {
     ║           SET-UP           ║
     ╚════════════════════════════╝*/
 
-  /// @notice
-  /// @dev
-  /// @param _admin
-  /// @param _longShort
-  /// @return
+  /// @notice TODO
+  /// @dev TODO
+  /// @param _admin TODO
+  /// @param _longShort TODO
+
   constructor(address _admin, address _longShort) {
     admin = _admin;
     longShort = _longShort;
@@ -59,18 +59,16 @@ contract TokenFactory is ITokenFactory {
     ║    MULTISIG ADMIN FUNCTIONS    ║
     ╚════════════════════════════════╝*/
 
-  /// @notice
-  /// @dev
-  /// @param _admin
-  /// @return
+  /// @notice TODO
+  /// @dev TODO
+  /// @param _admin TODO
   function changeAdmin(address _admin) external adminOnly {
     admin = _admin;
   }
 
-  /// @notice
-  /// @dev
-  /// @param _longShort
-  /// @return
+  /// @notice TODO
+  /// @dev TODO
+  /// @param _longShort TODO
   function changeFloatAddress(address _longShort) external adminOnly {
     longShort = _longShort;
   }
@@ -79,10 +77,9 @@ contract TokenFactory is ITokenFactory {
     ║       TOKEN CREATION       ║
     ╚════════════════════════════╝*/
 
-  /// @notice
-  /// @dev
-  /// @param tokenContract
-  /// @return
+  /// @notice TODO
+  /// @dev TODO
+  /// @param tokenContract TODO
   function setupPermissions(address tokenContract) internal {
     // Give minter roles
     SyntheticToken(tokenContract).grantRole(DEFAULT_ADMIN_ROLE, longShort);
@@ -95,13 +92,12 @@ contract TokenFactory is ITokenFactory {
     SyntheticToken(tokenContract).revokeRole(PAUSER_ROLE, address(this));
   }
 
-  /// @notice
-  /// @dev
-  /// @param syntheticName
-  /// @param syntheticSymbol
-  /// @param staker
-  /// @param marketIndex
-  /// @return
+  /// @notice TODO
+  /// @dev TODO
+  /// @param syntheticName TODO
+  /// @param syntheticSymbol TODO
+  /// @param staker TODO
+  /// @param marketIndex TODO
   function createTokenLong(
     string calldata syntheticName,
     string calldata syntheticSymbol,
@@ -122,13 +118,12 @@ contract TokenFactory is ITokenFactory {
     setupPermissions(syntheticToken);
   }
 
-  /// @notice
-  /// @dev
-  /// @param syntheticName
-  /// @param syntheticSymbol
-  /// @param staker
-  /// @param marketIndex
-  /// @return
+  /// @notice TODO
+  /// @dev TODO
+  /// @param syntheticName TODO
+  /// @param syntheticSymbol TODO
+  /// @param staker TODO
+  /// @param marketIndex TODO
   function createTokenShort(
     string calldata syntheticName,
     string calldata syntheticSymbol,

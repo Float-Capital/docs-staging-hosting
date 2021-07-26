@@ -8,27 +8,27 @@ import "./interfaces/ILongShort.sol";
 import "./interfaces/ISyntheticToken.sol";
 
 /// @title SyntheticToken
-/// @notice
+/// @notice TODO
 /// @dev
 contract SyntheticToken is ISyntheticToken {
-  /// @notice
+  /// @notice TODO
   address public longShort;
-  /// @notice
+  /// @notice TODO
   address public staker;
-  /// @notice
+  /// @notice TODO
   uint32 public marketIndex;
-  /// @notice
+  /// @notice TODO
   bool public isLong;
 
-  /// @notice
-  /// @dev
-  /// @param name
-  /// @param symbol
-  /// @param _longShort
-  /// @param _staker
-  /// @param _marketIndex
-  /// @param _isLong
-  /// @return
+  /// @notice TODO
+  /// @dev TODO
+  /// @param name TODO
+  /// @param symbol TODO
+  /// @param _longShort TODO
+  /// @param _staker TODO
+  /// @param _marketIndex TODO
+  /// @param _isLong TODO
+
   constructor(
     string memory name,
     string memory symbol,
@@ -43,20 +43,18 @@ contract SyntheticToken is ISyntheticToken {
     isLong = _isLong;
   }
 
-  /// @notice
-  /// @dev
-  /// @param account
-  /// @param amount
-  /// @return
+  /// @notice TODO
+  /// @dev TODO
+  /// @param account TODO
+  /// @param amount TODO
   function _burn(address account, uint256 amount) internal override {
     require(msg.sender == address(longShort), "Only longSHORT contract");
     super._burn(account, amount);
   }
 
-  /// @notice
-  /// @dev
-  /// @param amount
-  /// @return
+  /// @notice TODO
+  /// @dev TODO
+  /// @param amount TODO
   function stake(uint256 amount) external override {
     // NOTE: this is safe, this function will throw "ERC20: transfer
     //       amount exceeds balance" if amount exceeds users balance.
@@ -69,21 +67,19 @@ contract SyntheticToken is ISyntheticToken {
     ║    FUNCTIONS INHERITED BY ERC20PresetMinterPauser    ║
     ╚══════════════════════════════════════════════════════╝*/
 
-  /// @notice
-  /// @dev
-  /// @param to
-  /// @param amount
-  /// @return
+  /// @notice TODO
+  /// @dev TODO
+  /// @param to TODO
+  /// @param amount TODO
   function mint(address to, uint256 amount) public override {
     ERC20PresetMinterPauser.mint(to, amount);
   }
 
-  /// @notice
-  /// @dev
-  /// @param sender
-  /// @param recipient
-  /// @param amount
-  /// @return
+  /// @notice TODO
+  /// @dev TODO
+  /// @param sender TODO
+  /// @param recipient TODO
+  /// @param amount TODO
   function transferFrom(
     address sender,
     address recipient,
@@ -99,12 +95,11 @@ contract SyntheticToken is ISyntheticToken {
     }
   }
 
-  /// @notice
-  /// @dev
-  /// @param sender
+  /// @notice TODO
+  /// @dev TODO
+  /// @param sender TODO
   /// @param
-  /// @param
-  /// @return
+  /// @param TODO
   function _beforeTokenTransfer(
     address sender,
     address,
