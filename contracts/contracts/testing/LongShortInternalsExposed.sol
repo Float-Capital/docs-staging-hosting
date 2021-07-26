@@ -193,14 +193,14 @@ contract LongShortInternalsExposed is LongShortMockable {
     address user,
     bool isShiftFromLong,
     address syntheticTokenShiftedTo,
-    uint256 _userNextPriceShiftMarketSideAmount,
+    uint256 _userNextPrice_amountSynthToShiftFromMarketSide,
     uint256 _userCurrentNextPriceUpdateIndex,
     uint256 _syntheticTokenPriceSnapshotShiftedFrom,
     uint256 _syntheticTokenPriceSnapshotShiftedTo
   ) external {
-    userNextPriceShiftMarketSideAmount[marketIndex][isShiftFromLong][
+    userNextPrice_amountSynthToShiftFromMarketSide[marketIndex][isShiftFromLong][
       user
-    ] = _userNextPriceShiftMarketSideAmount;
+    ] = _userNextPrice_amountSynthToShiftFromMarketSide;
     userCurrentNextPriceUpdateIndex[marketIndex][user] = _userCurrentNextPriceUpdateIndex;
     syntheticTokenPriceSnapshot[marketIndex][isShiftFromLong][
       _userCurrentNextPriceUpdateIndex

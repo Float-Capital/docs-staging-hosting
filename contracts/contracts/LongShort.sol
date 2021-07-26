@@ -851,7 +851,7 @@ contract LongShort is ILongShort, Initializable {
         userCurrentNextPriceUpdateIndex[marketIndex][user]
       );
 
-      userNextPriceShiftMarketSideAmount[marketIndex][isShiftFromLong][user] = 0;
+      userNextPrice_amountSynthToShiftFromMarketSide[marketIndex][isShiftFromLong][user] = 0;
 
       require(
         ISyntheticToken(syntheticTokens[marketIndex][!isShiftFromLong]).transfer(
