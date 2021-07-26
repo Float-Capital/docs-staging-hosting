@@ -53,10 +53,10 @@ let recordEqualDeep: (~message: string=?, 'a, 'a) => unit = (~message="", expect
   }")
   a(message, expected, actual)
 }
-let recordArrayDeepEqualFlat: (array<'a>, array<'a>) => unit = (expected, actual) => {
+let recordArrayDeepEqualFlat: (~message: string=?, array<'a>, array<'a>) => unit = (~message="record array equality check",expected, actual) => {
   intEqual(expected->Array.length, actual->Array.length)
   expected->Array.forEachWithIndex((i, expectedResult) =>
-    recordEqualDeep(expectedResult, actual->Array.getUnsafe(i))
+    recordEqualDeep(~message=(`${message}: at index #${i->Int.toString}`), expectedResult, actual->Array.getUnsafe(i))
   )
 }
 

@@ -47,6 +47,28 @@ contract StakerInternalsExposed is StakerMockable {
     userAmountStaked[shortToken][user] = newUserAmountStakedShort;
   }
 
+  function setShiftParams(
+    uint32 marketIndex,
+    address user,
+    uint256 shiftAmountLong,
+    uint256 shiftAmountShort,
+    uint256 _shiftIndex,
+    uint256 _nextTokenShiftIndex,
+    uint256 _longShortMarketPriceSnapshotIndex,
+    uint256 _tokenShiftIndexToStakerStateMapping
+  ) public {
+    shiftIndex[marketIndex][user] = _shiftIndex;
+    amountToShiftFromLongUser[marketIndex][user] = shiftAmountLong;
+    amountToShiftFromShortUser[marketIndex][user] = shiftAmountShort;
+    nextTokenShiftIndex[marketIndex] = _nextTokenShiftIndex;
+    longShortMarketPriceSnapshotIndex[_shiftIndex] = _longShortMarketPriceSnapshotIndex;
+    tokenShiftIndexToStakerStateMapping[_shiftIndex] = _tokenShiftIndexToStakerStateMapping;
+  }
+
+  function setLongShort(address _longShort) public {
+    longShort = _longShort;
+  }
+
   function setAddNewStakingFundParams(
     uint32 marketIndex,
     address longToken,
