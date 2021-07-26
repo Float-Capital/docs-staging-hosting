@@ -1,6 +1,5 @@
 open Globals;
 open LetOps;
-open StakerHelpers;
 open Mocha;
 
 let test =
@@ -15,13 +14,13 @@ let test =
     let initialMultiplier = Helpers.randomInteger();
 
     let setup = () => {
-      let%AwaitThen _ =
-        contracts^.staker->StakerSmocked.InternalMock.setup;
+      let%AwaitThen _ = contracts^.staker->StakerSmocked.InternalMock.setup;
 
       let%AwaitThen _ =
-        contracts^.staker->StakerSmocked.InternalMock.setupFunctionForUnitTesting(
-        ~functionName="changeMarketLaunchIncentiveParameters",
-      );
+        contracts^.staker
+        ->StakerSmocked.InternalMock.setupFunctionForUnitTesting(
+            ~functionName="changeMarketLaunchIncentiveParameters",
+          );
 
       StakerSmocked.InternalMock.mock_changeMarketLaunchIncentiveParametersToReturn();
 
@@ -44,7 +43,6 @@ let test =
 
     it(
       "calls _changeMarketLaunchIncentiveParameters with correct arguments", () => {
-
       StakerSmocked.InternalMock._changeMarketLaunchIncentiveParametersCalls()
       ->Array.getUnsafe(0)
       ->Chai.recordEqualFlat({marketIndex, period, initialMultiplier})
