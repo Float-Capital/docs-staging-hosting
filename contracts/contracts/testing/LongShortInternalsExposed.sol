@@ -109,19 +109,19 @@ contract LongShortInternalsExposed is LongShortMockable {
 
   function setPerformOustandingBatchedSettlementsGlobals(
     uint32 marketIndex,
-    uint256 batchedAmountOfPaymentTokenTokensToDepositLong,
-    uint256 batchedAmountOfPaymentTokenTokensToDepositShort,
+    uint256 batchedAmountOfPaymentTokenToDepositLong,
+    uint256 batchedAmountOfPaymentTokenToDepositShort,
     uint256 batchedAmountOfSynthTokensToRedeemLong,
     uint256 batchedAmountOfSynthTokensToRedeemShort,
     uint256 batchedAmountOfSynthTokensToShiftFromLong,
     uint256 batchedAmountOfSynthTokensToShiftFromShort
   ) external {
-    batchedAmountOfPaymentTokenTokensToDeposit[marketIndex][
+    batchedAmountOfPaymentTokenToDeposit[marketIndex][
       true
-    ] = batchedAmountOfPaymentTokenTokensToDepositLong;
-    batchedAmountOfPaymentTokenTokensToDeposit[marketIndex][
+    ] = batchedAmountOfPaymentTokenToDepositLong;
+    batchedAmountOfPaymentTokenToDeposit[marketIndex][
       false
-    ] = batchedAmountOfPaymentTokenTokensToDepositShort;
+    ] = batchedAmountOfPaymentTokenToDepositShort;
     batchedAmountOfSynthTokensToRedeem[marketIndex][true] = batchedAmountOfSynthTokensToRedeemLong;
     batchedAmountOfSynthTokensToRedeem[marketIndex][
       false

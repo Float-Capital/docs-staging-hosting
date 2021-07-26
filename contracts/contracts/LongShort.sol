@@ -55,7 +55,7 @@ contract LongShort is ILongShort, Initializable {
   mapping(uint32 => mapping(bool => mapping(uint256 => uint256)))
     public syntheticTokenPriceSnapshot;
 
-  mapping(uint32 => mapping(bool => uint256)) public batchedAmountOfPaymentTokenTokensToDeposit;
+  mapping(uint32 => mapping(bool => uint256)) public batchedAmountOfPaymentTokenToDeposit;
   mapping(uint32 => mapping(bool => uint256)) public batchedAmountOfSynthTokensToRedeem;
   mapping(uint32 => mapping(bool => uint256)) public batchedAmountOfSynthTokensToShiftMarketSide;
 
@@ -671,7 +671,7 @@ contract LongShort is ILongShort, Initializable {
   {
     _depositFunds(marketIndex, amount);
 
-    batchedAmountOfPaymentTokenTokensToDeposit[marketIndex][isLong] += amount;
+    batchedAmountOfPaymentTokenToDeposit[marketIndex][isLong] += amount;
     userNextPriceDepositAmount[marketIndex][isLong][msg.sender] += amount;
     userCurrentNextPriceUpdateIndex[marketIndex][msg.sender] = marketUpdateIndex[marketIndex] + 1;
 
@@ -948,11 +948,11 @@ contract LongShort is ILongShort, Initializable {
 
 
       uint256 batchedAmountOfPaymentTokensToDepositOrShiftToLong
-     = batchedAmountOfPaymentTokenTokensToDeposit[marketIndex][true];
+     = batchedAmountOfPaymentTokenToDeposit[marketIndex][true];
 
 
       uint256 batchedAmountOfPaymentTokensToDepositOrShiftToShort
-     = batchedAmountOfPaymentTokenTokensToDeposit[marketIndex][false];
+     = batchedAmountOfPaymentTokenToDeposit[marketIndex][false];
 
     // NOTE: These variables currently only includes the amount to shift
     //       to save variable space (precious EVM stack) we share and update the same variable later to include the reedem.
@@ -989,7 +989,7 @@ contract LongShort is ILongShort, Initializable {
     if (batchedAmountOfPaymentTokensToDepositOrShiftToLong > 0) {
       valueChangeForLong += int256(batchedAmountOfPaymentTokensToDepositOrShiftToLong);
 
-      batchedAmountOfPaymentTokenTokensToDeposit[marketIndex][true] = 0;
+      batchedAmountOfPaymentTokenToDeposit[marketIndex][true] = 0;
 
       longChangeInSynthTokensTotalSupply += int256(
         _getAmountSynthToken(
@@ -1003,7 +1003,7 @@ contract LongShort is ILongShort, Initializable {
     if (batchedAmountOfPaymentTokensToDepositOrShiftToShort > 0) {
       valueChangeForShort += int256(batchedAmountOfPaymentTokensToDepositOrShiftToShort);
 
-      batchedAmountOfPaymentTokenTokensToDeposit[marketIndex][false] = 0;
+      batchedAmountOfPaymentTokenToDeposit[marketIndex][false] = 0;
 
       shortChangeInSynthTokensTotalSupply += int256(
         _getAmountSynthToken(
