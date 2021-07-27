@@ -120,7 +120,62 @@ let testUnit =
       ~contracts: ref(Helpers.coreContracts),
       ~accounts: ref(array(Ethers.Wallet.t)),
     ) => {
-  describe("mintNextPrice", () => {
+  describe("mintNextPrice external functions", () => {
+    let marketIndex = 1;
+    let amount = Helpers.randomTokenAmount();
+
+    let setup = () => {
+      contracts.contents.longShort->LongShortSmocked.InternalMock.setup;
+    };
+
+    describe("mintLongNextPrice", () => {
+      it("calls _mintNextPrice with isLong==true", () => {
+        let%Await _ = setup();
+
+        let%Await _ =
+          contracts.contents.longShort
+          ->LongShortSmocked.InternalMock.setupFunctionForUnitTesting(
+              ~functionName="mintLongNextPrice",
+            );
+
+        let%Await _ =
+          contracts.contents.longShort
+          ->LongShort.mintLongNextPrice(~marketIndex, ~amount);
+
+        let mintNextPriceCalls =
+          LongShortSmocked.InternalMock._mintNextPriceCalls();
+
+        mintNextPriceCalls->Chai.recordArrayDeepEqualFlat([|
+          {marketIndex, amount, isLong: true},
+        |]);
+      })
+    });
+
+    describe("mintShortNextPrice", () => {
+      it("calls _mintNextPrice with isLong==false", () => {
+        let%Await _ = setup();
+
+        let%Await _ =
+          contracts.contents.longShort
+          ->LongShortSmocked.InternalMock.setupFunctionForUnitTesting(
+              ~functionName="mintShortNextPrice",
+            );
+
+        let%Await _ =
+          contracts.contents.longShort
+          ->LongShort.mintShortNextPrice(~marketIndex, ~amount);
+
+        let mintNextPriceCalls =
+          LongShortSmocked.InternalMock._mintNextPriceCalls();
+
+        mintNextPriceCalls->Chai.recordArrayDeepEqualFlat([|
+          {marketIndex, amount, isLong: false},
+        |]);
+      })
+    });
+  });
+
+  describe("mintNextPrice internal function", () => {
     let marketIndex = 1;
     let marketUpdateIndex = Helpers.randomInteger();
     let amount = Helpers.randomTokenAmount();
