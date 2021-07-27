@@ -165,7 +165,8 @@ describe("Float System", () => {
       contracts := deployedContracts;
     });
     describeUnit("Unit tests", () => {
-      ShiftTokens.testUnit(~contracts, ~accounts)
+      ShiftTokens.testUnit(~contracts, ~accounts);
+      CalculateAccumulatedFloatInRange.testUnit(~contracts, ~accounts);
     });
   });
 });
