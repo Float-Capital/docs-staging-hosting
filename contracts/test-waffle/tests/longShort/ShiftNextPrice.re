@@ -7,7 +7,62 @@ let testUnit =
       ~contracts: ref(Helpers.coreContracts),
       ~accounts: ref(array(Ethers.Wallet.t)),
     ) => {
-  describe("_shiftPositionNextPrice", () => {
+  describe("shiftNextPrice external functions", () => {
+    let marketIndex = 1;
+    let synthTokensToShift = Helpers.randomTokenAmount();
+
+    let setup = () => {
+      contracts.contents.longShort->LongShortSmocked.InternalMock.setup;
+    };
+
+    describe("shiftPositionFromLongNextPrice", () => {
+      it("calls _shiftPositionNextPrice with isShiftFromLong==true", () => {
+        let%Await _ = setup();
+
+        let%Await _ =
+          contracts.contents.longShort
+          ->LongShortSmocked.InternalMock.setupFunctionForUnitTesting(
+              ~functionName="shiftPositionFromLongNextPrice",
+            );
+
+        let%Await _ =
+          contracts.contents.longShort
+          ->LongShort.shiftPositionFromLongNextPrice(~marketIndex, ~synthTokensToShift);
+
+        let shiftPositionNextPriceCalls =
+          LongShortSmocked.InternalMock._shiftPositionNextPriceCalls();
+
+        shiftPositionNextPriceCalls->Chai.recordArrayDeepEqualFlat([|
+          {marketIndex, synthTokensToShift, isShiftFromLong: true},
+        |]);
+      })
+    });
+
+    describe("shiftPositionFromShortNextPrice", () => {
+      it("calls _shiftPositionNextPrice with isShiftFromLong==false", () => {
+        let%Await _ = setup();
+
+        let%Await _ =
+          contracts.contents.longShort
+          ->LongShortSmocked.InternalMock.setupFunctionForUnitTesting(
+              ~functionName="shiftPositionFromShortNextPrice",
+            );
+
+        let%Await _ =
+          contracts.contents.longShort
+          ->LongShort.shiftPositionFromShortNextPrice(~marketIndex, ~synthTokensToShift);
+
+        let shiftPositionNextPriceCalls =
+          LongShortSmocked.InternalMock._shiftPositionNextPriceCalls();
+
+        shiftPositionNextPriceCalls->Chai.recordArrayDeepEqualFlat([|
+          {marketIndex, synthTokensToShift, isShiftFromLong: false},
+        |]);
+      })
+    });
+  });
+
+  describe("_shiftPositionNextPrice internal function", () => {
     let marketIndex = 1;
     let marketUpdateIndex = Helpers.randomInteger();
     let amount = Helpers.randomTokenAmount();
