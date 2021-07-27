@@ -307,6 +307,9 @@ contract Staker is IStaker, Initializable {
 
     _changeUnstakeFee(marketIndex, unstakeFeeBasisPoints);
 
+    // Rather start this at 1 to prevent confusion.
+    nextTokenShiftIndex[marketIndex] = 1;
+
     emit MarketAddedToStaker(
       marketIndex,
       unstakeFeeBasisPoints,
@@ -783,7 +786,10 @@ contract Staker is IStaker, Initializable {
 
     // If the user has outstanding token shift that have already been confirmed in the LongShort
     // contract, execute them first.
-    if (shiftIndex[marketIndex][msg.sender] < nextTokenShiftIndex[marketIndex]) {
+    if (
+      shiftIndex[marketIndex][msg.sender] != 0 &&
+      shiftIndex[marketIndex][msg.sender] < nextTokenShiftIndex[marketIndex]
+    ) {
       _mintAccumulatedFloat(marketIndex, msg.sender);
     }
 

@@ -216,6 +216,47 @@ let initialize = (~admin: Ethers.Wallet.t, ~exposeInternals: bool) => {
   })
 }
 
+type stakerUnitTestContracts = {
+  staker: Staker.t,
+  longShort: LongShort.t,
+  floatToken: FloatToken.t,
+  syntheticToken: SyntheticToken.t,
+  longShortSmocked: LongShortSmocked.t,
+  floatTokenSmocked: FloatTokenSmocked.t,
+  syntheticTokenSmocked: SyntheticTokenSmocked.t,
+}
+
+let initializeStakerUnit = () => {
+  JsPromise.all4((
+    Staker.Exposed.make(),
+    LongShort.make(),
+    FloatToken.make(),
+    SyntheticToken.make(
+      ~name="baseTestSynthToken",
+      ~symbol="BTST",
+      ~longShort=CONSTANTS.zeroAddress,
+      ~staker=CONSTANTS.zeroAddress,
+      ~marketIndex=0,
+      ~isLong=false,
+    ),
+  ))->JsPromise.then(((staker, longShort, floatToken, syntheticToken)) => {
+    JsPromise.all4((
+      staker->StakerSmocked.InternalMock.setup,
+      longShort->LongShortSmocked.make,
+      floatToken->FloatTokenSmocked.make,
+      syntheticToken->SyntheticTokenSmocked.make,
+    ))->JsPromise.map(((_, longShortSmocked, floatTokenSmocked, syntheticTokenSmocked)) => {
+      staker: staker,
+      longShort: longShort,
+      floatToken: floatToken,
+      syntheticToken: syntheticToken,
+      longShortSmocked: longShortSmocked,
+      floatTokenSmocked: floatTokenSmocked,
+      syntheticTokenSmocked: syntheticTokenSmocked,
+    })
+  })
+}
+
 let increaseTime: int => JsPromise.t<
   unit,
 > = %raw(`(seconds) => ethers.provider.send("evm_increaseTime", [seconds])`)
