@@ -39,6 +39,50 @@ let kCalc = (
   }
 }
 
+let xor = (a, b) => (!a && b) || (b && !a)
+
+let calcPaymentTokenFloatPerSecondUnscaled = (
+  ~tokenType,
+  ~longVal,
+  ~shortVal,
+  ~equibOffset,
+  ~balanceIncentiveExponent,
+) => {
+  open Ethers.BigNumber
+
+  let totalLocked = longVal->add(shortVal)
+  let equibOffsetScaled = equibOffset->mul(totalLocked)->div(CONSTANTS.tenToThe18)
+
+  let shortValAfterOffset = shortVal->sub(equibOffsetScaled)
+
+  let longIsSideWithMoreValAfterOffset = shortValAfterOffset->lt(longVal)
+
+  let sideWithLessValAfterEquibOffset = longIsSideWithMoreValAfterOffset
+    ? shortValAfterOffset
+    : longVal->add(equibOffsetScaled)
+
+  let rewardsForSideMoreValAfterOffset = if sideWithLessValAfterEquibOffset->lte(CONSTANTS.zeroBN) {
+    CONSTANTS.zeroBN
+  } else {
+    let numerator =
+      sideWithLessValAfterEquibOffset
+      ->div(CONSTANTS.stakeDivisorForSafeExponentiationDiv2)
+      ->pow(balanceIncentiveExponent)
+
+    let denominator =
+      totalLocked->div(CONSTANTS.stakeDivisorForSafeExponentiation)->pow(balanceIncentiveExponent)
+
+    numerator->mul(CONSTANTS.tenToThe18Div2)->div(denominator)
+  }
+
+  if xor(tokenType == "long", longIsSideWithMoreValAfterOffset) {
+    // token is for side with less val after offset
+    CONSTANTS.tenToThe18->sub(rewardsForSideMoreValAfterOffset)
+  } else {
+    rewardsForSideMoreValAfterOffset
+  }
+}
+
 let calculateFloatAPY = (
   longVal: Ethers.BigNumber.t,
   shortVal: Ethers.BigNumber.t,
@@ -46,42 +90,55 @@ let calculateFloatAPY = (
   kmultiplier: Ethers.BigNumber.t,
   initialTimestamp: Ethers.BigNumber.t,
   currentTimestamp: Ethers.BigNumber.t,
+  equilibriumOffset: Ethers.BigNumber.t,
+  balanceIncentiveExponent: Ethers.BigNumber.t,
+  floatTokenDollarWorth: Ethers.BigNumber.t,
   tokenType,
 ) => {
-  let total = longVal->Ethers.BigNumber.add(shortVal)
+  open Ethers.BigNumber
   let k = kCalc(kperiod, kmultiplier, initialTimestamp, currentTimestamp)
+  k
+  ->mul(
+    calcPaymentTokenFloatPerSecondUnscaled(
+      ~tokenType,
+      ~longVal,
+      ~shortVal,
+      ~equibOffset=equilibriumOffset,
+      ~balanceIncentiveExponent,
+    ),
+  )
+  ->mul(CONSTANTS.oneYearInSecondsMulTenToThe18) // one dai staked for a year at current price and fps
+  ->div(CONSTANTS.tenToThe42) // divided by float issuance decimal
+  ->mul(floatTokenDollarWorth) // gives this much float
+  ->div(CONSTANTS.tenToThe18) // converted back to dai
+}
+
+let calculateLendingProviderAPYForSide = (collateralTokenApy, longVal, shortVal, tokenType) => {
   switch tokenType {
+  // TO DO: account for different gradients once contracts have
+  //        the functionality to set gradients that aren't 1
   | "long" =>
-    switch longVal->Ethers.Utils.formatEther->Js.Float.fromString {
-    | 0.0 => CONSTANTS.zeroBN
-    | _ => k->Ethers.BigNumber.mul(shortVal)->Ethers.BigNumber.div(total)
+    if longVal >= shortVal {
+      0.0
+    } else {
+      collateralTokenApy *. (shortVal -. longVal) /. (shortVal +. longVal)
     }
+
   | "short" =>
-    switch shortVal->Ethers.Utils.formatEther->Js.Float.fromString {
-    | 0.0 => CONSTANTS.zeroBN
-    | _ => k->Ethers.BigNumber.mul(longVal)->Ethers.BigNumber.div(total)
+    if shortVal >= longVal {
+      0.0
+    } else {
+      collateralTokenApy *. (longVal -. shortVal) /. (shortVal +. longVal)
     }
-  | _ => CONSTANTS.oneHundredEth
+  | _ => collateralTokenApy
   }
 }
 
-let calculateLendingProviderAPYForSide = (apy, longVal, shortVal, tokenType) =>
+let calculateLendingProviderAPYForSideMapped = (apy, longVal, shortVal, tokenType) =>
   switch apy {
   | APYProvider.Loaded(collateralTokenApy) =>
     APYProvider.Loaded(
-      switch tokenType {
-      | "long" =>
-        switch longVal {
-        | 0.0 => collateralTokenApy
-        | _ => collateralTokenApy *. shortVal /. longVal
-        }
-      | "short" =>
-        switch shortVal {
-        | 0.0 => collateralTokenApy
-        | _ => collateralTokenApy *. longVal /. shortVal
-        }
-      | _ => collateralTokenApy
-      },
+      calculateLendingProviderAPYForSide(collateralTokenApy, longVal, shortVal, tokenType),
     )
   | a => a
   }
