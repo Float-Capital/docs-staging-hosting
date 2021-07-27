@@ -490,8 +490,8 @@ contract LongShort is ILongShort, Initializable {
   }
 
   /// @notice Return the minimum of the 2 parameters. If they are equal return the first parameter.
-  /// @param a A uint256
-  /// @param b A uint256
+  /// @param a Any uint256
+  /// @param b Any uint256
   /// @return min The minimum of the 2 parameters.
   function _getMin(uint256 a, uint256 b) internal pure virtual returns (uint256) {
     if (a > b) {
