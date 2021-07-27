@@ -471,11 +471,11 @@ let testUnit =
         it(
           "should call the depositPaymentToken function on the correct synthetic token with correct arguments.",
           () => {
-            let mintCalls =
+            let depositPaymentTokenCalls =
               yieldManagerRef.contents
               ->YieldManagerMockSmocked.depositPaymentTokenCalls;
             Chai.recordArrayDeepEqualFlat(
-              mintCalls,
+              depositPaymentTokenCalls,
               [|{amount: totalValueChangeForMarket}|],
             );
           },
