@@ -199,6 +199,6 @@ describe("Float System", () => {
     ShiftNextPrice.testUnit(~contracts, ~accounts);
     ExecuteNextPriceAction.testUnit(~contracts, ~accounts);
     ExecuteOutstandingNextPriceSettlements.testUnit(~contracts, ~accounts);
-    RedeemNextPrice.testUnit(~contracts, ~accounts);
+    ClaimAndDistributeYieldThenRebalanceMarket.testUnit(~contracts,~accounts);
   });
 });

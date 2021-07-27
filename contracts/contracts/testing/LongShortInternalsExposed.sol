@@ -240,4 +240,13 @@ contract LongShortInternalsExposed is LongShortMockable {
     userCurrentNextPriceUpdateIndex[marketIndex][user] = _userCurrentNextPriceUpdateIndex;
     marketUpdateIndex[marketIndex] = _marketUpdateIndex;
   }
+
+  function setClaimAndDistributeYieldThenRebalanceMarketGlobals(
+    uint32 marketIndex,
+    uint256 _syntheticTokenPoolValueLong,
+    uint256 _syntheticTokenPoolValueShort,
+  ) external {
+    syntheticTokenPoolValue[marketIndex][true] = _syntheticTokenPoolValueLong;
+    syntheticTokenPoolValue[marketIndex][false] = _syntheticTokenPoolValueShort;
+  }
 }
