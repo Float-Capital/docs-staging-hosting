@@ -130,13 +130,13 @@ describe("Float System", () => {
     // TESTS THAT MAY TEST MULTIPLE THINGS PER DEPLOYMENT
     describe("", () => {
       before_once'(() => {
-      let%Await deployedContracts =
-        Helpers.initialize(
-        ~admin=accounts.contents->Array.getUnsafe(0),
-        ~exposeInternals=true,
-      );
-      contracts := deployedContracts;
-    });
+        let%Await deployedContracts =
+          Helpers.initialize(
+            ~admin=accounts.contents->Array.getUnsafe(0),
+            ~exposeInternals=true,
+          );
+        contracts := deployedContracts;
+      });
       ChangeMarketLaunchIncentiveParameters.test(~contracts, ~accounts);
       AddNewStakingFund.test(~contracts, ~accounts);
       GetKValue.test(~contracts, ~accounts);
@@ -150,6 +150,22 @@ describe("Float System", () => {
       ClaimFloatCustom.test(~contracts, ~accounts);
       StakeFromUser.test(~contracts, ~accounts);
       Stake.test(~contracts, ~accounts);
+    });
+  });
+  describe("Smocked", () => {
+    let contracts = ref("NOT INITIALIZED"->Obj.magic);
+    let accounts = ref("NOT INITIALIZED"->Obj.magic);
+
+    before(() => {
+      let%Await loadedAccounts = Ethers.getSigners();
+      accounts := loadedAccounts;
+
+      let%Await deployedContracts = Helpers.initializeStakerUnit();
+
+      contracts := deployedContracts;
+    });
+    describeUnit("Unit tests", () => {
+      ShiftTokens.testUnit(~contracts, ~accounts)
     });
   });
 });
