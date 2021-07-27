@@ -207,10 +207,6 @@ contract StakerInternalsExposed is StakerMockable {
     latestRewardIndex[marketIndex] = latestRewardIndexForMarket;
   }
 
-  function setClaimFloatCustomParams(address longshortAddress) external {
-    longShort = longshortAddress;
-  }
-
   function set_stakeParams(
     address user,
     uint32 marketIndex,
