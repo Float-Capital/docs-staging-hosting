@@ -1,6 +1,5 @@
 open Globals;
 open LetOps;
-open StakerHelpers;
 open Mocha;
 
 let testUnit =
@@ -8,7 +7,7 @@ let testUnit =
       ~contracts: ref(Helpers.stakerUnitTestContracts),
       ~accounts: ref(array(Ethers.Wallet.t)),
     ) => {
-  describe_only("shiftTokens", () => {
+  describe("shiftTokens", () => {
     let marketIndex = Helpers.randomJsInteger();
     let synthTokensToShift = Helpers.randomTokenAmount();
     let synthTokensToShiftBeforeValue = Helpers.randomTokenAmount();
