@@ -2,13 +2,13 @@
 
 pragma solidity 0.8.3;
 
-import "./generated/StakerMockable.sol";
+import "../Staker.sol";
 
 /*
 NOTE: This contract is for testing purposes only!
 */
 
-contract StakerInternalsExposed is StakerMockable {
+contract StakerInternalStateSetters is Staker {
   ///////////////////////////////////////////////
   //////////// Test Helper Functions ////////////
   ///////////////////////////////////////////////
