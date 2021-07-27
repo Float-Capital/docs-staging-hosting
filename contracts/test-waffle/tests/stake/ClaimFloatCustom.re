@@ -1,6 +1,5 @@
 open Globals;
 open LetOps;
-open StakerHelpers;
 open Mocha;
 
 let randomLengthIntegerArr = (~minLength, ~maxLength) =>
@@ -8,73 +7,76 @@ let randomLengthIntegerArr = (~minLength, ~maxLength) =>
     Helpers.randomJsInteger()
   );
 
-let test =
+let testUnit =
     (
-      ~contracts: ref(Helpers.coreContracts),
+      ~contracts: ref(Helpers.stakerUnitTestContracts),
       ~accounts: ref(array(Ethers.Wallet.t)),
     ) => {
+  let marketIndices = randomLengthIntegerArr(~minLength=0, ~maxLength=100);
+  before_once'(() => {
+    let {longShortSmocked, staker} = contracts.contents;
+
+    let%Await _ =
+      staker->Staker.Exposed.setLongShort(
+        ~longShort=longShortSmocked.address,
+      );
+    ();
+  });
+
+  let commonTestsBetween_claimFloatCustomANDclaimFloatCustomFor = (~getUser) => {
+    it("calls LongShort.updateSystemStateMulti for the markets", () => {
+      let updateSystemStateMultiCalls =
+        contracts.contents.longShortSmocked
+        ->LongShortSmocked.updateSystemStateMultiCalls;
+
+      updateSystemStateMultiCalls->Chai.recordArrayDeepEqualFlat([|
+        {marketIndexes: marketIndices},
+      |]);
+    });
+
+    it("calls _mintAccumulatedFloatMulti with the correct arguments", () => {
+      let mintAccumulatedFloatMultiCalls =
+        StakerSmocked.InternalMock._mintAccumulatedFloatMultiCalls();
+      ();
+      mintAccumulatedFloatMultiCalls->Chai.recordArrayDeepEqualFlat([|
+        {marketIndexes: marketIndices, user: getUser()},
+      |]);
+    });
+  };
+
   describe("claimFloatCustom", () => {
-    let longShortSmockedRef: ref(LongShortSmocked.t) =
-      ref(LongShortSmocked.uninitializedValue);
+    let getUser = () => accounts.contents->Array.getUnsafe(0).address;
 
-    let promiseRef: ref(JsPromise.t(ContractHelpers.transaction)) =
-      ref(None->Obj.magic);
+    before_once'(() => {
+      let {staker} = contracts.contents;
 
-    let setup = (~marketIndices, ~shouldWaitForTransactionToFinish) => {
-      let%AwaitThen _ =
-        deployAndSetupStakerToUnitTest(
+      let%Await _ =
+        staker->StakerSmocked.InternalMock.setupFunctionForUnitTesting(
           ~functionName="claimFloatCustom",
-          ~contracts,
-          ~accounts,
         );
 
-      let%AwaitThen longShortSmocked =
-        LongShortSmocked.make(contracts^.longShort);
-
-      longShortSmockedRef := longShortSmocked;
-
-      longShortSmocked->LongShortSmocked.mockUpdateSystemStateMultiToReturn;
-
-      StakerSmocked.InternalMock.mock_mintAccumulatedFloatMultiToReturn();
-
-      let%AwaitThen _ =
-        contracts^.staker
-        ->Staker.Exposed.setClaimFloatCustomParams(
-            ~longshortAddress=longShortSmockedRef^.address,
-          );
-
-      let promise =
-        contracts^.staker
-        ->Staker.claimFloatCustom(~marketIndexes=marketIndices);
-      promiseRef := promise;
-      if (shouldWaitForTransactionToFinish) {
-        promise;
-      } else {
-        ()->JsPromise.resolve;
-      };
-    };
-
-    describe("case less than 51 markets", () => {
-      let marketIndices = randomLengthIntegerArr(~minLength=0, ~maxLength=50);
-      before_once'(() =>
-        setup(~marketIndices, ~shouldWaitForTransactionToFinish=true)
-      );
-
-      it("calls LongShort.updateSystemStateMulti for the markets", () => {
-        (longShortSmockedRef^)
-        ->LongShortSmocked.updateSystemStateMultiCalls
-        ->Array.getExn(0)
-        ->Chai.recordEqualDeep({marketIndexes: marketIndices})
-      });
-
-      it("calls _mintAccumulatedFloatMulti with the correct arguments", () => {
-        StakerSmocked.InternalMock._mintAccumulatedFloatMultiCalls()
-        ->Array.getExn(0)
-        ->Chai.recordEqualDeep({
-            marketIndexes: marketIndices,
-            user: accounts.contents->Array.getUnsafe(0).address,
-          })
-      });
+      staker->Staker.claimFloatCustom(~marketIndexes=marketIndices);
     });
+
+    commonTestsBetween_claimFloatCustomANDclaimFloatCustomFor(~getUser);
+  });
+
+  describe("claimFloatCustomFor", () => {
+    let user = Helpers.randomAddress();
+
+    before_once'(() => {
+      let {staker} = contracts.contents;
+
+      let%Await _ =
+        staker->StakerSmocked.InternalMock.setupFunctionForUnitTesting(
+          ~functionName="claimFloatCustomFor",
+        );
+
+      staker->Staker.claimFloatCustomFor(~marketIndexes=marketIndices, ~user);
+    });
+
+    commonTestsBetween_claimFloatCustomANDclaimFloatCustomFor(~getUser=() =>
+      user
+    );
   });
 };
