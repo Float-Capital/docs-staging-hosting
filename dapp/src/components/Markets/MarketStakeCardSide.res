@@ -11,7 +11,7 @@ let make = (~orderPostion, ~orderPostionMobile, ~marketName, ~isLong, ~apy, ~flo
     let maybeHotFlame = apy->isHotAPY ? `🔥` : ""
     let apyDisplay = (apy *. 100.)->Js.Float.toFixedWithPrecision(~digits=2)
 
-    isLong ? `${apyDisplay}${maybeHotFlame}` : `${maybeHotFlame}${apyDisplay}`
+    isLong ? `${apyDisplay}%${maybeHotFlame}` : `${maybeHotFlame}${apyDisplay}%`
   }
 
   <div

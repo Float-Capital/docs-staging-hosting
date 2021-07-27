@@ -4,6 +4,7 @@
 var Curry = require("rescript/lib/js/curry.js");
 var Decco = require("decco/src/Decco.js");
 var React = require("react");
+var Config = require("../config/Config.js");
 var Ethers = require("../ethereum/Ethers.js");
 var Future = require("rescript-future/src/Future.js");
 var Ethers$1 = require("ethers");
@@ -188,7 +189,7 @@ function determineAaveApy(setApy) {
     }
     
   };
-  Future.get($$Request.make("https://api.thegraph.com/subgraphs/name/aave/aave-v2-matic", "POST", /* Json */4, "{\"query\":\"{\\n  reserves(where:{symbol: \\\"DAI\\\"}){\\n    liquidityRate\\n  }\\n}\\n\",\"variables\":null}", Caml_option.some(Js_dict.fromArray([[
+  Future.get($$Request.make(Config.aaveGraphEndpoint, "POST", /* Json */4, "{\"query\":\"{\\n  reserves(where:{symbol: \\\"DAI\\\"}){\\n    liquidityRate\\n  }\\n}\\n\",\"variables\":null}", Caml_option.some(Js_dict.fromArray([[
                       "Content-type",
                       "application/json"
                     ]])), undefined, undefined, undefined, undefined, undefined), (function (response) {

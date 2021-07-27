@@ -7,6 +7,7 @@ type contractDetails = {
 type configShape = {
   graphEndpoint: string,
   priceHistoryGraphEndpoint: string,
+  aaveGraphEndpoint: string,
   networkId: int,
   networkName: string,
   networkCurrencyName: string,
@@ -27,6 +28,7 @@ let config: configShape = %raw(`require('config_file')`)
 let {
   graphEndpoint,
   priceHistoryGraphEndpoint,
+  aaveGraphEndpoint,
   networkId,
   networkName,
   networkCurrencyName,
