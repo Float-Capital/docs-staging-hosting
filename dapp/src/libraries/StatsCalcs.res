@@ -22,13 +22,13 @@ let trendingStakes = (~syntheticMarkets: array<Queries.SyntheticMarketInfo.t>, ~
       latestSystemState: {timestamp: currentTimestamp, totalLockedLong, totalLockedShort},
     },
   ) => {
-    let longApy = StakeCard.basicApyCalc(
+    let longApy = MarketCalculationHelpers.calculateLendingProviderAPYForSide(
       apy,
       totalLockedLong->Ethers.Utils.formatEther->Js.Float.fromString,
       totalLockedShort->Ethers.Utils.formatEther->Js.Float.fromString,
       "long",
     )
-    let shortApy = StakeCard.basicApyCalc(
+    let shortApy = MarketCalculationHelpers.calculateLendingProviderAPYForSide(
       apy,
       totalLockedLong->Ethers.Utils.formatEther->Js.Float.fromString,
       totalLockedShort->Ethers.Utils.formatEther->Js.Float.fromString,
@@ -42,6 +42,9 @@ let trendingStakes = (~syntheticMarkets: array<Queries.SyntheticMarketInfo.t>, ~
       CONSTANTS.kmultiplierHardcode,
       timestampCreated,
       currentTimestamp,
+      CONSTANTS.equilibriumOffsetHardcode,
+      CONSTANTS.balanceIncentiveExponentHardcode,
+      CONSTANTS.floatTokenDollarWorthHardcode,
       "long",
     )
 
@@ -52,6 +55,9 @@ let trendingStakes = (~syntheticMarkets: array<Queries.SyntheticMarketInfo.t>, ~
       CONSTANTS.kmultiplierHardcode,
       timestampCreated,
       currentTimestamp,
+      CONSTANTS.equilibriumOffsetHardcode,
+      CONSTANTS.balanceIncentiveExponentHardcode,
+      CONSTANTS.floatTokenDollarWorthHardcode,
       "short",
     )
 

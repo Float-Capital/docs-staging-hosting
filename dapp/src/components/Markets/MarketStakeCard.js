@@ -22,10 +22,10 @@ function MarketStakeCard(Props) {
   var longBeta = MarketCalculationHelpers.calculateBeta(totalValueLocked, totalLockedLong, totalLockedShort, true);
   var shortBeta = MarketCalculationHelpers.calculateBeta(totalValueLocked, totalLockedLong, totalLockedShort, false);
   var apy = APYProvider.useAPY(undefined);
-  var longApy = MarketCalculationHelpers.calculateLendingProviderAPYForSide(apy, Number(Ethers.Utils.formatEther(totalLockedLong)), Number(Ethers.Utils.formatEther(totalLockedShort)), "long");
-  var shortApy = MarketCalculationHelpers.calculateLendingProviderAPYForSide(apy, Number(Ethers.Utils.formatEther(totalLockedLong)), Number(Ethers.Utils.formatEther(totalLockedShort)), "short");
-  var longFloatApy = MarketCalculationHelpers.calculateFloatAPY(totalLockedLong, totalLockedShort, CONSTANTS.kperiodHardcode, CONSTANTS.kmultiplierHardcode, timestampCreated, currentTimestamp, "long");
-  var shortFloatApy = MarketCalculationHelpers.calculateFloatAPY(totalLockedLong, totalLockedShort, CONSTANTS.kperiodHardcode, CONSTANTS.kmultiplierHardcode, timestampCreated, currentTimestamp, "short");
+  var longApy = MarketCalculationHelpers.calculateLendingProviderAPYForSideMapped(apy, Number(Ethers.Utils.formatEther(totalLockedLong)), Number(Ethers.Utils.formatEther(totalLockedShort)), "long");
+  var shortApy = MarketCalculationHelpers.calculateLendingProviderAPYForSideMapped(apy, Number(Ethers.Utils.formatEther(totalLockedLong)), Number(Ethers.Utils.formatEther(totalLockedShort)), "short");
+  var longFloatApy = MarketCalculationHelpers.calculateFloatAPY(totalLockedLong, totalLockedShort, CONSTANTS.kperiodHardcode, CONSTANTS.kmultiplierHardcode, timestampCreated, currentTimestamp, CONSTANTS.equilibriumOffsetHardcode, CONSTANTS.balanceIncentiveExponentHardcode, CONSTANTS.floatTokenDollarWorthHardcode, "long");
+  var shortFloatApy = MarketCalculationHelpers.calculateFloatAPY(totalLockedLong, totalLockedShort, CONSTANTS.kperiodHardcode, CONSTANTS.kmultiplierHardcode, timestampCreated, currentTimestamp, CONSTANTS.equilibriumOffsetHardcode, CONSTANTS.balanceIncentiveExponentHardcode, CONSTANTS.floatTokenDollarWorthHardcode, "short");
   return React.createElement("div", {
               className: "p-4 rounded-lg flex flex-col justify-center bg-white bg-opacity-75 shadow-lg h-full"
             }, React.createElement("div", {
