@@ -147,7 +147,6 @@ describe("Float System", () => {
       MintFloat.test(~contracts, ~accounts);
       MintAccumulatedFloat.test(~contracts, ~accounts);
       ClaimFloat.test(~contracts, ~accounts);
-      ClaimFloatCustom.test(~contracts, ~accounts);
       StakeFromUser.test(~contracts, ~accounts);
       Stake.test(~contracts, ~accounts);
     });
@@ -165,7 +164,9 @@ describe("Float System", () => {
       contracts := deployedContracts;
     });
     describeUnit("Unit tests", () => {
-      ShiftTokens.testUnit(~contracts, ~accounts)
+      ShiftTokens.testUnit(~contracts, ~accounts);
+      CalculateAccumulatedFloatInRange.testUnit(~contracts, ~accounts);
+      ClaimFloatCustom.testUnit(~contracts, ~accounts);
     });
   });
 });
