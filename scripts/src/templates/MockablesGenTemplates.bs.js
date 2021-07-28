@@ -23,7 +23,7 @@ function internalMockingFileTemplate(fileNameWithoutExtension, parentImports, co
 }
 
 function mockingFileTemplate(prefix, fileNameWithoutExtension, fullBody) {
-  return prefix + "\nimport \"./" + fileNameWithoutExtension + "ForInternalMocking.sol\";\nimport \"../../" + fileNameWithoutExtension + ".sol\";\n\ncontract " + fileNameWithoutExtension + "Mockable is " + fileNameWithoutExtension + " {\n\n  " + fileNameWithoutExtension + "ForInternalMocking mocker;\n  bool shouldUseMock;\n  string functionToNotMock;\n\n  function setMocker(" + fileNameWithoutExtension + "ForInternalMocking _mocker) external {\n    mocker = _mocker;\n    shouldUseMock = true;\n  }\n\n  function setFunctionToNotMock(string calldata _functionToNotMock) external {\n    functionToNotMock = _functionToNotMock;\n  }\n\n" + fullBody + "\n}\n";
+  return prefix + "\nimport \"./" + fileNameWithoutExtension + "ForInternalMocking.sol\";\nimport \"../" + fileNameWithoutExtension + "InternalStateSetters.sol\";\n\ncontract " + fileNameWithoutExtension + "Mockable is " + fileNameWithoutExtension + "InternalStateSetters {\n\n  " + fileNameWithoutExtension + "ForInternalMocking mocker;\n  bool shouldUseMock;\n  string functionToNotMock;\n\n  function setMocker(" + fileNameWithoutExtension + "ForInternalMocking _mocker) external {\n    mocker = _mocker;\n    shouldUseMock = true;\n  }\n\n  function setFunctionToNotMock(string calldata _functionToNotMock) external {\n    functionToNotMock = _functionToNotMock;\n  }\n\n" + fullBody + "\n}\n";
 }
 
 exports.mockableFunctionBody = mockableFunctionBody;

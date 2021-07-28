@@ -56,9 +56,9 @@ contract ${fileNameWithoutExtension}ForInternalMocking {
 let mockingFileTemplate = (~prefix, ~fileNameWithoutExtension, ~fullBody) => {
   `${prefix}
 import "./${fileNameWithoutExtension}ForInternalMocking.sol";
-import "../../${fileNameWithoutExtension}.sol";
+import "../${fileNameWithoutExtension}InternalStateSetters.sol";
 
-contract ${fileNameWithoutExtension}Mockable is ${fileNameWithoutExtension} {
+contract ${fileNameWithoutExtension}Mockable is ${fileNameWithoutExtension}InternalStateSetters {
 
   ${fileNameWithoutExtension}ForInternalMocking mocker;
   bool shouldUseMock;
