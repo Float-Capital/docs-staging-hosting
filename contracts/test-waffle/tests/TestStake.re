@@ -143,7 +143,6 @@ describe("Float System", () => {
       CalculateFloatPerSecond.test(~contracts, ~accounts);
       CalculateNewCumulativeValue.test(~contracts, ~accounts);
       SetRewardObjects.test(~contracts, ~accounts);
-      AddNewStateForFloatRewards.test(~contracts, ~accounts);
       MintFloat.test(~contracts, ~accounts);
       MintAccumulatedFloat.test(~contracts, ~accounts);
       ClaimFloat.test(~contracts, ~accounts);
@@ -167,6 +166,7 @@ describe("Float System", () => {
       ShiftTokens.testUnit(~contracts, ~accounts);
       CalculateAccumulatedFloatInRange.testUnit(~contracts, ~accounts);
       ClaimFloatCustom.testUnit(~contracts, ~accounts);
+      AddNewStateForFloatRewards.testUnit(~contracts, ~accounts);
     });
   });
 });

@@ -131,8 +131,13 @@ contract StakerInternalStateSetters is Staker {
     syntheticTokens[marketIndex][false] = mockAddress;
   }
 
-  function setAddNewStateForFloatRewardsParams(address longShortAddress) external {
-    longShort = (longShortAddress);
+  function setAddNewStateForFloatRewardsGlobals(
+    uint32 marketIndex,
+    uint256 _nextTokenShiftIndex,
+    uint256 _latestRewardIndex
+  ) external {
+    nextTokenShiftIndex[marketIndex] = _nextTokenShiftIndex;
+    latestRewardIndex[marketIndex] = _latestRewardIndex;
   }
 
   function setGetMarketLaunchIncentiveParametersParams(
