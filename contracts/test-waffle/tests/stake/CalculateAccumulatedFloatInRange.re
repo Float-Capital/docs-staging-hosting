@@ -56,6 +56,7 @@ let testUnit =
       );
     };
 
+	// TODO: add tests to test case when amountStakedShort == 0 or amountStakedLong == 0
     it("[Happy Path] it calculates all the values correctly", () => {
       let%Await floatDue = setup();
 
