@@ -68,13 +68,13 @@ function calculateLendingProviderAPYForSide(collateralTokenApy, longVal, shortVa
         if (longVal >= shortVal) {
           return 0.0;
         } else {
-          return collateralTokenApy * (shortVal - longVal) / (shortVal + longVal);
+          return collateralTokenApy * (shortVal - longVal) / longVal;
         }
     case "short" :
         if (shortVal >= longVal) {
           return 0.0;
         } else {
-          return collateralTokenApy * (longVal - shortVal) / (shortVal + longVal);
+          return collateralTokenApy * (longVal - shortVal) / shortVal;
         }
     default:
       return collateralTokenApy;

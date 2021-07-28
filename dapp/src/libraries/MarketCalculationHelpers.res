@@ -121,14 +121,17 @@ let calculateLendingProviderAPYForSide = (collateralTokenApy, longVal, shortVal,
     if longVal >= shortVal {
       0.0
     } else {
-      collateralTokenApy *. (shortVal -. longVal) /. (shortVal +. longVal)
+      // apy = lending apy * marketApy * totalLocked / long
+      //      = lendingApy * ((short - long) / totalLocked) * totalLocked / long
+      //      = lendingApy * (short - long) / long
+      collateralTokenApy *. (shortVal -. longVal) /. longVal
     }
 
   | "short" =>
     if shortVal >= longVal {
       0.0
     } else {
-      collateralTokenApy *. (longVal -. shortVal) /. (shortVal +. longVal)
+      collateralTokenApy *. (longVal -. shortVal) /. shortVal
     }
   | _ => collateralTokenApy
   }
