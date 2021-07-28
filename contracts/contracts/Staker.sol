@@ -56,8 +56,10 @@ contract Staker is IStaker, Initializable {
 
   // Token shift management
   mapping(uint32 => uint256) public nextTokenShiftIndex;
-  // TODO: could pack these two into a struct of two uint128 for storage space optimization.
+  // TODO: could pack tokenShiftIndexToStakerStateMapping and longShortMarketPriceSnapshotIndex into a struct of two uint128 for storage space optimization.
+  /// @notice Used to link a token shift to a staker state
   mapping(uint256 => uint256) public tokenShiftIndexToStakerStateMapping;
+  /// @notice Used to fetch the price from LongShort at that point in time
   mapping(uint256 => uint256) public longShortMarketPriceSnapshotIndex;
   mapping(uint32 => mapping(address => uint256)) public shiftIndex;
   // This value is an `int256` so it can represent shifts in either direction.
@@ -126,24 +128,39 @@ contract Staker is IStaker, Initializable {
     ║          MODIFIERS          ║
     ╚═════════════════════════════╝*/
 
-  modifier onlyAdmin() virtual {
+  function onlyAdminModifierLogic() internal virtual {
     require(msg.sender == admin, "not admin");
+  }
+
+  modifier onlyAdmin() {
+    onlyAdminModifierLogic();
     _;
   }
 
-  modifier onlyValidSynthetic(address _synth) virtual {
+  function onlyValidSyntheticModifierLogic(address _synth) internal virtual {
     require(marketIndexOfToken[_synth] != 0, "not valid synth");
+  }
+
+  modifier onlyValidSynthetic(address _synth) {
+    onlyValidSyntheticModifierLogic(_synth);
     _;
+  }
+
+  function onlyValidMarketModifierLogic(uint32 marketIndex) internal virtual {
+    require(address(syntheticTokens[marketIndex][true]) != address(0), "not valid market");
   }
 
   modifier onlyValidMarket(uint32 marketIndex) {
-    require(address(syntheticTokens[marketIndex][true]) != address(0), "not valid market");
-    // require(latestRewardIndex[marketIndex] != 0, "not valid market");
+    onlyValidMarketModifierLogic(marketIndex);
     _;
   }
 
-  modifier onlyLongShort() virtual {
-    require(msg.sender == address(longShort));
+  function onlyLongShortModifierLogic() internal virtual {
+    require(msg.sender == address(longShort), "not long short");
+  }
+
+  modifier onlyLongShort() {
+    onlyLongShortModifierLogic();
     _;
   }
 

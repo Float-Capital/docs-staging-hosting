@@ -2,13 +2,13 @@
 
 pragma solidity 0.8.3;
 
-import "./generated/StakerMockable.sol";
+import "../Staker.sol";
 
 /*
 NOTE: This contract is for testing purposes only!
 */
 
-contract StakerInternalsExposed is StakerMockable {
+contract StakerInternalStateSetters is Staker {
   ///////////////////////////////////////////////
   //////////// Test Helper Functions ////////////
   ///////////////////////////////////////////////
@@ -131,8 +131,13 @@ contract StakerInternalsExposed is StakerMockable {
     syntheticTokens[marketIndex][false] = mockAddress;
   }
 
-  function setAddNewStateForFloatRewardsParams(address longShortAddress) external {
-    longShort = (longShortAddress);
+  function setAddNewStateForFloatRewardsGlobals(
+    uint32 marketIndex,
+    uint256 _nextTokenShiftIndex,
+    uint256 _latestRewardIndex
+  ) external {
+    nextTokenShiftIndex[marketIndex] = _nextTokenShiftIndex;
+    latestRewardIndex[marketIndex] = _latestRewardIndex;
   }
 
   function setGetMarketLaunchIncentiveParametersParams(
