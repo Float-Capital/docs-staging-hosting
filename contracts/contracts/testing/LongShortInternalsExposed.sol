@@ -240,4 +240,12 @@ contract LongShortInternalsExposed is LongShortMockable {
     userCurrentNextPriceUpdateIndex[marketIndex][user] = _userCurrentNextPriceUpdateIndex;
     marketUpdateIndex[marketIndex] = _marketUpdateIndex;
   }
+
+  function setDepositFundsGlobals(uint32 marketIndex, address paymentToken) external {
+    paymentTokens[marketIndex] = paymentToken;
+  }
+
+  function setLockFundsInMarketGlobals(uint32 marketIndex, address yieldManager) external {
+    yieldManagers[marketIndex] = yieldManager;
+  }
 }
