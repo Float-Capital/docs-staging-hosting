@@ -83,7 +83,7 @@ let test =
 
     describe("passing transaction", () => {
       before_each(() => {
-        let%Await _ = setup(~initialMultiplier=initialMultiplierFine);
+        let%AwaitThen _ = setup(~initialMultiplier=initialMultiplierFine);
         changeMarketLaunchIncentiveParametersCall.contents;
       });
 
