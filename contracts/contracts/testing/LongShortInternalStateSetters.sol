@@ -1,15 +1,12 @@
 pragma solidity 0.8.3;
 
-import "./generated/LongShortMockable.sol";
+import "../LongShort.sol";
 
 /*
 NOTE: This contract is for testing purposes only!
 */
 
-// TODO: rename this contract to "LongShortInternalStateSettors" and remove all
-//       exposed functions since they are part of the 'Mockable' contract now.
-//       Also update the contract-interface codegen so that it puts the correct functions as "Exposed".
-contract LongShortInternalsExposed is LongShortMockable {
+contract LongShortInternalStateSetters is LongShort {
   bool overRideexecuteOutstandingNextPriceSettlements;
 
   event executeOutstandingNextPriceSettlementsMock(address _user, uint32 _marketIndex);

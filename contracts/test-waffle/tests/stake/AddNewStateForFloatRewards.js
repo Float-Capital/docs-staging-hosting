@@ -6,17 +6,9 @@ var LetOps = require("../../library/LetOps.js");
 var Globals = require("../../library/Globals.js");
 var Helpers = require("../../library/Helpers.js");
 var CONSTANTS = require("../../CONSTANTS.js");
-var Belt_Array = require("rescript/lib/js/belt_Array.js");
-var StakerHelpers = require("./StakerHelpers.js");
 var StakerSmocked = require("../../library/smock/StakerSmocked.js");
 
-function test(contracts, accounts) {
-  var promiseRef = {
-    contents: undefined
-  };
-  var timestampRef = {
-    contents: CONSTANTS.zeroBn
-  };
+function testUnit(contracts, param) {
   var marketIndex = Helpers.randomJsInteger(undefined);
   var match = Helpers.Tuple.make5(Helpers.randomInteger);
   var timeDeltaGreaterThanZero = match[4];
@@ -25,49 +17,79 @@ function test(contracts, accounts) {
   var shortPrice = match[1];
   var longPrice = match[0];
   describe("addNewStateForFloatRewards", (function () {
-          var setup = function (timeDelta) {
-            var longShortAddress = accounts.contents[5];
-            return LetOps.AwaitThen.let_(StakerHelpers.deployAndSetupStakerToUnitTest("addNewStateForFloatRewards", contracts, accounts), (function (param) {
-                          StakerSmocked.InternalMock.mock_calculateTimeDeltaToReturn(timeDelta);
-                          StakerSmocked.InternalMock.mock_setRewardObjectsToReturn(undefined);
-                          return LetOps.AwaitThen.let_(Helpers.getBlock(undefined), (function (param) {
-                                        timestampRef.contents = ethers.BigNumber.from(param.timestamp + 1 | 0);
-                                        return LetOps.AwaitThen.let_(contracts.contents.staker.setAddNewStateForFloatRewardsParams(longShortAddress.address), (function (param) {
-                                                      promiseRef.contents = contracts.contents.staker.connect(longShortAddress).addNewStateForFloatRewards(marketIndex, longPrice, shortPrice, longValue, shortValue, Globals.zeroBn);
-                                                      return LetOps.Await.let_(promiseRef.contents, (function (param) {
-                                                                    
-                                                                  }));
-                                                    }));
+          Globals.before_once$p(function (param) {
+                return StakerSmocked.InternalMock.setupFunctionForUnitTesting(contracts.contents.staker, "addNewStateForFloatRewards");
+              });
+          var setup = function (longShortMarketPriceSnapshotIndexIfShiftExecuted, timeDelta) {
+            StakerSmocked.InternalMock.mock_calculateTimeDeltaToReturn(timeDelta);
+            return contracts.contents.staker.addNewStateForFloatRewards(marketIndex, longPrice, shortPrice, longValue, shortValue, longShortMarketPriceSnapshotIndexIfShiftExecuted);
+          };
+          describe("modifiers", (function () {
+                  it("calls the onlyLongShort modifier", (function () {
+                          return LetOps.Await.let_(contracts.contents.staker.addNewStateForFloatRewards(marketIndex, longPrice, shortPrice, longValue, shortValue, Globals.zeroBn), (function (param) {
+                                        return Chai.intEqual(undefined, StakerSmocked.InternalMock.onlyLongShortModifierLogicCalls(undefined).length, 1);
                                       }));
                         }));
-          };
+                  
+                }));
           describe("case timeDelta > 0", (function () {
+                  var longShortMarketPriceSnapshotIndexIfShiftExecuted = Helpers.randomTokenAmount(undefined);
                   Globals.before_once$p(function (param) {
-                        return setup(timeDeltaGreaterThanZero);
+                        return setup(longShortMarketPriceSnapshotIndexIfShiftExecuted, timeDeltaGreaterThanZero);
                       });
-                  it.skip("calls the onlyLongShort modifier", (function () {
-                          
-                        }));
                   it("calls calculateTimeDelta with correct arguments", (function () {
-                          return Chai.recordEqualFlat(Belt_Array.getExn(StakerSmocked.InternalMock._calculateTimeDeltaCalls(undefined), 0), {
-                                      marketIndex: marketIndex
-                                    });
+                          return Chai.recordArrayDeepEqualFlat(undefined, StakerSmocked.InternalMock._calculateTimeDeltaCalls(undefined), [{
+                                        marketIndex: marketIndex
+                                      }]);
                         }));
                   it("calls setRewardObjects with correct arguments", (function () {
-                          return Chai.recordEqualFlat(Belt_Array.getExn(StakerSmocked.InternalMock._setRewardObjectsCalls(undefined), 0), {
-                                      marketIndex: marketIndex,
-                                      longPrice: longPrice,
-                                      shortPrice: shortPrice,
-                                      longValue: longValue,
-                                      shortValue: shortValue
-                                    });
+                          return Chai.recordArrayDeepEqualFlat(undefined, StakerSmocked.InternalMock._setRewardObjectsCalls(undefined), [{
+                                        marketIndex: marketIndex,
+                                        longPrice: longPrice,
+                                        shortPrice: shortPrice,
+                                        longValue: longValue,
+                                        shortValue: shortValue
+                                      }]);
+                        }));
+                  
+                }));
+          describe("case longShortMarketPriceSnapshotIndexIfShiftExecuted > 0", (function () {
+                  var nextTokenShiftIndex = Helpers.randomInteger(undefined);
+                  var latestRewardIndex = Helpers.randomInteger(undefined);
+                  var longShortMarketPriceSnapshotIndexIfShiftExecuted = Helpers.randomInteger(undefined);
+                  var addNewStateForFloatRewardsTxPromise = {
+                    contents: "Not set yet"
+                  };
+                  Globals.before_once$p(function (param) {
+                        return LetOps.Await.let_(contracts.contents.staker.setAddNewStateForFloatRewardsGlobals(marketIndex, nextTokenShiftIndex, latestRewardIndex), (function (param) {
+                                      addNewStateForFloatRewardsTxPromise.contents = setup(longShortMarketPriceSnapshotIndexIfShiftExecuted, timeDeltaGreaterThanZero);
+                                      
+                                    }));
+                      });
+                  it("updates longShortMarketPriceSnapshotIndex to the 'longShortMarketPriceSnapshotIndexIfShiftExecuted' value recieved from long short", (function () {
+                          return LetOps.Await.let_(contracts.contents.staker.longShortMarketPriceSnapshotIndex(nextTokenShiftIndex), (function (longShortMarketPriceSnapshotIndex) {
+                                        return Chai.bnEqual(undefined, longShortMarketPriceSnapshotIndex, longShortMarketPriceSnapshotIndexIfShiftExecuted);
+                                      }));
+                        }));
+                  it("increments the tokenShiftIndexToStakerStateMapping", (function () {
+                          return LetOps.Await.let_(contracts.contents.staker.tokenShiftIndexToStakerStateMapping(nextTokenShiftIndex), (function (tokenShiftIndexToStakerStateMapping) {
+                                        return Chai.bnEqual(undefined, tokenShiftIndexToStakerStateMapping, Globals.add(latestRewardIndex, Globals.oneBn));
+                                      }));
+                        }));
+                  it("increments the nextTokenShiftIndex", (function () {
+                          return LetOps.Await.let_(contracts.contents.staker.nextTokenShiftIndex(marketIndex), (function (updatedNextTokenShiftIndex) {
+                                        return Chai.bnEqual(undefined, updatedNextTokenShiftIndex, Globals.add(nextTokenShiftIndex, Globals.oneBn));
+                                      }));
+                        }));
+                  it("emits the SynthTokensShifted event", (function () {
+                          return Chai.callEmitEvents(addNewStateForFloatRewardsTxPromise.contents, contracts.contents.staker, "SynthTokensShifted").withArgs();
                         }));
                   
                 }));
           describe("case timeDelta == 0", (function () {
                   it("doesn't call setRewardObjects", (function () {
-                          return LetOps.Await.let_(setup(CONSTANTS.zeroBn), (function (param) {
-                                        return Chai.intEqual(undefined, StakerSmocked.InternalMock._setRewardObjectsCalls(undefined).length, 0);
+                          return LetOps.Await.let_(setup(Globals.zeroBn, CONSTANTS.zeroBn), (function (param) {
+                                        return Chai.recordArrayDeepEqualFlat(undefined, StakerSmocked.InternalMock._setRewardObjectsCalls(undefined), []);
                                       }));
                         }));
                   
@@ -77,5 +99,5 @@ function test(contracts, accounts) {
   
 }
 
-exports.test = test;
+exports.testUnit = testUnit;
 /* Chai Not a pure module */
