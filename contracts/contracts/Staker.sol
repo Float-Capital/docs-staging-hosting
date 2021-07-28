@@ -132,7 +132,7 @@ contract Staker is IStaker, Initializable {
     require(msg.sender == admin, "not admin");
   }
 
-  modifier onlyAdmin() virtual {
+  modifier onlyAdmin() {
     onlyAdminModifierLogic();
     _;
   }
@@ -141,7 +141,7 @@ contract Staker is IStaker, Initializable {
     require(marketIndexOfToken[_synth] != 0, "not valid synth");
   }
 
-  modifier onlyValidSynthetic(address _synth) virtual {
+  modifier onlyValidSynthetic(address _synth) {
     onlyValidSyntheticModifierLogic(_synth);
     _;
   }
@@ -159,7 +159,7 @@ contract Staker is IStaker, Initializable {
     require(msg.sender == address(longShort), "not long short");
   }
 
-  modifier onlyLongShort() virtual {
+  modifier onlyLongShort() {
     onlyLongShortModifierLogic();
     _;
   }
