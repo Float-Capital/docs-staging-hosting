@@ -1,6 +1,7 @@
 {
   "graphEndpoint": "http://127.0.0.1:8000/subgraphs/name/float-capital/float-capital",
   "priceHistoryGraphEndpoint": "https://api.thegraph.com/subgraphs/id/QmRUfxBrFhXE8gVCGZCyHSm6MDJaAGDg1G9TXpYD7rS1m4",
+  "aaveGraphEndpoint": "https://api.thegraph.com/subgraphs/name/aave/aave-v2-polygon-mumbai",
   "networkId": 1337,
   "networkName": "localhost",
   "networkCurrencyName": "Test ETH",

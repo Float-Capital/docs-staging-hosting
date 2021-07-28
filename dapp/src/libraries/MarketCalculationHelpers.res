@@ -115,7 +115,7 @@ let calculateFloatAPY = (
 
 let calculateLendingProviderAPYForSide = (collateralTokenApy, longVal, shortVal, tokenType) => {
   switch tokenType {
-  // TO DO: account for different gradients once contracts have
+  // TODO: account for different gradients once contracts have
   //        the functionality to set gradients that aren't 1
   | "long" =>
     if longVal >= shortVal {
