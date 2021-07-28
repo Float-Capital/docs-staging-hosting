@@ -180,12 +180,12 @@ contract LongShort is ILongShort, Initializable {
     ║       CONTRACT SET-UP       ║
     ╚═════════════════════════════╝*/
 
-  /// @notice
-  /// @dev TODO TODO
-  /// @param _admin TODO
-  /// @param _treasury TODO
-  /// @param _tokenFactory TODO
-  /// @param _staker TODO
+  /// @notice Initializes the contract.
+  /// @dev Calls OpenZeppelin's initializer modifier.
+  /// @param _admin Address of the admin role.
+  /// @param _treasury Address of the treasury.
+  /// @param _tokenFactory Address of the contract which creates synthetic asset tokens.
+  /// @param _staker Address of the contract which handles synthetic asset stakes.
   function initialize(
     address _admin,
     address _treasury,
@@ -204,23 +204,23 @@ contract LongShort is ILongShort, Initializable {
     ║       MULTI-SIG ADMIN       ║
     ╚═════════════════════════════╝*/
 
-  /// @notice
-  /// @dev TODO TODO
-  /// @param _admin TODO
+  /// @notice Changes the admin address for this contract.
+  /// @dev Can only be called by the current admin.
+  /// @param _admin Address of the new admin.
   function changeAdmin(address _admin) external adminOnly {
     admin = _admin;
   }
 
-  /// @notice
-  /// @dev TODO TODO
+  /// @notice Changes the treasury contract address for this contract.
+  /// @dev Can only be called by the current admin.
   /// @param _treasury TODO
   function changeTreasury(address _treasury) external adminOnly {
     treasury = _treasury;
   }
 
   /// @notice Update oracle for a market
-  /// @dev TODO
-  /// @param marketIndex TODO
+  /// @dev Can only be called by the current admin.
+  /// @param marketIndex An int32 which uniquely identifies a market.
   /// @param _newOracleManager TODO
   function updateMarketOracle(uint32 marketIndex, address _newOracleManager) external adminOnly {
     // If not a oracle contract this would break things.. Test's arn't validating this
@@ -235,11 +235,11 @@ contract LongShort is ILongShort, Initializable {
     ╚═════════════════════════════╝*/
 
   /// @notice Creates an entirely new long/short market tracking an underlying oracle price. Make sure the synthetic names/symbols are unique.
-  /// @dev This does not make the market active. That `initializeMarket` function was split out separately to this function to reduce costs. TODO
-  /// @param syntheticName Name of the synthetic asset TODO
-  /// @param syntheticSymbol Symbol for the synthetic asset TODO
-  /// @param _paymentToken The address of the erc20 token used to buy this synthetic asset TODO
-  /// @param _oracleManager The address of the oracle manager that provides the price feed for this market TODO
+  /// @dev This does not make the market active. That `initializeMarket` function was split out separately to this function to reduce costs.
+  /// @param syntheticName Name of the synthetic asset
+  /// @param syntheticSymbol Symbol for the synthetic asset
+  /// @param _paymentToken The address of the erc20 token used to buy this synthetic asset
+  /// @param _oracleManager The address of the oracle manager that provides the price feed for this market
   /// @param _yieldManager The contract that manages depositing the paymentToken into a yield bearing protocol
   function newSyntheticMarket(
     string calldata syntheticName,
@@ -288,10 +288,10 @@ contract LongShort is ILongShort, Initializable {
     );
   }
 
-  /// @notice
-  /// @dev TODO TODO
-  /// @param initialMarketSeed TODO
-  /// @param marketIndex TODO
+  /// @notice Seeds a new market with initial capital.
+  /// @dev Only called when initializing a market.
+  /// @param initialMarketSeed Amount in wei for which to seed both sides of the market.
+  /// @param marketIndex An int32 which uniquely identifies a market.
   function _seedMarketInitially(uint256 initialMarketSeed, uint32 marketIndex) internal virtual {
     require(
       // You require at least 10^17 of the underlying payment token to seed the market.
@@ -310,15 +310,15 @@ contract LongShort is ILongShort, Initializable {
     emit NewMarketLaunchedAndSeeded(marketIndex, initialMarketSeed);
   }
 
-  /// @notice
-  /// @dev TODO TODO
-  /// @param marketIndex TODO
-  /// @param kInitialMultiplier TODO
-  /// @param kPeriod TODO
-  /// @param unstakeFeeBasisPoints TODO
-  /// @param initialMarketSeed TODO
-  /// @param balanceIncentiveCurveExponent TODO
-  /// @param balanceIncentiveCurveEquilibriumOffset TODO
+  /// @notice Sets a market as active once it has already been setup by newMarket.
+  /// @dev Seperated from newMarket due to gas considerations.
+  /// @param marketIndex An int32 which uniquely identifies the market.
+  /// @param kInitialMultiplier Linearly decreasing multiplier for Float token issuance for the market when staking synths.
+  /// @param kPeriod Time which kInitialMultiplier will last
+  /// @param unstakeFeeBasisPoints Base 1e18 percentage fee levied when unstaking for the market.
+  /// @param balanceIncentiveCurveExponent Sets the degree to which Float token issuance differs for market sides in unbalanced markets. See Staker.sol
+  /// @param balanceIncentiveCurveEquilibriumOffset An offset to acocunt for naturally imbalanced markets when Float token issuance should differ for market sides. See Staker.sol
+  /// @param initialMarketSeed Amount of ether that will be deposited in each market side to seed the market.
   function initializeMarket(
     uint32 marketIndex,
     uint256 kInitialMultiplier,
@@ -352,10 +352,11 @@ contract LongShort is ILongShort, Initializable {
     ║       GETTER FUNCTIONS       ║
     ╚══════════════════════════════╝*/
 
-  /// @notice
-  /// @dev TODO TODO
-  /// @param amountPaymentToken TODO
-  /// @param amountSynthToken TODO
+  /// @notice Calculates the conversion rate from synthetic tokens to payment tokens.
+  /// @dev Synth tokens have a fixed 18 decimals.
+  /// @param amountPaymentToken Amount of payment tokens in that token's lowest denomination.
+  /// @param amountSynthToken Amount of synth token in wei.
+  /// @return syntheticTokenPrice The calculated conversion rate in base 1e18.
   function _getSyntheticTokenPrice(uint256 amountPaymentToken, uint256 amountSynthToken)
     internal
     pure
@@ -365,10 +366,11 @@ contract LongShort is ILongShort, Initializable {
     return (amountPaymentToken * 1e18) / amountSynthToken;
   }
 
-  /// @notice
-  /// @dev TODO TODO
-  /// @param amountSynthToken TODO
-  /// @param price TODO
+  /// @notice Converts synth token amounts to payment token amounts at a synth token price.
+  /// @dev Price assumed base 1e18.
+  /// @param amountSynthToken Amount of synth token in wei.
+  /// @param price The conversion rate from synth to payment tokens in base 1e18.
+  /// @return amountPaymentToken The calculated amount of payment tokens in token's lowest denomination.
   function _getAmountPaymentToken(uint256 amountSynthToken, uint256 price)
     internal
     pure
@@ -378,10 +380,11 @@ contract LongShort is ILongShort, Initializable {
     return (amountSynthToken * price) / 1e18;
   }
 
-  /// @notice
-  /// @dev TODO TODO
-  /// @param amountPaymentToken TODO
-  /// @param price TODO
+  /// @notice Converts payment token amounts to synth token amounts at a synth token price.
+  /// @dev  Price assumed base 1e18.
+  /// @param amountPaymentToken Amount of payment tokens in that token's lowest denomination.
+  /// @param price The conversion rate from synth to payment tokens in base 1e18.
+  /// @return amountSynthToken The calculated amount of synthetic token in wei.
   function _getAmountSynthToken(uint256 amountPaymentToken, uint256 price)
     internal
     pure
@@ -391,12 +394,13 @@ contract LongShort is ILongShort, Initializable {
     return (amountPaymentToken * 1e18) / price;
   }
 
-  /// @notice
-  /// @dev TODO TODO
-  /// @param marketIndex TODO
-  /// @param amountSynthTokenShifted TODO
-  /// @param isShiftFromLong TODO
-  /// @param priceSnapshotIndex TODO
+  /// @notice Given an executed next price shift from tokens on one market side to the other, determines how many other side tokens the shift was worth.
+  /// @dev Intended for use primarily by Staker.sol
+  /// @param marketIndex An int32 which uniquely identifies a market.
+  /// @param amountSynthTokenShifted Amount of synth token in wei.
+  /// @param isShiftFromLong Whether the token shift is from long to short (true), or short to long (false).
+  /// @param priceSnapshotIndex Index which identifies which synth prices to use.
+  /// @return amountSynthShiftedToOtherSide The amount in wei of tokens for the other side that the shift was worth.
   function getAmountSynthTokenShifted(
     uint32 marketIndex,
     uint256 amountSynthTokenShifted,
@@ -425,11 +429,12 @@ contract LongShort is ILongShort, Initializable {
     It should return zero for all other types of next price actions.
     */
 
-  /// @notice
-  /// @dev TODO TODO
-  /// @param user TODO
-  /// @param marketIndex TODO
-  /// @param isLong TODO
+  /// @notice The amount of a synth token a user is owed following a batch execution.
+  /// @dev Used in SyntheticToken.sol balanceOf to allow for automatic reflection of next price actions.
+  /// @param user The address of the user for whom to execute the function for.
+  /// @param marketIndex An int32 which uniquely identifies a market.
+  /// @param isLong Whether it is for the long synthetic asset or the short synthetic asset.
+  /// @return confirmedButNotSettledBalance The amount in wei of tokens that the user is owed.
   function getUsersConfirmedButNotSettledSynthBalance(
     address user,
     uint32 marketIndex,
@@ -485,9 +490,9 @@ contract LongShort is ILongShort, Initializable {
   }
 
   /// @notice Return the minimum of the 2 parameters. If they are equal return the first parameter.
-  /// @dev TODO
-  /// @param a TODO
-  /// @param b TODO
+  /// @param a Any uint256
+  /// @param b Any uint256
+  /// @return min The minimum of the 2 parameters.
   function _getMin(uint256 a, uint256 b) internal pure virtual returns (uint256) {
     if (a > b) {
       return b;
@@ -496,16 +501,13 @@ contract LongShort is ILongShort, Initializable {
     }
   }
 
-  /**
-   * Returns the amount of accrued value that should go to each side of the
-   * market. To incentivise balance, more value goes to the weaker side in
-   * proportion to how imbalanced the market is.
-   */
-  /// @notice
-  /// @dev TODO TODO
-  /// @param longValue TODO
-  /// @param shortValue TODO
-  /// @param totalValueLockedInMarket TODO
+  /// @notice Calculates the percentage in base 1e18 of how much of the accrued yield for a market should be allocated to treasury.
+  /// @dev For gas considerations also returns whether the long side is imbalanced.
+  /// @param longValue The current total payment token value of the long side of the market.
+  /// @param shortValue The current total payment token value of the short side of the market.
+  /// @param totalValueLockedInMarket Total payment token value of both sides of the market.
+  /// @return isLongSideUnderbalanced Whether the long side initially had less value than the short side.
+  /// @return treasuryPercentE18 The percentage in base 1e18 of how much of the accrued yield for a market should be allocated to treasury.
   function _getYieldSplit(
     uint256 longValue,
     uint256 shortValue,
@@ -534,11 +536,13 @@ contract LongShort is ILongShort, Initializable {
     ║       HELPER FUNCTIONS       ║
     ╚══════════════════════════════╝*/
 
-  /// @notice
-  /// @dev TODO TODO
-  /// @param marketIndex TODO
-  /// @param newAssetPrice TODO
-  /// @param oldAssetPrice TODO
+  /// @notice First gets yield from the yield manager and allocates it markets, then reallocates the total market value to each side. The side with less value has full exposure.
+  /// @dev In one function as yield should be allocated before rebalancing. This prevents an attack whereby the user imbalances a side to capture all accrued yield.
+  /// @param marketIndex The market for which to execute the function for.
+  /// @param newAssetPrice The new asset price.
+  /// @param oldAssetPrice The old asset price.
+  /// @return longValue The value of the long side after rebalancing.
+  /// @return shortValue The value of the short side after rebalancing.
   function _claimAndDistributeYieldThenRebalanceMarket(
     uint32 marketIndex,
     int256 newAssetPrice,
@@ -590,9 +594,9 @@ contract LongShort is ILongShort, Initializable {
     ║     UPDATING SYSTEM STATE     ║
     ╚═══════════════════════════════╝*/
 
-  /// @notice
-  /// @dev Updates the value of the long and short sides within the system. TODO
-  /// @param marketIndex TODO
+  /// @notice Updates the value of the long and short sides to account for latest oracle price all batched next price actions.
+  /// @dev To prevent front-running only executes on price change from an oracle. We assume the function will be called for each market at least once per price update.
+  /// @param marketIndex The market index for which to update.
   function _updateSystemStateInternal(uint32 marketIndex)
     internal
     virtual
@@ -689,16 +693,14 @@ contract LongShort is ILongShort, Initializable {
     }
   }
 
-  /// @notice
-  /// @dev TODO TODO
-  /// @param marketIndex TODO
+  /// @notice Updates the state of a market to account for the latest oracle price update.
+  /// @param marketIndex An int32 which uniquely identifies a market.
   function updateSystemState(uint32 marketIndex) external override {
     _updateSystemStateInternal(marketIndex);
   }
 
-  /// @notice
-  /// @dev TODO TODO
-  /// @param marketIndexes TODO
+  /// @notice Updates the state of multiples markets to account for their latest oracle price updates.
+  /// @param marketIndexes An array of int32s which uniquely identify markets.
   function updateSystemStateMulti(uint32[] calldata marketIndexes) external override {
     for (uint256 i = 0; i < marketIndexes.length; i++) {
       _updateSystemStateInternal(marketIndexes[i]);
@@ -709,15 +711,18 @@ contract LongShort is ILongShort, Initializable {
     ║      DEPOSIT + WITHDRAWAL      ║
     ╚════════════════════════════════╝*/
 
-  /// @notice
-  /// @dev TODO TODO
-  /// @param marketIndex TODO
-  /// @param amount TODO
+  /// @notice Transfers payment tokens for a market from msg.sender to this contract.
+  /// @dev Transferred to this contract to be deposited to the yield manager on batch execution of next price actions.
+  /// @param marketIndex An int32 which uniquely identifies a market.
+  /// @param amount Amount of payment tokens in that token's lowest denominationto deposit.
   function _depositFunds(uint32 marketIndex, uint256 amount) internal virtual {
     require(IERC20(paymentTokens[marketIndex]).transferFrom(msg.sender, address(this), amount));
   }
 
-  // NOTE: Only used in seeding the market.
+  /// @notice Transfer payment tokens to the contract then lock them in yield manager.
+  /// @dev Only used in seeding a market.
+  /// @param marketIndex An int32 which uniquely identifies a market.
+  /// @param amount Amount of payment tokens in that token's lowest denominationto deposit.
   function _lockFundsInMarket(uint32 marketIndex, uint256 amount) internal virtual {
     _depositFunds(marketIndex, amount);
     IYieldManager(yieldManagers[marketIndex]).depositPaymentToken(amount);
@@ -727,11 +732,11 @@ contract LongShort is ILongShort, Initializable {
     ║       MINT POSITION       ║
     ╚═══════════════════════════╝*/
 
-  /// @notice
-  /// @dev TODO TODO
-  /// @param marketIndex TODO
-  /// @param amount TODO
-  /// @param isLong TODO
+  /// @notice Allows users to mint synthetic assets for a market. To prevent front-running these mints are executed on the next price update from the oracle.
+  /// @dev Called by external functions to mint either long or short. If a user mints multiple times before a price update, these are treated as a single mint.
+  /// @param marketIndex An int32 which uniquely identifies a market.
+  /// @param amount Amount of payment tokens in that token's lowest denominationfor which to mint synthetic assets at next price.
+  /// @param isLong Whether the mint is for a long or short synth.
   function _mintNextPrice(
     uint32 marketIndex,
     uint256 amount,
@@ -757,18 +762,16 @@ contract LongShort is ILongShort, Initializable {
     );
   }
 
-  /// @notice
-  /// @dev TODO TODO
-  /// @param marketIndex TODO
-  /// @param amount TODO
+  /// @notice Allows users to mint long synthetic assets for a market. To prevent front-running these mints are executed on the next price update from the oracle.
+  /// @param marketIndex An int32 which uniquely identifies a market.
+  /// @param amount Amount of payment tokens in that token's lowest denominationfor which to mint synthetic assets at next price.
   function mintLongNextPrice(uint32 marketIndex, uint256 amount) external {
     _mintNextPrice(marketIndex, amount, true);
   }
 
-  /// @notice
-  /// @dev TODO TODO
-  /// @param marketIndex TODO
-  /// @param amount TODO
+  /// @notice Allows users to mint short synthetic assets for a market. To prevent front-running these mints are executed on the next price update from the oracle.
+  /// @param marketIndex An int32 which uniquely identifies a market.
+  /// @param amount Amount of payment tokens in that token's lowest denominationfor which to mint synthetic assets at next price.
   function mintShortNextPrice(uint32 marketIndex, uint256 amount) external {
     _mintNextPrice(marketIndex, amount, false);
   }
@@ -777,11 +780,11 @@ contract LongShort is ILongShort, Initializable {
     ║      REDEEM POSITION      ║
     ╚═══════════════════════════╝*/
 
-  /// @notice
-  /// @dev TODO TODO
-  /// @param marketIndex TODO
-  /// @param tokensToRedeem TODO
-  /// @param isLong TODO
+  /// @notice Allows users to redeem their synthetic tokens for payment tokens. To prevent front-running these redeems are executed on the next price update from the oracle.
+  /// @dev Called by external functions to redeem either long or short. Payment tokens are actually transferred to the user when executeOutstandingNextPriceSettlements is called from a function call by the user.
+  /// @param marketIndex An int32 which uniquely identifies a market.
+  /// @param tokensToRedeem Amount in wei of synth tokens to redeem.
+  /// @param isLong Whether this redeem is for a long or short synth.
   function _redeemNextPrice(
     uint32 marketIndex,
     uint256 tokensToRedeem,
@@ -814,18 +817,16 @@ contract LongShort is ILongShort, Initializable {
     );
   }
 
-  /// @notice
-  /// @dev TODO TODO
-  /// @param marketIndex TODO
-  /// @param tokensToRedeem TODO TODO
+  /// @notice  Allows users to redeem long synthetic assets for a market. To prevent front-running these redeems are executed on the next price update from the oracle.
+  /// @param marketIndex An int32 which uniquely identifies a market.
+  /// @param tokensToRedeem Amount in wei of synth tokens to redeem at the next oracle price.
   function redeemLongNextPrice(uint32 marketIndex, uint256 tokensToRedeem) external {
     _redeemNextPrice(marketIndex, tokensToRedeem, true);
   }
 
-  /// @notice
-  /// @dev TODO TODO
-  /// @param marketIndex TODO
-  /// @param tokensToRedeem TODO
+  /// @notice  Allows users to redeem short synthetic assets for a market. To prevent front-running these redeems are executed on the next price update from the oracle.
+  /// @param marketIndex An int32 which uniquely identifies a market.
+  /// @param tokensToRedeem Amount in wei of synth tokens to redeem at the next oracle price.
   function redeemShortNextPrice(uint32 marketIndex, uint256 tokensToRedeem) external {
     _redeemNextPrice(marketIndex, tokensToRedeem, false);
   }
@@ -834,11 +835,11 @@ contract LongShort is ILongShort, Initializable {
     ║       SHIFT POSITION      ║
     ╚═══════════════════════════╝*/
 
-  /// @notice
-  /// @dev TODO TODO
-  /// @param marketIndex TODO
-  /// @param synthTokensToShift TODO
-  /// @param isShiftFromLong TODO
+  /// @notice  Allows users to shift their position from one side of the market to the other in a single transaction. To prevent front-running these shifts are executed on the next price update from the oracle.
+  /// @dev Called by external functions to shift either way. Intended for primary use by Staker.sol
+  /// @param marketIndex An int32 which uniquely identifies a market.
+  /// @param synthTokensToShift Amount in wei of synthetic tokens to shift from the one side to the other at the next oracle price update.
+  /// @param isShiftFromLong Whether the token shift is from long to short (true), or short to long (false).
   function _shiftPositionNextPrice(
     uint32 marketIndex,
     uint256 synthTokensToShift,
@@ -873,10 +874,9 @@ contract LongShort is ILongShort, Initializable {
     );
   }
 
-  /// @notice
-  /// @dev TODO TODO
-  /// @param marketIndex TODO
-  /// @param synthTokensToShift TODO
+  /// @notice Allows users to shift their position from long to short in a single transaction. To prevent front-running these shifts are executed on the next price update from the oracle.
+  /// @param marketIndex An int32 which uniquely identifies a market.
+  /// @param synthTokensToShift Amount in wei of synthetic tokens to shift from long to short the next oracle price update.
   function shiftPositionFromLongNextPrice(uint32 marketIndex, uint256 synthTokensToShift)
     external
     override
@@ -884,10 +884,9 @@ contract LongShort is ILongShort, Initializable {
     _shiftPositionNextPrice(marketIndex, synthTokensToShift, true);
   }
 
-  /// @notice
-  /// @dev TODO TODO
-  /// @param marketIndex TODO
-  /// @param synthTokensToShift TODO
+  /// @notice Allows users to shift their position from short to long in a single transaction. To prevent front-running these shifts are executed on the next price update from the oracle.
+  /// @param marketIndex An int32 which uniquely identifies a market.
+  /// @param synthTokensToShift Amount in wei of synthetic tokens to shift from the short to long at the next oracle price update.
   function shiftPositionFromShortNextPrice(uint32 marketIndex, uint256 synthTokensToShift)
     external
     override
@@ -899,11 +898,11 @@ contract LongShort is ILongShort, Initializable {
     ║     NEXT PRICE SETTLEMENTS     ║
     ╚════════════════════════════════╝*/
 
-  /// @notice
-  /// @dev TODO TODO
-  /// @param marketIndex TODO
-  /// @param user TODO
-  /// @param isLong TODO
+  /// @notice Transfers outstanding synth tokens from a next price mint to the user.
+  /// @dev The outstanding synths should already be reflected for the user due to balanceOf in SyntheticToken.sol, this just does the accounting.
+  /// @param marketIndex An int32 which uniquely identifies a market.
+  /// @param user The address of the user for whom to execute the function for.
+  /// @param isLong Whether this is for the long or short synth for the market.
   function _executeOutstandingNextPriceMints(
     uint32 marketIndex,
     address user,
@@ -926,11 +925,10 @@ contract LongShort is ILongShort, Initializable {
     }
   }
 
-  /// @notice
-  /// @dev TODO TODO
-  /// @param marketIndex TODO
-  /// @param user TODO
-  /// @param isLong TODO
+  /// @notice Transfers outstanding payment tokens from a next price redemption to the user.
+  /// @param marketIndex An int32 which uniquely identifies a market.
+  /// @param user The address of the user for whom to execute the function for.
+  /// @param isLong Whether this is for the long or short synth for the market.
   function _executeOutstandingNextPriceRedeems(
     uint32 marketIndex,
     address user,
@@ -952,11 +950,11 @@ contract LongShort is ILongShort, Initializable {
     }
   }
 
-  /// @notice
-  /// @dev TODO TODO
-  /// @param marketIndex TODO
-  /// @param user TODO
-  /// @param isShiftFromLong TODO
+  /// @notice Transfers outstanding synth tokens from a next price position shift to the user.
+  /// @dev The outstanding synths should already be reflected for the user due to balanceOf in SyntheticToken.sol, this just does the accounting.
+  /// @param marketIndex An int32 which uniquely identifies a market.
+  /// @param user The address of the user for whom to execute the function for.
+  /// @param isShiftFromLong Whether the token shift was from long to short (true), or short to long (false).
   function _executeOutstandingNextPriceTokenShifts(
     uint32 marketIndex,
     address user,
@@ -991,10 +989,10 @@ contract LongShort is ILongShort, Initializable {
     }
   }
 
-  /// @notice
-  /// @dev TODO TODO
-  /// @param user TODO
-  /// @param marketIndex TODO
+  /// @notice After markets have been batched updated on a new oracle price, transfers any owed tokens to a user from their next price actions for that update to that user.
+  /// @dev Once the market has updated for the next price, should be guaranteed (through modifiers) to execute for a user before user initiation of new next price actions.
+  /// @param user The address of the user for whom to execute the function for.
+  /// @param marketIndex An int32 which uniquely identifies a market.
   function _executeOutstandingNextPriceSettlements(address user, uint32 marketIndex)
     internal
     virtual
@@ -1014,10 +1012,9 @@ contract LongShort is ILongShort, Initializable {
     }
   }
 
-  /// @notice
-  /// @dev TODO TODO
-  /// @param user TODO
-  /// @param marketIndex TODO
+  /// @notice After markets have been batched updated on a new oracle price, transfers any owed tokens to a user from their next price actions for that update to that user.
+  /// @param user The address of the user for whom to execute the function for.
+  /// @param marketIndex An int32 which uniquely identifies a market.
   function executeOutstandingNextPriceSettlementsUser(address user, uint32 marketIndex)
     external
     override
@@ -1025,6 +1022,9 @@ contract LongShort is ILongShort, Initializable {
     _executeOutstandingNextPriceSettlements(user, marketIndex);
   }
 
+  /// @notice Executes outstanding next price settlements for a user for multiple markets.
+  /// @param user The address of the user for whom to execute the function for.
+  /// @param marketIndexes An array of int32s which each uniquely identify a market.
   function executeOutstandingNextPriceSettlementsUserMulti(
     address user,
     uint32[] memory marketIndexes
@@ -1038,10 +1038,10 @@ contract LongShort is ILongShort, Initializable {
     ║   BATCHED NEXT PRICE SETTLEMENT ACTIONS   ║
     ╚═══════════════════════════════════════════╝*/
 
-  /// @notice
-  /// @dev TODO TODO
-  /// @param marketIndex TODO
-  /// @param totalValueChangeForMarket TODO
+  /// @notice Either transfers funds to the yield manager, or deposits them, based on whether market value has increased or decreased.
+  /// @dev When all batched next price actions are handled the total value in the market can either increase or decrease based on the value of mints and redeems.
+  /// @param marketIndex An int32 which uniquely identifies a market.
+  /// @param totalValueChangeForMarket An int256 which indicates the magnitude and direction of the change in market value.
   function _handleTotalValueChangeForMarketWithYieldManager(
     uint32 marketIndex,
     int256 totalValueChangeForMarket
@@ -1059,11 +1059,11 @@ contract LongShort is ILongShort, Initializable {
     }
   }
 
-  /// @notice
-  /// @dev TODO TODO
-  /// @param marketIndex TODO
-  /// @param isLong TODO
-  /// @param changeInSynthTokensTotalSupply TODO
+  /// @notice Given a desired change in synth token supply, either mints or burns tokens to achieve that desired change.
+  /// @dev When all batched next price actions are executed total supply for a synth can either increase or decrease.
+  /// @param marketIndex An int32 which uniquely identifies a market.
+  /// @param isLong Whether this function should execute for the long or short synth for the market.
+  /// @param changeInSynthTokensTotalSupply The amount in wei by which synth token supply should change.
   function _handleChangeInSynthTokensTotalSupply(
     uint32 marketIndex,
     bool isLong,
@@ -1083,6 +1083,14 @@ contract LongShort is ILongShort, Initializable {
 
   // QUESTION: is the word "Settlements" confusing, since after this function the users are only
   //           "confirmed" not "settled"
+
+  /// @notice Performs all batched next price actions on an oracle price update.
+  /// @dev Mints or burns all synthetic tokens for this contract. Users are transferred their owed tokens when _executeOutstandingNexPriceSettlements is called for that user.
+  /// @param marketIndex An int32 which uniquely identifies a market.
+  /// @param syntheticTokenPriceLong The long synthetic token price for this oracle price update.
+  /// @param syntheticTokenPriceShort The short synthetic token price for this oracle price update.
+  /// @return valueChangeForLong The total value change for the long side after all batched actions are executed.
+  /// @return valueChangeForShort The total value change for the short side after all batched actions are executed.
   function _performOustandingBatchedSettlements(
     uint32 marketIndex,
     uint256 syntheticTokenPriceLong,
