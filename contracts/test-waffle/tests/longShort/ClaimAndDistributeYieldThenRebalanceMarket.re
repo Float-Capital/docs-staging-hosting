@@ -5,30 +5,72 @@ open Helpers;
 
 let testUnit =
     (
-      ~contracts: ref(Helpers.coreContracts),
+      ~contracts: ref(Helpers.longShortUnitTestContracts),
       ~accounts as _: ref(array(Ethers.Wallet.t)),
     ) => {
   describeUnit("_claimAndDistributeYieldThenRebalanceMarket", () => {
     let marketIndex = 1;
+    let oldAssetPrice = Helpers.randomTokenAmount();
+    let newAssetPrice =
+      Helpers.increaseOrDecreaseByRandomPercentageLessThan100Percent(
+        oldAssetPrice,
+      );
 
-    // let mockedYieldManager = ref(None->Obj.magic);
+    let marketAmountFromYieldManager = Helpers.randomTokenAmount();
+
+    let syntheticTokenPoolValueLong = Helpers.randomTokenAmount();
+    let syntheticTokenPoolValueShort = Helpers.randomTokenAmount();
+    let totalValueLockedInMarket =
+      syntheticTokenPoolValueLong->add(syntheticTokenPoolValueShort);
+
+    before_once'(() => {
+      contracts.contents.longShort
+      ->LongShortSmocked.InternalMock.setupFunctionForUnitTesting(
+          ~functionName="_claimAndDistributeYieldThenRebalanceMarket",
+        )
+    });
 
     it_only(
-      "gets the treasuryYieldPercent from _getYieldSplit (passing it the correct parameters)",
+      "gets the treasuryYieldPercent from _getYieldSplit and calls claimYieldAndGetMarketAmount on the yieldManager with correct amount",
       () => {
-        let longShort = contracts.contents.longShort;
-
-        let longValue = Helpers.randomTokenAmount();
-        let shortValue = Helpers.randomTokenAmount();
-        let totalValueLockedInMarket = longValue->add(shortValue);
+        let {longShort, yieldManagerSmocked} = contracts.contents;
 
         let%Await _ =
+          longShort->LongShort.Exposed.setClaimAndDistributeYieldThenRebalanceMarketGlobals(
+            ~marketIndex,
+            ~syntheticTokenPoolValueLong,
+            ~syntheticTokenPoolValueShort,
+            ~yieldManager=yieldManagerSmocked.address,
+          );
+
+        Js.log({"yieldmanager": yieldManagerSmocked.address});
+
+        yieldManagerSmocked->YieldManagerAaveSmocked.mockClaimYieldAndGetMarketAmountToReturn(
+          marketAmountFromYieldManager,
+        );
+
+        let%Await {treasuryPercentE18} =
           longShort->LongShort.Exposed._getYieldSplitExposed(
-            ~longValue,
-            ~shortValue,
+            ~longValue=syntheticTokenPoolValueLong,
+            ~shortValue=syntheticTokenPoolValueShort,
             ~totalValueLockedInMarket,
           );
-        ();
+
+        let%Await _ =
+          longShort->LongShort.Exposed._claimAndDistributeYieldThenRebalanceMarketExposed(
+            ~marketIndex,
+            ~newAssetPrice,
+            ~oldAssetPrice,
+          );
+
+        yieldManagerSmocked
+        ->YieldManagerAaveSmocked.claimYieldAndGetMarketAmountCalls
+        ->Chai.recordArrayDeepEqualFlat([|
+            {
+              totalValueRealizedForMarket: totalValueLockedInMarket,
+              treasuryPercentE18,
+            },
+          |]);
       },
     );
 
@@ -86,8 +128,8 @@ let testUnit =
     //     let syntheticTokenPoolValueShort = Helpers.randomTokenAmount();
     //     let totalValueRealizedForMarket =
     //       syntheticTokenPoolValueLong->add(syntheticTokenPoolValueShort);
-        
-    //     // mock longshort so that we can set the return values from _getYieldSplit 
+
+    //     // mock longshort so that we can set the return values from _getYieldSplit
     //     let%Await LongShortSmocked =
     //     longShort->LongShortSmocked.make;
     //     yieldManagerSmocked->LongShortSmocked.mockGetYieldSplitToReturn(

@@ -199,11 +199,27 @@ describe("Float System", () => {
     ShiftNextPrice.testUnit(~contracts, ~accounts);
     ExecuteNextPriceAction.testUnit(~contracts, ~accounts);
     ExecuteOutstandingNextPriceSettlements.testUnit(~contracts, ~accounts);
-    ClaimAndDistributeYieldThenRebalanceMarket.testUnit(
-      ~contracts,
-      ~accounts,
-    );
     RedeemNextPrice.testUnit(~contracts, ~accounts);
     DepositFunds.testUnit(~contracts, ~accounts);
+  });
+
+  describe("Smocked", () => {
+    let contracts = ref("NOT INITIALIZED"->Obj.magic);
+    let accounts = ref("NOT INITIALIZED"->Obj.magic);
+
+    before(() => {
+      let%Await loadedAccounts = Ethers.getSigners();
+      accounts := loadedAccounts;
+
+      let%Await deployedContracts = Helpers.initializeLongShortUnit();
+
+      contracts := deployedContracts;
+    });
+    describeUnit("Unit tests", () => {
+      ClaimAndDistributeYieldThenRebalanceMarket.testUnit(
+        ~contracts,
+        ~accounts,
+      )
+    });
   });
 });
