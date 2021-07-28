@@ -2,16 +2,17 @@
 
 pragma solidity 0.8.3;
 
-import "./generated/StakerMockable.sol";
+import "../Staker.sol";
 
 /*
 NOTE: This contract is for testing purposes only!
 */
 
-contract StakerInternalsExposed is StakerMockable {
+contract StakerInternalStateSetters is Staker {
   ///////////////////////////////////////////////
   //////////// Test Helper Functions ////////////
   ///////////////////////////////////////////////
+  // TODO: remove parts of this function that aren't necessary for the updated `_calculateAccumulatedFloat` funciton
   function setFloatRewardCalcParams(
     uint32 marketIndex,
     address longToken,
@@ -45,6 +46,25 @@ contract StakerInternalsExposed is StakerMockable {
 
     userAmountStaked[longToken][user] = newUserAmountStakedLong;
     userAmountStaked[shortToken][user] = newUserAmountStakedShort;
+  }
+
+  function setCalculateAccumulatedFloatInRangeGlobals(
+    uint32 marketIndex,
+    uint256 rewardIndexTo,
+    uint256 rewardIndexFrom,
+    uint256 syntheticRewardToLongToken,
+    uint256 syntheticRewardFromLongToken,
+    uint256 syntheticRewardToShortToken,
+    uint256 syntheticRewardFromShortToken
+  ) public {
+    syntheticRewardParams[marketIndex][rewardIndexTo]
+    .accumulativeFloatPerLongToken = syntheticRewardToLongToken;
+    syntheticRewardParams[marketIndex][rewardIndexTo]
+    .accumulativeFloatPerShortToken = syntheticRewardToShortToken;
+    syntheticRewardParams[marketIndex][rewardIndexFrom]
+    .accumulativeFloatPerLongToken = syntheticRewardFromLongToken;
+    syntheticRewardParams[marketIndex][rewardIndexFrom]
+    .accumulativeFloatPerShortToken = syntheticRewardFromShortToken;
   }
 
   function setShiftParams(
@@ -111,8 +131,13 @@ contract StakerInternalsExposed is StakerMockable {
     syntheticTokens[marketIndex][false] = mockAddress;
   }
 
-  function setAddNewStateForFloatRewardsParams(address longShortAddress) external {
-    longShort = (longShortAddress);
+  function setAddNewStateForFloatRewardsGlobals(
+    uint32 marketIndex,
+    uint256 _nextTokenShiftIndex,
+    uint256 _latestRewardIndex
+  ) external {
+    nextTokenShiftIndex[marketIndex] = _nextTokenShiftIndex;
+    latestRewardIndex[marketIndex] = _latestRewardIndex;
   }
 
   function setGetMarketLaunchIncentiveParametersParams(
@@ -185,10 +210,6 @@ contract StakerInternalsExposed is StakerMockable {
     uint256 latestRewardIndexForMarket
   ) public {
     latestRewardIndex[marketIndex] = latestRewardIndexForMarket;
-  }
-
-  function setClaimFloatCustomParams(address longshortAddress) external {
-    longShort = longshortAddress;
   }
 
   function set_stakeParams(

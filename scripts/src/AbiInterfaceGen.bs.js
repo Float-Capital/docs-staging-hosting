@@ -164,12 +164,12 @@ Belt_Array.map(files, (function (abiFileName) {
 
 var _writeFiles = Belt_Array.map(Js_dict.entries(moduleDictionary), (function (param) {
         var moduleName = param[0];
-        if (moduleName.endsWith("InternalsExposed")) {
+        if (moduleName.endsWith("Mockable")) {
           return ;
         }
         var match = param[1];
-        var optExposedFunctions = Js_dict.get(moduleDictionary, moduleName + "InternalsExposed");
-        var exposedFunctionBinding = optExposedFunctions !== undefined ? "module Exposed = {\n          let contractName = \"" + moduleName + "InternalsExposed\"\n\n          " + optExposedFunctions[1] + "\n          " + Caml_splice_call.spliceObjApply("", "concat", [Js_dict.values(optExposedFunctions[0])]) + "\n        }" : "";
+        var optExposedFunctions = Js_dict.get(moduleDictionary, moduleName + "Mockable");
+        var exposedFunctionBinding = optExposedFunctions !== undefined ? "module Exposed = {\n          let contractName = \"" + moduleName + "Mockable\"\n\n          " + optExposedFunctions[1] + "\n          " + Caml_splice_call.spliceObjApply("", "concat", [Js_dict.values(optExposedFunctions[0])]) + "\n        }" : "";
         Fs.writeFileSync("../contracts/test-waffle/library/contracts/" + moduleName + ".res", "\n@@ocaml.warning(\"-32\")\nopen ContractHelpers\ntype t = {address: Ethers.ethAddress}\nlet contractName = \"" + moduleName + "\"\n\nlet at: Ethers.ethAddress => JsPromise.t<t> = contractAddress =>\n  attachToContract(contractName, ~contractAddress)->Obj.magic\n\n" + match[1] + "\n\n" + Caml_splice_call.spliceObjApply("", "concat", [Js_dict.values(match[0])]) + "\n\n" + exposedFunctionBinding + "\n", "utf8");
         
       }));

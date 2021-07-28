@@ -1,15 +1,12 @@
 pragma solidity 0.8.3;
 
-import "./generated/LongShortMockable.sol";
+import "../LongShort.sol";
 
 /*
 NOTE: This contract is for testing purposes only!
 */
 
-// TODO: rename this contract to "LongShortInternalStateSettors" and remove all
-//       exposed functions since they are part of the 'Mockable' contract now.
-//       Also update the contract-interface codegen so that it puts the correct functions as "Exposed".
-contract LongShortInternalsExposed is LongShortMockable {
+contract LongShortInternalStateSetters is LongShort {
   bool overRideexecuteOutstandingNextPriceSettlements;
 
   event executeOutstandingNextPriceSettlementsMock(address _user, uint32 _marketIndex);
@@ -245,8 +242,18 @@ contract LongShortInternalsExposed is LongShortMockable {
     uint32 marketIndex,
     uint256 _syntheticTokenPoolValueLong,
     uint256 _syntheticTokenPoolValueShort,
+    address yieldManager
   ) external {
     syntheticTokenPoolValue[marketIndex][true] = _syntheticTokenPoolValueLong;
     syntheticTokenPoolValue[marketIndex][false] = _syntheticTokenPoolValueShort;
+    yieldManagers[marketIndex] = yieldManager;
+  }
+
+  function setDepositFundsGlobals(uint32 marketIndex, address paymentToken) external {
+    paymentTokens[marketIndex] = paymentToken;
+  }
+
+  function setLockFundsInMarketGlobals(uint32 marketIndex, address yieldManager) external {
+    yieldManagers[marketIndex] = yieldManager;
   }
 }
