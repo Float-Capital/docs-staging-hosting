@@ -249,4 +249,12 @@ contract LongShortInternalsExposed is LongShortMockable {
     syntheticTokenPoolValue[marketIndex][true] = _syntheticTokenPoolValueLong;
     syntheticTokenPoolValue[marketIndex][false] = _syntheticTokenPoolValueShort;
   }
+
+  function setDepositFundsGlobals(uint32 marketIndex, address paymentToken) external {
+    paymentTokens[marketIndex] = paymentToken;
+  }
+
+  function setLockFundsInMarketGlobals(uint32 marketIndex, address yieldManager) external {
+    yieldManagers[marketIndex] = yieldManager;
+  }
 }

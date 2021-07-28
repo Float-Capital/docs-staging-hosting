@@ -15,6 +15,7 @@ let smockedCalculateAccumulatedFloatInRangeMultiBinding = [%raw
   {|(_r, arr) => _r.smocked._calculateAccumulatedFloatInRangeMock.will.return.with(makeIterator(arr))|}
 ];
 
+// TODO: now that `_calculateAccumulatedFloatInRange` is unit tested, simplify these tests and use mocks correctly (this is a bit of an integration test)
 let test = (~contracts: ref(Helpers.coreContracts)) =>
   describe("calculateAccumulatedFloat", () => {
     // generate all parameters randomly

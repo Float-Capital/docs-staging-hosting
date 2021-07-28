@@ -12,6 +12,7 @@ contract StakerInternalsExposed is StakerMockable {
   ///////////////////////////////////////////////
   //////////// Test Helper Functions ////////////
   ///////////////////////////////////////////////
+  // TODO: remove parts of this function that aren't necessary for the updated `_calculateAccumulatedFloat` funciton
   function setFloatRewardCalcParams(
     uint32 marketIndex,
     address longToken,
@@ -47,6 +48,25 @@ contract StakerInternalsExposed is StakerMockable {
     userAmountStaked[shortToken][user] = newUserAmountStakedShort;
   }
 
+  function setCalculateAccumulatedFloatInRangeGlobals(
+    uint32 marketIndex,
+    uint256 rewardIndexTo,
+    uint256 rewardIndexFrom,
+    uint256 syntheticRewardToLongToken,
+    uint256 syntheticRewardFromLongToken,
+    uint256 syntheticRewardToShortToken,
+    uint256 syntheticRewardFromShortToken
+  ) public {
+    syntheticRewardParams[marketIndex][rewardIndexTo]
+    .accumulativeFloatPerLongToken = syntheticRewardToLongToken;
+    syntheticRewardParams[marketIndex][rewardIndexTo]
+    .accumulativeFloatPerShortToken = syntheticRewardToShortToken;
+    syntheticRewardParams[marketIndex][rewardIndexFrom]
+    .accumulativeFloatPerLongToken = syntheticRewardFromLongToken;
+    syntheticRewardParams[marketIndex][rewardIndexFrom]
+    .accumulativeFloatPerShortToken = syntheticRewardFromShortToken;
+  }
+
   function setShiftParams(
     uint32 marketIndex,
     address user,
@@ -63,6 +83,29 @@ contract StakerInternalsExposed is StakerMockable {
     nextTokenShiftIndex[marketIndex] = _nextTokenShiftIndex;
     longShortMarketPriceSnapshotIndex[_shiftIndex] = _longShortMarketPriceSnapshotIndex;
     tokenShiftIndexToStakerStateMapping[_shiftIndex] = _tokenShiftIndexToStakerStateMapping;
+  }
+
+  function setShiftTokensParams(
+    uint32 marketIndex,
+    bool isShiftFromLong,
+    address user,
+    uint256 synthTokensToShift,
+    uint256 _userAmountStaked,
+    uint256 _shiftIndex,
+    uint256 _nextTokenShiftIndex,
+    address syntheticToken
+  ) public {
+    shiftIndex[marketIndex][user] = _shiftIndex;
+    nextTokenShiftIndex[marketIndex] = _nextTokenShiftIndex;
+
+    if (isShiftFromLong) {
+      amountToShiftFromLongUser[marketIndex][user] = synthTokensToShift;
+    } else {
+      amountToShiftFromShortUser[marketIndex][user] = synthTokensToShift;
+    }
+
+    syntheticTokens[marketIndex][isShiftFromLong] = syntheticToken;
+    userAmountStaked[syntheticToken][user] = _userAmountStaked;
   }
 
   function setLongShort(address _longShort) public {
@@ -162,10 +205,6 @@ contract StakerInternalsExposed is StakerMockable {
     uint256 latestRewardIndexForMarket
   ) public {
     latestRewardIndex[marketIndex] = latestRewardIndexForMarket;
-  }
-
-  function setClaimFloatCustomParams(address longshortAddress) external {
-    longShort = longshortAddress;
   }
 
   function set_stakeParams(
