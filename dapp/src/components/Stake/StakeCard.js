@@ -17,37 +17,6 @@ function calculateDollarValue(tokenPrice, amountStaked) {
   return tokenPrice.mul(amountStaked).div(CONSTANTS.tenToThe18);
 }
 
-function basicApyCalc(collateralTokenApy, longVal, shortVal, tokenType) {
-  switch (tokenType) {
-    case "long" :
-        if (longVal !== 0.0) {
-          return collateralTokenApy * shortVal / longVal;
-        } else {
-          return collateralTokenApy;
-        }
-    case "short" :
-        if (shortVal !== 0.0) {
-          return collateralTokenApy * longVal / shortVal;
-        } else {
-          return collateralTokenApy;
-        }
-    default:
-      return collateralTokenApy;
-  }
-}
-
-function mappedBasicCalc(apy, longVal, shortVal, tokenType) {
-  if (typeof apy === "number" || apy.TAG !== /* Loaded */0) {
-    return apy;
-  } else {
-    return {
-            TAG: 0,
-            _0: basicApyCalc(apy._0, longVal, shortVal, tokenType),
-            [Symbol.for("name")]: "Loaded"
-          };
-  }
-}
-
 function StakeCard(Props) {
   var param = Props.syntheticMarket;
   var match = param.latestSystemState;
@@ -66,10 +35,10 @@ function StakeCard(Props) {
   var longDollarValueStaked = calculateDollarValue(match.longTokenPrice.price.price, match$2.totalStaked);
   var shortDollarValueStaked = calculateDollarValue(match.shortTokenPrice.price.price, match$1.totalStaked);
   var totalDollarValueStake = longDollarValueStaked.add(shortDollarValueStaked);
-  var longApy = mappedBasicCalc(apy, Number(Ethers.Utils.formatEther(totalLockedLong)), Number(Ethers.Utils.formatEther(totalLockedShort)), "long");
-  var shortApy = mappedBasicCalc(apy, Number(Ethers.Utils.formatEther(totalLockedLong)), Number(Ethers.Utils.formatEther(totalLockedShort)), "short");
-  var longFloatApy = MarketCalculationHelpers.calculateFloatAPY(totalLockedLong, totalLockedShort, CONSTANTS.kperiodHardcode, CONSTANTS.kmultiplierHardcode, timestampCreated, currentTimestamp, "long");
-  var shortFloatApy = MarketCalculationHelpers.calculateFloatAPY(totalLockedLong, totalLockedShort, CONSTANTS.kperiodHardcode, CONSTANTS.kmultiplierHardcode, timestampCreated, currentTimestamp, "short");
+  var longApy = MarketCalculationHelpers.calculateLendingProviderAPYForSideMapped(apy, Number(Ethers.Utils.formatEther(totalLockedLong)), Number(Ethers.Utils.formatEther(totalLockedShort)), "long");
+  var shortApy = MarketCalculationHelpers.calculateLendingProviderAPYForSideMapped(apy, Number(Ethers.Utils.formatEther(totalLockedLong)), Number(Ethers.Utils.formatEther(totalLockedShort)), "short");
+  var longFloatApy = MarketCalculationHelpers.calculateFloatAPY(totalLockedLong, totalLockedShort, CONSTANTS.kperiodHardcode, CONSTANTS.kmultiplierHardcode, timestampCreated, currentTimestamp, CONSTANTS.equilibriumOffsetHardcode, CONSTANTS.balanceIncentiveExponentHardcode, CONSTANTS.floatTokenDollarWorthHardcode, "long");
+  var shortFloatApy = MarketCalculationHelpers.calculateFloatAPY(totalLockedLong, totalLockedShort, CONSTANTS.kperiodHardcode, CONSTANTS.kmultiplierHardcode, timestampCreated, currentTimestamp, CONSTANTS.equilibriumOffsetHardcode, CONSTANTS.balanceIncentiveExponentHardcode, CONSTANTS.floatTokenDollarWorthHardcode, "short");
   var stakeButtons = function (param) {
     return React.createElement("div", {
                 className: "flex flex-wrap justify-evenly"
@@ -160,7 +129,5 @@ function StakeCard(Props) {
 var make = StakeCard;
 
 exports.calculateDollarValue = calculateDollarValue;
-exports.basicApyCalc = basicApyCalc;
-exports.mappedBasicCalc = mappedBasicCalc;
 exports.make = make;
 /* Misc Not a pure module */

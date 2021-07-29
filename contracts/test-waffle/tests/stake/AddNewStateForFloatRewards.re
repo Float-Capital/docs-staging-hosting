@@ -1,90 +1,156 @@
 open Globals;
 open LetOps;
-open StakerHelpers;
 open Mocha;
-let test =
+
+let testUnit =
     (
-      ~contracts: ref(Helpers.coreContracts),
-      ~accounts: ref(array(Ethers.Wallet.t)),
+      ~contracts: ref(Helpers.stakerUnitTestContracts),
+      ~accounts as _: ref(array(Ethers.Wallet.t)),
     ) => {
-  let promiseRef: ref(JsPromise.t(ContractHelpers.transaction)) =
-    ref(None->Obj.magic);
-  let timestampRef: ref(Ethers.BigNumber.t) = ref(CONSTANTS.zeroBn);
   let marketIndex = Helpers.randomJsInteger();
   let (longPrice, shortPrice, longValue, shortValue, timeDeltaGreaterThanZero) =
     Helpers.Tuple.make5(Helpers.randomInteger);
-  describe("addNewStateForFloatRewards", () => {
-    let setup = (~timeDelta) => {
-      let longShortAddress = (accounts^)->Array.getUnsafe(5);
-      let%AwaitThen _ =
-        deployAndSetupStakerToUnitTest(
-          ~functionName="addNewStateForFloatRewards",
-          ~contracts,
-          ~accounts,
-        );
-      // StakerSmocked.InternalMock.mockOnlyFloatToReturn();
-      StakerSmocked.InternalMock.mock_calculateTimeDeltaToReturn(timeDelta);
-      StakerSmocked.InternalMock.mock_setRewardObjectsToReturn();
-      let%AwaitThen {timestamp} = Helpers.getBlock();
-      timestampRef := (timestamp + 1)->Ethers.BigNumber.fromInt; // one second per block
 
-      let%AwaitThen _ =
-        contracts^.staker
-        ->Staker.Exposed.setAddNewStateForFloatRewardsParams(
-            ~longShortAddress=longShortAddress.address,
-          );
-      promiseRef :=
-        contracts^.staker
-        ->ContractHelpers.connect(~address=longShortAddress)
-        ->Obj.magic
-        ->Staker.addNewStateForFloatRewards(
-            ~marketIndex,
-            ~longPrice,
-            ~shortPrice,
-            ~longValue,
-            ~shortValue,
-            ~longShortMarketPriceSnapshotIndexIfShiftExecuted=zeroBn,
-          );
-      let%Await _ = promiseRef^;
-      ();
+  describe("addNewStateForFloatRewards", () => {
+    before_once'(() => {
+      contracts.contents.staker
+      ->StakerSmocked.InternalMock.setupFunctionForUnitTesting(
+          ~functionName="addNewStateForFloatRewards",
+        )
+    });
+
+    let setup =
+        (~longShortMarketPriceSnapshotIndexIfShiftExecuted, ~timeDelta) => {
+      StakerSmocked.InternalMock.mock_calculateTimeDeltaToReturn(timeDelta);
+
+      contracts.contents.staker
+      ->Staker.addNewStateForFloatRewards(
+          ~marketIndex,
+          ~longPrice,
+          ~shortPrice,
+          ~longValue,
+          ~shortValue,
+          ~longShortMarketPriceSnapshotIndexIfShiftExecuted,
+        );
     };
 
-    describe("case timeDelta > 0", () => {
-      before_once'(() => setup(~timeDelta=timeDeltaGreaterThanZero));
+    describe("modifiers", () =>
+      it("calls the onlyLongShort modifier", () => {
+        let%Await _ =
+          contracts.contents.staker
+          ->Staker.addNewStateForFloatRewards(
+              ~marketIndex,
+              ~longPrice,
+              ~shortPrice,
+              ~longValue,
+              ~shortValue,
+              ~longShortMarketPriceSnapshotIndexIfShiftExecuted=zeroBn,
+            );
 
-      it_skip("calls the onlyLongShort modifier", () => {
-        // StakerSmocked.InternalMock.onlyFloatCalls()
-        // ->Array.length
-        // ->Chai.intEqual(1)
-        ()
-      });
+        StakerSmocked.InternalMock.onlyLongShortModifierLogicCalls()
+        ->Array.length
+        ->Chai.intEqual(1);
+      })
+    );
+
+    describe("case timeDelta > 0", () => {
+      let longShortMarketPriceSnapshotIndexIfShiftExecuted =
+        Helpers.randomTokenAmount();
+
+      before_once'(() =>
+        setup(
+          ~timeDelta=timeDeltaGreaterThanZero,
+          ~longShortMarketPriceSnapshotIndexIfShiftExecuted,
+        )
+      );
 
       it("calls calculateTimeDelta with correct arguments", () => {
         StakerSmocked.InternalMock._calculateTimeDeltaCalls()
-        ->Array.getExn(0)
-        ->Chai.recordEqualFlat({marketIndex: marketIndex})
+        ->Chai.recordArrayDeepEqualFlat([|{marketIndex: marketIndex}|])
       });
 
       it("calls setRewardObjects with correct arguments", () => {
         StakerSmocked.InternalMock._setRewardObjectsCalls()
-        ->Array.getExn(0)
-        ->Chai.recordEqualFlat({
-            marketIndex,
-            longPrice,
-            shortPrice,
-            longValue,
-            shortValue,
-          })
+        ->Chai.recordArrayDeepEqualFlat([|
+            {marketIndex, longPrice, shortPrice, longValue, shortValue},
+          |])
+      });
+    });
+
+    describe("case longShortMarketPriceSnapshotIndexIfShiftExecuted > 0", () => {
+      let nextTokenShiftIndex = Helpers.randomInteger();
+      let latestRewardIndex = Helpers.randomInteger();
+      let longShortMarketPriceSnapshotIndexIfShiftExecuted =
+        Helpers.randomInteger();
+      let addNewStateForFloatRewardsTxPromise = ref("Not set yet"->Obj.magic);
+
+      before_once'(() => {
+        let%Await _ =
+          contracts.contents.staker
+          ->Staker.Exposed.setAddNewStateForFloatRewardsGlobals(
+              ~marketIndex,
+              ~nextTokenShiftIndex,
+              ~latestRewardIndex,
+            );
+
+        addNewStateForFloatRewardsTxPromise :=
+          setup(
+            ~timeDelta=timeDeltaGreaterThanZero,
+            ~longShortMarketPriceSnapshotIndexIfShiftExecuted,
+          );
+      });
+
+      it(
+        "updates longShortMarketPriceSnapshotIndex to the 'longShortMarketPriceSnapshotIndexIfShiftExecuted' value recieved from long short",
+        () => {
+          let%Await longShortMarketPriceSnapshotIndex =
+            contracts.contents.staker
+            ->Staker.longShortMarketPriceSnapshotIndex(nextTokenShiftIndex);
+          Chai.bnEqual(
+            longShortMarketPriceSnapshotIndex,
+            longShortMarketPriceSnapshotIndexIfShiftExecuted,
+          );
+        },
+      );
+
+      it("increments the tokenShiftIndexToStakerStateMapping", () => {
+        let%Await tokenShiftIndexToStakerStateMapping =
+          contracts.contents.staker
+          ->Staker.tokenShiftIndexToStakerStateMapping(nextTokenShiftIndex);
+        Chai.bnEqual(
+          tokenShiftIndexToStakerStateMapping,
+          latestRewardIndex->add(oneBn),
+        );
+      });
+
+      it("increments the nextTokenShiftIndex", () => {
+        let%Await updatedNextTokenShiftIndex =
+          contracts.contents.staker->Staker.nextTokenShiftIndex(marketIndex);
+        Chai.bnEqual(
+          updatedNextTokenShiftIndex,
+          nextTokenShiftIndex->add(oneBn),
+        );
+      });
+
+      it("emits the SynthTokensShifted event", () => {
+        Chai.callEmitEvents(
+          ~call=addNewStateForFloatRewardsTxPromise.contents,
+          ~contract=contracts.contents.staker->Obj.magic,
+          ~eventName="SynthTokensShifted",
+        )
+        ->Chai.withArgs0
       });
     });
 
     describe("case timeDelta == 0", () => {
-      // still calls onlyLongShort + calculateTimeDelta but unwieldy to test twice
       it("doesn't call setRewardObjects", () => {
-        let%Await _ = setup(~timeDelta=CONSTANTS.zeroBn);
+        let%Await _ =
+          setup(
+            ~timeDelta=CONSTANTS.zeroBn,
+            ~longShortMarketPriceSnapshotIndexIfShiftExecuted=zeroBn,
+          );
         StakerSmocked.InternalMock._setRewardObjectsCalls()
-        ->Array.length
-        ->Chai.intEqual(0);
+        ->Chai.recordArrayDeepEqualFlat([||]);
       })
     });
   });

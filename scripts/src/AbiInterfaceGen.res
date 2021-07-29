@@ -158,12 +158,12 @@ let _writeFiles =
   moduleDictionary
   ->Js.Dict.entries
   ->Array.map(((moduleName, (functions, contractConstructor))) => {
-    if !(moduleName->Js.String2.endsWith("InternalsExposed")) {
-      let optExposedFunctions = moduleDictionary->Js.Dict.get(moduleName ++ "InternalsExposed")
+    if !(moduleName->Js.String2.endsWith("Mockable")) {
+      let optExposedFunctions = moduleDictionary->Js.Dict.get(moduleName ++ "Mockable")
       let exposedFunctionBinding = switch optExposedFunctions {
       | Some((functions, contractConstructor)) =>
         `module Exposed = {
-          let contractName = "${moduleName}InternalsExposed"
+          let contractName = "${moduleName}Mockable"
 
           ${contractConstructor}
           ${functions->Js.Dict.values->Js.String.concatMany("")}

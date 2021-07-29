@@ -10,6 +10,8 @@ var graphEndpoint = config.graphEndpoint;
 
 var priceHistoryGraphEndpoint = config.priceHistoryGraphEndpoint;
 
+var aaveGraphEndpoint = config.aaveGraphEndpoint;
+
 var networkId = config.networkId;
 
 var networkName = config.networkName;
@@ -43,6 +45,7 @@ var floatToken = match.FloatToken;
 exports.config = config;
 exports.graphEndpoint = graphEndpoint;
 exports.priceHistoryGraphEndpoint = priceHistoryGraphEndpoint;
+exports.aaveGraphEndpoint = aaveGraphEndpoint;
 exports.networkId = networkId;
 exports.networkName = networkName;
 exports.networkCurrencyName = networkCurrencyName;

@@ -157,22 +157,30 @@ contract LongShort is ILongShort, Initializable {
    * Necessary to update system state before any contract actions (deposits / withdraws)
    */
 
-  modifier adminOnly() virtual {
+  function adminOnlyModifierLogic() internal virtual {
     require(msg.sender == admin, "only admin");
+  }
+
+  modifier adminOnly() {
+    adminOnlyModifierLogic();
     _;
   }
 
-  modifier requireMarketExists(uint32 marketIndex) virtual {
+  function requireMarketExistsModifierLogic(uint32 marketIndex) internal view virtual {
     require(marketExists[marketIndex], "market doesn't exist");
+  }
+
+  modifier requireMarketExists(uint32 marketIndex) {
+    requireMarketExistsModifierLogic(marketIndex);
     _;
   }
 
-  modifier executeOutstandingNextPriceSettlements(address user, uint32 marketIndex) virtual {
+  modifier executeOutstandingNextPriceSettlements(address user, uint32 marketIndex) {
     _executeOutstandingNextPriceSettlements(user, marketIndex);
     _;
   }
 
-  modifier updateSystemStateMarket(uint32 marketIndex) virtual {
+  modifier updateSystemStateMarket(uint32 marketIndex) {
     _updateSystemStateInternal(marketIndex);
     _;
   }

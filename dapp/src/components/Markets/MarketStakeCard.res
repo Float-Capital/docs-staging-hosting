@@ -27,13 +27,13 @@ let make = (
 
   let apy = APYProvider.useAPY()
 
-  let longApy = MarketCalculationHelpers.calculateLendingProviderAPYForSide(
+  let longApy = MarketCalculationHelpers.calculateLendingProviderAPYForSideMapped(
     apy,
     totalLockedLong->Ethers.Utils.formatEther->Js.Float.fromString,
     totalLockedShort->Ethers.Utils.formatEther->Js.Float.fromString,
     "long",
   )
-  let shortApy = MarketCalculationHelpers.calculateLendingProviderAPYForSide(
+  let shortApy = MarketCalculationHelpers.calculateLendingProviderAPYForSideMapped(
     apy,
     totalLockedLong->Ethers.Utils.formatEther->Js.Float.fromString,
     totalLockedShort->Ethers.Utils.formatEther->Js.Float.fromString,
@@ -47,6 +47,9 @@ let make = (
     CONSTANTS.kmultiplierHardcode,
     timestampCreated,
     currentTimestamp,
+    CONSTANTS.equilibriumOffsetHardcode,
+    CONSTANTS.balanceIncentiveExponentHardcode,
+    CONSTANTS.floatTokenDollarWorthHardcode,
     "long",
   )
 
@@ -57,6 +60,9 @@ let make = (
     CONSTANTS.kmultiplierHardcode,
     timestampCreated,
     currentTimestamp,
+    CONSTANTS.equilibriumOffsetHardcode,
+    CONSTANTS.balanceIncentiveExponentHardcode,
+    CONSTANTS.floatTokenDollarWorthHardcode,
     "short",
   )
 
