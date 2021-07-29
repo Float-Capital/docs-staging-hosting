@@ -90,7 +90,7 @@ const deployTestMarket = async (
     await paymentToken.grantRole(mintRole, yieldManager.address);
   }
 
-  await longShortInstance.newSyntheticMarket(
+  await longShortInstance.createNewSyntheticMarket(
     syntheticName,
     syntheticSymbol,
     fundTokenAddress,

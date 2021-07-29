@@ -161,7 +161,7 @@ contract LongShort is ILongShort, Initializable {
     _;
   }
 
-  modifier assertMarketExists(uint32 marketIndex) virtual {
+  modifier requireMarketExists(uint32 marketIndex) virtual {
     require(marketExists[marketIndex], "market doesn't exist");
     _;
   }
@@ -241,7 +241,7 @@ contract LongShort is ILongShort, Initializable {
   /// @param _paymentToken The address of the erc20 token used to buy this synthetic asset
   /// @param _oracleManager The address of the oracle manager that provides the price feed for this market
   /// @param _yieldManager The contract that manages depositing the paymentToken into a yield bearing protocol
-  function newSyntheticMarket(
+  function createNewSyntheticMarket(
     string calldata syntheticName,
     string calldata syntheticSymbol,
     address _paymentToken,
@@ -310,8 +310,8 @@ contract LongShort is ILongShort, Initializable {
     emit NewMarketLaunchedAndSeeded(marketIndex, initialMarketSeed);
   }
 
-  /// @notice Sets a market as active once it has already been setup by newSyntheticMarket.
-  /// @dev Seperated from newSyntheticMarket due to gas considerations.
+  /// @notice Sets a market as active once it has already been setup by createNewSyntheticMarket.
+  /// @dev Seperated from createNewSyntheticMarket due to gas considerations.
   /// @param marketIndex An int32 which uniquely identifies the market.
   /// @param kInitialMultiplier Linearly decreasing multiplier for Float token issuance for the market when staking synths.
   /// @param kPeriod Time which kInitialMultiplier will last
@@ -444,7 +444,7 @@ contract LongShort is ILongShort, Initializable {
     view
     virtual
     override
-    assertMarketExists(marketIndex)
+    requireMarketExists(marketIndex)
     returns (uint256 confirmedButNotSettledBalance)
   {
     uint256 currentMarketUpdateIndex = marketUpdateIndex[marketIndex];
@@ -596,7 +596,7 @@ contract LongShort is ILongShort, Initializable {
   function _updateSystemStateInternal(uint32 marketIndex)
     internal
     virtual
-    assertMarketExists(marketIndex)
+    requireMarketExists(marketIndex)
   {
     // If a negative int is return this should fail.
     int256 newAssetPrice = IOracleManager(oracleManagers[marketIndex]).updatePrice();

@@ -87,7 +87,7 @@ let createSyntheticMarket = (
         paymentToken->ERC20Mock.grantRole(~role=minterRole, ~account=yieldManager.address)
       )
     longShort
-    ->LongShort.newSyntheticMarket(
+    ->LongShort.createNewSyntheticMarket(
       ~syntheticName=marketName,
       ~syntheticSymbol=marketSymbol,
       ~paymentToken=paymentToken.address,

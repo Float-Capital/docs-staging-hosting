@@ -197,7 +197,7 @@ let testIntegration =
         markets->Array.getUnsafe(0);
 
       let%Await _ =
-        longShort->LongShort.newSyntheticMarket(
+        longShort->LongShort.createNewSyntheticMarket(
           ~syntheticName="Test",
           ~syntheticSymbol="T",
           ~paymentToken=paymentToken.address,
