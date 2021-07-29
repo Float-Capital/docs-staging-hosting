@@ -160,6 +160,36 @@ describe("Float System", () => {
         );
       });
     });
+  describe("changeMarketTreasurySplitGradient", () => {
+      let newGradient = twoBn;
+      let marketIndex = 1;
+
+      it("should allow admin to update a gradient", () => {
+        let%Await _ =
+          contracts.contents.longShort
+          ->LongShort.changeMarketTreasurySplitGradient(~marketIndex, ~marketTreasurySplitGradientE18=newGradient);
+
+        let%Await updatedGradient =
+          contracts.contents.longShort->LongShort.marketTreasurySplitGradientsE18(marketIndex);
+
+        Chai.bnEqual(
+          updatedGradient,
+          newGradient,
+        );
+      });
+
+      it("shouldn't allow non admin to update the treasury address", () => {
+        let attackerAddress = accounts.contents->Array.getUnsafe(5);
+
+        Chai.expectRevert(
+          ~transaction=
+            contracts.contents.longShort
+            ->ContractHelpers.connect(~address=attackerAddress)
+            ->LongShort.changeMarketTreasurySplitGradient(~marketIndex, ~marketTreasurySplitGradientE18=newGradient),
+          ~reason="only admin",
+        );
+      });
+    });
   });
 
   describeUnit("LongShort - internals exposed", () => {
