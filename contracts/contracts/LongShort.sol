@@ -322,7 +322,7 @@ contract LongShort is ILongShort, Initializable {
   /// @param marketIndex An int32 which uniquely identifies the market.
   /// @param kInitialMultiplier Linearly decreasing multiplier for Float token issuance for the market when staking synths.
   /// @param kPeriod Time which kInitialMultiplier will last
-  /// @param unstakeFeeBasisPoints Base 1e18 percentage fee levied when unstaking for the market.
+  /// @param unstakeFeeE18 Base 1e18 percentage fee levied when unstaking for the market.
   /// @param balanceIncentiveCurveExponent Sets the degree to which Float token issuance differs for market sides in unbalanced markets. See Staker.sol
   /// @param balanceIncentiveCurveEquilibriumOffset An offset to account for naturally imbalanced markets when Float token issuance should differ for market sides. See Staker.sol
   /// @param initialMarketSeed Amount of ether that will be deposited in each market side to seed the market.
@@ -330,7 +330,7 @@ contract LongShort is ILongShort, Initializable {
     uint32 marketIndex,
     uint256 kInitialMultiplier,
     uint256 kPeriod,
-    uint256 unstakeFeeBasisPoints,
+    uint256 unstakeFeeE18,
     uint256 initialMarketSeed,
     uint256 balanceIncentiveCurveExponent,
     int256 balanceIncentiveCurveEquilibriumOffset
@@ -347,7 +347,7 @@ contract LongShort is ILongShort, Initializable {
       syntheticTokens[latestMarket][false],
       kInitialMultiplier,
       kPeriod,
-      unstakeFeeBasisPoints,
+      unstakeFeeE18,
       balanceIncentiveCurveExponent,
       balanceIncentiveCurveEquilibriumOffset
     );
