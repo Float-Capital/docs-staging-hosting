@@ -28,7 +28,8 @@ contract LongShort is ILongShort, Initializable {
     ╚═════════════════════════════╝*/
 
   // Fixed-precision constants
-  address public constant DEAD_ADDRESS = 0xf10A7_F10A7_f10A7_F10a7_F10A7_f10a7_F10A7_f10a7;
+  address public constant INTO_THE_ETHERS_ADDRESS =
+    0xf10A7_F10A7_f10A7_F10a7_F10A7_f10a7_F10A7_f10a7;
   uint256[45] private __constantsGap;
 
   // Global state
@@ -301,8 +302,14 @@ contract LongShort is ILongShort, Initializable {
 
     _lockFundsInMarket(marketIndex, initialMarketSeed * 2);
 
-    ISyntheticToken(syntheticTokens[latestMarket][true]).mint(DEAD_ADDRESS, initialMarketSeed);
-    ISyntheticToken(syntheticTokens[latestMarket][false]).mint(DEAD_ADDRESS, initialMarketSeed);
+    ISyntheticToken(syntheticTokens[latestMarket][true]).mint(
+      INTO_THE_ETHERS_ADDRESS,
+      initialMarketSeed
+    );
+    ISyntheticToken(syntheticTokens[latestMarket][false]).mint(
+      INTO_THE_ETHERS_ADDRESS,
+      initialMarketSeed
+    );
 
     syntheticTokenPoolValue[marketIndex][true] = initialMarketSeed;
     syntheticTokenPoolValue[marketIndex][false] = initialMarketSeed;
