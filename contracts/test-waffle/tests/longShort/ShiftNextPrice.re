@@ -162,9 +162,9 @@ let testUnit =
               isShiftFromLong,
             );
 
-        let%AwaitThen updatedUserNextPrice_amountSynthToShiftFromMarketSide =
+        let%AwaitThen updateduserNextPriceAmountSynthToShiftFromMarketSide =
           contracts.contents.longShort
-          ->LongShort.userNextPrice_amountSynthToShiftFromMarketSide(
+          ->LongShort.userNextPriceAmountSynthToShiftFromMarketSide(
               marketIndex,
               isShiftFromLong,
               testWallet.address,
@@ -186,8 +186,8 @@ let testUnit =
 
         Chai.bnEqual(
           ~message=
-            "userNextPrice_amountSynthToShiftFromMarketSide not updated correctly",
-          updatedUserNextPrice_amountSynthToShiftFromMarketSide,
+            "userNextPriceAmountSynthToShiftFromMarketSide not updated correctly",
+          updateduserNextPriceAmountSynthToShiftFromMarketSide,
           amount,
         );
 
