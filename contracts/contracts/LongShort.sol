@@ -288,9 +288,6 @@ contract LongShort is ILongShort, Initializable {
     oracleManagers[latestMarket] = _oracleManager;
     assetPrice[latestMarket] = uint256(IOracleManager(oracleManagers[latestMarket]).updatePrice());
 
-    // default gradient is 1
-    marketTreasurySplitGradientsE18[latestMarket] = 1e18;
-
     // Approve tokens for aave lending pool maximally.
     IERC20(paymentTokens[latestMarket]).approve(_yieldManager, type(uint256).max);
 
@@ -345,12 +342,15 @@ contract LongShort is ILongShort, Initializable {
     uint256 unstakeFeeBasisPoints,
     uint256 initialMarketSeed,
     uint256 balanceIncentiveCurveExponent,
-    int256 balanceIncentiveCurveEquilibriumOffset
+    int256 balanceIncentiveCurveEquilibriumOffset,
+    uint256 marketTreasurySplitGradientE18
   ) external adminOnly {
     require(!marketExists[marketIndex], "already initialized");
-    require(marketIndex <= latestMarket, "index too highh");
+    require(marketIndex <= latestMarket, "index too high");
 
     marketExists[marketIndex] = true;
+
+    marketTreasurySplitGradientsE18[marketIndex] = marketTreasurySplitGradientE18;
 
     // Add new staker funds with fresh synthetic tokens.
     IStaker(staker).addNewStakingFund(
