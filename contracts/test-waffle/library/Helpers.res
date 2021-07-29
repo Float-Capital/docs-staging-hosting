@@ -39,10 +39,10 @@ let randomRatio1e18 = () =>
       Js.Math.random_int(0, 1000000000)->Int.toString,
   )
 
-let increaseOrDecreaseByRandomPercentageLessThan100Percent = number => {
-  let numerator = Js.Math.random_int(-1000000, 1000000)->bnFromInt
+let adjustNumberRandomlyWithinRange = (~basisPointsMin, ~basisPointsMax, number) => {
+  let numerator = Js.Math.random_int(basisPointsMin, basisPointsMax)->bnFromInt
 
-  number->sub(number->div(numerator)->mul(bnFromInt(1000000)))
+  number->add(number->mul(numerator)->div(bnFromInt(100000)))
 }
 
 @ocaml.doc(`Generates random BigNumber between 0.01 and 21474836.47 of a token (10^18 in BigNumber units)`)

@@ -581,20 +581,15 @@ contract LongShort is ILongShort, Initializable {
 
     int256 unbalancedSidePoolValue = int256(_getMin(longValue, shortValue));
 
-    int256 percentageChangeE18 = ((newAssetPrice - oldAssetPrice) * 1e18) / oldAssetPrice;
-
-    int256 valueChange = (percentageChangeE18 * unbalancedSidePoolValue) / 1e18;
-    // TODO: try refactor? Seems to be the same but have issues on edge cases,
-    //       but removes need to multiply then divide by 1e18
-    // int256 valueChangeRefactorAttempt = ((newAssetPrice - oldAssetPrice) * unbalancedSidePoolValue) /
-    //   oldAssetPrice;
+    int256 valueChange = ((newAssetPrice - oldAssetPrice) * unbalancedSidePoolValue) /
+      oldAssetPrice;
 
     if (valueChange > 0) {
       longValue += uint256(valueChange);
       shortValue -= uint256(valueChange);
     } else {
-      longValue -= uint256(valueChange * -1);
-      shortValue += uint256(valueChange * -1);
+      longValue -= uint256(-valueChange);
+      shortValue += uint256(-valueChange);
     }
   }
 

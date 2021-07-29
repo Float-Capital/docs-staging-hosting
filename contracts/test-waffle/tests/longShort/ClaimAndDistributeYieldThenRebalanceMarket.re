@@ -9,19 +9,10 @@ let testUnit =
       ~accounts as _: ref(array(Ethers.Wallet.t)),
     ) => {
   describeUnit("_claimAndDistributeYieldThenRebalanceMarket", () => {
-    let marketIndex = 1;
+    let marketIndex = Helpers.randomJsInteger();
     let oldAssetPrice = Helpers.randomTokenAmount();
-    let newAssetPrice =
-      Helpers.increaseOrDecreaseByRandomPercentageLessThan100Percent(
-        oldAssetPrice,
-      );
 
     let marketAmountFromYieldManager = Helpers.randomTokenAmount();
-
-    let syntheticTokenPoolValueLong = Helpers.randomTokenAmount();
-    let syntheticTokenPoolValueShort = Helpers.randomTokenAmount();
-    let totalValueLockedInMarket =
-      syntheticTokenPoolValueLong->add(syntheticTokenPoolValueShort);
 
     before_once'(() => {
       contracts.contents.longShort
@@ -30,160 +21,171 @@ let testUnit =
         )
     });
 
-    it_only(
-      "gets the treasuryYieldPercent from _getYieldSplit and calls claimYieldAndGetMarketAmount on the yieldManager with correct amount",
-      () => {
-        let {longShort, yieldManagerSmocked} = contracts.contents;
-
-        let%Await _ =
-          longShort->LongShort.Exposed.setClaimAndDistributeYieldThenRebalanceMarketGlobals(
-            ~marketIndex,
-            ~syntheticTokenPoolValueLong,
-            ~syntheticTokenPoolValueShort,
-            ~yieldManager=yieldManagerSmocked.address,
-          );
-
-        Js.log({"yieldmanager": yieldManagerSmocked.address});
-
-        yieldManagerSmocked->YieldManagerAaveSmocked.mockClaimYieldAndGetMarketAmountToReturn(
-          marketAmountFromYieldManager,
+    let setup = (~newAssetPrice) => {
+      contracts.contents.longShort
+      ->LongShort.Exposed._claimAndDistributeYieldThenRebalanceMarketExposedCall(
+          ~marketIndex,
+          ~newAssetPrice,
+          ~oldAssetPrice,
         );
+    };
 
-        let%Await {treasuryPercentE18} =
-          longShort->LongShort.Exposed._getYieldSplitExposed(
-            ~longValue=syntheticTokenPoolValueLong,
-            ~shortValue=syntheticTokenPoolValueShort,
-            ~totalValueLockedInMarket,
+    let runTests =
+        (~syntheticTokenPoolValueLong, ~syntheticTokenPoolValueShort) => {
+      let totalValueLockedInMarket =
+        syntheticTokenPoolValueLong->add(syntheticTokenPoolValueShort);
+
+      let (yieldDistributedValueLong, yieldDistributedValueShort) =
+        if (syntheticTokenPoolValueLong->bnGt(syntheticTokenPoolValueShort)) {
+          (
+            syntheticTokenPoolValueLong,
+            syntheticTokenPoolValueShort->add(marketAmountFromYieldManager),
           );
+        } else {
+          (
+            syntheticTokenPoolValueLong->add(marketAmountFromYieldManager),
+            syntheticTokenPoolValueShort,
+          );
+        };
 
+      before_once'(() => {
         let%Await _ =
-          longShort->LongShort.Exposed._claimAndDistributeYieldThenRebalanceMarketExposed(
-            ~marketIndex,
-            ~newAssetPrice,
-            ~oldAssetPrice,
+          contracts.contents.longShort
+          ->LongShort.Exposed.setClaimAndDistributeYieldThenRebalanceMarketGlobals(
+              ~marketIndex,
+              ~syntheticTokenPoolValueLong,
+              ~syntheticTokenPoolValueShort,
+              ~yieldManager=contracts.contents.yieldManagerSmocked.address,
+            );
+
+        contracts.contents.yieldManagerSmocked
+        ->YieldManagerAaveSmocked.mockClaimYieldAndGetMarketAmountToReturn(
+            marketAmountFromYieldManager,
           );
+      });
 
-        yieldManagerSmocked
-        ->YieldManagerAaveSmocked.claimYieldAndGetMarketAmountCalls
-        ->Chai.recordArrayDeepEqualFlat([|
-            {
-              totalValueRealizedForMarket: totalValueLockedInMarket,
-              treasuryPercentE18,
-            },
-          |]);
-      },
-    );
+      it(
+        "gets the treasuryYieldPercent from _getYieldSplit and calls claimYieldAndGetMarketAmount on the yieldManager with correct amount",
+        () => {
+          let newAssetPrice =
+            Helpers.adjustNumberRandomlyWithinRange(
+              ~basisPointsMin=-99999,
+              ~basisPointsMax=99999,
+              oldAssetPrice,
+            );
+          let%AwaitThen {treasuryPercentE18} =
+            contracts.contents.longShort
+            ->LongShort.Exposed._getYieldSplitExposed(
+                ~longValue=syntheticTokenPoolValueLong,
+                ~shortValue=syntheticTokenPoolValueShort,
+                ~totalValueLockedInMarket,
+              );
 
-    // it_only(
-    //   "gets marketAmount from yield manager by calling `claimYieldAndGetMarketAmount` with the correct arguments",
-    //   () => {
+          let%Await _ = setup(~newAssetPrice);
 
-    //     let longShort = contracts.contents.longShort;
+          contracts.contents.yieldManagerSmocked
+          ->YieldManagerAaveSmocked.claimYieldAndGetMarketAmountCalls
+          ->Chai.recordArrayDeepEqualFlat([|
+              {
+                totalValueRealizedForMarket: totalValueLockedInMarket,
+                treasuryPercentE18,
+              },
+            |]);
+        },
+      );
 
-    //         // set the globals that this test fn uses
-    //     let%Await _ =
-    //       contracts^.longShort
-    //       ->LongShort.Exposed.setClaimAndDistributeYieldThenRebalanceMarketGlobals(
-    //           ~marketIndex,
-    //           ~syntheticTokenPoolValueLong,
-    //           ~syntheticTokenPoolValueShort,
-    //         );
+      it(
+        "returns the correct updated long and short values when price has increased (newAssetPrice == oldAssetPrice)",
+        () => {
+          let newAssetPrice = oldAssetPrice;
+          let%Await {longValue, shortValue} = setup(~newAssetPrice);
 
-    //     let%Await {treasuryPercentE18} =
-    //       longShort->LongShort.Exposed._getYieldSplitExposed(
-    //         ~longValue=syntheticTokenPoolValueLong,
-    //         ~shortValue=syntheticTokenPoolValueShort,
-    //         ~totalValueLockedInMarket=totalValueRealizedForMarket,
-    //       );
+          Chai.bnEqual(yieldDistributedValueLong, longValue);
+          Chai.bnEqual(yieldDistributedValueShort, shortValue);
+        },
+      );
 
-    //     let%Await _ =
-    //       longShort->LongShort.Exposed._claimYieldAndGetMarketAmountExposed(
-    //         ~totalValueLockedInMarket=totalValueRealizedForMarket,
-    //         ~treasuryYieldPercentE18=treasuryPercentR18,
-    //       );
+      it(
+        "returns the correct updated long and short values when price has increased (newAssetPrice > oldAssetPrice)",
+        () => {
+          // make the price increase
+          let newAssetPrice =
+            Helpers.adjustNumberRandomlyWithinRange(
+              ~basisPointsMin=0,
+              ~basisPointsMax=99999,
+              oldAssetPrice,
+            );
 
-    //     // fetch the values it was called with
-    //     let claimYieldAndGetMarketAmountCalls =
-    //       mockedYieldManager.contents
-    //       ->YieldManagerMockSmocked.claimYieldAndGetMarketAmountCalls;
+          let%Await {longValue, shortValue} = setup(~newAssetPrice);
 
-    //     // checks that the fn was called with the correct values
-    //     Chai.recordArrayDeepEqualFlat(
-    //       claimYieldAndGetMarketAmountCalls,
-    //       [|{totalValueRealizedForMarket, treasuryPercentE18}|],
-    //     );
-    //   },
-    // );
+          let unbalancedSidePoolValue =
+            bnMin(yieldDistributedValueLong, yieldDistributedValueShort);
 
-    // it_only(
-    //   "returns the correct updated long and short values when price has increased (newAssetPrice > oldAssetPrice)",
-    //   () => {
-    //     let {longShort, markets} = contracts.contents;
-    //     let {yieldManager} = markets->Array.getUnsafe(0);
+          let valueChange =
+            newAssetPrice
+            ->sub(oldAssetPrice)
+            ->mul(unbalancedSidePoolValue)
+            ->div(oldAssetPrice);
 
-    //     // hardcode the asset prices so that price has increased
-    //     let oldAssetPrice = Helpers.randomTokenAmount();
-    //     let newAssetPrice = oldAssetPrice->add(Helpers.randomTokenAmount());
-    //     let syntheticTokenPoolValueLong = Helpers.randomTokenAmount();
-    //     let syntheticTokenPoolValueShort = Helpers.randomTokenAmount();
-    //     let totalValueRealizedForMarket =
-    //       syntheticTokenPoolValueLong->add(syntheticTokenPoolValueShort);
+          Chai.bnEqual(
+            yieldDistributedValueLong->add(valueChange),
+            longValue,
+          );
+          Chai.bnEqual(
+            yieldDistributedValueShort->sub(valueChange),
+            shortValue,
+          );
+        },
+      );
 
-    //     // mock longshort so that we can set the return values from _getYieldSplit
-    //     let%Await LongShortSmocked =
-    //     longShort->LongShortSmocked.make;
-    //     yieldManagerSmocked->LongShortSmocked.mockGetYieldSplitToReturn(
-    //       false,
-    //       treasuryPercentE18,
-    //     );
+      it(
+        "returns the correct updated long and short values when price has increased (newAssetPrice < oldAssetPrice)",
+        () => {
+          // make the price decrease
+          let newAssetPrice =
+            Helpers.adjustNumberRandomlyWithinRange(
+              ~basisPointsMin=-99999,
+              ~basisPointsMax=0,
+              oldAssetPrice,
+            );
 
-    //     // mock yieldManager so that we can set the return values for claimYieldAndGetMarketAmount
-    //     let%Await yieldManagerSmocked =
-    //     yieldManager->YieldManagerSmocked.make;
-    //     yieldManagerSmocked->YieldManagerSmocked.mockClaimYieldAndGetMarketAmountToReturn(
-    //       false,
-    //       treasuryPercentE18,
-    //     );
+          let%Await {longValue, shortValue} = setup(~newAssetPrice);
 
-    //     // obtain expectedResult by implementing the math from the smart contract here in reason
-    //     // using the mocked return values
+          let unbalancedSidePoolValue =
+            bnMin(yieldDistributedValueLong, yieldDistributedValueShort);
 
-    //     // set the globals that this test fn uses
-    //     let%Await _ =
-    //       contracts^.longShort
-    //       ->LongShort.Exposed.setClaimAndDistributeYieldThenRebalanceMarketGlobals(
-    //           ~marketIndex,
-    //           ~syntheticTokenPoolValueLong,
-    //           ~syntheticTokenPoolValueShort,
-    //         );
+          let valueChange =
+            newAssetPrice
+            ->sub(oldAssetPrice)
+            ->mul(unbalancedSidePoolValue)
+            ->div(oldAssetPrice);
 
-    //     // obtain actualResult via calling the fn with globals set
-    //     let%Await actualResult =
-    //       contracts.contents.longShort
-    //       ->LongShort.Exposed._claimAndDistributeYieldThenRebalanceMarketExposed(
-    //           ~marketIndex,
-    //           ~newAssetPrice,
-    //           ~oldAssetPrice,
-    //         );
-    //     ();
-    //     // test whether they're the same
-    //     Chai.recordArrayDeepEqualFlat(
-    //       [|{expectedLongValue, expectedShortValue}|],
-    //       [|{actualLongValue, actualShortValue}|],
-    //     );
-    //   },
-    // );
-
-    // it_only(
-    //   "returns the correct updated long and short values when price has decreased (newAssetPrice < oldAssetPrice)",
-    //   () => {
-    //     // hardcode the asset prices
-    //     let newAssetPrice = Helpers.randomTokenAmount();
-    //     let oldAssetPrice = newAssetPrice->add(Helpers.randomTokenAmount());
-    //     ();
-    //   },
-    // );
-
+          Chai.bnEqual(
+            yieldDistributedValueLong->add(valueChange),
+            longValue,
+          );
+          Chai.bnEqual(
+            yieldDistributedValueShort->sub(valueChange),
+            shortValue,
+          );
+        },
+      );
+    };
     ();
+
+    describe("Long Side is Overvalued", () => {
+      let syntheticTokenPoolValueShort = Helpers.randomTokenAmount();
+      let syntheticTokenPoolValueLong =
+        syntheticTokenPoolValueShort->add(Helpers.randomTokenAmount());
+
+      runTests(~syntheticTokenPoolValueLong, ~syntheticTokenPoolValueShort);
+    });
+    describe("Short Side is Overvalued", () => {
+      let syntheticTokenPoolValueLong = Helpers.randomTokenAmount();
+      let syntheticTokenPoolValueShort =
+        syntheticTokenPoolValueLong->add(Helpers.randomTokenAmount());
+
+      runTests(~syntheticTokenPoolValueLong, ~syntheticTokenPoolValueShort);
+    });
   });
 };
