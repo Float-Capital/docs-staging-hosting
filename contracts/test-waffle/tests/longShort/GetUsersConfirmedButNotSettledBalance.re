@@ -35,7 +35,7 @@ let testUnit =
           contracts^.longShort
           ->LongShort.Exposed._getAmountSynthTokenExposed(
               ~amountPaymentToken=userNextPriceDepositAmount,
-              ~price=syntheticTokenPriceSnapshot,
+              ~syntheticTokenPriceInPaymentTokens=syntheticTokenPriceSnapshot,
             );
 
         let%Await actualResult =

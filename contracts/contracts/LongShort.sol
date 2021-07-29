@@ -417,7 +417,7 @@ contract LongShort is ILongShort, Initializable {
     uint256 amountSynthTokenShiftedFromOneSide,
     bool isShiftFromLong,
     uint256 priceSnapshotIndex
-  ) public view virtual returns (uint256 amountSynthShiftedToOtherSide) {
+  ) public view virtual override returns (uint256 amountSynthShiftedToOtherSide) {
     uint256 paymentTokensToShift = _getAmountPaymentToken(
       amountSynthTokenShiftedFromOneSide,
       syntheticTokenPriceSnapshot[marketIndex][isShiftFromLong][priceSnapshotIndex]
@@ -676,10 +676,10 @@ contract LongShort is ILongShort, Initializable {
         int256 valueChangeForLong,
         int256 valueChangeForShort
       ) = _performOustandingBatchedSettlements(
-          marketIndex,
-          syntheticTokenPriceLong,
-          syntheticTokenPriceShort
-        );
+        marketIndex,
+        syntheticTokenPriceLong,
+        syntheticTokenPriceShort
+      );
 
       newLongPoolValue = uint256(int256(newLongPoolValue) + valueChangeForLong);
       newShortPoolValue = uint256(int256(newShortPoolValue) + valueChangeForShort);
@@ -1107,24 +1107,24 @@ contract LongShort is ILongShort, Initializable {
     // NOTE: These variables currently only includes the amount to deposit
     //       to save variable space (precious EVM stack) we share and update the same variable later to include the shift.
 
-    uint256 batchedAmountOfPaymentTokensToDepositOrShiftToLong = batchedAmountOfPaymentTokenToDeposit[
-        marketIndex
-      ][true];
 
-    uint256 batchedAmountOfPaymentTokensToDepositOrShiftToShort = batchedAmountOfPaymentTokenToDeposit[
-        marketIndex
-      ][false];
+      uint256 batchedAmountOfPaymentTokensToDepositOrShiftToLong
+     = batchedAmountOfPaymentTokenToDeposit[marketIndex][true];
+
+
+      uint256 batchedAmountOfPaymentTokensToDepositOrShiftToShort
+     = batchedAmountOfPaymentTokenToDeposit[marketIndex][false];
 
     // NOTE: These variables currently only includes the amount to shift
     //       to save variable space (precious EVM stack) we share and update the same variable later to include the reedem.
 
-    uint256 batchedAmountOfSynthTokensToRedeemOrShiftFromLong = batchedAmountOfSynthTokensToShiftMarketSide[
-        marketIndex
-      ][true];
 
-    uint256 batchedAmountOfSynthTokensToRedeemOrShiftFromShort = batchedAmountOfSynthTokensToShiftMarketSide[
-        marketIndex
-      ][false];
+      uint256 batchedAmountOfSynthTokensToRedeemOrShiftFromLong
+     = batchedAmountOfSynthTokensToShiftMarketSide[marketIndex][true];
+
+
+      uint256 batchedAmountOfSynthTokensToRedeemOrShiftFromShort
+     = batchedAmountOfSynthTokensToShiftMarketSide[marketIndex][false];
 
     // Handle shift tokens from LONG to SHORT
     if (batchedAmountOfSynthTokensToRedeemOrShiftFromLong > 0) {
