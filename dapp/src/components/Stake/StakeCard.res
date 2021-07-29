@@ -4,28 +4,6 @@ let calculateDollarValue = (~tokenPrice: Ethers.BigNumber.t, ~amountStaked: Ethe
   tokenPrice->Ethers.BigNumber.mul(amountStaked)->Ethers.BigNumber.div(CONSTANTS.tenToThe18)
 }
 
-let basicApyCalc = (collateralTokenApy: float, longVal: float, shortVal: float, tokenType) => {
-  switch tokenType {
-  | "long" =>
-    switch longVal {
-    | 0.0 => collateralTokenApy
-    | _ => collateralTokenApy *. shortVal /. longVal
-    }
-  | "short" =>
-    switch shortVal {
-    | 0.0 => collateralTokenApy
-    | _ => collateralTokenApy *. longVal /. shortVal
-    }
-  | _ => collateralTokenApy
-  }
-}
-
-let mappedBasicCalc = (apy, longVal, shortVal, tokenType) =>
-  switch apy {
-  | Loaded(apyVal) => Loaded(basicApyCalc(apyVal, longVal, shortVal, tokenType))
-  | a => a
-  }
-
 type handleStakeButtonPress =
   | WaitingForInteraction
   | Loading
@@ -64,13 +42,13 @@ let make = (
   )
   let totalDollarValueStake = longDollarValueStaked->Ethers.BigNumber.add(shortDollarValueStaked)
 
-  let longApy = mappedBasicCalc(
+  let longApy = MarketCalculationHelpers.calculateLendingProviderAPYForSideMapped(
     apy,
     totalLockedLong->Ethers.Utils.formatEther->Js.Float.fromString,
     totalLockedShort->Ethers.Utils.formatEther->Js.Float.fromString,
     "long",
   )
-  let shortApy = mappedBasicCalc(
+  let shortApy = MarketCalculationHelpers.calculateLendingProviderAPYForSideMapped(
     apy,
     totalLockedLong->Ethers.Utils.formatEther->Js.Float.fromString,
     totalLockedShort->Ethers.Utils.formatEther->Js.Float.fromString,
@@ -84,6 +62,9 @@ let make = (
     CONSTANTS.kmultiplierHardcode,
     timestampCreated,
     currentTimestamp,
+    CONSTANTS.equilibriumOffsetHardcode,
+    CONSTANTS.balanceIncentiveExponentHardcode,
+    CONSTANTS.floatTokenDollarWorthHardcode,
     "long",
   )
 
@@ -94,6 +75,9 @@ let make = (
     CONSTANTS.kmultiplierHardcode,
     timestampCreated,
     currentTimestamp,
+    CONSTANTS.equilibriumOffsetHardcode,
+    CONSTANTS.balanceIncentiveExponentHardcode,
+    CONSTANTS.floatTokenDollarWorthHardcode,
     "short",
   )
 

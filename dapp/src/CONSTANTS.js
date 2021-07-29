@@ -9,6 +9,10 @@ var zeroAddress = Ethers.utils.getAddress(zeroAddressStr);
 
 var zeroBN = Ethers.BigNumber.from(0);
 
+var twoBN = Ethers.BigNumber.from(2);
+
+var eightBN = Ethers.BigNumber.from(8);
+
 var tenToThe5 = Ethers.BigNumber.from("100000");
 
 var tenToThe6 = Ethers.BigNumber.from("1000000");
@@ -19,7 +23,7 @@ var tenToThe18 = Ethers.BigNumber.from("1000000000000000000");
 
 var oneHundredThousandInWei = tenToThe18.mul(tenToThe5);
 
-var fiveHundredThousandInWei = tenToThe18.mul(tenToThe6).div(Ethers.BigNumber.from(2));
+var fiveHundredThousandInWei = tenToThe18.mul(tenToThe6).div(twoBN);
 
 var oneMillionInWei = tenToThe18.mul(tenToThe6);
 
@@ -28,6 +32,12 @@ var tenToThe42 = tenToThe6.mul(tenToThe18).mul(tenToThe18);
 var oneHundredEth = Ethers.BigNumber.from("100000000000000000000");
 
 var oneThousandInWei = Ethers.BigNumber.from("1000000000000000000000");
+
+var stakeDivisorForSafeExponentiation = twoBN.pow(Ethers.BigNumber.from(52));
+
+var stakeDivisorForSafeExponentiationDiv2 = stakeDivisorForSafeExponentiation.div(twoBN);
+
+var tenToThe18Div2 = tenToThe18.div(twoBN);
 
 var PriceGraphLabels = {
   max: "MAX",
@@ -41,6 +51,10 @@ var PriceGraphLabels = {
 var kperiodHardcode = Ethers.BigNumber.from("1664000");
 
 var kmultiplierHardcode = Ethers.BigNumber.from("5000000000000000000");
+
+var floatTokenDollarWorthHardcode = tenToThe18.div(eightBN);
+
+var oneYearInSecondsMulTenToThe18 = Ethers.BigNumber.from(31536000).mul(tenToThe18);
 
 var fiveMinutesInSeconds = 300;
 
@@ -64,6 +78,10 @@ var oneYearInSeconds = 31536000;
 
 var hotAPYThreshold = 0.15;
 
+var equilibriumOffsetHardcode = zeroBN;
+
+var balanceIncentiveExponentHardcode = twoBN;
+
 var daiDisplayToken = {
   name: "DAI",
   iconUrl: "/icons/dai.svg"
@@ -72,6 +90,8 @@ var daiDisplayToken = {
 exports.zeroAddressStr = zeroAddressStr;
 exports.zeroAddress = zeroAddress;
 exports.zeroBN = zeroBN;
+exports.twoBN = twoBN;
+exports.eightBN = eightBN;
 exports.tenToThe5 = tenToThe5;
 exports.tenToThe6 = tenToThe6;
 exports.tenToThe9 = tenToThe9;
@@ -82,6 +102,9 @@ exports.oneMillionInWei = oneMillionInWei;
 exports.tenToThe42 = tenToThe42;
 exports.oneHundredEth = oneHundredEth;
 exports.oneThousandInWei = oneThousandInWei;
+exports.stakeDivisorForSafeExponentiation = stakeDivisorForSafeExponentiation;
+exports.stakeDivisorForSafeExponentiationDiv2 = stakeDivisorForSafeExponentiationDiv2;
+exports.tenToThe18Div2 = tenToThe18Div2;
 exports.fiveMinutesInSeconds = fiveMinutesInSeconds;
 exports.oneHourInSeconds = oneHourInSeconds;
 exports.halfDayInSeconds = halfDayInSeconds;
@@ -96,5 +119,9 @@ exports.oneYearInSeconds = oneYearInSeconds;
 exports.hotAPYThreshold = hotAPYThreshold;
 exports.kperiodHardcode = kperiodHardcode;
 exports.kmultiplierHardcode = kmultiplierHardcode;
+exports.equilibriumOffsetHardcode = equilibriumOffsetHardcode;
+exports.balanceIncentiveExponentHardcode = balanceIncentiveExponentHardcode;
+exports.floatTokenDollarWorthHardcode = floatTokenDollarWorthHardcode;
+exports.oneYearInSecondsMulTenToThe18 = oneYearInSecondsMulTenToThe18;
 exports.daiDisplayToken = daiDisplayToken;
 /* zeroAddress Not a pure module */
