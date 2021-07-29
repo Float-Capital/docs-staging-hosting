@@ -457,8 +457,6 @@ contract LongShort is ILongShort, Initializable {
       userCurrentNextPriceUpdateIndex[marketIndex][user] != 0 &&
       userCurrentNextPriceUpdateIndex[marketIndex][user] <= currentMarketUpdateIndex
     ) {
-      // Update is still nextPrice but not past the next oracle update - display the
-      // amount the user would get if they executed immediately.
       uint256 amountPaymentTokenDeposited = userNextPriceDepositAmount[marketIndex][isLong][user];
 
       if (amountPaymentTokenDeposited > 0) {
