@@ -198,7 +198,7 @@ contract LongShort is ILongShort, Initializable {
     tokenFactory = _tokenFactory;
     staker = _staker;
 
-    emit LongShortV1(_admin, address(treasury), address(_tokenFactory), address(_staker));
+    emit LongShortV1(admin, treasury, tokenFactory, staker);
   }
 
   /*╔═════════════════════════════╗
