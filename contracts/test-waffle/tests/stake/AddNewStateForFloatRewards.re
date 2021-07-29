@@ -98,6 +98,8 @@ let testUnit =
             ~timeDelta=timeDeltaGreaterThanZero,
             ~longShortMarketPriceSnapshotIndexIfShiftExecuted,
           );
+
+        addNewStateForFloatRewardsTxPromise.contents;
       });
 
       it(
