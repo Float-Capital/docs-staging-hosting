@@ -85,7 +85,7 @@ contract LongShort is ILongShort, Initializable {
     uint256 shortPrice
   );
 
-  event SyntheticTokenCreated(
+  event SyntheticMarketCreated(
     uint32 marketIndex,
     address longTokenAddress,
     address shortTokenAddress,
@@ -275,7 +275,7 @@ contract LongShort is ILongShort, Initializable {
     // Approve tokens for aave lending pool maximally.
     IERC20(paymentTokens[latestMarket]).approve(_yieldManager, type(uint256).max);
 
-    emit SyntheticTokenCreated(
+    emit SyntheticMarketCreated(
       latestMarket,
       syntheticTokens[latestMarket][true],
       syntheticTokens[latestMarket][false],
