@@ -11,6 +11,7 @@ let testUnit =
   describeUnit("_claimAndDistributeYieldThenRebalanceMarket", () => {
     let marketIndex = Helpers.randomJsInteger();
     let oldAssetPrice = Helpers.randomTokenAmount();
+    let treasuryYieldPercentE18 = Helpers.randomRatio1e18();
 
     let marketAmountFromYieldManager = Helpers.randomTokenAmount();
 
@@ -58,41 +59,55 @@ let testUnit =
               ~yieldManager=contracts.contents.yieldManagerSmocked.address,
             );
 
+        let isLongSideUnderbalanced =
+          syntheticTokenPoolValueLong->bnLt(syntheticTokenPoolValueShort);
+
+        LongShortSmocked.InternalMock.mock_getYieldSplitToReturn(
+          isLongSideUnderbalanced,
+          treasuryYieldPercentE18,
+        );
+
         contracts.contents.yieldManagerSmocked
         ->YieldManagerAaveSmocked.mockClaimYieldAndGetMarketAmountToReturn(
             marketAmountFromYieldManager,
           );
       });
 
-      it(
-        "gets the treasuryYieldPercent from _getYieldSplit and calls claimYieldAndGetMarketAmount on the yieldManager with correct amount",
-        () => {
+      describe("Function calls", () => {
+        before_once'(() => {
           let newAssetPrice =
             Helpers.adjustNumberRandomlyWithinRange(
               ~basisPointsMin=-99999,
               ~basisPointsMax=99999,
               oldAssetPrice,
             );
-          let%AwaitThen {treasuryPercentE18} =
-            contracts.contents.longShort
-            ->LongShort.Exposed._getYieldSplitExposed(
-                ~longValue=syntheticTokenPoolValueLong,
-                ~shortValue=syntheticTokenPoolValueShort,
-                ~totalValueLockedInMarket,
-              );
 
-          let%Await _ = setup(~newAssetPrice);
-
+          setup(~newAssetPrice);
+        });
+        it("calls _getYieldSplit with correct parameters", () => {
+          LongShortSmocked.InternalMock._getYieldSplitCalls()
+          ->Chai.recordArrayDeepEqualFlat([|
+              {
+                marketIndex,
+                longValue: syntheticTokenPoolValueLong,
+                shortValue: syntheticTokenPoolValueShort,
+                totalValueLockedInMarket,
+              },
+            |])
+        });
+        it(
+          "gets the treasuryYieldPercent from _getYieldSplit and calls claimYieldAndGetMarketAmount on the yieldManager with correct amount",
+          () => {
           contracts.contents.yieldManagerSmocked
           ->YieldManagerAaveSmocked.claimYieldAndGetMarketAmountCalls
           ->Chai.recordArrayDeepEqualFlat([|
               {
                 totalValueRealizedForMarket: totalValueLockedInMarket,
-                treasuryPercentE18,
+                treasuryYieldPercentE18,
               },
-            |]);
-        },
-      );
+            |])
+        });
+      });
 
       it(
         "returns the correct updated long and short values when price has increased (newAssetPrice == oldAssetPrice)",

@@ -20,9 +20,9 @@ function MarketStakeCardSide(Props) {
     var maybeHotFlame = apy > CONSTANTS.hotAPYThreshold ? "🔥" : "";
     var apyDisplay = (apy * 100).toFixed(2);
     if (isLong) {
-      return apyDisplay + maybeHotFlame;
+      return apyDisplay + "%" + maybeHotFlame;
     } else {
-      return maybeHotFlame + apyDisplay;
+      return maybeHotFlame + apyDisplay + "%";
     }
   };
   var tmp;

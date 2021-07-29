@@ -71,6 +71,8 @@ let testUnit =
     });
 
     describe("_getYieldSplit", () => {
+      let marketIndex = 1;
+
       let test = (~syntheticTokenPoolValueLong, ~syntheticTokenPoolValueShort) => {
         let totalValueLockedInMarket =
           syntheticTokenPoolValueLong->add(syntheticTokenPoolValueShort);
@@ -83,19 +85,25 @@ let testUnit =
             ? syntheticTokenPoolValueShort->sub(syntheticTokenPoolValueLong)
             : syntheticTokenPoolValueLong->sub(syntheticTokenPoolValueShort);
 
-        let marketTreasurySplitGradientE18 = CONSTANTS.tenToThe18;
+        let%AwaitThen marketTreasurySplitGradientE18 =
+          contracts.contents.longShort
+          ->LongShort.marketTreasurySplitGradientsE18(marketIndex);
+
         let marketPercentCalculatedE18 =
           imbalance
           ->mul(marketTreasurySplitGradientE18)
           ->div(totalValueLockedInMarket);
         let marketPercentE18 =
           bnMin(marketPercentCalculatedE18, CONSTANTS.tenToThe18);
+
         let treasuryPercentE18 = CONSTANTS.tenToThe18->sub(marketPercentE18);
+
         let expectedResult = treasuryPercentE18;
 
         let%Await actualResult =
           contracts.contents.longShort
           ->LongShort.Exposed._getYieldSplitExposed(
+              ~marketIndex,
               ~longValue=syntheticTokenPoolValueLong,
               ~shortValue=syntheticTokenPoolValueShort,
               ~totalValueLockedInMarket,
@@ -104,7 +112,7 @@ let testUnit =
           ~message=
             "expectedResult and result after `_getYieldSplit` not the same",
           expectedResult,
-          actualResult.treasuryPercentE18,
+          actualResult.treasuryYieldPercentE18,
         );
       };
 

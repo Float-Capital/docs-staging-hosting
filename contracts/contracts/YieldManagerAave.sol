@@ -137,7 +137,7 @@ contract YieldManagerAave is IYieldManager {
    */
   function claimYieldAndGetMarketAmount(
     uint256 totalValueRealizedForMarket,
-    uint256 treasuryPercentE18
+    uint256 treasuryYieldPercentE18
   ) public override longShortOnly returns (uint256) {
     uint256 totalHeld = aToken.balanceOf(address(this));
 
@@ -149,12 +149,12 @@ contract YieldManagerAave is IYieldManager {
 
     uint256 unrealizedYield = totalHeld - totalRealized;
 
-    uint256 amountForTreasury = (unrealizedYield * treasuryPercentE18) / 1e18;
+    uint256 amountForTreasury = (unrealizedYield * treasuryYieldPercentE18) / 1e18;
     uint256 amountForMarketIncetives = unrealizedYield - amountForTreasury;
 
     totalReservedForTreasury += amountForTreasury;
 
-    emit YieldDistributed(unrealizedYield, treasuryPercentE18);
+    emit YieldDistributed(unrealizedYield, treasuryYieldPercentE18);
 
     return amountForMarketIncetives;
   }

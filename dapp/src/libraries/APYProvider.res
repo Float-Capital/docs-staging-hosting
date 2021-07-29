@@ -62,7 +62,7 @@ let determineAaveApy = setApy => {
   }
 
   let _ = Request.make(
-    ~url="https://api.thegraph.com/subgraphs/name/aave/aave-v2-matic",
+    ~url=Config.aaveGraphEndpoint,
     ~responseType=Json,
     ~headers=Js.Dict.fromArray([("Content-type", "application/json")]),
     ~body="{\"query\":\"{\\n  reserves(where:{symbol: \\\"DAI\\\"}){\\n    liquidityRate\\n  }\\n}\\n\",\"variables\":null}",
