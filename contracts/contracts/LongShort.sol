@@ -402,13 +402,13 @@ contract LongShort is ILongShort, Initializable {
   /// @notice Given an executed next price shift from tokens on one market side to the other, determines how many other side tokens the shift was worth.
   /// @dev Intended for use primarily by Staker.sol
   /// @param marketIndex An uint32 which uniquely identifies a market.
-  /// @param amountSynthTokenShifted Amount of synth token in wei.
+  /// @param amountSynthTokenShiftedFromOneSide Amount of synth token in wei.
   /// @param isShiftFromLong Whether the token shift is from long to short (true), or short to long (false).
   /// @param priceSnapshotIndex Index which identifies which synth prices to use.
   /// @return amountSynthShiftedToOtherSide The amount in wei of tokens for the other side that the shift was worth.
-  function getAmountSynthTokenShifted(
+  function getAmountSynthTokenShiftedToOtherSide(
     uint32 marketIndex,
-    uint256 amountSynthTokenShifted,
+    uint256 amountSynthTokenShiftedFromOneSide,
     bool isShiftFromLong,
     uint256 priceSnapshotIndex
   ) public view virtual override returns (uint256 amountSynthShiftedToOtherSide) {
@@ -570,14 +570,14 @@ contract LongShort is ILongShort, Initializable {
       }
     }
 
-    int256 unbalancedSidePoolValue = int256(_getMin(longValue, shortValue));
+    int256 underbalancedSidePoolValue = int256(_getMin(longValue, shortValue));
 
     int256 percentageChangeE18 = ((newAssetPrice - oldAssetPrice) * 1e18) / oldAssetPrice;
 
-    int256 valueChange = (percentageChangeE18 * unbalancedSidePoolValue) / 1e18;
+    int256 valueChange = (percentageChangeE18 * underbalancedSidePoolValue) / 1e18;
     // TODO: try refactor? Seems to be the same but have issues on edge cases,
     //       but removes need to multiply then divide by 1e18
-    // int256 valueChangeRefactorAttempt = ((newAssetPrice - oldAssetPrice) * unbalancedSidePoolValue) /
+    // int256 valueChangeRefactorAttempt = ((newAssetPrice - oldAssetPrice) * underbalancedSidePoolValue) /
     //   oldAssetPrice;
 
     if (valueChange > 0) {
@@ -963,7 +963,7 @@ contract LongShort is ILongShort, Initializable {
       marketIndex
     ][isShiftFromLong][user];
     if (synthTokensShiftedAwayFromMarketSide > 0) {
-      uint256 amountSynthTokenRecievedOnOtherSide = getAmountSynthTokenShifted(
+      uint256 amountSynthTokenRecievedOnOtherSide = getAmountSynthTokenShiftedToOtherSide(
         marketIndex,
         synthTokensShiftedAwayFromMarketSide,
         isShiftFromLong,
