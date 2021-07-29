@@ -94,21 +94,17 @@ contract("OracleManager (Flippening V0)", (accounts) => {
     assert.equal(val.toString(), expectedVal.toString());
   };
 
-  describe("dominance calc = (eth market cap) / (btc market cap)", () => {
-    let testDominanceStatic = ({
-      btcSupply,
-      ethSupply,
-      btcPrice,
-      ethPrice,
-      expectedDominance,
-    }) => async () => {
-      await setup({ btcSupply, ethSupply, btcPrice, ethPrice });
+  describe.skip("dominance calc = (eth market cap) / (btc market cap)", () => {
+    let testDominanceStatic =
+      ({ btcSupply, ethSupply, btcPrice, ethPrice, expectedDominance }) =>
+      async () => {
+        await setup({ btcSupply, ethSupply, btcPrice, ethPrice });
 
-      await testPropertyStatic(
-        expectedDominance,
-        flippening.getLatestPrice.call
-      );
-    };
+        await testPropertyStatic(
+          expectedDominance,
+          flippening.getLatestPrice.call
+        );
+      };
 
     it(
       "identical prices and supplies lead to 100% eth dominance",
@@ -166,21 +162,23 @@ contract("OracleManager (Flippening V0)", (accounts) => {
     );
   });
 
-  describe("btc supply gain", () => {
-    let testBtcSupplyGain = ({
-      btcBlocksPerDay,
-      btcBlockReward,
-      timeIncrease,
-      expectedSupplyIncrease,
-    }) => async () => {
-      await setup({ btcBlocksPerDay, btcBlockReward, btcSupply: oneBN });
-      await increaseTime(timeIncrease - time.duration.seconds(1)); // next tx increments seconds by 1
-      await flippening.updatePrice();
-      await testPropertyStatic(
-        expectedSupplyIncrease.add(oneBN),
-        flippening.btcSupply
-      );
-    };
+  describe.skip("btc supply gain", () => {
+    let testBtcSupplyGain =
+      ({
+        btcBlocksPerDay,
+        btcBlockReward,
+        timeIncrease,
+        expectedSupplyIncrease,
+      }) =>
+      async () => {
+        await setup({ btcBlocksPerDay, btcBlockReward, btcSupply: oneBN });
+        await increaseTime(timeIncrease - time.duration.seconds(1)); // next tx increments seconds by 1
+        await flippening.updatePrice();
+        await testPropertyStatic(
+          expectedSupplyIncrease.add(oneBN),
+          flippening.btcSupply
+        );
+      };
 
     describe("increases by blockReward * blocksPerDay per day", () => {
       let twelvePointFiveBTC = tenToThe8.mul(bn(25)).div(twoBN);
@@ -241,28 +239,30 @@ contract("OracleManager (Flippening V0)", (accounts) => {
     });
   });
 
-  describe("eth supply gain", () => {
-    let testEthSupplyGain = ({
-      ethBlocksPerDay,
-      ethBlockReward,
-      ethNephewReward,
-      ethUncleReward,
-      ethUnclesPerDay,
-      timeIncrease,
-      expectedSupplyIncrease,
-    }) => async () => {
-      await setup({
+  describe.skip("eth supply gain", () => {
+    let testEthSupplyGain =
+      ({
         ethBlocksPerDay,
         ethBlockReward,
         ethNephewReward,
         ethUncleReward,
         ethUnclesPerDay,
-        ethSupply: zeroBN,
-      });
-      await increaseTime(timeIncrease - time.duration.seconds(1));
-      await flippening.updatePrice(); // each tx increments seconds by 1
-      await testPropertyStatic(expectedSupplyIncrease, flippening.ethSupply);
-    };
+        timeIncrease,
+        expectedSupplyIncrease,
+      }) =>
+      async () => {
+        await setup({
+          ethBlocksPerDay,
+          ethBlockReward,
+          ethNephewReward,
+          ethUncleReward,
+          ethUnclesPerDay,
+          ethSupply: zeroBN,
+        });
+        await increaseTime(timeIncrease - time.duration.seconds(1));
+        await flippening.updatePrice(); // each tx increments seconds by 1
+        await testPropertyStatic(expectedSupplyIncrease, flippening.ethSupply);
+      };
 
     describe("increases by blockReward * blocksPerDay + (uncleReward + nephewReward) * unclesPerDay per day", () => {
       let defaultUncleReward = oneEth.mul(bn(3)).div(bn(4)); // 0.75 ETH
@@ -391,7 +391,7 @@ contract("OracleManager (Flippening V0)", (accounts) => {
     });
   });
 
-  describe("integration", () => {
+  describe.skip("integration", () => {
     it("handles price changes and estimated supply increases over time", async () => {
       await setup({
         btcSupply: oneBTC,
