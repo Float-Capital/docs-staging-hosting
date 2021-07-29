@@ -364,13 +364,13 @@ contract LongShort is ILongShort, Initializable {
   /// @param amountPaymentToken Amount of payment tokens in that token's lowest denomination.
   /// @param amountSynthToken Amount of synth token in wei.
   /// @return syntheticTokenPrice The calculated conversion rate in base 1e18.
-  function _getSyntheticTokenPrice(uint256 amountPaymentToken, uint256 amountSynthToken)
+  function _getSyntheticTokenPrice(uint256 amountPaymentTokenInSynth, uint256 synthTokenTotalSupply)
     internal
     pure
     virtual
     returns (uint256 syntheticTokenPrice)
   {
-    return (amountPaymentToken * 1e18) / amountSynthToken;
+    return (amountPaymentTokenInSynth * 1e18) / synthTokenTotalSupply;
   }
 
   /// @notice Converts synth token amounts to payment token amounts at a synth token price.
@@ -392,13 +392,11 @@ contract LongShort is ILongShort, Initializable {
   /// @param amountPaymentToken Amount of payment tokens in that token's lowest denomination.
   /// @param price The conversion rate from synth to payment tokens in base 1e18.
   /// @return amountSynthToken The calculated amount of synthetic token in wei.
-  function _getAmountSynthToken(uint256 amountPaymentToken, uint256 price)
-    internal
-    pure
-    virtual
-    returns (uint256 amountSynthToken)
-  {
-    return (amountPaymentToken * 1e18) / price;
+  function _getAmountSynthToken(
+    uint256 amountPaymentToken,
+    uint256 syntheticTokenPriceInPaymentTokens
+  ) internal pure virtual returns (uint256 amountSynthToken) {
+    return (amountPaymentToken * 1e18) / syntheticTokenPriceInPaymentTokens;
   }
 
   /// @notice Given an executed next price shift from tokens on one market side to the other, determines how many other side tokens the shift was worth.
