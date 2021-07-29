@@ -361,8 +361,8 @@ contract LongShort is ILongShort, Initializable {
 
   /// @notice Calculates the conversion rate from synthetic tokens to payment tokens.
   /// @dev Synth tokens have a fixed 18 decimals.
-  /// @param amountPaymentToken Amount of payment tokens in that token's lowest denomination.
-  /// @param amountSynthToken Amount of synth token in wei.
+  /// @param amountPaymentTokenInSynth Amount of payment tokens in that token's lowest denomination.
+  /// @param synthTokenTotalSupply Amount of synth token in wei.
   /// @return syntheticTokenPrice The calculated conversion rate in base 1e18.
   function _getSyntheticTokenPrice(uint256 amountPaymentTokenInSynth, uint256 synthTokenTotalSupply)
     internal
@@ -376,21 +376,19 @@ contract LongShort is ILongShort, Initializable {
   /// @notice Converts synth token amounts to payment token amounts at a synth token price.
   /// @dev Price assumed base 1e18.
   /// @param amountSynthToken Amount of synth token in wei.
-  /// @param price The conversion rate from synth to payment tokens in base 1e18.
+  /// @param syntheticTokenPriceInPaymentTokens The conversion rate from synth to payment tokens in base 1e18.
   /// @return amountPaymentToken The calculated amount of payment tokens in token's lowest denomination.
-  function _getAmountPaymentToken(uint256 amountSynthToken, uint256 price)
-    internal
-    pure
-    virtual
-    returns (uint256 amountPaymentToken)
-  {
-    return (amountSynthToken * price) / 1e18;
+  function _getAmountPaymentToken(
+    uint256 amountSynthToken,
+    uint256 syntheticTokenPriceInPaymentTokens
+  ) internal pure virtual returns (uint256 amountPaymentToken) {
+    return (amountSynthToken * syntheticTokenPriceInPaymentTokens) / 1e18;
   }
 
   /// @notice Converts payment token amounts to synth token amounts at a synth token price.
   /// @dev  Price assumed base 1e18.
   /// @param amountPaymentToken Amount of payment tokens in that token's lowest denomination.
-  /// @param price The conversion rate from synth to payment tokens in base 1e18.
+  /// @param syntheticTokenPriceInPaymentTokens The conversion rate from synth to payment tokens in base 1e18.
   /// @return amountSynthToken The calculated amount of synthetic token in wei.
   function _getAmountSynthToken(
     uint256 amountPaymentToken,
@@ -411,9 +409,9 @@ contract LongShort is ILongShort, Initializable {
     uint256 amountSynthTokenShiftedFromOneSide,
     bool isShiftFromLong,
     uint256 priceSnapshotIndex
-  ) public view virtual override returns (uint256 amountSynthShiftedToOtherSide) {
+  ) public view virtual returns (uint256 amountSynthShiftedToOtherSide) {
     uint256 paymentTokensToShift = _getAmountPaymentToken(
-      amountSynthTokenShifted,
+      amountSynthTokenShiftedFromOneSide,
       syntheticTokenPriceSnapshot[marketIndex][isShiftFromLong][priceSnapshotIndex]
     );
 
