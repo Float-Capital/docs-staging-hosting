@@ -620,7 +620,7 @@ contract LongShort is ILongShort, Initializable {
       uint256 syntheticTokenPriceShort = syntheticTokenPriceSnapshot[marketIndex][false][
         marketUpdateIndex[marketIndex]
       ];
-      // if there is a price change and the 'staker' contract has pending updates, pusht the stakers price snapshot index to the staker
+      // if there is a price change and the 'staker' contract has pending updates, push the stakers price snapshot index to the staker
       // (so the staker can handle its internal accounting)
       if (userCurrentNextPriceUpdateIndex[marketIndex][staker] > 0 && assetPriceChanged) {
         IStaker(staker).addNewStateForFloatRewards(
@@ -676,10 +676,10 @@ contract LongShort is ILongShort, Initializable {
         int256 valueChangeForLong,
         int256 valueChangeForShort
       ) = _performOustandingBatchedSettlements(
-        marketIndex,
-        syntheticTokenPriceLong,
-        syntheticTokenPriceShort
-      );
+          marketIndex,
+          syntheticTokenPriceLong,
+          syntheticTokenPriceShort
+        );
 
       newLongPoolValue = uint256(int256(newLongPoolValue) + valueChangeForLong);
       newShortPoolValue = uint256(int256(newShortPoolValue) + valueChangeForShort);
@@ -1107,24 +1107,24 @@ contract LongShort is ILongShort, Initializable {
     // NOTE: These variables currently only includes the amount to deposit
     //       to save variable space (precious EVM stack) we share and update the same variable later to include the shift.
 
+    uint256 batchedAmountOfPaymentTokensToDepositOrShiftToLong = batchedAmountOfPaymentTokenToDeposit[
+        marketIndex
+      ][true];
 
-      uint256 batchedAmountOfPaymentTokensToDepositOrShiftToLong
-     = batchedAmountOfPaymentTokenToDeposit[marketIndex][true];
-
-
-      uint256 batchedAmountOfPaymentTokensToDepositOrShiftToShort
-     = batchedAmountOfPaymentTokenToDeposit[marketIndex][false];
+    uint256 batchedAmountOfPaymentTokensToDepositOrShiftToShort = batchedAmountOfPaymentTokenToDeposit[
+        marketIndex
+      ][false];
 
     // NOTE: These variables currently only includes the amount to shift
     //       to save variable space (precious EVM stack) we share and update the same variable later to include the reedem.
 
+    uint256 batchedAmountOfSynthTokensToRedeemOrShiftFromLong = batchedAmountOfSynthTokensToShiftMarketSide[
+        marketIndex
+      ][true];
 
-      uint256 batchedAmountOfSynthTokensToRedeemOrShiftFromLong
-     = batchedAmountOfSynthTokensToShiftMarketSide[marketIndex][true];
-
-
-      uint256 batchedAmountOfSynthTokensToRedeemOrShiftFromShort
-     = batchedAmountOfSynthTokensToShiftMarketSide[marketIndex][false];
+    uint256 batchedAmountOfSynthTokensToRedeemOrShiftFromShort = batchedAmountOfSynthTokensToShiftMarketSide[
+        marketIndex
+      ][false];
 
     // Handle shift tokens from LONG to SHORT
     if (batchedAmountOfSynthTokensToRedeemOrShiftFromLong > 0) {

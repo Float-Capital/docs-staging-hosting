@@ -68,7 +68,8 @@ let testUnit =
             longToken: sampleAddress,
             shortToken: sampleAddress,
             kPeriod: Ethers.BigNumber.fromUnsafe("4"),
-            unstakeFeeBasisPoints: Ethers.BigNumber.fromInt(50),
+            unstakeFeeBasisPoints:
+              Ethers.BigNumber.fromUnsafe("5000000000000000"), // 0.5% or 50 basis points
             balanceIncentiveCurveExponent: bnFromInt(5),
             balanceIncentiveCurveEquilibriumOffset: bnFromInt(0),
           },
