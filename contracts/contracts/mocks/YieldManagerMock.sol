@@ -165,11 +165,11 @@ contract YieldManagerMock is IYieldManager {
     }
 
     uint256 amountForTreasury = (unrealizedYield * treasuryYieldPercentE18) / TEN_TO_THE_18;
-    uint256 amountForMarketIncetives = unrealizedYield - amountForTreasury;
+    uint256 amountForMarketIncentives = unrealizedYield - amountForTreasury;
 
     totalReservedForTreasury += amountForTreasury;
 
-    return amountForMarketIncetives;
+    return amountForMarketIncentives;
   }
 
   // TODO STENT need to change this and unit test it

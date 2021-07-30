@@ -110,7 +110,7 @@ let testUnit =
       });
 
       it(
-        "returns the correct updated long and short values when price has increased (newAssetPrice == oldAssetPrice)",
+        "returns the correct updated long and short values when price has remained the same (newAssetPrice == oldAssetPrice)",
         () => {
           let newAssetPrice = oldAssetPrice;
           let%Await {longValue, shortValue} = setup(~newAssetPrice);
@@ -154,7 +154,7 @@ let testUnit =
       );
 
       it(
-        "returns the correct updated long and short values when price has increased (newAssetPrice < oldAssetPrice)",
+        "returns the correct updated long and short values when price has decreased (newAssetPrice < oldAssetPrice)",
         () => {
           // make the price decrease
           let newAssetPrice =

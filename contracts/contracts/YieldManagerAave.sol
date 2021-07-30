@@ -150,13 +150,13 @@ contract YieldManagerAave is IYieldManager {
     uint256 unrealizedYield = totalHeld - totalRealized;
 
     uint256 amountForTreasury = (unrealizedYield * treasuryYieldPercentE18) / 1e18;
-    uint256 amountForMarketIncetives = unrealizedYield - amountForTreasury;
+    uint256 amountForMarketIncentives = unrealizedYield - amountForTreasury;
 
     totalReservedForTreasury += amountForTreasury;
 
     emit YieldDistributed(unrealizedYield, treasuryYieldPercentE18);
 
-    return amountForMarketIncetives;
+    return amountForMarketIncentives;
   }
 
   /*
