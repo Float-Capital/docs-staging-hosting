@@ -137,7 +137,7 @@ let testUnit =
         // function is pure so we don't mock it
         let%AwaitThen predictedLongPrice =
           longShort->LongShort.Exposed._getSyntheticTokenPriceExposed(
-            ~amountPaymentToken=oldLongValueAfterYield,
+            ~amountPaymentTokenBackingSynth=oldLongValueAfterYield,
             ~amountSynthToken=longSynthSupply,
           );
 
@@ -145,7 +145,7 @@ let testUnit =
 
         let%AwaitThen predictedShortPrice =
           longShort->LongShort.Exposed._getSyntheticTokenPriceExposed(
-            ~amountPaymentToken=oldShortValueAfterYield,
+            ~amountPaymentTokenBackingSynth=oldShortValueAfterYield,
             ~amountSynthToken=shortSynthSupply,
           );
 

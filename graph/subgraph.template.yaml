@@ -17,7 +17,7 @@ dataSources:
         - ExecuteNextPriceMintSettlementUser
         - ExecuteNextPriceRedeemSettlementUser
         - LongShortV1
-        - SyntheticTokenCreated
+        - SyntheticMarketCreated
         - LongMinted
         - LongRedeem
         - ShortMinted
@@ -34,8 +34,8 @@ dataSources:
           handler: handleExecuteNextPriceMintSettlementUser
         - event: ExecuteNextPriceRedeemSettlementUser(address,uint32,bool,uint256)
           handler: handleExecuteNextPriceRedeemSettlementUser
-        - event: SyntheticTokenCreated(uint32,address,address,address,uint256,string,string,address,address)
-          handler: handleSyntheticTokenCreated
+        - event: SyntheticMarketCreated(uint32,address,address,address,uint256,string,string,address,address)
+          handler: handleSyntheticMarketCreated
         - event: LongMinted(uint32,uint256,uint256,uint256,address)
           handler: handleLongMinted
         - event: LongRedeem(uint32,uint256,uint256,uint256,address)

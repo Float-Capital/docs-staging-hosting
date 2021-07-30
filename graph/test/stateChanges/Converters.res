@@ -101,7 +101,7 @@ type longRedeemData = {
   user: address,
 }
 @decco.decode
-type syntheticTokenCreatedData = {
+type syntheticMarketCreatedData = {
   marketIndex: bn,
   longTokenAddress: address,
   shortTokenAddress: address,
@@ -139,7 +139,7 @@ type stateChanges =
   | FeesChanges(feesChangesData)
   | KFactorParametersChanges(kFactorParametersChangesData)
   | LongRedeem(longRedeemData)
-  | SyntheticTokenCreated(syntheticTokenCreatedData)
+  | SyntheticMarketCreated(syntheticMarketCreatedData)
   | DeployV1(deployV1Data)
   | FloatMinted(floatMintedData)
 
@@ -160,7 +160,7 @@ let covertToStateChange = (eventName, paramsObject) => {
   | "FeesChanges" => FeesChanges(paramsObject->Js.Json.object_->feesChangesData_decode->Result.getExn)
   | "KFactorParametersChanges" => KFactorParametersChanges(paramsObject->Js.Json.object_->kFactorParametersChangesData_decode->Result.getExn)
   | "LongRedeem" => LongRedeem(paramsObject->Js.Json.object_->longRedeemData_decode->Result.getExn)
-  | "SyntheticTokenCreated" => SyntheticTokenCreated(paramsObject->Js.Json.object_->syntheticTokenCreatedData_decode->Result.getExn)
+  | "SyntheticMarketCreated" => SyntheticMarketCreated(paramsObject->Js.Json.object_->syntheticMarketCreatedData_decode->Result.getExn)
   | "DeployV1" => DeployV1(paramsObject->Js.Json.object_->deployV1Data_decode->Result.getExn)
   | "FloatMinted" => FloatMinted(paramsObject->Js.Json.object_->floatMintedData_decode->Result.getExn)
   | name => Unclassified({name: name, data: paramsObject})
@@ -182,7 +182,7 @@ type eventGroup = {
   allFeesChangesEvents: array<eventData<feesChangesData>>,
   allKFactorParametersChangesEvents: array<eventData<kFactorParametersChangesData>>,
   allLongRedeemEvents: array<eventData<longRedeemData>>,
-  allSyntheticTokenCreatedEvents: array<eventData<syntheticTokenCreatedData>>,
+  allSyntheticMarketCreatedEvents: array<eventData<syntheticMarketCreatedData>>,
   allDeployV1Events: array<eventData<deployV1Data>>,
   allFloatMintedEvents: array<eventData<floatMintedData>>,
   allUnclassifiedEvents: array<ConverterTypes.unclassifiedEvent>,
@@ -202,7 +202,7 @@ let emptyEventGroups = {
   allFeesChangesEvents: [],
   allKFactorParametersChangesEvents: [],
   allLongRedeemEvents: [],
-  allSyntheticTokenCreatedEvents: [],
+  allSyntheticMarketCreatedEvents: [],
   allDeployV1Events: [],
   allFloatMintedEvents: [],
   allUnclassifiedEvents: [],
@@ -297,9 +297,9 @@ let addEventToCorrectGrouping = (
         {blockNumber: blockNumber, timestamp: timestamp, data: eventData, txHash: txHash},
       ]),
     }
-  | SyntheticTokenCreated(eventData) => {
+  | SyntheticMarketCreated(eventData) => {
       ...currentEventGroups,
-      allSyntheticTokenCreatedEvents: currentEventGroups.allSyntheticTokenCreatedEvents->Array.concat([
+      allSyntheticMarketCreatedEvents: currentEventGroups.allSyntheticMarketCreatedEvents->Array.concat([
         {blockNumber: blockNumber, timestamp: timestamp, data: eventData, txHash: txHash},
       ]),
     }

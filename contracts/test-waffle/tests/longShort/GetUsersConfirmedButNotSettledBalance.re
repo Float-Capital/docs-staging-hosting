@@ -15,7 +15,6 @@ let testUnit =
       | _ => true
       };
     let marketIndex = 1;
-    let syntheticTokenPriceSnapshot = Helpers.randomTokenAmount();
 
     before_once'(() => {
       contracts.contents.longShort

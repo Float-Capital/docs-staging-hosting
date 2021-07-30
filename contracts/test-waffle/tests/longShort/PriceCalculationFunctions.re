@@ -15,7 +15,7 @@ let testUnit =
       let%Await actualResult =
         contracts^.longShort
         ->LongShort.Exposed._getSyntheticTokenPriceExposed(
-            ~amountPaymentToken=randomAmountPaymentToken,
+            ~amountPaymentTokenBackingSynth=randomAmountPaymentToken,
             ~amountSynthToken=randomAmountSynthToken,
           );
 
@@ -43,7 +43,7 @@ let testUnit =
         contracts^.longShort
         ->LongShort.Exposed._getAmountPaymentTokenExposed(
             ~amountSynthToken=randomAmountSynthToken,
-            ~price=randomTokenPrice,
+            ~syntheticTokenPriceInPaymentTokens=randomTokenPrice,
           );
 
       let expectedResult =
@@ -68,8 +68,8 @@ let testUnit =
       let%Await actualResult =
         contracts^.longShort
         ->LongShort.Exposed._getAmountSynthTokenExposed(
-            ~amountPaymentToken=randomAmountPaymentToken,
-            ~price=randomTokenPrice,
+            ~amountPaymentTokenBackingSynth=randomAmountPaymentToken,
+            ~syntheticTokenPriceInPaymentTokens=randomTokenPrice,
           );
 
       let expectedResult =
