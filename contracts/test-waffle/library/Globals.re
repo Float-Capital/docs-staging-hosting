@@ -42,6 +42,8 @@ let (
     lt,
   );
 
+let bnMin = (a, b) => a->bnGt(b) ? b : a;
+
 let (zeroBn, twoBn, oneBn, tenToThe18) =
   CONSTANTS.(zeroBn, twoBn, oneBn, tenToThe18);
 

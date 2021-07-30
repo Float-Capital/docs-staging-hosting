@@ -50,6 +50,7 @@ contract LongShort is ILongShort, Initializable {
   mapping(uint32 => address) public paymentTokens;
   mapping(uint32 => address) public yieldManagers;
   mapping(uint32 => address) public oracleManagers;
+  mapping(uint32 => uint256) public marketTreasurySplitGradientsE18;
 
   // Market + position (long/short) specific
   mapping(uint32 => mapping(bool => address)) public syntheticTokens;
@@ -70,7 +71,7 @@ contract LongShort is ILongShort, Initializable {
   mapping(uint32 => mapping(bool => mapping(address => uint256)))
     public userNextPriceRedemptionAmount;
   mapping(uint32 => mapping(bool => mapping(address => uint256)))
-    public userNextPriceAmountSynthToShiftFromMarketSide;
+    public userNextPrice_amountSynthToShiftFromMarketSide;
 
   /*╔════════════════════════════╗
     ║           EVENTS           ║
@@ -241,6 +242,13 @@ contract LongShort is ILongShort, Initializable {
     emit OracleUpdated(marketIndex, previousOracleManager, _newOracleManager);
   }
 
+  function changeMarketTreasurySplitGradient(
+    uint32 marketIndex,
+    uint256 marketTreasurySplitGradientE18
+  ) external adminOnly {
+    marketTreasurySplitGradientsE18[marketIndex] = marketTreasurySplitGradientE18;
+  }
+
   /*╔═════════════════════════════╗
     ║       MARKET CREATION       ║
     ╚═════════════════════════════╝*/
@@ -282,6 +290,9 @@ contract LongShort is ILongShort, Initializable {
     yieldManagers[latestMarket] = _yieldManager;
     oracleManagers[latestMarket] = _oracleManager;
     assetPrice[latestMarket] = uint256(IOracleManager(oracleManagers[latestMarket]).updatePrice());
+
+    // default gradient is 1
+    marketTreasurySplitGradientsE18[latestMarket] = 1e18;
 
     // Approve tokens for aave lending pool maximally.
     IERC20(paymentTokens[latestMarket]).approve(_yieldManager, type(uint256).max);
@@ -478,10 +489,11 @@ contract LongShort is ILongShort, Initializable {
         );
       }
 
-      uint256 synthTokensShiftedAwayFromOtherSide = userNextPriceAmountSynthToShiftFromMarketSide[
+      uint256 synthTokensShiftedAwayFromOtherSide = userNextPrice_amountSynthToShiftFromMarketSide[
         marketIndex
       ][!isLong][user];
 
+      // TODO STENT optimize this like https://github.com/Float-Capital/monorepo/pull/990
       if (synthTokensShiftedAwayFromOtherSide > 0) {
         uint256 paymentTokensToShift = _getAmountPaymentToken(
           synthTokensShiftedAwayFromOtherSide,
@@ -514,12 +526,13 @@ contract LongShort is ILongShort, Initializable {
   /// @param shortValue The current total payment token value of the short side of the market.
   /// @param totalValueLockedInMarket Total payment token value of both sides of the market.
   /// @return isLongSideUnderbalanced Whether the long side initially had less value than the short side.
-  /// @return treasuryPercentE18 The percentage in base 1e18 of how much of the accrued yield for a market should be allocated to treasury.
+  /// @return treasuryYieldPercentE18 The percentage in base 1e18 of how much of the accrued yield for a market should be allocated to treasury.
   function _getYieldSplit(
+    uint32 marketIndex,
     uint256 longValue,
     uint256 shortValue,
     uint256 totalValueLockedInMarket
-  ) internal pure virtual returns (bool isLongSideUnderbalanced, uint256 treasuryPercentE18) {
+  ) internal view virtual returns (bool isLongSideUnderbalanced, uint256 treasuryYieldPercentE18) {
     isLongSideUnderbalanced = longValue < shortValue;
     uint256 imbalance;
     if (isLongSideUnderbalanced) {
@@ -528,15 +541,12 @@ contract LongShort is ILongShort, Initializable {
       imbalance = longValue - shortValue;
     }
 
-    // This gradient/slope can be adjusted, it is in base 10^18
-    uint256 marketTreasurySplitGradientE18 = 1e18;
-
-    uint256 marketPercentCalculatedE18 = (imbalance * marketTreasurySplitGradientE18) /
-      totalValueLockedInMarket;
+    uint256 marketPercentCalculatedE18 = (imbalance *
+      marketTreasurySplitGradientsE18[marketIndex]) / totalValueLockedInMarket;
 
     uint256 marketPercentE18 = _getMin(marketPercentCalculatedE18, 1e18);
 
-    treasuryPercentE18 = 1e18 - marketPercentE18;
+    treasuryYieldPercentE18 = 1e18 - marketPercentE18;
   }
 
   /*╔══════════════════════════════╗
@@ -560,6 +570,7 @@ contract LongShort is ILongShort, Initializable {
     uint256 totalValueLockedInMarket = longValue + shortValue;
 
     (bool isLongSideUnderbalanced, uint256 treasuryYieldPercentE18) = _getYieldSplit(
+      marketIndex,
       longValue,
       shortValue,
       totalValueLockedInMarket
@@ -578,22 +589,16 @@ contract LongShort is ILongShort, Initializable {
       }
     }
 
-    int256 underbalancedSidePoolValue = int256(_getMin(longValue, shortValue));
+    int256 underbalancedSideValue = int256(_getMin(longValue, shortValue));
 
-    int256 percentageChangeE18 = ((newAssetPrice - oldAssetPrice) * 1e18) / oldAssetPrice;
-
-    int256 valueChange = (percentageChangeE18 * underbalancedSidePoolValue) / 1e18;
-    // TODO: try refactor? Seems to be the same but have issues on edge cases,
-    //       but removes need to multiply then divide by 1e18
-    // int256 valueChangeRefactorAttempt = ((newAssetPrice - oldAssetPrice) * underbalancedSidePoolValue) /
-    //   oldAssetPrice;
+    int256 valueChange = ((newAssetPrice - oldAssetPrice) * underbalancedSideValue) / oldAssetPrice;
 
     if (valueChange > 0) {
       longValue += uint256(valueChange);
       shortValue -= uint256(valueChange);
     } else {
-      longValue -= uint256(valueChange * -1);
-      shortValue += uint256(valueChange * -1);
+      longValue -= uint256(-valueChange);
+      shortValue += uint256(-valueChange);
     }
   }
 
@@ -865,7 +870,7 @@ contract LongShort is ILongShort, Initializable {
       )
     );
 
-    userNextPriceAmountSynthToShiftFromMarketSide[marketIndex][isShiftFromLong][
+    userNextPrice_amountSynthToShiftFromMarketSide[marketIndex][isShiftFromLong][
       msg.sender
     ] += synthTokensToShift;
     userCurrentNextPriceUpdateIndex[marketIndex][msg.sender] = marketUpdateIndex[marketIndex] + 1;
@@ -967,7 +972,7 @@ contract LongShort is ILongShort, Initializable {
     address user,
     bool isShiftFromLong
   ) internal virtual {
-    uint256 synthTokensShiftedAwayFromMarketSide = userNextPriceAmountSynthToShiftFromMarketSide[
+    uint256 synthTokensShiftedAwayFromMarketSide = userNextPrice_amountSynthToShiftFromMarketSide[
       marketIndex
     ][isShiftFromLong][user];
     if (synthTokensShiftedAwayFromMarketSide > 0) {
@@ -978,7 +983,7 @@ contract LongShort is ILongShort, Initializable {
         userCurrentNextPriceUpdateIndex[marketIndex][user]
       );
 
-      userNextPriceAmountSynthToShiftFromMarketSide[marketIndex][isShiftFromLong][user] = 0;
+      userNextPrice_amountSynthToShiftFromMarketSide[marketIndex][isShiftFromLong][user] = 0;
 
       require(
         ISyntheticToken(syntheticTokens[marketIndex][!isShiftFromLong]).transfer(

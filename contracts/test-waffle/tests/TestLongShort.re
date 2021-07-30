@@ -160,6 +160,36 @@ describe("Float System", () => {
         );
       });
     });
+  describe("changeMarketTreasurySplitGradient", () => {
+      let newGradient = twoBn;
+      let marketIndex = 1;
+
+      it("should allow admin to update a gradient", () => {
+        let%Await _ =
+          contracts.contents.longShort
+          ->LongShort.changeMarketTreasurySplitGradient(~marketIndex, ~marketTreasurySplitGradientE18=newGradient);
+
+        let%Await updatedGradient =
+          contracts.contents.longShort->LongShort.marketTreasurySplitGradientsE18(marketIndex);
+
+        Chai.bnEqual(
+          updatedGradient,
+          newGradient,
+        );
+      });
+
+      it("shouldn't allow non admin to update the treasury address", () => {
+        let attackerAddress = accounts.contents->Array.getUnsafe(5);
+
+        Chai.expectRevert(
+          ~transaction=
+            contracts.contents.longShort
+            ->ContractHelpers.connect(~address=attackerAddress)
+            ->LongShort.changeMarketTreasurySplitGradient(~marketIndex, ~marketTreasurySplitGradientE18=newGradient),
+          ~reason="only admin",
+        );
+      });
+    });
   });
 
   describeUnit("LongShort - internals exposed", () => {
@@ -201,5 +231,25 @@ describe("Float System", () => {
     ExecuteOutstandingNextPriceSettlements.testUnit(~contracts, ~accounts);
     RedeemNextPrice.testUnit(~contracts, ~accounts);
     DepositFunds.testUnit(~contracts, ~accounts);
+  });
+
+  describe("Smocked", () => {
+    let contracts = ref("NOT INITIALIZED"->Obj.magic);
+    let accounts = ref("NOT INITIALIZED"->Obj.magic);
+
+    before(() => {
+      let%Await loadedAccounts = Ethers.getSigners();
+      accounts := loadedAccounts;
+
+      let%Await deployedContracts = Helpers.initializeLongShortUnit();
+
+      contracts := deployedContracts;
+    });
+    describeUnit("Unit tests", () => {
+      ClaimAndDistributeYieldThenRebalanceMarket.testUnit(
+        ~contracts,
+        ~accounts,
+      )
+    });
   });
 });

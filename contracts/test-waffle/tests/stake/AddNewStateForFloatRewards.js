@@ -63,7 +63,7 @@ function testUnit(contracts, param) {
                   Globals.before_once$p(function (param) {
                         return LetOps.Await.let_(contracts.contents.staker.setAddNewStateForFloatRewardsGlobals(marketIndex, nextTokenShiftIndex, latestRewardIndex), (function (param) {
                                       addNewStateForFloatRewardsTxPromise.contents = setup(longShortMarketPriceSnapshotIndexIfShiftExecuted, timeDeltaGreaterThanZero);
-                                      
+                                      return addNewStateForFloatRewardsTxPromise.contents;
                                     }));
                       });
                   it("updates longShortMarketPriceSnapshotIndex to the 'longShortMarketPriceSnapshotIndexIfShiftExecuted' value recieved from long short", (function () {

@@ -33,6 +33,18 @@ let randomInteger = () => Js.Math.random_int(1, Js.Int.max)->Ethers.BigNumber.fr
 @ocaml.doc(`Generates a random JS integer between 0 and 2147483647 (max js int)`)
 let randomJsInteger = () => Js.Math.random_int(0, Js.Int.max)
 
+let randomRatio1e18 = () =>
+  bnFromString(
+    Js.Math.random_int(0, 1000000000)->Int.toString ++
+      Js.Math.random_int(0, 1000000000)->Int.toString,
+  )
+
+let adjustNumberRandomlyWithinRange = (~basisPointsMin, ~basisPointsMax, number) => {
+  let numerator = Js.Math.random_int(basisPointsMin, basisPointsMax)->bnFromInt
+
+  number->add(number->mul(numerator)->div(bnFromInt(100000)))
+}
+
 @ocaml.doc(`Generates random BigNumber between 0.01 and 21474836.47 of a token (10^18 in BigNumber units)`)
 let randomTokenAmount = () =>
   randomInteger()->Ethers.BigNumber.mul(Ethers.BigNumber.fromUnsafe("10000000000000000"))
@@ -255,6 +267,91 @@ let initializeStakerUnit = () => {
       syntheticTokenSmocked: syntheticTokenSmocked,
     })
   })
+}
+
+type longShortUnitTestContracts = {
+  staker: Staker.t,
+  longShort: LongShort.t,
+  floatToken: FloatToken.t,
+  syntheticToken: SyntheticToken.t,
+  tokenFactory: TokenFactory.t,
+  yieldManager: YieldManagerAave.t,
+  oracleManager: OracleManagerMock.t,
+  stakerSmocked: StakerSmocked.t,
+  floatTokenSmocked: FloatTokenSmocked.t,
+  syntheticTokenSmocked: SyntheticTokenSmocked.t,
+  tokenFactorySmocked: TokenFactorySmocked.t,
+  yieldManagerSmocked: YieldManagerAaveSmocked.t,
+  oracleManagerSmocked: OracleManagerMockSmocked.t,
+}
+
+let initializeLongShortUnit = () => {
+  ERC20Mock.make(~name="Pay Token 1", ~symbol="PT1")->JsPromise.then(paymentToken =>
+    JsPromise.all7((
+      LongShort.Exposed.make(),
+      Staker.make(),
+      FloatToken.make(),
+      TokenFactory.make(~admin=CONSTANTS.zeroAddress, ~longShort=CONSTANTS.zeroAddress),
+      YieldManagerAave.make(
+        ~admin=CONSTANTS.zeroAddress,
+        ~longShort=CONSTANTS.zeroAddress,
+        ~treasury=CONSTANTS.zeroAddress,
+        ~paymentToken=paymentToken.address,
+        ~aToken=CONSTANTS.zeroAddress,
+        ~lendingPool=randomAddress(),
+        ~aaveReferalCode=0,
+      ),
+      OracleManagerMock.make(~admin=CONSTANTS.zeroAddress),
+      SyntheticToken.make(
+        ~name="baseTestSynthToken",
+        ~symbol="BTST",
+        ~longShort=CONSTANTS.zeroAddress,
+        ~staker=CONSTANTS.zeroAddress,
+        ~marketIndex=0,
+        ~isLong=false,
+      ),
+    ))->JsPromise.then(((
+      longShort,
+      staker,
+      floatToken,
+      tokenFactory,
+      yieldManager,
+      oracleManager,
+      syntheticToken,
+    )) => {
+      JsPromise.all7((
+        longShort->LongShortSmocked.InternalMock.setup,
+        staker->StakerSmocked.make,
+        floatToken->FloatTokenSmocked.make,
+        syntheticToken->SyntheticTokenSmocked.make,
+        tokenFactory->TokenFactorySmocked.make,
+        yieldManager->YieldManagerAaveSmocked.make,
+        oracleManager->OracleManagerMockSmocked.make,
+      ))->JsPromise.map(((
+        _,
+        stakerSmocked,
+        floatTokenSmocked,
+        syntheticTokenSmocked,
+        tokenFactorySmocked,
+        yieldManagerSmocked,
+        oracleManagerSmocked,
+      )) => {
+        staker: staker,
+        longShort: longShort,
+        floatToken: floatToken,
+        syntheticToken: syntheticToken,
+        tokenFactory: tokenFactory,
+        yieldManager: yieldManager,
+        oracleManager: oracleManager,
+        stakerSmocked: stakerSmocked,
+        floatTokenSmocked: floatTokenSmocked,
+        yieldManagerSmocked: yieldManagerSmocked,
+        oracleManagerSmocked: oracleManagerSmocked,
+        syntheticTokenSmocked: syntheticTokenSmocked,
+        tokenFactorySmocked: tokenFactorySmocked,
+      })
+    })
+  )
 }
 
 let increaseTime: int => JsPromise.t<

@@ -10,7 +10,7 @@ pragma solidity 0.8.3;
 abstract contract IYieldManager {
   event WithdrawErc20TokenToTreasury(address erc20Token, uint256 amount);
 
-  event YieldDistributed(uint256 unrealizedYield, uint256 treasuryPercentE18);
+  event YieldDistributed(uint256 unrealizedYield, uint256 treasuryYieldPercentE18);
 
   // NOTE: This is purely saving some gas, but the subgraph will know how much is
   //       due for the treasury at all times - no need to include in event.
@@ -45,7 +45,7 @@ abstract contract IYieldManager {
    */
   function claimYieldAndGetMarketAmount(
     uint256 totalValueRealizedForMarket,
-    uint256 treasuryPercentE18
+    uint256 treasuryYieldPercentE18
   ) public virtual returns (uint256 marketAmount);
 
   /*

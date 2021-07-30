@@ -92,16 +92,29 @@ contract LongShortInternalStateSetters is LongShort {
     bool isLong,
     uint256 _userCurrentNextPriceUpdateIndex,
     uint256 _marketUpdateIndex,
-    uint256 _userNextPriceDepositAmount,
-    uint256 _syntheticTokenPriceSnapshot
+    uint256 _userNextPriceDepositAmount_isLong,
+    uint256 _syntheticTokenPriceSnapshot_isLong,
+    uint256 _syntheticTokenPriceSnapshot_notIsLong,
+    uint256 _userNextPrice_amountSynthToShiftFromMarketSide_notIsLong
   ) external {
     marketExists[marketIndex] = true;
     userCurrentNextPriceUpdateIndex[marketIndex][user] = _userCurrentNextPriceUpdateIndex;
     marketUpdateIndex[marketIndex] = _marketUpdateIndex;
-    userNextPriceDepositAmount[marketIndex][isLong][user] = _userNextPriceDepositAmount;
+
+    userNextPriceDepositAmount[marketIndex][isLong][user] = _userNextPriceDepositAmount_isLong;
+    userNextPriceDepositAmount[marketIndex][!isLong][user] = 0; // reset other side for good measure
+
     syntheticTokenPriceSnapshot[marketIndex][isLong][
       _marketUpdateIndex
-    ] = _syntheticTokenPriceSnapshot;
+    ] = _syntheticTokenPriceSnapshot_isLong;
+    syntheticTokenPriceSnapshot[marketIndex][!isLong][
+      _marketUpdateIndex
+    ] = _syntheticTokenPriceSnapshot_notIsLong;
+
+    userNextPrice_amountSynthToShiftFromMarketSide[marketIndex][!isLong][
+      user
+    ] = _userNextPrice_amountSynthToShiftFromMarketSide_notIsLong;
+    userNextPrice_amountSynthToShiftFromMarketSide[marketIndex][isLong][user] = 0; // reset other side for good measure
   }
 
   function setPerformOustandingBatchedSettlementsGlobals(
@@ -236,6 +249,17 @@ contract LongShortInternalStateSetters is LongShort {
   ) external {
     userCurrentNextPriceUpdateIndex[marketIndex][user] = _userCurrentNextPriceUpdateIndex;
     marketUpdateIndex[marketIndex] = _marketUpdateIndex;
+  }
+
+  function setClaimAndDistributeYieldThenRebalanceMarketGlobals(
+    uint32 marketIndex,
+    uint256 _syntheticTokenPoolValueLong,
+    uint256 _syntheticTokenPoolValueShort,
+    address yieldManager
+  ) external {
+    syntheticTokenPoolValue[marketIndex][true] = _syntheticTokenPoolValueLong;
+    syntheticTokenPoolValue[marketIndex][false] = _syntheticTokenPoolValueShort;
+    yieldManagers[marketIndex] = yieldManager;
   }
 
   function setDepositFundsGlobals(uint32 marketIndex, address paymentToken) external {

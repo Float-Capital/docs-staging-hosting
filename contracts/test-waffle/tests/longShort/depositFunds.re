@@ -1,11 +1,6 @@
 open Mocha;
 open LetOps;
 
-let mockTransferFromToRevert: ERC20MockSmocked.t => unit =
-  _r => {
-    let _ = [%raw "_r.smocked.transferFrom.will.revert()"];
-  };
-
 let testUnit =
     (
       ~contracts: ref(Helpers.coreContracts),
@@ -17,30 +12,22 @@ let testUnit =
 
     describe("_depositFunds", () => {
       let paymentTokenSmocked = ref(ERC20MockSmocked.uninitializedValue);
-      let longShortRef: ref(LongShort.t) = ref(""->Obj.magic);
 
-      let setup = (~testWallet: Ethers.walletType, ~failTransfer: bool) => {
+      let setup = (~testWallet: Ethers.walletType) => {
         let {paymentToken} = contracts.contents.markets->Array.getUnsafe(0);
 
-        let%AwaitThen _ =
+        let%Await _ =
           contracts.contents.longShort
           ->LongShortSmocked.InternalMock.setupFunctionForUnitTesting(
-              ~functionName="_depositFunds",
-            );
+          ~functionName="_depositFunds",
+        );
 
         let%AwaitThen smockedPaymentToken =
           ERC20MockSmocked.make(paymentToken);
-
-        if (failTransfer) {
-          smockedPaymentToken->mockTransferFromToRevert;
-        } else {
-          smockedPaymentToken->ERC20MockSmocked.mockTransferFromToReturn(
-            true,
-          );
-        };
+        smockedPaymentToken->ERC20MockSmocked.mockTransferFromToReturn(true);
         paymentTokenSmocked := smockedPaymentToken;
 
-        let%Await _ =
+        let%AwaitThen _ =
           contracts.contents.longShort
           ->LongShort.Exposed.setDepositFundsGlobals(
               ~marketIndex,
@@ -51,16 +38,15 @@ let testUnit =
           contracts.contents.longShort
           ->ContractHelpers.connect(~address=testWallet);
 
-        longShortRef := longShort;
+        longShort->LongShort.Exposed._depositFundsExposed(
+          ~marketIndex,
+          ~amount,
+        );
       };
 
       it("calls paymentToken.transferFrom with correct arguments", () => {
         let testWallet = accounts.contents->Array.getUnsafe(1);
-        let%Await _ = setup(~testWallet, ~failTransfer=false);
-
-        let%Await _ =
-          longShortRef.contents
-          ->LongShort.Exposed._depositFundsExposed(~marketIndex, ~amount);
+        let%Await _ = setup(~testWallet);
 
         let transferFromCalls =
           paymentTokenSmocked.contents->ERC20MockSmocked.transferFromCalls;
@@ -72,17 +58,6 @@ let testUnit =
             amount,
           },
         |]);
-      });
-
-      it("fails if paymetToken.transferFrom fails", () => {
-        let testWallet = accounts.contents->Array.getUnsafe(1);
-        let%Await _ = setup(~testWallet, ~failTransfer=true);
-
-        Chai.expectRevertNoReason(
-          ~transaction=
-            longShortRef.contents
-            ->LongShort.Exposed._depositFundsExposed(~marketIndex, ~amount),
-        );
       });
     });
 

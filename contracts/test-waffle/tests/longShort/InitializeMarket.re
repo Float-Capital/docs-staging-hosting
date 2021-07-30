@@ -121,7 +121,7 @@ let testUnit =
     });
     it("reverts if market index is greater than latest market index", () => {
       let%Await _ =
-        setup(~marketIndex=2, ~marketIndexValue=false, ~latestMarket=1);
+        setup(~marketIndex=1, ~marketIndexValue=false, ~latestMarket=1);
       let%Await _ =
         Chai.expectRevertNoReason(
           ~transaction=
@@ -130,7 +130,7 @@ let testUnit =
                 ~address=(accounts^)->Array.getUnsafe(0),
               )
             ->LongShort.initializeMarket(
-                ~marketIndex=1,
+                ~marketIndex=2,
                 ~kPeriod=Ethers.BigNumber.fromUnsafe("4"),
                 ~kInitialMultiplier=Ethers.BigNumber.fromUnsafe("6"),
                 ~unstakeFeeE18=
