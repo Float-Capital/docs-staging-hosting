@@ -238,6 +238,17 @@ contract LongShortInternalStateSetters is LongShort {
     marketUpdateIndex[marketIndex] = _marketUpdateIndex;
   }
 
+  function setClaimAndDistributeYieldThenRebalanceMarketGlobals(
+    uint32 marketIndex,
+    uint256 _syntheticTokenPoolValueLong,
+    uint256 _syntheticTokenPoolValueShort,
+    address yieldManager
+  ) external {
+    syntheticTokenPoolValue[marketIndex][true] = _syntheticTokenPoolValueLong;
+    syntheticTokenPoolValue[marketIndex][false] = _syntheticTokenPoolValueShort;
+    yieldManagers[marketIndex] = yieldManager;
+  }
+
   function setDepositFundsGlobals(uint32 marketIndex, address paymentToken) external {
     paymentTokens[marketIndex] = paymentToken;
   }

@@ -32,6 +32,17 @@ external all5: ((t<'a>, t<'b>, t<'c>, t<'d>, t<'e>)) => t<('a, 'b, 'c, 'd, 'e)> 
 @scope("Promise") @val
 external all6: ((t<'a>, t<'b>, t<'c>, t<'d>, t<'e>, t<'f>)) => t<('a, 'b, 'c, 'd, 'e, 'f)> = "all"
 
+@scope("Promise") @val
+external all7: ((t<'a>, t<'b>, t<'c>, t<'d>, t<'e>, t<'f>, t<'g>)) => t<(
+  'a,
+  'b,
+  'c,
+  'd,
+  'e,
+  'f,
+  'g,
+)> = "all"
+
 @send
 external _catch: (t<'a>, @uncurry (exn => t<'a>)) => t<'a> = "catch"
 

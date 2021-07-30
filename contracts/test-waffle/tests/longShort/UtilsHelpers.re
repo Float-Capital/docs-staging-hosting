@@ -93,13 +93,8 @@ let testUnit =
           imbalance
           ->mul(marketTreasurySplitGradientE18)
           ->div(totalValueLockedInMarket);
-
-        let%AwaitThen marketPercentE18 =
-          contracts.contents.longShort
-          ->LongShort.Exposed._getMinExposed(
-              ~a=marketPercentCalculatedE18,
-              ~b=CONSTANTS.tenToThe18,
-            );
+        let marketPercentE18 =
+          bnMin(marketPercentCalculatedE18, CONSTANTS.tenToThe18);
 
         let treasuryPercentE18 = CONSTANTS.tenToThe18->sub(marketPercentE18);
 
@@ -117,7 +112,7 @@ let testUnit =
           ~message=
             "expectedResult and result after `_getYieldSplit` not the same",
           expectedResult,
-          actualResult.treasuryPercentE18,
+          actualResult.treasuryYieldPercentE18,
         );
       };
 

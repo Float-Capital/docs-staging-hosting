@@ -526,13 +526,13 @@ contract LongShort is ILongShort, Initializable {
   /// @param shortValue The current total payment token value of the short side of the market.
   /// @param totalValueLockedInMarket Total payment token value of both sides of the market.
   /// @return isLongSideUnderbalanced Whether the long side initially had less value than the short side.
-  /// @return treasuryPercentE18 The percentage in base 1e18 of how much of the accrued yield for a market should be allocated to treasury.
+  /// @return treasuryYieldPercentE18 The percentage in base 1e18 of how much of the accrued yield for a market should be allocated to treasury.
   function _getYieldSplit(
     uint32 marketIndex,
     uint256 longValue,
     uint256 shortValue,
     uint256 totalValueLockedInMarket
-  ) internal view virtual returns (bool isLongSideUnderbalanced, uint256 treasuryPercentE18) {
+  ) internal view virtual returns (bool isLongSideUnderbalanced, uint256 treasuryYieldPercentE18) {
     isLongSideUnderbalanced = longValue < shortValue;
     uint256 imbalance;
     if (isLongSideUnderbalanced) {
@@ -546,7 +546,7 @@ contract LongShort is ILongShort, Initializable {
 
     uint256 marketPercentE18 = _getMin(marketPercentCalculatedE18, 1e18);
 
-    treasuryPercentE18 = 1e18 - marketPercentE18;
+    treasuryYieldPercentE18 = 1e18 - marketPercentE18;
   }
 
   /*╔══════════════════════════════╗
@@ -591,20 +591,15 @@ contract LongShort is ILongShort, Initializable {
 
     int256 unbalancedSidePoolValue = int256(_getMin(longValue, shortValue));
 
-    int256 percentageChangeE18 = ((newAssetPrice - oldAssetPrice) * 1e18) / oldAssetPrice;
-
-    int256 valueChange = (percentageChangeE18 * unbalancedSidePoolValue) / 1e18;
-    // TODO: try refactor? Seems to be the same but have issues on edge cases,
-    //       but removes need to multiply then divide by 1e18
-    // int256 valueChangeRefactorAttempt = ((newAssetPrice - oldAssetPrice) * unbalancedSidePoolValue) /
-    //   oldAssetPrice;
+    int256 valueChange = ((newAssetPrice - oldAssetPrice) * unbalancedSidePoolValue) /
+      oldAssetPrice;
 
     if (valueChange > 0) {
       longValue += uint256(valueChange);
       shortValue -= uint256(valueChange);
     } else {
-      longValue -= uint256(valueChange * -1);
-      shortValue += uint256(valueChange * -1);
+      longValue -= uint256(-valueChange);
+      shortValue += uint256(-valueChange);
     }
   }
 
