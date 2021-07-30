@@ -28,7 +28,9 @@ contract LongShort is ILongShort, Initializable {
     ╚═════════════════════════════╝*/
 
   // Fixed-precision constants
-  address public constant INTO_THE_ETHERS_ADDRESS =
+  /// @notice this is the address that permanently locked initial liquidity for markets is held by. These tokens will never move so market can never have zero liquidity on a side.
+  /// @dev f10a7 spells float in hex - this is just for fun - important part is that the private key for this address in not known.
+  address public constant PERMANENT_INITIAL_LIQUIDITY_HOLDER =
     0xf10A7_F10A7_f10A7_F10a7_F10A7_f10a7_F10A7_f10a7;
   uint256[45] private __constantsGap;
 
