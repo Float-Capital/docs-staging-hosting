@@ -313,11 +313,11 @@ contract LongShort is ILongShort, Initializable {
     _lockFundsInMarket(marketIndex, initialMarketSeed * 2);
 
     ISyntheticToken(syntheticTokens[latestMarket][true]).mint(
-      INTO_THE_ETHERS_ADDRESS,
+      PERMANENT_INITIAL_LIQUIDITY_HOLDER,
       initialMarketSeed
     );
     ISyntheticToken(syntheticTokens[latestMarket][false]).mint(
-      INTO_THE_ETHERS_ADDRESS,
+      PERMANENT_INITIAL_LIQUIDITY_HOLDER,
       initialMarketSeed
     );
 
