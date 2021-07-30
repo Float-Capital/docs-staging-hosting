@@ -28,7 +28,9 @@ contract LongShort is ILongShort, Initializable {
     ╚═════════════════════════════╝*/
 
   // Fixed-precision constants
-  address public constant INTO_THE_ETHERS_ADDRESS =
+  /// @notice this is the address that permanently locked initial liquidity for markets is held by. These tokens will never move so market can never have zero liquidity on a side.
+  /// @dev f10a7 spells float in hex - this is just for fun - important part is that the private key for this address in not known.
+  address public constant PERMANENT_INITIAL_LIQUIDITY_HOLDER =
     0xf10A7_F10A7_f10A7_F10a7_F10A7_f10a7_F10A7_f10a7;
   uint256[45] private __constantsGap;
 
@@ -53,7 +55,7 @@ contract LongShort is ILongShort, Initializable {
   mapping(uint32 => mapping(bool => address)) public syntheticTokens;
   mapping(uint32 => mapping(bool => uint256)) public syntheticTokenPoolValue;
 
-  // synthetic token price of a given market of a (long/short) of a price snapshot in time
+  /// @notice synthetic token prices of a given market of a (long/short) at every previous price update
   mapping(uint32 => mapping(bool => mapping(uint256 => uint256)))
     public syntheticTokenPriceSnapshot;
 
@@ -206,7 +208,7 @@ contract LongShort is ILongShort, Initializable {
     tokenFactory = _tokenFactory;
     staker = _staker;
 
-    emit LongShortV1(admin, treasury, tokenFactory, staker);
+    emit LongShortV1(_admin, _treasury, _tokenFactory, _staker);
   }
 
   /*╔═════════════════════════════╗
@@ -311,11 +313,11 @@ contract LongShort is ILongShort, Initializable {
     _lockFundsInMarket(marketIndex, initialMarketSeed * 2);
 
     ISyntheticToken(syntheticTokens[latestMarket][true]).mint(
-      INTO_THE_ETHERS_ADDRESS,
+      PERMANENT_INITIAL_LIQUIDITY_HOLDER,
       initialMarketSeed
     );
     ISyntheticToken(syntheticTokens[latestMarket][false]).mint(
-      INTO_THE_ETHERS_ADDRESS,
+      PERMANENT_INITIAL_LIQUIDITY_HOLDER,
       initialMarketSeed
     );
 
