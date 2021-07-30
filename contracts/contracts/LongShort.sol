@@ -55,7 +55,7 @@ contract LongShort is ILongShort, Initializable {
   mapping(uint32 => mapping(bool => address)) public syntheticTokens;
   mapping(uint32 => mapping(bool => uint256)) public syntheticTokenPoolValue;
 
-  // synthetic token price of a given market of a (long/short) of a price snapshot in time
+  /// @notice synthetic token prices of a given market of a (long/short) at every previous price update
   mapping(uint32 => mapping(bool => mapping(uint256 => uint256)))
     public syntheticTokenPriceSnapshot;
 
