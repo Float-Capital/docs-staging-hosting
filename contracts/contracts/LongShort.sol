@@ -490,6 +490,7 @@ contract LongShort is ILongShort, Initializable {
         marketIndex
       ][!isLong][user];
 
+      // TODO STENT optimize this like https://github.com/Float-Capital/monorepo/pull/990
       if (synthTokensShiftedAwayFromOtherSide > 0) {
         uint256 paymentTokensToShift = _getAmountPaymentToken(
           synthTokensShiftedAwayFromOtherSide,
