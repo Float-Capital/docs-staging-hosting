@@ -6,10 +6,10 @@ let testIntegration =
       ~contracts: ref(Helpers.coreContracts),
       ~accounts: ref(array(Ethers.Wallet.t)),
     ) =>
-  describe("lazyRedeem", () => {
-    let runLazyRedeemTest = (~isLong) =>
+  describe("nextPriceShiftPosition", () => {
+    let runnextPriceShiftPositionTest = (~isLong) =>
       it(
-        "should work as expected happy path for redeem "
+        "should work as expected happy path for token shifting "
         ++ (isLong ? "Long" : "Short"),
         () => {
           let testUser = accounts.contents->Array.getUnsafe(8);
@@ -144,8 +144,8 @@ let testIntegration =
         },
       );
 
-    runLazyRedeemTest(~isLong=true);
-    runLazyRedeemTest(~isLong=false);
+    runnextPriceShiftPositionTest(~isLong=true);
+    runnextPriceShiftPositionTest(~isLong=false);
   });
 
 let testUnit =

@@ -7,8 +7,8 @@ let testIntegration =
       ~contracts: ref(Helpers.coreContracts),
       ~accounts: ref(array(Ethers.Wallet.t)),
     ) =>
-  describe("lazyRedeem", () => {
-    let runLazyRedeemTest = (~isLong) =>
+  describe("nextPriceRedeem", () => {
+    let runnextPriceRedeemTest = (~isLong) =>
       it(
         "should work as expected happy path for redeem "
         ++ (isLong ? "Long" : "Short"),
@@ -135,8 +135,8 @@ let testIntegration =
         },
       );
 
-    runLazyRedeemTest(~isLong=true);
-    runLazyRedeemTest(~isLong=false);
+    runnextPriceRedeemTest(~isLong=true);
+    runnextPriceRedeemTest(~isLong=false);
   });
 
 let testUnit =
