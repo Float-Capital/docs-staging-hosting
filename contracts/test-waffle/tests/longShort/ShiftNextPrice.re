@@ -27,7 +27,10 @@ let testUnit =
 
         let%Await _ =
           contracts.contents.longShort
-          ->LongShort.shiftPositionFromLongNextPrice(~marketIndex, ~synthTokensToShift);
+          ->LongShort.shiftPositionFromLongNextPrice(
+              ~marketIndex,
+              ~synthTokensToShift,
+            );
 
         let shiftPositionNextPriceCalls =
           LongShortSmocked.InternalMock._shiftPositionNextPriceCalls();
@@ -50,7 +53,10 @@ let testUnit =
 
         let%Await _ =
           contracts.contents.longShort
-          ->LongShort.shiftPositionFromShortNextPrice(~marketIndex, ~synthTokensToShift);
+          ->LongShort.shiftPositionFromShortNextPrice(
+              ~marketIndex,
+              ~synthTokensToShift,
+            );
 
         let shiftPositionNextPriceCalls =
           LongShortSmocked.InternalMock._shiftPositionNextPriceCalls();
@@ -162,9 +168,9 @@ let testUnit =
               isShiftFromLong,
             );
 
-        let%AwaitThen updateduserNextPriceAmountSynthToShiftFromMarketSide =
+        let%AwaitThen updateduserNextPrice_amountSynthToShiftFromMarketSide =
           contracts.contents.longShort
-          ->LongShort.userNextPriceAmountSynthToShiftFromMarketSide(
+          ->LongShort.userNextPrice_amountSynthToShiftFromMarketSide(
               marketIndex,
               isShiftFromLong,
               testWallet.address,
@@ -186,8 +192,8 @@ let testUnit =
 
         Chai.bnEqual(
           ~message=
-            "userNextPriceAmountSynthToShiftFromMarketSide not updated correctly",
-          updateduserNextPriceAmountSynthToShiftFromMarketSide,
+            "userNextPrice_amountSynthToShiftFromMarketSide not updated correctly",
+          updateduserNextPrice_amountSynthToShiftFromMarketSide,
           amount,
         );
 
