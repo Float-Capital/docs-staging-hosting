@@ -143,10 +143,11 @@ contract YieldManagerAave is IYieldManager {
 
     uint256 totalRealized = totalValueRealizedForMarket + totalReservedForTreasury;
 
-    if (totalRealized >= totalHeld) {
+    if (totalRealized == totalHeld) {
       return 0;
     }
 
+    // will revert in case totalRealized > totalHeld which should be never.
     uint256 unrealizedYield = totalHeld - totalRealized;
 
     uint256 amountForTreasury = (unrealizedYield * treasuryYieldPercentE18) / 1e18;
