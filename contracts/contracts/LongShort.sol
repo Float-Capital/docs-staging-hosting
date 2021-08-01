@@ -1239,7 +1239,7 @@ contract LongShort is ILongShort, Initializable {
     }
 
     // Handle batched redeems LONG
-    amountForCurrentActionWorkingVariable += batched_amountOfSynthTokensToRedeem[marketIndex][true];
+    amountForCurrentActionWorkingVariable = batched_amountOfSynthTokensToRedeem[marketIndex][true];
     if (amountForCurrentActionWorkingVariable > 0) {
       paymentTokenValueChangeForLong -= int256(
         _getAmountPaymentToken(amountForCurrentActionWorkingVariable, syntheticTokenPriceLong)
@@ -1250,12 +1250,13 @@ contract LongShort is ILongShort, Initializable {
     }
 
     // Handle batched redeems SHORT
-    amountForCurrentActionWorkingVariable += batched_amountOfSynthTokensToRedeem[marketIndex][true];
+
+    amountForCurrentActionWorkingVariable = batched_amountOfSynthTokensToRedeem[marketIndex][false];
     if (amountForCurrentActionWorkingVariable > 0) {
-      paymentTokenValueChangeForLong -= int256(
-        _getAmountPaymentToken(amountForCurrentActionWorkingVariable, syntheticTokenPriceLong)
+      paymentTokenValueChangeForShort -= int256(
+        _getAmountPaymentToken(amountForCurrentActionWorkingVariable, syntheticTokenPriceShort)
       );
-      longChangeInSynthTokensTotalSupply -= int256(amountForCurrentActionWorkingVariable);
+      shortChangeInSynthTokensTotalSupply -= int256(amountForCurrentActionWorkingVariable);
 
       batched_amountOfSynthTokensToRedeem[marketIndex][true] = 0;
     }
