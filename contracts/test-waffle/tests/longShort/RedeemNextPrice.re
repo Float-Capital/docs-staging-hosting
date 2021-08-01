@@ -295,28 +295,31 @@ let testUnit =
 
         let%AwaitThen _ = setup(~isLong, ~testWallet);
 
-        let%AwaitThen updatedBatchedAmountOfSynthTokensToRedeem =
+        let%AwaitThen updatedbatched_amountOfSynthTokensToRedeem =
           contracts.contents.longShort
-          ->LongShort.batchedAmountOfSynthTokensToRedeem(marketIndex, isLong);
+          ->LongShort.batched_amountOfSynthTokensToRedeem(
+              marketIndex,
+              isLong,
+            );
 
         let%AwaitThen updatedUserNextPriceRedemptionAmount =
           contracts.contents.longShort
-          ->LongShort.userNextPriceRedemptionAmount(
+          ->LongShort.userNextPrice_redemptionAmount(
               marketIndex,
               isLong,
               testWallet.address,
             );
 
-        let%Await updatedUserCurrentNextPriceUpdateIndex =
+        let%Await updateduserNextPrice_currentUpdateIndex =
           contracts.contents.longShort
-          ->LongShort.userCurrentNextPriceUpdateIndex(
+          ->LongShort.userNextPrice_currentUpdateIndex(
               marketIndex,
               testWallet.address,
             );
 
         Chai.bnEqual(
-          ~message="batchedAmountOfSynthTokensToRedeem not updated correctly",
-          updatedBatchedAmountOfSynthTokensToRedeem,
+          ~message="batched_amountOfSynthTokensToRedeem not updated correctly",
+          updatedbatched_amountOfSynthTokensToRedeem,
           amount,
         );
 
@@ -327,8 +330,8 @@ let testUnit =
         );
 
         Chai.bnEqual(
-          ~message="userCurrentNextPriceUpdateIndex not updated correctly",
-          updatedUserCurrentNextPriceUpdateIndex,
+          ~message="userNextPrice_currentUpdateIndex not updated correctly",
+          updateduserNextPrice_currentUpdateIndex,
           marketUpdateIndex->add(oneBn),
         );
       });

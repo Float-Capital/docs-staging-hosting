@@ -259,29 +259,29 @@ let testUnit =
 
         let%AwaitThen updatedBatchedAmountOfTokensToDeposit =
           contracts.contents.longShort
-          ->LongShort.batchedAmountOfPaymentTokenToDeposit(
+          ->LongShort.batched_amountOfPaymentTokenToDeposit(
               marketIndex,
               isLong,
             );
 
         let%AwaitThen updatedUserNextPriceDepositAmount =
           contracts.contents.longShort
-          ->LongShort.userNextPriceDepositAmount(
+          ->LongShort.userNextPrice_depositAmount(
               marketIndex,
               isLong,
               testWallet.address,
             );
 
-        let%Await updatedUserCurrentNextPriceUpdateIndex =
+        let%Await updateduserNextPrice_currentUpdateIndex =
           contracts.contents.longShort
-          ->LongShort.userCurrentNextPriceUpdateIndex(
+          ->LongShort.userNextPrice_currentUpdateIndex(
               marketIndex,
               testWallet.address,
             );
 
         Chai.bnEqual(
           ~message=
-            "batchedAmountOfPaymentTokenToDeposit not updated correctly",
+            "batched_amountOfPaymentTokenToDeposit not updated correctly",
           updatedBatchedAmountOfTokensToDeposit,
           amount,
         );
@@ -293,8 +293,8 @@ let testUnit =
         );
 
         Chai.bnEqual(
-          ~message="userCurrentNextPriceUpdateIndex not updated correctly",
-          updatedUserCurrentNextPriceUpdateIndex,
+          ~message="userNextPrice_currentUpdateIndex not updated correctly",
+          updateduserNextPrice_currentUpdateIndex,
           marketUpdateIndex->add(oneBn),
         );
       });

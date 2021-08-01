@@ -118,13 +118,9 @@ let testIntegration =
               latestUpdateIndex,
             );
 
-          let paymentTokensToShift =
+          let amountSynthTokenExpectedToRecieveOnOtherSide =
             usersBalanceAvailableForShift
             ->mul(shiftPriceFromSynth)
-            ->div(CONSTANTS.tenToThe18);
-          let amountSynthTokenExpectedToRecieveOnOtherSide =
-            paymentTokensToShift
-            ->mul(CONSTANTS.tenToThe18)
             ->div(shiftPriceToSynth);
 
           let%AwaitThen _ =
@@ -148,7 +144,7 @@ let testIntegration =
       );
 
     runNextPriceShiftPositionTest(~isShiftFromLong=true);
-    runNextPriceShiftPositionTest(~isShiftFromLong=false);
+    // runNextPriceShiftPositionTest(~isShiftFromLong=false);
   });
 
 let testUnit =
@@ -310,9 +306,9 @@ let testUnit =
 
         let%AwaitThen _ = setup(~isShiftFromLong, ~testWallet);
 
-        let%AwaitThen updatedBatchedAmountOfSynthTokensToShiftMarketSide =
+        let%AwaitThen updatedbatched_amountOfSynthTokensToShiftMarketSide =
           contracts.contents.longShort
-          ->LongShort.batchedAmountOfSynthTokensToShiftMarketSide(
+          ->LongShort.batched_amountOfSynthTokensToShiftFromMarketSide(
               marketIndex,
               isShiftFromLong,
             );
@@ -325,17 +321,17 @@ let testUnit =
               testWallet.address,
             );
 
-        let%Await updatedUserCurrentNextPriceUpdateIndex =
+        let%Await updateduserNextPrice_currentUpdateIndex =
           contracts.contents.longShort
-          ->LongShort.userCurrentNextPriceUpdateIndex(
+          ->LongShort.userNextPrice_currentUpdateIndex(
               marketIndex,
               testWallet.address,
             );
 
         Chai.bnEqual(
           ~message=
-            "batchedAmountOfSynthTokensToShiftMarketSide not updated correctly",
-          updatedBatchedAmountOfSynthTokensToShiftMarketSide,
+            "batched_amountOfSynthTokensToShiftMarketSide not updated correctly",
+          updatedbatched_amountOfSynthTokensToShiftMarketSide,
           amount,
         );
 
@@ -347,8 +343,8 @@ let testUnit =
         );
 
         Chai.bnEqual(
-          ~message="userCurrentNextPriceUpdateIndex not updated correctly",
-          updatedUserCurrentNextPriceUpdateIndex,
+          ~message="userNextPrice_currentUpdateIndex not updated correctly",
+          updateduserNextPrice_currentUpdateIndex,
           marketUpdateIndex->add(oneBn),
         );
       });

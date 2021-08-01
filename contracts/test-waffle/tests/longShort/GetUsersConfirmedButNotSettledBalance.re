@@ -24,15 +24,15 @@ let testUnit =
     });
 
     describe(
-      {j|[happy case] [isLong: $isLong] userCurrentNextPriceUpdateIndex within bounds|j},
+      {j|[happy case] [isLong: $isLong] userNextPrice_currentUpdateIndex within bounds|j},
       () => {
-        let userCurrentNextPriceUpdateIndex = oneBn;
+        let userNextPrice_currentUpdateIndex = oneBn;
         let marketUpdateIndex = twoBn;
 
         describe(
           "userNextPriceDepositAmount non-zero and userNextPrice_amountSynthToShiftFromMarketSide zero",
           () => {
-            let userNextPriceDepositAmount_isLong =
+            let userNextPrice_depositAmount_isLong =
               Helpers.randomTokenAmount();
             let syntheticTokenPriceSnapshot_isLong =
               Helpers.randomTokenAmount();
@@ -47,16 +47,16 @@ let testUnit =
                     ~marketIndex,
                     ~user,
                     ~isLong,
-                    ~userCurrentNextPriceUpdateIndex,
+                    ~userNextPrice_currentUpdateIndex,
                     ~marketUpdateIndex,
-                    ~userNextPriceDepositAmount_isLong,
+                    ~userNextPrice_depositAmount_isLong,
                     ~syntheticTokenPriceSnapshot_isLong,
                     ~syntheticTokenPriceSnapshot_notIsLong,
                     ~userNextPrice_amountSynthToShiftFromMarketSide_notIsLong,
                   );
 
               let expectedResult =
-                userNextPriceDepositAmount_isLong
+                userNextPrice_depositAmount_isLong
                 ->mul(tenToThe18)
                 ->div(syntheticTokenPriceSnapshot_isLong);
               let%Await actualResult =
@@ -74,7 +74,7 @@ let testUnit =
         describe(
           "userNextPriceDepositAmount zero and userNextPrice_amountSynthToShiftFromMarketSide non-zero",
           () => {
-            let userNextPriceDepositAmount_isLong = zeroBn;
+            let userNextPrice_depositAmount_isLong = zeroBn;
             let syntheticTokenPriceSnapshot_isLong =
               Helpers.randomTokenAmount();
             let syntheticTokenPriceSnapshot_notIsLong =
@@ -89,9 +89,9 @@ let testUnit =
                     ~marketIndex,
                     ~user,
                     ~isLong,
-                    ~userCurrentNextPriceUpdateIndex,
+                    ~userNextPrice_currentUpdateIndex,
                     ~marketUpdateIndex,
-                    ~userNextPriceDepositAmount_isLong,
+                    ~userNextPrice_depositAmount_isLong,
                     ~syntheticTokenPriceSnapshot_isLong,
                     ~syntheticTokenPriceSnapshot_notIsLong,
                     ~userNextPrice_amountSynthToShiftFromMarketSide_notIsLong,
@@ -115,7 +115,7 @@ let testUnit =
         describe(
           "userNextPriceDepositAmount non-zero and userNextPrice_amountSynthToShiftFromMarketSide non-zero",
           () => {
-            let userNextPriceDepositAmount_isLong =
+            let userNextPrice_depositAmount_isLong =
               Helpers.randomTokenAmount();
             let syntheticTokenPriceSnapshot_isLong =
               Helpers.randomTokenAmount();
@@ -131,9 +131,9 @@ let testUnit =
                     ~marketIndex,
                     ~user,
                     ~isLong,
-                    ~userCurrentNextPriceUpdateIndex,
+                    ~userNextPrice_currentUpdateIndex,
                     ~marketUpdateIndex,
-                    ~userNextPriceDepositAmount_isLong,
+                    ~userNextPrice_depositAmount_isLong,
                     ~syntheticTokenPriceSnapshot_isLong,
                     ~syntheticTokenPriceSnapshot_notIsLong,
                     ~userNextPrice_amountSynthToShiftFromMarketSide_notIsLong,
@@ -144,7 +144,7 @@ let testUnit =
                 ->mul(syntheticTokenPriceSnapshot_notIsLong)
                 ->div(syntheticTokenPriceSnapshot_isLong)
                 ->add(
-                    userNextPriceDepositAmount_isLong
+                    userNextPrice_depositAmount_isLong
                     ->mul(tenToThe18)
                     ->div(syntheticTokenPriceSnapshot_isLong),
                   );
@@ -162,36 +162,36 @@ let testUnit =
       },
     );
     describe(
-      {j|[sad case] [isLong: $isLong] userCurrentNextPriceUpdateIndex out of bounds|j},
+      {j|[sad case] [isLong: $isLong] userNextPrice_currentUpdateIndex out of bounds|j},
       () => {
-        let userNextPriceDepositAmount_isLong = Helpers.randomTokenAmount();
+        let userNextPrice_depositAmount_isLong = Helpers.randomTokenAmount();
         let syntheticTokenPriceSnapshot_isLong = Helpers.randomTokenAmount();
         let syntheticTokenPriceSnapshot_notIsLong =
           Helpers.randomTokenAmount();
         let userNextPrice_amountSynthToShiftFromMarketSide_notIsLong =
           Helpers.randomTokenAmount();
 
-        let setup = (~userCurrentNextPriceUpdateIndex, ~marketUpdateIndex) => {
+        let setup = (~userNextPrice_currentUpdateIndex, ~marketUpdateIndex) => {
           contracts.contents.longShort
           ->LongShort.Exposed.setGetUsersConfirmedButNotSettledBalanceGlobals(
               ~marketIndex,
               ~user,
               ~isLong,
-              ~userCurrentNextPriceUpdateIndex,
+              ~userNextPrice_currentUpdateIndex,
               ~marketUpdateIndex,
-              ~userNextPriceDepositAmount_isLong,
+              ~userNextPrice_depositAmount_isLong,
               ~syntheticTokenPriceSnapshot_isLong,
               ~syntheticTokenPriceSnapshot_notIsLong,
               ~userNextPrice_amountSynthToShiftFromMarketSide_notIsLong,
             );
         };
 
-        it("returns 0 if userCurrentNextPriceUpdateIndex == 0", () => {
-          let userCurrentNextPriceUpdateIndex = zeroBn;
+        it("returns 0 if userNextPrice_currentUpdateIndex == 0", () => {
+          let userNextPrice_currentUpdateIndex = zeroBn;
           let marketUpdateIndex = oneBn;
 
           let%Await _ =
-            setup(~userCurrentNextPriceUpdateIndex, ~marketUpdateIndex);
+            setup(~userNextPrice_currentUpdateIndex, ~marketUpdateIndex);
 
           let%Await result =
             contracts^.longShort
@@ -204,13 +204,13 @@ let testUnit =
           Chai.bnEqual(zeroBn, result);
         });
         it(
-          "returns 0 if userCurrentNextPriceUpdateIndex > currentMarketUpdateIndex",
+          "returns 0 if userNextPrice_currentUpdateIndex > currentMarketUpdateIndex",
           () => {
-          let userCurrentNextPriceUpdateIndex = twoBn;
+          let userNextPrice_currentUpdateIndex = twoBn;
           let marketUpdateIndex = oneBn;
 
           let%Await _ =
-            setup(~userCurrentNextPriceUpdateIndex, ~marketUpdateIndex);
+            setup(~userNextPrice_currentUpdateIndex, ~marketUpdateIndex);
 
           let%Await result =
             contracts^.longShort

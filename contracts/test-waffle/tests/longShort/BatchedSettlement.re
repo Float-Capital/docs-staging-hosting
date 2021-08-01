@@ -9,16 +9,16 @@ let testUnit =
     ) => {
   describeUnit("Batched Settlement", () => {
     let marketIndex = Helpers.randomJsInteger();
-    describe("_performOustandingBatchedSettlements", () => {
+    describe_only("_performOustandingBatchedSettlements", () => {
       let syntheticTokenPriceLong = Helpers.randomTokenAmount();
       let syntheticTokenPriceShort = Helpers.randomTokenAmount();
 
       let setup =
           (
-            ~batchedAmountOfPaymentTokenToDepositLong,
-            ~batchedAmountOfPaymentTokenToDepositShort,
-            ~batchedAmountOfSynthTokensToRedeemLong,
-            ~batchedAmountOfSynthTokensToRedeemShort,
+            ~batched_amountOfPaymentTokenToDepositLong,
+            ~batched_amountOfPaymentTokenToDepositShort,
+            ~batched_amountOfSynthTokensToRedeemLong,
+            ~batched_amountOfSynthTokensToRedeemShort,
             ~batchedAmountOfSynthTokensToShiftFromLong,
             ~batchedAmountOfSynthTokensToShiftFromShort,
           ) => {
@@ -28,16 +28,16 @@ let testUnit =
             ~functionName="_performOustandingBatchedSettlements",
           );
 
-        LongShortSmocked.InternalMock.mock_handleTotalValueChangeForMarketWithYieldManagerToReturn();
+        LongShortSmocked.InternalMock.mock_handleTotalPaymentTokenValueChangeForMarketWithYieldManagerToReturn();
         LongShortSmocked.InternalMock.mock_handleChangeInSynthTokensTotalSupplyToReturn();
 
         let%AwaitThen _ =
           longShort->LongShort.Exposed.setPerformOustandingBatchedSettlementsGlobals(
             ~marketIndex,
-            ~batchedAmountOfPaymentTokenToDepositLong,
-            ~batchedAmountOfPaymentTokenToDepositShort,
-            ~batchedAmountOfSynthTokensToRedeemLong,
-            ~batchedAmountOfSynthTokensToRedeemShort,
+            ~batched_amountOfPaymentTokenToDepositLong,
+            ~batched_amountOfPaymentTokenToDepositShort,
+            ~batched_amountOfSynthTokensToRedeemLong,
+            ~batched_amountOfSynthTokensToRedeemShort,
             ~batchedAmountOfSynthTokensToShiftFromLong,
             ~batchedAmountOfSynthTokensToShiftFromShort,
           );
@@ -51,10 +51,10 @@ let testUnit =
 
       let runTest =
           (
-            ~batchedAmountOfPaymentTokenToDepositLong,
-            ~batchedAmountOfPaymentTokenToDepositShort,
-            ~batchedAmountOfSynthTokensToRedeemLong,
-            ~batchedAmountOfSynthTokensToRedeemShort,
+            ~batched_amountOfPaymentTokenToDepositLong,
+            ~batched_amountOfPaymentTokenToDepositShort,
+            ~batched_amountOfSynthTokensToRedeemLong,
+            ~batched_amountOfSynthTokensToRedeemShort,
             ~batchedAmountOfSynthTokensToShiftFromLong,
             ~batchedAmountOfSynthTokensToShiftFromShort,
           ) => {
@@ -76,32 +76,32 @@ let testUnit =
         before_each(() => {
           let%Await functionCallReturn =
             setup(
-              ~batchedAmountOfPaymentTokenToDepositLong,
-              ~batchedAmountOfPaymentTokenToDepositShort,
-              ~batchedAmountOfSynthTokensToRedeemLong,
-              ~batchedAmountOfSynthTokensToRedeemShort,
+              ~batched_amountOfPaymentTokenToDepositLong,
+              ~batched_amountOfPaymentTokenToDepositShort,
+              ~batched_amountOfSynthTokensToRedeemLong,
+              ~batched_amountOfSynthTokensToRedeemShort,
               ~batchedAmountOfSynthTokensToShiftFromLong,
               ~batchedAmountOfSynthTokensToShiftFromShort,
             );
 
           batchedAmountOfSynthTokensToMintLong :=
             Contract.LongShortHelpers.calcAmountSynthToken(
-              ~amountPaymentToken=batchedAmountOfPaymentTokenToDepositLong,
+              ~amountPaymentToken=batched_amountOfPaymentTokenToDepositLong,
               ~price=syntheticTokenPriceLong,
             );
           batchedAmountOfSynthTokensToMintShort :=
             Contract.LongShortHelpers.calcAmountSynthToken(
-              ~amountPaymentToken=batchedAmountOfPaymentTokenToDepositShort,
+              ~amountPaymentToken=batched_amountOfPaymentTokenToDepositShort,
               ~price=syntheticTokenPriceShort,
             );
           batchedAmountOfPaymentTokensToBurnLong :=
             Contract.LongShortHelpers.calcAmountPaymentToken(
-              ~amountSynthToken=batchedAmountOfSynthTokensToRedeemLong,
+              ~amountSynthToken=batched_amountOfSynthTokensToRedeemLong,
               ~price=syntheticTokenPriceLong,
             );
           batchedAmountOfPaymentTokensToBurnShort :=
             Contract.LongShortHelpers.calcAmountPaymentToken(
-              ~amountSynthToken=batchedAmountOfSynthTokensToRedeemShort,
+              ~amountSynthToken=batched_amountOfSynthTokensToRedeemShort,
               ~price=syntheticTokenPriceShort,
             );
 
@@ -116,38 +116,38 @@ let testUnit =
               ~price=syntheticTokenPriceLong,
             );
 
-          batchedAmountOfSynthTokensToShiftToLong :=
-            Contract.LongShortHelpers.calcAmountSynthToken(
-              ~amountPaymentToken=
-                batchedAmountOfPaymentTokensToShiftToLong.contents,
-              ~price=syntheticTokenPriceLong,
-            );
           batchedAmountOfSynthTokensToShiftToShort :=
-            Contract.LongShortHelpers.calcAmountSynthToken(
-              ~amountPaymentToken=
-                batchedAmountOfPaymentTokensToShiftToShort.contents,
-              ~price=syntheticTokenPriceShort,
+            Contract.LongShortHelpers.calcEquivalentAmountSynthTokensOnTargetSide(
+              ~amountSynthTokenOriginSide=batchedAmountOfSynthTokensToShiftFromLong,
+              ~priceOriginSide=syntheticTokenPriceLong,
+              ~priceTargetSide=syntheticTokenPriceShort,
+            );
+          batchedAmountOfSynthTokensToShiftToLong :=
+            Contract.LongShortHelpers.calcEquivalentAmountSynthTokensOnTargetSide(
+              ~amountSynthTokenOriginSide=batchedAmountOfSynthTokensToShiftFromShort,
+              ~priceOriginSide=syntheticTokenPriceShort,
+              ~priceTargetSide=syntheticTokenPriceLong,
             );
 
           calculatedValueChangeForLong :=
-            batchedAmountOfPaymentTokenToDepositLong
+            batched_amountOfPaymentTokenToDepositLong
             ->sub(batchedAmountOfPaymentTokensToBurnLong.contents)
             ->add(batchedAmountOfPaymentTokensToShiftToLong.contents)
             ->sub(batchedAmountOfPaymentTokensToShiftToShort.contents);
           calculatedValueChangeForShort :=
-            batchedAmountOfPaymentTokenToDepositShort
+            batched_amountOfPaymentTokenToDepositShort
             ->sub(batchedAmountOfPaymentTokensToBurnShort.contents)
             ->add(batchedAmountOfPaymentTokensToShiftToShort.contents)
             ->sub(batchedAmountOfPaymentTokensToShiftToLong.contents);
 
           calculatedValueChangeInSynthSupplyLong :=
             batchedAmountOfSynthTokensToMintLong.contents
-            ->sub(batchedAmountOfSynthTokensToRedeemLong)
+            ->sub(batched_amountOfSynthTokensToRedeemLong)
             ->add(batchedAmountOfSynthTokensToShiftToLong.contents)
             ->sub(batchedAmountOfSynthTokensToShiftFromLong);
           calculatedValueChangeInSynthSupplyShort :=
             batchedAmountOfSynthTokensToMintShort.contents
-            ->sub(batchedAmountOfSynthTokensToRedeemShort)
+            ->sub(batched_amountOfSynthTokensToRedeemShort)
             ->add(batchedAmountOfSynthTokensToShiftToShort.contents)
             ->sub(batchedAmountOfSynthTokensToShiftFromShort);
           returnOfPerformOustandingBatchedSettlements := functionCallReturn;
@@ -160,56 +160,36 @@ let testUnit =
 
           // NOTE: due to the small optimization in the implementation (and ovoiding stack too deep errors) it is possible that the algorithm over issues float by a unit.
           //       This is probably not an issue since it overshoots rather than undershoots. However, this should be monitored or changed.
-          // Chai.recordArrayDeepEqualFlat(
-          //   handleChangeInSynthTokensTotalSupplyCalls,
-          //   [|
-          //     {
-          //       marketIndex,
-          //       isLong: true,
-          //       changeInSynthTokensTotalSupply:
-          //         calculatedValueChangeInSynthSupplyLong.contents,
-          //     },
-          //     {
-          //       marketIndex,
-          //       isLong: false,
-          //       changeInSynthTokensTotalSupply:
-          //         calculatedValueChangeInSynthSupplyShort.contents,
-          //     },
-          //   |],
-          // );
-
-          Chai.intEqual(
-            handleChangeInSynthTokensTotalSupplyCalls->Array.length,
-            2,
-          );
-          let longCall =
-            handleChangeInSynthTokensTotalSupplyCalls->Array.getUnsafe(0);
-          let shortCall =
-            handleChangeInSynthTokensTotalSupplyCalls->Array.getUnsafe(1);
-
-          Chai.bnWithin(
-            longCall.changeInSynthTokensTotalSupply,
-            ~min=calculatedValueChangeInSynthSupplyLong.contents,
-            ~max=calculatedValueChangeInSynthSupplyLong.contents->add(oneBn),
-          );
-          Chai.bnWithin(
-            shortCall.changeInSynthTokensTotalSupply,
-            ~min=calculatedValueChangeInSynthSupplyShort.contents,
-            ~max=calculatedValueChangeInSynthSupplyShort.contents->add(oneBn),
+          Chai.recordArrayDeepEqualFlat(
+            handleChangeInSynthTokensTotalSupplyCalls,
+            [|
+              {
+                marketIndex,
+                isLong: true,
+                changeInSynthTokensTotalSupply:
+                  calculatedValueChangeInSynthSupplyLong.contents,
+              },
+              {
+                marketIndex,
+                isLong: false,
+                changeInSynthTokensTotalSupply:
+                  calculatedValueChangeInSynthSupplyShort.contents,
+              },
+            |],
           );
         });
         it(
           "call handleTotalValueChangeForMarketWithYieldManager with the correct parameters",
           () => {
             let handleTotalValueChangeForMarketWithYieldManagerCalls =
-              LongShortSmocked.InternalMock._handleTotalValueChangeForMarketWithYieldManagerCalls();
+              LongShortSmocked.InternalMock._handleTotalPaymentTokenValueChangeForMarketWithYieldManagerCalls();
 
-            let totalValueChangeForMarket =
+            let totalPaymentTokenValueChangeForMarket =
               calculatedValueChangeForLong.contents
               ->add(calculatedValueChangeForShort.contents);
             Chai.recordArrayDeepEqualFlat(
               handleTotalValueChangeForMarketWithYieldManagerCalls,
-              [|{marketIndex, totalValueChangeForMarket}|],
+              [|{marketIndex, totalPaymentTokenValueChangeForMarket}|],
             );
           },
         );
@@ -217,8 +197,10 @@ let testUnit =
           Chai.recordEqualDeep(
             returnOfPerformOustandingBatchedSettlements.contents,
             {
-              valueChangeForLong: calculatedValueChangeForLong.contents,
-              valueChangeForShort: calculatedValueChangeForShort.contents,
+              paymentTokenValueChangeForLong:
+                calculatedValueChangeForLong.contents,
+              paymentTokenValueChangeForShort:
+                calculatedValueChangeForShort.contents,
             },
           )
         });
@@ -226,62 +208,63 @@ let testUnit =
 
       describe("there are no actions in the batch", () => {
         runTest(
-          ~batchedAmountOfPaymentTokenToDepositLong=zeroBn,
-          ~batchedAmountOfPaymentTokenToDepositShort=zeroBn,
-          ~batchedAmountOfSynthTokensToRedeemLong=zeroBn,
-          ~batchedAmountOfSynthTokensToRedeemShort=zeroBn,
+          ~batched_amountOfPaymentTokenToDepositLong=zeroBn,
+          ~batched_amountOfPaymentTokenToDepositShort=zeroBn,
+          ~batched_amountOfSynthTokensToRedeemLong=zeroBn,
+          ~batched_amountOfSynthTokensToRedeemShort=zeroBn,
           ~batchedAmountOfSynthTokensToShiftFromLong=zeroBn,
           ~batchedAmountOfSynthTokensToShiftFromShort=zeroBn,
         )
       });
       describe("there is 1 deposit long", () => {
         runTest(
-          ~batchedAmountOfPaymentTokenToDepositLong=
+          ~batched_amountOfPaymentTokenToDepositLong=
             Helpers.randomTokenAmount(),
-          ~batchedAmountOfPaymentTokenToDepositShort=zeroBn,
-          ~batchedAmountOfSynthTokensToRedeemLong=zeroBn,
-          ~batchedAmountOfSynthTokensToRedeemShort=zeroBn,
+          ~batched_amountOfPaymentTokenToDepositShort=zeroBn,
+          ~batched_amountOfSynthTokensToRedeemLong=zeroBn,
+          ~batched_amountOfSynthTokensToRedeemShort=zeroBn,
           ~batchedAmountOfSynthTokensToShiftFromLong=zeroBn,
           ~batchedAmountOfSynthTokensToShiftFromShort=zeroBn,
         )
       });
       describe("there is 1 deposit short", () => {
         runTest(
-          ~batchedAmountOfPaymentTokenToDepositLong=zeroBn,
-          ~batchedAmountOfPaymentTokenToDepositShort=
+          ~batched_amountOfPaymentTokenToDepositLong=zeroBn,
+          ~batched_amountOfPaymentTokenToDepositShort=
             Helpers.randomTokenAmount(),
-          ~batchedAmountOfSynthTokensToRedeemLong=zeroBn,
-          ~batchedAmountOfSynthTokensToRedeemShort=zeroBn,
+          ~batched_amountOfSynthTokensToRedeemLong=zeroBn,
+          ~batched_amountOfSynthTokensToRedeemShort=zeroBn,
           ~batchedAmountOfSynthTokensToShiftFromLong=zeroBn,
           ~batchedAmountOfSynthTokensToShiftFromShort=zeroBn,
         )
       });
       describe("there is 1 withdraw long", () => {
         runTest(
-          ~batchedAmountOfPaymentTokenToDepositLong=zeroBn,
-          ~batchedAmountOfPaymentTokenToDepositShort=zeroBn,
-          ~batchedAmountOfSynthTokensToRedeemLong=Helpers.randomTokenAmount(),
-          ~batchedAmountOfSynthTokensToRedeemShort=zeroBn,
+          ~batched_amountOfPaymentTokenToDepositLong=zeroBn,
+          ~batched_amountOfPaymentTokenToDepositShort=zeroBn,
+          ~batched_amountOfSynthTokensToRedeemLong=Helpers.randomTokenAmount(),
+          ~batched_amountOfSynthTokensToRedeemShort=zeroBn,
           ~batchedAmountOfSynthTokensToShiftFromLong=zeroBn,
           ~batchedAmountOfSynthTokensToShiftFromShort=zeroBn,
         )
       });
       describe("there is 1 withdraw short", () => {
         runTest(
-          ~batchedAmountOfPaymentTokenToDepositLong=zeroBn,
-          ~batchedAmountOfPaymentTokenToDepositShort=zeroBn,
-          ~batchedAmountOfSynthTokensToRedeemLong=zeroBn,
-          ~batchedAmountOfSynthTokensToRedeemShort=Helpers.randomTokenAmount(),
+          ~batched_amountOfPaymentTokenToDepositLong=zeroBn,
+          ~batched_amountOfPaymentTokenToDepositShort=zeroBn,
+          ~batched_amountOfSynthTokensToRedeemLong=zeroBn,
+          ~batched_amountOfSynthTokensToRedeemShort=
+            Helpers.randomTokenAmount(),
           ~batchedAmountOfSynthTokensToShiftFromLong=zeroBn,
           ~batchedAmountOfSynthTokensToShiftFromShort=zeroBn,
         )
       });
       describe("there is 1 shift from long to short", () => {
         runTest(
-          ~batchedAmountOfPaymentTokenToDepositLong=zeroBn,
-          ~batchedAmountOfPaymentTokenToDepositShort=zeroBn,
-          ~batchedAmountOfSynthTokensToRedeemLong=zeroBn,
-          ~batchedAmountOfSynthTokensToRedeemShort=zeroBn,
+          ~batched_amountOfPaymentTokenToDepositLong=zeroBn,
+          ~batched_amountOfPaymentTokenToDepositShort=zeroBn,
+          ~batched_amountOfSynthTokensToRedeemLong=zeroBn,
+          ~batched_amountOfSynthTokensToRedeemShort=zeroBn,
           ~batchedAmountOfSynthTokensToShiftFromLong=
             Helpers.randomTokenAmount(),
           ~batchedAmountOfSynthTokensToShiftFromShort=zeroBn,
@@ -289,25 +272,26 @@ let testUnit =
       });
       describe("there is 1 shift from short to long", () => {
         runTest(
-          ~batchedAmountOfPaymentTokenToDepositLong=zeroBn,
-          ~batchedAmountOfPaymentTokenToDepositShort=zeroBn,
-          ~batchedAmountOfSynthTokensToRedeemLong=zeroBn,
-          ~batchedAmountOfSynthTokensToRedeemShort=zeroBn,
+          ~batched_amountOfPaymentTokenToDepositLong=zeroBn,
+          ~batched_amountOfPaymentTokenToDepositShort=zeroBn,
+          ~batched_amountOfSynthTokensToRedeemLong=zeroBn,
+          ~batched_amountOfSynthTokensToRedeemShort=zeroBn,
           ~batchedAmountOfSynthTokensToShiftFromLong=zeroBn,
           ~batchedAmountOfSynthTokensToShiftFromShort=
             Helpers.randomTokenAmount(),
         )
       });
       describe(
-        "[FLAKY - sometimes off by one!]there random deposits and withdrawals (we could be more specific with this test possibly?)",
+        "there random deposits and withdrawals (we could be more specific with this test possibly?)",
         () => {
         runTest(
-          ~batchedAmountOfPaymentTokenToDepositLong=
+          ~batched_amountOfPaymentTokenToDepositLong=
             Helpers.randomTokenAmount(),
-          ~batchedAmountOfPaymentTokenToDepositShort=
+          ~batched_amountOfPaymentTokenToDepositShort=
             Helpers.randomTokenAmount(),
-          ~batchedAmountOfSynthTokensToRedeemLong=Helpers.randomTokenAmount(),
-          ~batchedAmountOfSynthTokensToRedeemShort=Helpers.randomTokenAmount(),
+          ~batched_amountOfSynthTokensToRedeemLong=Helpers.randomTokenAmount(),
+          ~batched_amountOfSynthTokensToRedeemShort=
+            Helpers.randomTokenAmount(),
           ~batchedAmountOfSynthTokensToShiftFromLong=
             Helpers.randomTokenAmount(),
           ~batchedAmountOfSynthTokensToShiftFromShort=
@@ -436,7 +420,8 @@ let testUnit =
         );
       });
     });
-    describe("_handleTotalValueChangeForMarketWithYieldManager", () => {
+    describe(
+      "_handleTotalPaymentTokenValueChangeForMarketWithYieldManager", () => {
       let yieldManagerRef = ref("Not Set Yet"->Obj.magic);
 
       before_each(() => {
@@ -458,14 +443,15 @@ let testUnit =
           ~yieldManager=smockedYieldManager.address,
         );
       });
-      describe("totalValueChangeForMarket > 0", () => {
-        let totalValueChangeForMarket = Helpers.randomTokenAmount();
+      describe("totalPaymentTokenValueChangeForMarket > 0", () => {
+        let totalPaymentTokenValueChangeForMarket =
+          Helpers.randomTokenAmount();
         before_each(() => {
           let {longShort} = contracts.contents;
 
-          longShort->LongShort.Exposed._handleTotalValueChangeForMarketWithYieldManagerExposed(
+          longShort->LongShort.Exposed._handleTotalPaymentTokenValueChangeForMarketWithYieldManagerExposed(
             ~marketIndex,
-            ~totalValueChangeForMarket,
+            ~totalPaymentTokenValueChangeForMarket,
           );
         });
         it(
@@ -476,7 +462,7 @@ let testUnit =
               ->YieldManagerMockSmocked.depositPaymentTokenCalls;
             Chai.recordArrayDeepEqualFlat(
               depositPaymentTokenCalls,
-              [|{amount: totalValueChangeForMarket}|],
+              [|{amount: totalPaymentTokenValueChangeForMarket}|],
             );
           },
         );
@@ -487,15 +473,15 @@ let testUnit =
           Chai.recordArrayDeepEqualFlat(burnCalls, [||]);
         });
       });
-      describe("totalValueChangeForMarket < 0", () => {
-        let totalValueChangeForMarket =
+      describe("totalPaymentTokenValueChangeForMarket < 0", () => {
+        let totalPaymentTokenValueChangeForMarket =
           zeroBn->sub(Helpers.randomTokenAmount());
         before_each(() => {
           let {longShort} = contracts.contents;
 
-          longShort->LongShort.Exposed._handleTotalValueChangeForMarketWithYieldManagerExposed(
+          longShort->LongShort.Exposed._handleTotalPaymentTokenValueChangeForMarketWithYieldManagerExposed(
             ~marketIndex,
-            ~totalValueChangeForMarket,
+            ~totalPaymentTokenValueChangeForMarket,
           );
         });
         it(
@@ -515,22 +501,24 @@ let testUnit =
               ->YieldManagerMockSmocked.withdrawPaymentTokenCalls;
             Chai.recordArrayDeepEqualFlat(
               burnCalls,
-              [|{amount: zeroBn->sub(totalValueChangeForMarket)}|],
+              [|
+                {amount: zeroBn->sub(totalPaymentTokenValueChangeForMarket)},
+              |],
             );
           },
         );
       });
-      describe("totalValueChangeForMarket == 0", () => {
+      describe("totalPaymentTokenValueChangeForMarket == 0", () => {
         it(
           "should call NEITHER the depositPaymentToken NOR withdrawPaymentToken function.",
           () => {
-          let totalValueChangeForMarket = zeroBn;
+          let totalPaymentTokenValueChangeForMarket = zeroBn;
           let {longShort} = contracts.contents;
 
           let%Await _ =
-            longShort->LongShort.Exposed._handleTotalValueChangeForMarketWithYieldManagerExposed(
+            longShort->LongShort.Exposed._handleTotalPaymentTokenValueChangeForMarketWithYieldManagerExposed(
               ~marketIndex,
-              ~totalValueChangeForMarket,
+              ~totalPaymentTokenValueChangeForMarket,
             );
           let mintCalls =
             yieldManagerRef.contents
