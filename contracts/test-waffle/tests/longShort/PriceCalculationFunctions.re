@@ -10,19 +10,19 @@ let testUnit =
   describe("_getSyntheticTokenPrice", () => {
     it("should test function returns correct price", () => {
       let randomAmountPaymentToken = Helpers.randomTokenAmount();
-      let randomAmountSynthToken = Helpers.randomTokenAmount();
+      let randomAmountSyntheticToken = Helpers.randomTokenAmount();
 
       let%Await actualResult =
         contracts^.longShort
         ->LongShort.Exposed._getSyntheticTokenPriceExposed(
             ~amountPaymentTokenBackingSynth=randomAmountPaymentToken,
-            ~amountSynthToken=randomAmountSynthToken,
+            ~amountSyntheticToken=randomAmountSyntheticToken,
           );
 
       let expectedResult =
         Contract.LongShortHelpers.calcSyntheticTokenPrice(
           ~amountPaymentToken=randomAmountPaymentToken,
-          ~amountSynthToken=randomAmountSynthToken,
+          ~amountSyntheticToken=randomAmountSyntheticToken,
         );
 
       Chai.bnEqual(
@@ -36,19 +36,19 @@ let testUnit =
 
   describe("_getAmountPaymentToken", () => {
     it("should test function returns correct amount", () => {
-      let randomAmountSynthToken = Helpers.randomTokenAmount();
+      let randomAmountSyntheticToken = Helpers.randomTokenAmount();
       let randomTokenPrice = Helpers.randomTokenAmount();
 
       let%Await actualResult =
         contracts^.longShort
         ->LongShort.Exposed._getAmountPaymentTokenExposed(
-            ~amountSynthToken=randomAmountSynthToken,
+            ~amountSyntheticToken=randomAmountSyntheticToken,
             ~syntheticTokenPriceInPaymentTokens=randomTokenPrice,
           );
 
       let expectedResult =
         Contract.LongShortHelpers.calcAmountPaymentToken(
-          ~amountSynthToken=randomAmountSynthToken,
+          ~amountSyntheticToken=randomAmountSyntheticToken,
           ~price=randomTokenPrice,
         );
       Chai.bnEqual(
@@ -60,27 +60,27 @@ let testUnit =
     })
   });
 
-  describe("_getAmountSynthToken", () => {
+  describe("_getAmountSyntheticToken", () => {
     it("should test function returns correct amount", () => {
       let randomAmountPaymentToken = Helpers.randomTokenAmount();
       let randomTokenPrice = Helpers.randomTokenAmount();
 
       let%Await actualResult =
         contracts^.longShort
-        ->LongShort.Exposed._getAmountSynthTokenExposed(
+        ->LongShort.Exposed._getAmountSyntheticTokenExposed(
             ~amountPaymentTokenBackingSynth=randomAmountPaymentToken,
             ~syntheticTokenPriceInPaymentTokens=randomTokenPrice,
           );
 
       let expectedResult =
-        Contract.LongShortHelpers.calcAmountSynthToken(
+        Contract.LongShortHelpers.calcAmountSyntheticToken(
           ~amountPaymentToken=randomAmountPaymentToken,
           ~price=randomTokenPrice,
         );
 
       Chai.bnEqual(
         ~message=
-          "expected result different to actual result for _getAmountSynthTokencd call",
+          "expected result different to actual result for _getAmountSyntheticTokencd call",
         actualResult,
         expectedResult,
       );

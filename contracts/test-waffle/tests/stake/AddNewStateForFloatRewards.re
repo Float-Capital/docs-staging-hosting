@@ -134,11 +134,11 @@ let testUnit =
         );
       });
 
-      it("emits the SynthTokensShifted event", () => {
+      it("emits the SyntheticTokensShifted event", () => {
         Chai.callEmitEvents(
           ~call=addNewStateForFloatRewardsTxPromise.contents,
           ~contract=contracts.contents.staker->Obj.magic,
-          ~eventName="SynthTokensShifted",
+          ~eventName="SyntheticTokensShifted",
         )
         ->Chai.withArgs0
       });

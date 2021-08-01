@@ -17,17 +17,17 @@ abstract contract ILongShort {
     external
     virtual;
 
-  function shiftPositionFromLongNextPrice(uint32 marketIndex, uint256 synthTokensToShift)
+  function shiftPositionFromLongNextPrice(uint32 marketIndex, uint256 syntheticTokensToShift)
     external
     virtual;
 
-  function shiftPositionFromShortNextPrice(uint32 marketIndex, uint256 synthTokensToShift)
+  function shiftPositionFromShortNextPrice(uint32 marketIndex, uint256 syntheticTokensToShift)
     external
     virtual;
 
-  function getAmountSynthTokenToMintOnTargetSide(
+  function getAmountSyntheticTokenToMintOnTargetSide(
     uint32 marketIndex,
-    uint256 amountSynthTokenShiftedFromOneSide,
+    uint256 amountSyntheticTokenShiftedFromOneSide,
     bool isShiftFromLong,
     uint256 priceSnapshotIndex
   ) public view virtual returns (uint256 amountSynthShiftedToOtherSide);

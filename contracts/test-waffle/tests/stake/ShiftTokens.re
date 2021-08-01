@@ -9,8 +9,8 @@ let testUnit =
     ) => {
   describe("shiftTokens", () => {
     let marketIndex = Helpers.randomJsInteger();
-    let synthTokensToShift = Helpers.randomTokenAmount();
-    let synthTokensToShiftBeforeValue = Helpers.randomTokenAmount();
+    let syntheticTokensToShift = Helpers.randomTokenAmount();
+    let syntheticTokensToShiftBeforeValue = Helpers.randomTokenAmount();
 
     before_once'(() => {
       let {staker, longShortSmocked} = contracts.contents;
@@ -27,8 +27,8 @@ let testUnit =
     let setup =
         (
           ~isShiftFromLong,
-          ~synthTokensToShiftBeforeValue,
-          ~synthTokensToShift,
+          ~syntheticTokensToShiftBeforeValue,
+          ~syntheticTokensToShift,
           ~shiftIndex,
           ~nextTokenShiftIndex,
           ~userAmountStaked,
@@ -41,14 +41,14 @@ let testUnit =
           ~marketIndex,
           ~isShiftFromLong,
           ~user,
-          ~synthTokensToShift=synthTokensToShiftBeforeValue,
+          ~syntheticTokensToShift=syntheticTokensToShiftBeforeValue,
           ~shiftIndex,
           ~nextTokenShiftIndex,
           ~userAmountStaked,
           ~syntheticToken=syntheticTokenSmocked.address,
         );
       staker->Staker.shiftTokens(
-        ~synthTokensToShift,
+        ~syntheticTokensToShift,
         ~marketIndex,
         ~isShiftFromLong,
       );
@@ -63,7 +63,7 @@ let testUnit =
         ~transaction=
           contracts.contents.staker
           ->Staker.shiftTokens(
-              ~synthTokensToShift,
+              ~syntheticTokensToShift,
               ~marketIndex,
               ~isShiftFromLong,
             ),
@@ -81,11 +81,11 @@ let testUnit =
         let%Await _ =
           setup(
             ~isShiftFromLong,
-            ~synthTokensToShiftBeforeValue,
+            ~syntheticTokensToShiftBeforeValue,
             ~shiftIndex,
             ~nextTokenShiftIndex,
-            ~synthTokensToShift,
-            ~userAmountStaked=synthTokensToShift,
+            ~syntheticTokensToShift,
+            ~userAmountStaked=syntheticTokensToShift,
           );
 
         let mintAccumulatedFloatCalls =
@@ -103,11 +103,11 @@ let testUnit =
       let%Await _ =
         setup(
           ~isShiftFromLong,
-          ~synthTokensToShiftBeforeValue,
+          ~syntheticTokensToShiftBeforeValue,
           ~shiftIndex=zeroBn,
           ~nextTokenShiftIndex,
-          ~synthTokensToShift,
-          ~userAmountStaked=synthTokensToShift,
+          ~syntheticTokensToShift,
+          ~userAmountStaked=syntheticTokensToShift,
         );
 
       let mintAccumulatedFloatCalls =
@@ -124,11 +124,11 @@ let testUnit =
       let%Await _ =
         setup(
           ~isShiftFromLong,
-          ~synthTokensToShiftBeforeValue,
+          ~syntheticTokensToShiftBeforeValue,
           ~shiftIndex,
           ~nextTokenShiftIndex,
-          ~synthTokensToShift,
-          ~userAmountStaked=synthTokensToShift,
+          ~syntheticTokensToShift,
+          ~userAmountStaked=syntheticTokensToShift,
         );
 
       let mintAccumulatedFloatCalls =
@@ -146,11 +146,11 @@ let testUnit =
       let%Await _ =
         setup(
           ~isShiftFromLong,
-          ~synthTokensToShiftBeforeValue,
+          ~syntheticTokensToShiftBeforeValue,
           ~shiftIndex,
           ~nextTokenShiftIndex,
-          ~synthTokensToShift,
-          ~userAmountStaked=synthTokensToShift,
+          ~syntheticTokensToShift,
+          ~userAmountStaked=syntheticTokensToShift,
         );
 
       let mintAccumulatedFloatCalls =
@@ -166,11 +166,11 @@ let testUnit =
       let%Await _ =
         setup(
           ~isShiftFromLong,
-          ~synthTokensToShiftBeforeValue,
+          ~syntheticTokensToShiftBeforeValue,
           ~shiftIndex=zeroBn,
           ~nextTokenShiftIndex,
-          ~synthTokensToShift,
-          ~userAmountStaked=synthTokensToShift,
+          ~syntheticTokensToShift,
+          ~userAmountStaked=syntheticTokensToShift,
         );
 
       let%Await shiftIndexAfter =
@@ -191,11 +191,11 @@ let testUnit =
           let%Await _ =
             setup(
               ~isShiftFromLong,
-              ~synthTokensToShiftBeforeValue,
+              ~syntheticTokensToShiftBeforeValue,
               ~shiftIndex=zeroBn,
               ~nextTokenShiftIndex,
-              ~synthTokensToShift,
-              ~userAmountStaked=synthTokensToShift,
+              ~syntheticTokensToShift,
+              ~userAmountStaked=syntheticTokensToShift,
             );
 
           let shiftPositionFromLongNextPriceCalls =
@@ -204,13 +204,13 @@ let testUnit =
             longShortSmocked->LongShortSmocked.shiftPositionFromShortNextPriceCalls;
           if (isShiftFromLong) {
             shiftPositionFromLongNextPriceCalls->Chai.recordArrayDeepEqualFlat([|
-              {marketIndex, synthTokensToShift},
+              {marketIndex, syntheticTokensToShift},
             |]);
             shiftPositionFromShortNextPriceCalls->Chai.recordArrayDeepEqualFlat([||]);
           } else {
             shiftPositionFromLongNextPriceCalls->Chai.recordArrayDeepEqualFlat([||]);
             shiftPositionFromShortNextPriceCalls->Chai.recordArrayDeepEqualFlat([|
-              {marketIndex, synthTokensToShift},
+              {marketIndex, syntheticTokensToShift},
             |]);
           };
         },
@@ -226,11 +226,11 @@ let testUnit =
           let%Await _ =
             setup(
               ~isShiftFromLong,
-              ~synthTokensToShiftBeforeValue,
+              ~syntheticTokensToShiftBeforeValue,
               ~shiftIndex=zeroBn,
               ~nextTokenShiftIndex,
-              ~synthTokensToShift,
-              ~userAmountStaked=synthTokensToShift,
+              ~syntheticTokensToShift,
+              ~userAmountStaked=syntheticTokensToShift,
             );
 
           let getTotalAmountToShiftFromSide =
@@ -244,7 +244,7 @@ let testUnit =
 
           Chai.bnEqual(
             totalAmountToShiftFromSide,
-            synthTokensToShiftBeforeValue->add(synthTokensToShift),
+            syntheticTokensToShiftBeforeValue->add(syntheticTokensToShift),
           );
         },
       );

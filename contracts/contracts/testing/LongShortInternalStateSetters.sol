@@ -121,10 +121,10 @@ contract LongShortInternalStateSetters is LongShort {
     uint32 marketIndex,
     uint256 batched_amountOfPaymentTokenToDepositLong,
     uint256 batched_amountOfPaymentTokenToDepositShort,
-    uint256 batched_amountOfSynthTokensToRedeemLong,
-    uint256 batched_amountOfSynthTokensToRedeemShort,
-    uint256 batchedAmountOfSynthTokensToShiftFromLong,
-    uint256 batchedAmountOfSynthTokensToShiftFromShort
+    uint256 batched_amountOfSyntheticTokensToRedeemLong,
+    uint256 batched_amountOfSyntheticTokensToRedeemShort,
+    uint256 batchedAmountOfSyntheticTokensToShiftFromLong,
+    uint256 batchedAmountOfSyntheticTokensToShiftFromShort
   ) external {
     batched_amountOfPaymentTokenToDeposit[marketIndex][
       true
@@ -132,27 +132,27 @@ contract LongShortInternalStateSetters is LongShort {
     batched_amountOfPaymentTokenToDeposit[marketIndex][
       false
     ] = batched_amountOfPaymentTokenToDepositShort;
-    batched_amountOfSynthTokensToRedeem[marketIndex][
+    batched_amountOfSyntheticTokensToRedeem[marketIndex][
       true
-    ] = batched_amountOfSynthTokensToRedeemLong;
-    batched_amountOfSynthTokensToRedeem[marketIndex][
+    ] = batched_amountOfSyntheticTokensToRedeemLong;
+    batched_amountOfSyntheticTokensToRedeem[marketIndex][
       false
-    ] = batched_amountOfSynthTokensToRedeemShort;
-    batched_amountOfSynthTokensToShiftFromMarketSide[marketIndex][
+    ] = batched_amountOfSyntheticTokensToRedeemShort;
+    batched_amountOfSyntheticTokensToShiftFromMarketSide[marketIndex][
       true
-    ] = batchedAmountOfSynthTokensToShiftFromLong;
-    batched_amountOfSynthTokensToShiftFromMarketSide[marketIndex][
+    ] = batchedAmountOfSyntheticTokensToShiftFromLong;
+    batched_amountOfSyntheticTokensToShiftFromMarketSide[marketIndex][
       false
-    ] = batchedAmountOfSynthTokensToShiftFromShort;
+    ] = batchedAmountOfSyntheticTokensToShiftFromShort;
   }
 
-  function setHandleChangeInSynthTokensTotalSupplyGlobals(
+  function setHandleChangeInSyntheticTokensTotalSupplyGlobals(
     uint32 marketIndex,
-    address longSynthToken,
-    address shortSynthToken
+    address longSyntheticToken,
+    address shortSyntheticToken
   ) external {
-    syntheticTokens[marketIndex][true] = longSynthToken;
-    syntheticTokens[marketIndex][false] = shortSynthToken;
+    syntheticTokens[marketIndex][true] = longSyntheticToken;
+    syntheticTokens[marketIndex][false] = shortSyntheticToken;
   }
 
   function setHandleTotalValueChangeForMarketWithYieldManagerGlobals(
