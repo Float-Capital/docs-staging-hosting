@@ -433,21 +433,22 @@ contract LongShort is ILongShort, Initializable {
     bool isShiftFromLong,
     uint256 priceSnapshotIndex
   ) public view virtual override returns (uint256 amountSynthTokensToMintOnTargetSide) {
-    uint256 priceOfSynthTokenOnOriginSide = syntheticTokenPriceSnapshot[marketIndex][
+    uint256 syntheticTokenPriceOnOriginSide = syntheticTokenPriceSnapshot[marketIndex][
       isShiftFromLong
     ][priceSnapshotIndex];
-    uint256 priceOfSynthTokenOnTargetSide = syntheticTokenPriceSnapshot[marketIndex][
+    uint256 syntheticTokenPriceOnTargetSide = syntheticTokenPriceSnapshot[marketIndex][
       !isShiftFromLong
     ][priceSnapshotIndex];
 
-    amountSynthTokensToMintOnTargetSide = _getEquivalentAmountSynthTokensOnSideB(
+    amountSynthTokensToMintOnTargetSide = _getEquivalentAmountSynthTokensOnTargetSide(
       amountSynthTokenToRedeemOnOriginSide,
-      priceOfSynthTokenOnOriginSide,
-      priceOfSynthTokenOnTargetSide
+      syntheticTokenPriceOnOriginSide,
+      syntheticTokenPriceOnTargetSide
     );
   }
 
-  /*
+  /**
+  @notice The amount of a synth token a user is owed following a batch execution.
     4 possible states for next price actions:
         - "Pending" - means the next price update hasn't happened or been enacted on by the updateSystemState function.
         - "Confirmed" - means the next price has been updated by the updateSystemState function. There is still
@@ -456,14 +457,12 @@ contract LongShort is ILongShort, Initializable {
         - "Non-existant" - user has no next price actions.
     This function returns a calculated value only in the case of 'confirmed' next price actions.
     It should return zero for all other types of next price actions.
-    */
-
-  /// @notice The amount of a synth token a user is owed following a batch execution.
-  /// @dev Used in SyntheticToken.sol balanceOf to allow for automatic reflection of next price actions.
-  /// @param user The address of the user for whom to execute the function for.
-  /// @param marketIndex An int32 which uniquely identifies a market.
-  /// @param isLong Whether it is for the long synthetic asset or the short synthetic asset.
-  /// @return confirmedButNotSettledBalance The amount in wei of tokens that the user is owed.
+  @dev Used in SyntheticToken.sol balanceOf to allow for automatic reflection of next price actions.
+  @param user The address of the user for whom to execute the function for.
+  @param marketIndex An int32 which uniquely identifies a market.
+  @param isLong Whether it is for the long synthetic asset or the short synthetic asset.
+  @return confirmedButNotSettledBalance The amount in wei of tokens that the user is owed.
+  */
   function getUsersConfirmedButNotSettledSynthBalance(
     address user,
     uint32 marketIndex,
@@ -500,17 +499,17 @@ contract LongShort is ILongShort, Initializable {
 
       // TODO STENT optimize this like https://github.com/Float-Capital/monorepo/pull/990
       if (amountSynthTokensToBeShiftedAwayFromOriginSide > 0) {
-        uint256 priceOfSynthTokenOnOriginSide = syntheticTokenPriceSnapshot[marketIndex][!isLong][
+        uint256 syntheticTokenPriceOnOriginSide = syntheticTokenPriceSnapshot[marketIndex][!isLong][
           currentMarketUpdateIndex
         ];
-        uint256 priceOfSynthTokenOnTargetSide = syntheticTokenPriceSnapshot[marketIndex][isLong][
+        uint256 syntheticTokenPriceOnTargetSide = syntheticTokenPriceSnapshot[marketIndex][isLong][
           currentMarketUpdateIndex
         ];
 
-        confirmedButNotSettledBalance += _getEquivalentAmountSynthTokensOnSideB(
+        confirmedButNotSettledBalance += _getEquivalentAmountSynthTokensOnTargetSide(
           amountSynthTokensToBeShiftedAwayFromOriginSide,
-          priceOfSynthTokenOnOriginSide,
-          priceOfSynthTokenOnTargetSide
+          syntheticTokenPriceOnOriginSide,
+          syntheticTokenPriceOnTargetSide
         );
       }
     }
@@ -534,17 +533,17 @@ contract LongShort is ILongShort, Initializable {
   /// (amountOriginSynth * priceOriginSynth) / priceTagretSynth
   ///
   /// @param amountSynthTokensOnSideA Amount of synthetic tokens on side A
-  /// @param priceOfSynthTokenOnSideA Price of side A's synthetic token
-  /// @param priceOfSynthTokenOnSideB Price of side B's synthetic token
-  /// @return equivalentAmountSynthTokensOnSideB Amount of synthetic token on side B
-  function _getEquivalentAmountSynthTokensOnSideB(
+  /// @param syntheticTokenPriceOnSideA Price of side A's synthetic token
+  /// @param syntheticTokenPriceOnSideB Price of side B's synthetic token
+  /// @return equivalentAmountSynthTokensOnTargetSide Amount of synthetic token on side B
+  function _getEquivalentAmountSynthTokensOnTargetSide(
     uint256 amountSynthTokensOnSideA,
-    uint256 priceOfSynthTokenOnSideA,
-    uint256 priceOfSynthTokenOnSideB
-  ) internal pure virtual returns (uint256 equivalentAmountSynthTokensOnSideB) {
-    equivalentAmountSynthTokensOnSideB =
-      (amountSynthTokensOnSideA * priceOfSynthTokenOnSideA) /
-      priceOfSynthTokenOnSideB;
+    uint256 syntheticTokenPriceOnSideA,
+    uint256 syntheticTokenPriceOnSideB
+  ) internal pure virtual returns (uint256 equivalentAmountSynthTokensOnTargetSide) {
+    equivalentAmountSynthTokensOnTargetSide =
+      (amountSynthTokensOnSideA * syntheticTokenPriceOnSideA) /
+      syntheticTokenPriceOnSideB;
   }
 
   /// @notice Return the minimum of the 2 parameters. If they are equal return the first parameter.
@@ -1178,7 +1177,7 @@ contract LongShort is ILongShort, Initializable {
 
       longChangeInSynthTokensTotalSupply -= int256(amountForCurrentActionWorkingVariable);
       shortChangeInSynthTokensTotalSupply += int256(
-        _getEquivalentAmountSynthTokensOnSideB(
+        _getEquivalentAmountSynthTokensOnTargetSide(
           amountForCurrentActionWorkingVariable,
           syntheticTokenPriceLong,
           syntheticTokenPriceShort
@@ -1202,7 +1201,7 @@ contract LongShort is ILongShort, Initializable {
 
       shortChangeInSynthTokensTotalSupply -= int256(amountForCurrentActionWorkingVariable);
       longChangeInSynthTokensTotalSupply += int256(
-        _getEquivalentAmountSynthTokensOnSideB(
+        _getEquivalentAmountSynthTokensOnTargetSide(
           amountForCurrentActionWorkingVariable,
           syntheticTokenPriceShort,
           syntheticTokenPriceLong
