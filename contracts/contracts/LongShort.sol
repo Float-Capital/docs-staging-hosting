@@ -650,7 +650,7 @@ contract LongShort is ILongShort, Initializable {
     // The side/position with more liquidity will have exposure < 100% to the price movement.
     // I.e. Imagine $100 in longValue and $50 shortValue
     // long side would have $50/$100 = 50% exposure to price movements based on the liquidity imbalance.
-    // min(longValue, shortValue) = $50 , therefore is price change was -10%
+    // min(longValue, shortValue) = $50 , therefore if the price change was -10% then
     // $50 * 10% = $5 gained for short side and conversely $5 lost for long side. 
     int256 underbalancedSideValue = int256(_getMin(longValue, shortValue));
 
@@ -673,7 +673,7 @@ contract LongShort is ILongShort, Initializable {
   /// and batches all next price actions.
   /// @dev To prevent front-running only executes on price change from an oracle. 
   /// We assume the function will be called for each market at least once per price update.
-  /// Note Even if not called on every price update, this won't affect security, will affect how closely
+  /// Note Even if not called on every price update, this won't affect security, it will only affect how closely
   /// the synthetic asset actually tracks the underlying asset.  
   /// @param marketIndex The market index for which to update.
   function _updateSystemStateInternal(uint32 marketIndex)
@@ -1182,7 +1182,7 @@ contract LongShort is ILongShort, Initializable {
     int256 shortChangeInSynthTokensTotalSupply;
 
     // NOTE: These variables currently only includes the amount to deposit
-    // to save variable space (precious EVM stack) we share and update the same variable later to include the shift.
+    //       to save variable space (precious EVM stack) we share and update the same variable later to include the shift.
 
       uint256 batchedAmountOfPaymentTokensToDepositOrShiftToLong
      = batchedAmountOfPaymentTokenToDeposit[marketIndex][true];
@@ -1191,7 +1191,7 @@ contract LongShort is ILongShort, Initializable {
      = batchedAmountOfPaymentTokenToDeposit[marketIndex][false];
 
     // NOTE: These variables currently only includes the amount to shift
-    // to save variable space (precious EVM stack) we share and update the same variable later to include the reedem.
+    //       to save variable space (precious EVM stack) we share and update the same variable later to include the reedem.
 
       uint256 batchedAmountOfSynthTokensToRedeemOrShiftFromLong
      = batchedAmountOfSynthTokensToShiftMarketSide[marketIndex][true];
