@@ -25,9 +25,9 @@ abstract contract ILongShort {
     external
     virtual;
 
-  function getAmountSynthTokenShifted(
+  function getAmountSynthTokenShiftedToOtherSide(
     uint32 marketIndex,
-    uint256 amountSynthTokenShifted,
+    uint256 amountSynthTokenShiftedFromOneSide,
     bool isShiftFromLong,
     uint256 priceSnapshotIndex
   ) public view virtual returns (uint256 amountSynthShiftedToOtherSide);

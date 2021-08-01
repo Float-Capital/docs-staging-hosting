@@ -28,7 +28,10 @@ contract LongShort is ILongShort, Initializable {
     ╚═════════════════════════════╝*/
 
   // Fixed-precision constants
-  address public constant DEAD_ADDRESS = 0xf10A7_F10A7_f10A7_F10a7_F10A7_f10a7_F10A7_f10a7;
+  /// @notice this is the address that permanently locked initial liquidity for markets is held by. These tokens will never move so market can never have zero liquidity on a side.
+  /// @dev f10a7 spells float in hex - this is just for fun - important part is that the private key for this address in not known.
+  address public constant PERMANENT_INITIAL_LIQUIDITY_HOLDER =
+    0xf10A7_F10A7_f10A7_F10a7_F10A7_f10a7_F10A7_f10a7;
   uint256[45] private __constantsGap;
 
   // Global state
@@ -53,6 +56,7 @@ contract LongShort is ILongShort, Initializable {
   mapping(uint32 => mapping(bool => address)) public syntheticTokens;
   mapping(uint32 => mapping(bool => uint256)) public syntheticTokenPoolValue;
 
+  /// @notice synthetic token prices of a given market of a (long/short) at every previous price update
   mapping(uint32 => mapping(bool => mapping(uint256 => uint256)))
     public syntheticTokenPriceSnapshot;
 
@@ -85,7 +89,7 @@ contract LongShort is ILongShort, Initializable {
     uint256 shortPrice
   );
 
-  event SyntheticTokenCreated(
+  event SyntheticMarketCreated(
     uint32 marketIndex,
     address longTokenAddress,
     address shortTokenAddress,
@@ -165,12 +169,12 @@ contract LongShort is ILongShort, Initializable {
     _;
   }
 
-  function assertMarketExistsModifierLogic(uint32 marketIndex) internal view virtual {
+  function requireMarketExistsModifierLogic(uint32 marketIndex) internal view virtual {
     require(marketExists[marketIndex], "market doesn't exist");
   }
 
-  modifier assertMarketExists(uint32 marketIndex) {
-    assertMarketExistsModifierLogic(marketIndex);
+  modifier requireMarketExists(uint32 marketIndex) {
+    requireMarketExistsModifierLogic(marketIndex);
     _;
   }
 
@@ -181,7 +185,6 @@ contract LongShort is ILongShort, Initializable {
 
   modifier updateSystemStateMarket(uint32 marketIndex) {
     _updateSystemStateInternal(marketIndex);
-
     _;
   }
 
@@ -206,7 +209,7 @@ contract LongShort is ILongShort, Initializable {
     tokenFactory = _tokenFactory;
     staker = _staker;
 
-    emit LongShortV1(_admin, address(treasury), address(_tokenFactory), address(_staker));
+    emit LongShortV1(_admin, _treasury, _tokenFactory, _staker);
   }
 
   /*╔═════════════════════════════╗
@@ -257,7 +260,7 @@ contract LongShort is ILongShort, Initializable {
   /// @param _paymentToken The address of the erc20 token used to buy this synthetic asset
   /// @param _oracleManager The address of the oracle manager that provides the price feed for this market
   /// @param _yieldManager The contract that manages depositing the paymentToken into a yield bearing protocol
-  function newSyntheticMarket(
+  function createNewSyntheticMarket(
     string calldata syntheticName,
     string calldata syntheticSymbol,
     address _paymentToken,
@@ -294,7 +297,7 @@ contract LongShort is ILongShort, Initializable {
     // Approve tokens for aave lending pool maximally.
     IERC20(paymentTokens[latestMarket]).approve(_yieldManager, type(uint256).max);
 
-    emit SyntheticTokenCreated(
+    emit SyntheticMarketCreated(
       latestMarket,
       syntheticTokens[latestMarket][true],
       syntheticTokens[latestMarket][false],
@@ -320,8 +323,14 @@ contract LongShort is ILongShort, Initializable {
 
     _lockFundsInMarket(marketIndex, initialMarketSeed * 2);
 
-    ISyntheticToken(syntheticTokens[latestMarket][true]).mint(DEAD_ADDRESS, initialMarketSeed);
-    ISyntheticToken(syntheticTokens[latestMarket][false]).mint(DEAD_ADDRESS, initialMarketSeed);
+    ISyntheticToken(syntheticTokens[latestMarket][true]).mint(
+      PERMANENT_INITIAL_LIQUIDITY_HOLDER,
+      initialMarketSeed
+    );
+    ISyntheticToken(syntheticTokens[latestMarket][false]).mint(
+      PERMANENT_INITIAL_LIQUIDITY_HOLDER,
+      initialMarketSeed
+    );
 
     syntheticTokenPoolValue[marketIndex][true] = initialMarketSeed;
     syntheticTokenPoolValue[marketIndex][false] = initialMarketSeed;
@@ -329,26 +338,26 @@ contract LongShort is ILongShort, Initializable {
     emit NewMarketLaunchedAndSeeded(marketIndex, initialMarketSeed);
   }
 
-  /// @notice Sets a market as active once it has already been setup by newMarket.
-  /// @dev Seperated from newMarket due to gas considerations.
+  /// @notice Sets a market as active once it has already been setup by createNewSyntheticMarket.
+  /// @dev Seperated from createNewSyntheticMarket due to gas considerations.
   /// @param marketIndex An int32 which uniquely identifies the market.
   /// @param kInitialMultiplier Linearly decreasing multiplier for Float token issuance for the market when staking synths.
   /// @param kPeriod Time which kInitialMultiplier will last
-  /// @param unstakeFeeBasisPoints Base 1e18 percentage fee levied when unstaking for the market.
+  /// @param unstakeFeeE18 Base 1e18 percentage fee levied when unstaking for the market.
   /// @param balanceIncentiveCurveExponent Sets the degree to which Float token issuance differs for market sides in unbalanced markets. See Staker.sol
-  /// @param balanceIncentiveCurveEquilibriumOffset An offset to acocunt for naturally imbalanced markets when Float token issuance should differ for market sides. See Staker.sol
+  /// @param balanceIncentiveCurveEquilibriumOffset An offset to account for naturally imbalanced markets when Float token issuance should differ for market sides. See Staker.sol
   /// @param initialMarketSeed Amount of ether that will be deposited in each market side to seed the market.
   function initializeMarket(
     uint32 marketIndex,
     uint256 kInitialMultiplier,
     uint256 kPeriod,
-    uint256 unstakeFeeBasisPoints,
+    uint256 unstakeFeeE18,
     uint256 initialMarketSeed,
     uint256 balanceIncentiveCurveExponent,
     int256 balanceIncentiveCurveEquilibriumOffset
   ) external adminOnly {
     require(!marketExists[marketIndex], "already initialized");
-    require(marketIndex <= latestMarket, "index too highh");
+    require(marketIndex <= latestMarket, "index too high");
 
     marketExists[marketIndex] = true;
 
@@ -359,7 +368,7 @@ contract LongShort is ILongShort, Initializable {
       syntheticTokens[latestMarket][false],
       kInitialMultiplier,
       kPeriod,
-      unstakeFeeBasisPoints,
+      unstakeFeeE18,
       balanceIncentiveCurveExponent,
       balanceIncentiveCurveEquilibriumOffset
     );
@@ -373,61 +382,57 @@ contract LongShort is ILongShort, Initializable {
 
   /// @notice Calculates the conversion rate from synthetic tokens to payment tokens.
   /// @dev Synth tokens have a fixed 18 decimals.
-  /// @param amountPaymentToken Amount of payment tokens in that token's lowest denomination.
+  /// @param amountPaymentTokenBackingSynth Amount of payment tokens in that token's lowest denomination.
   /// @param amountSynthToken Amount of synth token in wei.
   /// @return syntheticTokenPrice The calculated conversion rate in base 1e18.
-  function _getSyntheticTokenPrice(uint256 amountPaymentToken, uint256 amountSynthToken)
+  function _getSyntheticTokenPrice(uint256 amountPaymentTokenBackingSynth, uint256 amountSynthToken)
     internal
     pure
     virtual
     returns (uint256 syntheticTokenPrice)
   {
-    return (amountPaymentToken * 1e18) / amountSynthToken;
+    return (amountPaymentTokenBackingSynth * 1e18) / amountSynthToken;
   }
 
   /// @notice Converts synth token amounts to payment token amounts at a synth token price.
   /// @dev Price assumed base 1e18.
   /// @param amountSynthToken Amount of synth token in wei.
-  /// @param price The conversion rate from synth to payment tokens in base 1e18.
+  /// @param syntheticTokenPriceInPaymentTokens The conversion rate from synth to payment tokens in base 1e18.
   /// @return amountPaymentToken The calculated amount of payment tokens in token's lowest denomination.
-  function _getAmountPaymentToken(uint256 amountSynthToken, uint256 price)
-    internal
-    pure
-    virtual
-    returns (uint256 amountPaymentToken)
-  {
-    return (amountSynthToken * price) / 1e18;
+  function _getAmountPaymentToken(
+    uint256 amountSynthToken,
+    uint256 syntheticTokenPriceInPaymentTokens
+  ) internal pure virtual returns (uint256 amountPaymentToken) {
+    return (amountSynthToken * syntheticTokenPriceInPaymentTokens) / 1e18;
   }
 
   /// @notice Converts payment token amounts to synth token amounts at a synth token price.
   /// @dev  Price assumed base 1e18.
-  /// @param amountPaymentToken Amount of payment tokens in that token's lowest denomination.
-  /// @param price The conversion rate from synth to payment tokens in base 1e18.
+  /// @param amountPaymentTokenBackingSynth Amount of payment tokens in that token's lowest denomination.
+  /// @param syntheticTokenPriceInPaymentTokens The conversion rate from synth to payment tokens in base 1e18.
   /// @return amountSynthToken The calculated amount of synthetic token in wei.
-  function _getAmountSynthToken(uint256 amountPaymentToken, uint256 price)
-    internal
-    pure
-    virtual
-    returns (uint256 amountSynthToken)
-  {
-    return (amountPaymentToken * 1e18) / price;
+  function _getAmountSynthToken(
+    uint256 amountPaymentTokenBackingSynth,
+    uint256 syntheticTokenPriceInPaymentTokens
+  ) internal pure virtual returns (uint256 amountSynthToken) {
+    return (amountPaymentTokenBackingSynth * 1e18) / syntheticTokenPriceInPaymentTokens;
   }
 
   /// @notice Given an executed next price shift from tokens on one market side to the other, determines how many other side tokens the shift was worth.
   /// @dev Intended for use primarily by Staker.sol
-  /// @param marketIndex An int32 which uniquely identifies a market.
-  /// @param amountSynthTokenShifted Amount of synth token in wei.
+  /// @param marketIndex An uint32 which uniquely identifies a market.
+  /// @param amountSynthTokenShiftedFromOneSide Amount of synth token in wei.
   /// @param isShiftFromLong Whether the token shift is from long to short (true), or short to long (false).
   /// @param priceSnapshotIndex Index which identifies which synth prices to use.
   /// @return amountSynthShiftedToOtherSide The amount in wei of tokens for the other side that the shift was worth.
-  function getAmountSynthTokenShifted(
+  function getAmountSynthTokenShiftedToOtherSide(
     uint32 marketIndex,
-    uint256 amountSynthTokenShifted,
+    uint256 amountSynthTokenShiftedFromOneSide,
     bool isShiftFromLong,
     uint256 priceSnapshotIndex
   ) public view virtual override returns (uint256 amountSynthShiftedToOtherSide) {
     uint256 paymentTokensToShift = _getAmountPaymentToken(
-      amountSynthTokenShifted,
+      amountSynthTokenShiftedFromOneSide,
       syntheticTokenPriceSnapshot[marketIndex][isShiftFromLong][priceSnapshotIndex]
     );
 
@@ -463,7 +468,7 @@ contract LongShort is ILongShort, Initializable {
     view
     virtual
     override
-    assertMarketExists(marketIndex)
+    requireMarketExists(marketIndex)
     returns (uint256 confirmedButNotSettledBalance)
   {
     uint256 currentMarketUpdateIndex = marketUpdateIndex[marketIndex];
@@ -471,8 +476,6 @@ contract LongShort is ILongShort, Initializable {
       userCurrentNextPriceUpdateIndex[marketIndex][user] != 0 &&
       userCurrentNextPriceUpdateIndex[marketIndex][user] <= currentMarketUpdateIndex
     ) {
-      // Update is still nextPrice but not past the next oracle update - display the
-      // amount the user would get if they executed immediately.
       uint256 amountPaymentTokenDeposited = userNextPriceDepositAmount[marketIndex][isLong][user];
 
       if (amountPaymentTokenDeposited > 0) {
@@ -490,6 +493,7 @@ contract LongShort is ILongShort, Initializable {
         marketIndex
       ][!isLong][user];
 
+      // TODO STENT optimize this like https://github.com/Float-Capital/monorepo/pull/990
       if (synthTokensShiftedAwayFromOtherSide > 0) {
         uint256 paymentTokensToShift = _getAmountPaymentToken(
           synthTokensShiftedAwayFromOtherSide,
@@ -501,10 +505,6 @@ contract LongShort is ILongShort, Initializable {
           syntheticTokenPriceSnapshot[marketIndex][isLong][currentMarketUpdateIndex]
         );
       }
-
-      return confirmedButNotSettledBalance;
-    } else {
-      return 0;
     }
   }
 
@@ -553,7 +553,7 @@ contract LongShort is ILongShort, Initializable {
     ║       HELPER FUNCTIONS       ║
     ╚══════════════════════════════╝*/
 
-  /// @notice First gets yield from the yield manager and allocates it markets, then reallocates the total market value to each side. The side with less value has full exposure.
+  /// @notice First gets yield from the yield manager and allocates it to markets, then reallocates the total market value to each side. The side with less value has full exposure.
   /// @dev In one function as yield should be allocated before rebalancing. This prevents an attack whereby the user imbalances a side to capture all accrued yield.
   /// @param marketIndex The market for which to execute the function for.
   /// @param newAssetPrice The new asset price.
@@ -589,10 +589,9 @@ contract LongShort is ILongShort, Initializable {
       }
     }
 
-    int256 unbalancedSidePoolValue = int256(_getMin(longValue, shortValue));
+    int256 underbalancedSideValue = int256(_getMin(longValue, shortValue));
 
-    int256 valueChange = ((newAssetPrice - oldAssetPrice) * unbalancedSidePoolValue) /
-      oldAssetPrice;
+    int256 valueChange = ((newAssetPrice - oldAssetPrice) * underbalancedSideValue) / oldAssetPrice;
 
     if (valueChange > 0) {
       longValue += uint256(valueChange);
@@ -607,13 +606,13 @@ contract LongShort is ILongShort, Initializable {
     ║     UPDATING SYSTEM STATE     ║
     ╚═══════════════════════════════╝*/
 
-  /// @notice Updates the value of the long and short sides to account for latest oracle price all batched next price actions.
+  /// @notice Updates the value of the long and short sides to account for latest oracle price updates and batches all next price actions.
   /// @dev To prevent front-running only executes on price change from an oracle. We assume the function will be called for each market at least once per price update.
   /// @param marketIndex The market index for which to update.
   function _updateSystemStateInternal(uint32 marketIndex)
     internal
     virtual
-    assertMarketExists(marketIndex)
+    requireMarketExists(marketIndex)
   {
     // If a negative int is return this should fail.
     int256 newAssetPrice = IOracleManager(oracleManagers[marketIndex]).updatePrice();
@@ -628,7 +627,7 @@ contract LongShort is ILongShort, Initializable {
       uint256 syntheticTokenPriceShort = syntheticTokenPriceSnapshot[marketIndex][false][
         marketUpdateIndex[marketIndex]
       ];
-      // if there is a price change and the 'staker' contract has pending updates, pusht the stakers price snapshot index to the staker
+      // if there is a price change and the 'staker' contract has pending updates, push the stakers price snapshot index to the staker
       // (so the staker can handle its internal accounting)
       if (userCurrentNextPriceUpdateIndex[marketIndex][staker] > 0 && assetPriceChanged) {
         IStaker(staker).addNewStateForFloatRewards(
@@ -684,10 +683,10 @@ contract LongShort is ILongShort, Initializable {
         int256 valueChangeForLong,
         int256 valueChangeForShort
       ) = _performOustandingBatchedSettlements(
-        marketIndex,
-        syntheticTokenPriceLong,
-        syntheticTokenPriceShort
-      );
+          marketIndex,
+          syntheticTokenPriceLong,
+          syntheticTokenPriceShort
+        );
 
       newLongPoolValue = uint256(int256(newLongPoolValue) + valueChangeForLong);
       newShortPoolValue = uint256(int256(newShortPoolValue) + valueChangeForShort);
@@ -977,7 +976,7 @@ contract LongShort is ILongShort, Initializable {
       marketIndex
     ][isShiftFromLong][user];
     if (synthTokensShiftedAwayFromMarketSide > 0) {
-      uint256 amountSynthTokenRecievedOnOtherSide = getAmountSynthTokenShifted(
+      uint256 amountSynthTokenRecievedOnOtherSide = getAmountSynthTokenShiftedToOtherSide(
         marketIndex,
         synthTokensShiftedAwayFromMarketSide,
         isShiftFromLong,
@@ -1115,24 +1114,24 @@ contract LongShort is ILongShort, Initializable {
     // NOTE: These variables currently only includes the amount to deposit
     //       to save variable space (precious EVM stack) we share and update the same variable later to include the shift.
 
+    uint256 batchedAmountOfPaymentTokensToDepositOrShiftToLong = batchedAmountOfPaymentTokenToDeposit[
+        marketIndex
+      ][true];
 
-      uint256 batchedAmountOfPaymentTokensToDepositOrShiftToLong
-     = batchedAmountOfPaymentTokenToDeposit[marketIndex][true];
-
-
-      uint256 batchedAmountOfPaymentTokensToDepositOrShiftToShort
-     = batchedAmountOfPaymentTokenToDeposit[marketIndex][false];
+    uint256 batchedAmountOfPaymentTokensToDepositOrShiftToShort = batchedAmountOfPaymentTokenToDeposit[
+        marketIndex
+      ][false];
 
     // NOTE: These variables currently only includes the amount to shift
     //       to save variable space (precious EVM stack) we share and update the same variable later to include the reedem.
 
+    uint256 batchedAmountOfSynthTokensToRedeemOrShiftFromLong = batchedAmountOfSynthTokensToShiftMarketSide[
+        marketIndex
+      ][true];
 
-      uint256 batchedAmountOfSynthTokensToRedeemOrShiftFromLong
-     = batchedAmountOfSynthTokensToShiftMarketSide[marketIndex][true];
-
-
-      uint256 batchedAmountOfSynthTokensToRedeemOrShiftFromShort
-     = batchedAmountOfSynthTokensToShiftMarketSide[marketIndex][false];
+    uint256 batchedAmountOfSynthTokensToRedeemOrShiftFromShort = batchedAmountOfSynthTokensToShiftMarketSide[
+        marketIndex
+      ][false];
 
     // Handle shift tokens from LONG to SHORT
     if (batchedAmountOfSynthTokensToRedeemOrShiftFromLong > 0) {

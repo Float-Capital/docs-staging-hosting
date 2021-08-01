@@ -633,7 +633,7 @@ contract Staker is IStaker, Initializable {
 
       // Update the users balances
       if (amountToShiftFromLongUser[marketIndex][user] > 0) {
-        amountStakedShort += ILongShort(longShort).getAmountSynthTokenShifted(
+        amountStakedShort += ILongShort(longShort).getAmountSynthTokenShiftedToOtherSide(
           marketIndex,
           amountToShiftFromLongUser[marketIndex][user],
           true,
@@ -645,7 +645,7 @@ contract Staker is IStaker, Initializable {
       }
 
       if (amountToShiftFromShortUser[marketIndex][user] > 0) {
-        amountStakedLong += ILongShort(longShort).getAmountSynthTokenShifted(
+        amountStakedLong += ILongShort(longShort).getAmountSynthTokenShiftedToOtherSide(
           marketIndex,
           amountToShiftFromShortUser[marketIndex][user],
           false,
