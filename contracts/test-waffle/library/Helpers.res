@@ -174,10 +174,7 @@ let initialize = (~admin: Ethers.Wallet.t, ~exposeInternals: bool) => {
     longShort,
     (payToken1, payToken2),
   )) => {
-    TokenFactory.make(
-      ~admin=admin.address,
-      ~longShort=longShort.address,
-    )->JsPromise.then(tokenFactory => {
+    TokenFactory.make(~longShort=longShort.address)->JsPromise.then(tokenFactory => {
       JsPromise.all4((
         floatToken->FloatToken.initialize3(
           ~name="Float token",
@@ -292,7 +289,7 @@ let initializeLongShortUnit = () => {
       LongShort.Exposed.make(),
       Staker.make(),
       FloatToken.make(),
-      TokenFactory.make(~admin=CONSTANTS.zeroAddress, ~longShort=CONSTANTS.zeroAddress),
+      TokenFactory.make(~longShort=CONSTANTS.zeroAddress),
       YieldManagerAave.make(
         ~admin=CONSTANTS.zeroAddress,
         ~longShort=CONSTANTS.zeroAddress,

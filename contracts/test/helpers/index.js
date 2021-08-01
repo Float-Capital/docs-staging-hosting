@@ -31,7 +31,7 @@ const initialize = async (admin) => {
     from: admin,
   });
 
-  const tokenFactory = await TokenFactory.new(admin, longShort.address, {
+  const tokenFactory = await TokenFactory.new(longShort.address, {
     from: admin,
   });
 
