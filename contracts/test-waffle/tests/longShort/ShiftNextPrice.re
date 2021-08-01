@@ -1,6 +1,155 @@
 open Globals;
 open LetOps;
 open Mocha;
+let testIntegration =
+    (
+      ~contracts: ref(Helpers.coreContracts),
+      ~accounts: ref(array(Ethers.Wallet.t)),
+    ) =>
+  describe("nextPriceShiftPosition", () => {
+    let runNextPriceShiftPositionTest = (~isShiftFromLong) =>
+      it(
+        "should work as expected happy path for token shifting "
+        ++ (isShiftFromLong ? "Long" : "Short"),
+        () => {
+          let testUser = accounts.contents->Array.getUnsafe(8);
+          let amountToNextPriceMint = Helpers.randomTokenAmount();
+
+          let {longShort, markets} = contracts.contents;
+
+          let longShortUserConnected =
+            longShort->ContractHelpers.connect(~address=testUser);
+
+          let {
+            paymentToken,
+            oracleManager,
+            longSynth,
+            shortSynth,
+            marketIndex,
+          } =
+            markets->Array.getUnsafe(0);
+
+          let fromSynth = isShiftFromLong ? longSynth : shortSynth;
+          let toSynth = isShiftFromLong ? shortSynth : longSynth;
+          let redeemNextPriceFunction =
+            isShiftFromLong
+              ? LongShort.shiftPositionFromLongNextPrice
+              : LongShort.shiftPositionFromShortNextPrice;
+
+          let%AwaitThen _longValueBefore =
+            longShort->LongShort.syntheticTokenPoolValue(
+              marketIndex,
+              isShiftFromLong,
+            );
+
+          let%AwaitThen _ =
+            paymentToken->ERC20Mock.mint(
+              ~_to=testUser.address,
+              ~amount=amountToNextPriceMint,
+            );
+
+          let%AwaitThen _ =
+            paymentToken->ERC20Mock.setShouldMockTransfer(~value=false);
+
+          let%AwaitThen _ =
+            paymentToken
+            ->ContractHelpers.connect(~address=testUser)
+            ->ERC20Mock.approve(
+                ~spender=longShort.address,
+                ~amount=amountToNextPriceMint,
+              );
+
+          let%AwaitThen _ =
+            HelperActions.mintDirect(
+              ~marketIndex,
+              ~amount=amountToNextPriceMint,
+              ~token=paymentToken,
+              ~user=testUser,
+              ~longShort,
+              ~oracleManagerMock=oracleManager,
+              ~isLong=isShiftFromLong,
+            );
+
+          let%AwaitThen usersBalanceAvailableForShift =
+            fromSynth->SyntheticToken.balanceOf(~account=testUser.address);
+          let%AwaitThen _ =
+            longShortUserConnected->redeemNextPriceFunction(
+              ~marketIndex,
+              ~synthTokensToShift=usersBalanceAvailableForShift,
+            );
+          let%AwaitThen usersBalanceAfterNextPriceShift =
+            fromSynth->SyntheticToken.balanceOf(~account=testUser.address);
+
+          Chai.bnEqual(
+            ~message=
+              "Balance after price system update but before user settlement should be the same as after settlement",
+            usersBalanceAfterNextPriceShift,
+            CONSTANTS.zeroBn,
+          );
+
+          let%AwaitThen otherSynthTokenBalanceBeforeShift =
+            toSynth->SyntheticToken.balanceOf(~account=testUser.address);
+
+          let%AwaitThen previousPrice =
+            oracleManager->OracleManagerMock.getLatestPrice;
+
+          let nextPrice =
+            previousPrice
+            ->mul(bnFromInt(12)) // 20% increase
+            ->div(bnFromInt(10));
+
+          let%AwaitThen _ =
+            oracleManager->OracleManagerMock.setPrice(~newPrice=nextPrice);
+
+          let%AwaitThen _ =
+            longShort->LongShort.updateSystemState(~marketIndex);
+          let%AwaitThen latestUpdateIndex =
+            longShort->LongShort.marketUpdateIndex(marketIndex);
+          let%AwaitThen shiftPriceFromSynth =
+            longShort->LongShort.syntheticTokenPriceSnapshot(
+              marketIndex,
+              isShiftFromLong,
+              latestUpdateIndex,
+            );
+          let%AwaitThen shiftPriceToSynth =
+            longShort->LongShort.syntheticTokenPriceSnapshot(
+              marketIndex,
+              !isShiftFromLong,
+              latestUpdateIndex,
+            );
+
+          let paymentTokensToShift =
+            usersBalanceAvailableForShift
+            ->mul(shiftPriceFromSynth)
+            ->div(CONSTANTS.tenToThe18);
+          let amountSynthTokenExpectedToRecieveOnOtherSide =
+            paymentTokensToShift
+            ->mul(CONSTANTS.tenToThe18)
+            ->div(shiftPriceToSynth);
+
+          let%AwaitThen _ =
+            longShort->LongShort.executeOutstandingNextPriceSettlementsUser(
+              ~marketIndex,
+              ~user=testUser.address,
+            );
+
+          let%Await toSynthBalanceAfterShift =
+            toSynth->SyntheticToken.balanceOf(~account=testUser.address);
+
+          let deltaBalanceChange =
+            toSynthBalanceAfterShift->sub(otherSynthTokenBalanceBeforeShift);
+
+          Chai.bnEqual(
+            ~message="Balance of paymentToken didn't update correctly",
+            deltaBalanceChange,
+            amountSynthTokenExpectedToRecieveOnOtherSide,
+          );
+        },
+      );
+
+    runNextPriceShiftPositionTest(~isShiftFromLong=true);
+    runNextPriceShiftPositionTest(~isShiftFromLong=false);
+  });
 
 let testUnit =
     (
