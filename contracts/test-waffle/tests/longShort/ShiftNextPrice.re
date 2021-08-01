@@ -7,10 +7,10 @@ let testIntegration =
       ~accounts: ref(array(Ethers.Wallet.t)),
     ) =>
   describe("nextPriceShiftPosition", () => {
-    let runnextPriceShiftPositionTest = (~isLong) =>
+    let runNextPriceShiftPositionTest = (~isShiftFromLong) =>
       it(
         "should work as expected happy path for token shifting "
-        ++ (isLong ? "Long" : "Short"),
+        ++ (isShiftFromLong ? "Long" : "Short"),
         () => {
           let testUser = accounts.contents->Array.getUnsafe(8);
           let amountToNextPriceMint = Helpers.randomTokenAmount();
@@ -29,15 +29,18 @@ let testIntegration =
           } =
             markets->Array.getUnsafe(0);
 
-          let fromSynth = isLong ? longSynth : shortSynth;
-          let toSynth = isLong ? shortSynth : longSynth;
+          let fromSynth = isShiftFromLong ? longSynth : shortSynth;
+          let toSynth = isShiftFromLong ? shortSynth : longSynth;
           let redeemNextPriceFunction =
-            isLong
+            isShiftFromLong
               ? LongShort.shiftPositionFromLongNextPrice
               : LongShort.shiftPositionFromShortNextPrice;
 
           let%AwaitThen _longValueBefore =
-            longShort->LongShort.syntheticTokenPoolValue(marketIndex, isLong);
+            longShort->LongShort.syntheticTokenPoolValue(
+              marketIndex,
+              isShiftFromLong,
+            );
 
           let%AwaitThen _ =
             paymentToken->ERC20Mock.mint(
@@ -64,7 +67,7 @@ let testIntegration =
               ~user=testUser,
               ~longShort,
               ~oracleManagerMock=oracleManager,
-              ~isLong,
+              ~isLong=isShiftFromLong,
             );
 
           let%AwaitThen usersBalanceAvailableForShift =
@@ -105,13 +108,13 @@ let testIntegration =
           let%AwaitThen shiftPriceFromSynth =
             longShort->LongShort.syntheticTokenPriceSnapshot(
               marketIndex,
-              isLong,
+              isShiftFromLong,
               latestUpdateIndex,
             );
           let%AwaitThen shiftPriceToSynth =
             longShort->LongShort.syntheticTokenPriceSnapshot(
               marketIndex,
-              !isLong,
+              !isShiftFromLong,
               latestUpdateIndex,
             );
 
@@ -144,8 +147,8 @@ let testIntegration =
         },
       );
 
-    runnextPriceShiftPositionTest(~isLong=true);
-    runnextPriceShiftPositionTest(~isLong=false);
+    runNextPriceShiftPositionTest(~isShiftFromLong=true);
+    runNextPriceShiftPositionTest(~isShiftFromLong=false);
   });
 
 let testUnit =

@@ -8,7 +8,7 @@ let testIntegration =
       ~accounts: ref(array(Ethers.Wallet.t)),
     ) =>
   describe("nextPriceRedeem", () => {
-    let runnextPriceRedeemTest = (~isLong) =>
+    let runNextPriceRedeemTest = (~isLong) =>
       it(
         "should work as expected happy path for redeem "
         ++ (isLong ? "Long" : "Short"),
@@ -135,8 +135,8 @@ let testIntegration =
         },
       );
 
-    runnextPriceRedeemTest(~isLong=true);
-    runnextPriceRedeemTest(~isLong=false);
+    runNextPriceRedeemTest(~isLong=true);
+    runNextPriceRedeemTest(~isLong=false);
   });
 
 let testUnit =
