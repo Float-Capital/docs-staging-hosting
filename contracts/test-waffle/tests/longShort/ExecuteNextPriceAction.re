@@ -19,8 +19,8 @@ let testUnit =
       let setup =
           (
             ~isLong,
-            ~userNextPriceRedemptionAmount,
-            ~userCurrentNextPriceUpdateIndex,
+            ~userNextPrice_redemptionAmount,
+            ~userNextPrice_currentUpdateIndex,
             ~syntheticTokenPriceSnapshot,
           ) => {
         let {longShort, markets} = contracts.contents;
@@ -41,8 +41,8 @@ let testUnit =
           ~isLong,
           ~syntheticToken=
             (isLong ? smockedLongSynth : smockedShortSynth).address,
-          ~userNextPriceRedemptionAmount,
-          ~userCurrentNextPriceUpdateIndex,
+          ~userNextPrice_redemptionAmount,
+          ~userNextPrice_currentUpdateIndex,
           ~syntheticTokenPriceSnapshot,
         );
       };
@@ -55,8 +55,8 @@ let testUnit =
             let%Await _ =
               setup(
                 ~isLong,
-                ~userNextPriceRedemptionAmount=zeroBn,
-                ~userCurrentNextPriceUpdateIndex=Helpers.randomInteger(),
+                ~userNextPrice_redemptionAmount=zeroBn,
+                ~userNextPrice_currentUpdateIndex=Helpers.randomInteger(),
                 ~syntheticTokenPriceSnapshot=Helpers.randomTokenAmount(),
               );
 
@@ -91,15 +91,15 @@ let testUnit =
         describe("userNextPriceDepositAmount > 0", () => {
           let executeOutstandingNextPriceMintsTx =
             ref("Undefined"->Obj.magic);
-          let userNextPriceRedemptionAmount = Helpers.randomTokenAmount();
+          let userNextPrice_redemptionAmount = Helpers.randomTokenAmount();
           let syntheticTokenPriceSnapshot = Helpers.randomTokenAmount();
 
           before_each(() => {
             let%Await _ =
               setup(
                 ~isLong,
-                ~userNextPriceRedemptionAmount,
-                ~userCurrentNextPriceUpdateIndex=Helpers.randomInteger(),
+                ~userNextPrice_redemptionAmount,
+                ~userNextPrice_currentUpdateIndex=Helpers.randomInteger(),
                 ~syntheticTokenPriceSnapshot,
               );
 
@@ -121,7 +121,7 @@ let testUnit =
               ->SyntheticTokenSmocked.transferCalls;
             let expectedAmountOfSynthToRecieve =
               Contract.LongShortHelpers.calcAmountSynthToken(
-                ~amountPaymentToken=userNextPriceRedemptionAmount,
+                ~amountPaymentToken=userNextPrice_redemptionAmount,
                 ~price=syntheticTokenPriceSnapshot,
               );
             Chai.recordArrayDeepEqualFlat(
@@ -135,7 +135,7 @@ let testUnit =
             () => {
               let expectedAmountOfSynthToRecieve =
                 Contract.LongShortHelpers.calcAmountSynthToken(
-                  ~amountPaymentToken=userNextPriceRedemptionAmount,
+                  ~amountPaymentToken=userNextPrice_redemptionAmount,
                   ~price=syntheticTokenPriceSnapshot,
                 );
 
@@ -155,7 +155,7 @@ let testUnit =
           it("should reset userNextPriceDepositAmount to zero", () => {
             let%Await userNextPriceDepositAmount =
               contracts.contents.longShort
-              ->LongShort.userNextPriceDepositAmount(
+              ->LongShort.userNextPrice_depositAmount(
                   marketIndex,
                   isLong,
                   user,
@@ -178,8 +178,8 @@ let testUnit =
       let setup =
           (
             ~isLong,
-            ~userNextPriceRedemptionAmount,
-            ~userCurrentNextPriceUpdateIndex,
+            ~userNextPrice_redemptionAmount,
+            ~userNextPrice_currentUpdateIndex,
             ~syntheticTokenPriceSnapshot,
           ) => {
         let {longShort, markets} = contracts^;
@@ -196,8 +196,8 @@ let testUnit =
           ~user,
           ~isLong,
           ~paymentToken=smockedPaymentToken.address,
-          ~userNextPriceRedemptionAmount,
-          ~userCurrentNextPriceUpdateIndex,
+          ~userNextPrice_redemptionAmount,
+          ~userNextPrice_currentUpdateIndex,
           ~syntheticTokenPriceSnapshot,
         );
       };
@@ -210,8 +210,8 @@ let testUnit =
             let%Await _ =
               setup(
                 ~isLong,
-                ~userNextPriceRedemptionAmount=zeroBn,
-                ~userCurrentNextPriceUpdateIndex=Helpers.randomInteger(),
+                ~userNextPrice_redemptionAmount=zeroBn,
+                ~userNextPrice_currentUpdateIndex=Helpers.randomInteger(),
                 ~syntheticTokenPriceSnapshot=Helpers.randomTokenAmount(),
               );
 
@@ -246,15 +246,15 @@ let testUnit =
         describe("userNextPriceDepositAmount > 0", () => {
           let executeOutstandingNextPriceRedeemsTx =
             ref("Undefined"->Obj.magic);
-          let userNextPriceRedemptionAmount = Helpers.randomTokenAmount();
+          let userNextPrice_redemptionAmount = Helpers.randomTokenAmount();
           let syntheticTokenPriceSnapshot = Helpers.randomTokenAmount();
 
           before_each(() => {
             let%Await _ =
               setup(
                 ~isLong,
-                ~userNextPriceRedemptionAmount,
-                ~userCurrentNextPriceUpdateIndex=Helpers.randomInteger(),
+                ~userNextPrice_redemptionAmount,
+                ~userNextPrice_currentUpdateIndex=Helpers.randomInteger(),
                 ~syntheticTokenPriceSnapshot,
               );
 
@@ -275,7 +275,7 @@ let testUnit =
               paymentTokenSmocked.contents->ERC20MockSmocked.transferCalls;
             let expectedAmountOfPaymentTokenToRecieve =
               Contract.LongShortHelpers.calcAmountPaymentToken(
-                ~amountSynthToken=userNextPriceRedemptionAmount,
+                ~amountSynthToken=userNextPrice_redemptionAmount,
                 ~price=syntheticTokenPriceSnapshot,
               );
             Chai.recordArrayDeepEqualFlat(
@@ -294,7 +294,7 @@ let testUnit =
             () => {
               let expectedAmountOfPaymentTokenToRecieve =
                 Contract.LongShortHelpers.calcAmountPaymentToken(
-                  ~amountSynthToken=userNextPriceRedemptionAmount,
+                  ~amountSynthToken=userNextPrice_redemptionAmount,
                   ~price=syntheticTokenPriceSnapshot,
                 );
 
@@ -314,7 +314,7 @@ let testUnit =
           it("should reset userNextPriceDepositAmount to zero", () => {
             let%Await userNextPriceDepositAmount =
               contracts.contents.longShort
-              ->LongShort.userNextPriceDepositAmount(
+              ->LongShort.userNextPrice_depositAmount(
                   marketIndex,
                   isLong,
                   user,
@@ -339,7 +339,7 @@ let testUnit =
           (
             ~isShiftFromLong,
             ~userNextPrice_amountSynthToShiftFromMarketSide,
-            ~userCurrentNextPriceUpdateIndex,
+            ~userNextPrice_currentUpdateIndex,
             ~syntheticTokenPriceSnapshotShiftedFrom,
             ~syntheticTokenPriceSnapshotShiftedTo,
           ) => {
@@ -362,7 +362,7 @@ let testUnit =
           ~syntheticTokenShiftedTo=
             (isShiftFromLong ? smockedShortSynth : smockedLongSynth).address,
           ~userNextPrice_amountSynthToShiftFromMarketSide,
-          ~userCurrentNextPriceUpdateIndex,
+          ~userNextPrice_currentUpdateIndex,
           ~syntheticTokenPriceSnapshotShiftedFrom,
           ~syntheticTokenPriceSnapshotShiftedTo,
         );
@@ -377,7 +377,7 @@ let testUnit =
               setup(
                 ~isShiftFromLong,
                 ~userNextPrice_amountSynthToShiftFromMarketSide=zeroBn,
-                ~userCurrentNextPriceUpdateIndex=Helpers.randomInteger(),
+                ~userNextPrice_currentUpdateIndex=Helpers.randomInteger(),
                 ~syntheticTokenPriceSnapshotShiftedFrom=
                   Helpers.randomTokenAmount(),
                 ~syntheticTokenPriceSnapshotShiftedTo=
@@ -428,7 +428,7 @@ let testUnit =
               setup(
                 ~isShiftFromLong,
                 ~userNextPrice_amountSynthToShiftFromMarketSide,
-                ~userCurrentNextPriceUpdateIndex=Helpers.randomInteger(),
+                ~userNextPrice_currentUpdateIndex=Helpers.randomInteger(),
                 ~syntheticTokenPriceSnapshotShiftedFrom,
                 ~syntheticTokenPriceSnapshotShiftedTo,
               );
