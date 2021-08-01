@@ -218,7 +218,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
           staker->Staker.Exposed.setLongShort(
             ~longShort=longShortSmocked.address,
           );
-        longShortSmocked->LongShortSmocked.mockGetAmountSynthTokenShiftedToOtherSideToReturn(
+        longShortSmocked->LongShortSmocked.mockGetAmountSynthTokenToMintOnTargetSideToReturn(
           amountOfStakeShifted,
         );
         smockedLongShort := longShortSmocked;
@@ -284,20 +284,20 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
           );
         });
         it(
-          "it should call LongShort.getAmountSynthTokenShiftedToOtherSideCalls with the correct parameters",
+          "it should call LongShort.getAmountSynthTokenToMintOnTargetSideCalls with the correct parameters",
           () => {
             let%Await _ = setup(~isShiftFromLong);
 
-            let getAmountSynthTokenShiftedToOtherSideCalls =
+            let getAmountSynthTokenToMintOnTargetSideCalls =
               smockedLongShort.contents
-              ->LongShortSmocked.getAmountSynthTokenShiftedToOtherSideCalls;
+              ->LongShortSmocked.getAmountSynthTokenToMintOnTargetSideCalls;
 
             Chai.recordArrayDeepEqualFlat(
-              getAmountSynthTokenShiftedToOtherSideCalls,
+              getAmountSynthTokenToMintOnTargetSideCalls,
               [|
                 {
                   marketIndex,
-                  amountSynthTokenShiftedFromOneSide: amountToShift,
+                amountSynthTokenToRedeemOnOriginSide: amountToShift,
                   isShiftFromLong,
                   priceSnapshotIndex: longShortMarketPriceSnapshotIndex,
                 },

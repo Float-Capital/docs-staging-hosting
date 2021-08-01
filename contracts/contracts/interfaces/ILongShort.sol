@@ -25,7 +25,7 @@ abstract contract ILongShort {
     external
     virtual;
 
-  function getAmountSynthTokenShiftedToOtherSide(
+  function getAmountSynthTokenToMintOnTargetSide(
     uint32 marketIndex,
     uint256 amountSynthTokenShiftedFromOneSide,
     bool isShiftFromLong,
