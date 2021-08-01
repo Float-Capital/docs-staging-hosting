@@ -55,6 +55,7 @@ let testUnit =
               ~initialMarketSeed=Ethers.BigNumber.fromUnsafe("7"),
               ~balanceIncentiveCurveExponent=bnFromInt(5),
               ~balanceIncentiveCurveEquilibriumOffset=bnFromInt(0),
+              ~marketTreasurySplitGradientE18=bnFromInt(1),
             );
 
         let stakerCalls =
@@ -115,6 +116,7 @@ let testUnit =
                 ~initialMarketSeed=Ethers.BigNumber.fromUnsafe("7"),
                 ~balanceIncentiveCurveExponent=bnFromInt(5),
                 ~balanceIncentiveCurveEquilibriumOffset=bnFromInt(0),
+                ~marketTreasurySplitGradientE18=bnFromInt(1),
               ),
         );
       ();
@@ -138,6 +140,7 @@ let testUnit =
                 ~initialMarketSeed=Ethers.BigNumber.fromUnsafe("7"),
                 ~balanceIncentiveCurveExponent=bnFromInt(5),
                 ~balanceIncentiveCurveEquilibriumOffset=bnFromInt(0),
+                ~marketTreasurySplitGradientE18=bnFromInt(1),
               ),
         );
       ();
@@ -165,6 +168,7 @@ let testIntegration =
               ~initialMarketSeed=CONSTANTS.oneBn,
               ~balanceIncentiveCurveExponent=bnFromInt(5),
               ~balanceIncentiveCurveEquilibriumOffset=bnFromInt(0),
+              ~marketTreasurySplitGradientE18=bnFromInt(1),
             ),
         ~reason="index too high",
       );
@@ -186,6 +190,7 @@ let testIntegration =
             ~initialMarketSeed=CONSTANTS.oneBn,
             ~balanceIncentiveCurveExponent=bnFromInt(5),
             ~balanceIncentiveCurveEquilibriumOffset=bnFromInt(0),
+            ~marketTreasurySplitGradientE18=bnFromInt(1),
           ),
         ~reason="already initialized",
       );
@@ -218,6 +223,7 @@ let testIntegration =
             ~initialMarketSeed=CONSTANTS.oneBn,
             ~balanceIncentiveCurveExponent=bnFromInt(5),
             ~balanceIncentiveCurveEquilibriumOffset=bnFromInt(0),
+            ~marketTreasurySplitGradientE18=bnFromInt(1),
           ),
         ~reason="Insufficient market seed",
       );

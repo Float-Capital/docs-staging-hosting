@@ -148,6 +148,7 @@ const createSynthetic = async (
     "500000000000000000",
     "5",
     0,
+    1,
     { from: admin }
   );
 

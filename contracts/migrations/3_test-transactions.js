@@ -118,7 +118,8 @@ const deployTestMarket = async (
     new BN("5000000000000000"), // 50 basis point unstake fee
     new BN("1000000000000000000"),
     5,
-    0
+    0,
+    1
   );
 };
 
@@ -318,7 +319,7 @@ module.exports = async function (deployer, network, accounts) {
     }
 
     console.log(`To verify market specific contracts run the following:
-    
+
     \`${verifyString} --network ${network}\``);
   }
 
