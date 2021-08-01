@@ -67,9 +67,10 @@ contract LongShort is ILongShort, Initializable {
   // User specific
   mapping(uint32 => mapping(address => uint256)) public userCurrentNextPriceUpdateIndex;
 
-  mapping(uint32 => mapping(bool => mapping(address => uint256))) public userNextPriceDepositAmount;
   mapping(uint32 => mapping(bool => mapping(address => uint256)))
-    public userNextPriceRedemptionAmount;
+    public userNextPrice_depositAmount;
+  mapping(uint32 => mapping(bool => mapping(address => uint256)))
+    public userNextPrice_redemptionAmount;
   mapping(uint32 => mapping(bool => mapping(address => uint256)))
     public userNextPrice_amountSynthToShiftFromMarketSide;
 
@@ -479,7 +480,7 @@ contract LongShort is ILongShort, Initializable {
       userCurrentNextPriceUpdateIndex[marketIndex][user] != 0 &&
       userCurrentNextPriceUpdateIndex[marketIndex][user] <= currentMarketUpdateIndex
     ) {
-      uint256 amountPaymentTokenDeposited = userNextPriceDepositAmount[marketIndex][isLong][user];
+      uint256 amountPaymentTokenDeposited = userNextPrice_depositAmount[marketIndex][isLong][user];
 
       if (amountPaymentTokenDeposited > 0) {
         uint256 syntheticTokenPrice = syntheticTokenPriceSnapshot[marketIndex][isLong][
@@ -799,7 +800,7 @@ contract LongShort is ILongShort, Initializable {
     _depositFunds(marketIndex, amount);
 
     batchedAmountOfPaymentTokenToDeposit[marketIndex][isLong] += amount;
-    userNextPriceDepositAmount[marketIndex][isLong][msg.sender] += amount;
+    userNextPrice_depositAmount[marketIndex][isLong][msg.sender] += amount;
     userCurrentNextPriceUpdateIndex[marketIndex][msg.sender] = marketUpdateIndex[marketIndex] + 1;
 
     emit NextPriceDeposit(
@@ -852,7 +853,7 @@ contract LongShort is ILongShort, Initializable {
       )
     );
 
-    userNextPriceRedemptionAmount[marketIndex][isLong][msg.sender] += tokensToRedeem;
+    userNextPrice_redemptionAmount[marketIndex][isLong][msg.sender] += tokensToRedeem;
     userCurrentNextPriceUpdateIndex[marketIndex][msg.sender] = marketUpdateIndex[marketIndex] + 1;
 
     batchedAmountOfSynthTokensToRedeem[marketIndex][isLong] += tokensToRedeem;
@@ -957,9 +958,9 @@ contract LongShort is ILongShort, Initializable {
     address user,
     bool isLong
   ) internal virtual {
-    uint256 currentDepositAmount = userNextPriceDepositAmount[marketIndex][isLong][user];
+    uint256 currentDepositAmount = userNextPrice_depositAmount[marketIndex][isLong][user];
     if (currentDepositAmount > 0) {
-      userNextPriceDepositAmount[marketIndex][isLong][user] = 0;
+      userNextPrice_depositAmount[marketIndex][isLong][user] = 0;
       uint256 tokensToTransferToUser = _getAmountSynthToken(
         currentDepositAmount,
         syntheticTokenPriceSnapshot[marketIndex][isLong][
@@ -983,9 +984,9 @@ contract LongShort is ILongShort, Initializable {
     address user,
     bool isLong
   ) internal virtual {
-    uint256 currentRedemptions = userNextPriceRedemptionAmount[marketIndex][isLong][user];
+    uint256 currentRedemptions = userNextPrice_redemptionAmount[marketIndex][isLong][user];
     if (currentRedemptions > 0) {
-      userNextPriceRedemptionAmount[marketIndex][isLong][user] = 0;
+      userNextPrice_redemptionAmount[marketIndex][isLong][user] = 0;
       uint256 amountToRedeem = _getAmountPaymentToken(
         currentRedemptions,
         syntheticTokenPriceSnapshot[marketIndex][isLong][

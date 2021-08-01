@@ -301,7 +301,7 @@ let testUnit =
 
         let%AwaitThen updatedUserNextPriceRedemptionAmount =
           contracts.contents.longShort
-          ->LongShort.userNextPriceRedemptionAmount(
+          ->LongShort.userNextPrice_redemptionAmount(
               marketIndex,
               isLong,
               testWallet.address,
