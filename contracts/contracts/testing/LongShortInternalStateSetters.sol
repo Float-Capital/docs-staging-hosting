@@ -138,10 +138,10 @@ contract LongShortInternalStateSetters is LongShort {
     batched_amountOfSynthTokensToRedeem[marketIndex][
       false
     ] = batched_amountOfSynthTokensToRedeemShort;
-    batched_amountOfSynthTokensToShiftMarketSide[marketIndex][
+    batched_amountOfSynthTokensToShiftFromMarketSide[marketIndex][
       true
     ] = batchedAmountOfSynthTokensToShiftFromLong;
-    batched_amountOfSynthTokensToShiftMarketSide[marketIndex][
+    batched_amountOfSynthTokensToShiftFromMarketSide[marketIndex][
       false
     ] = batchedAmountOfSynthTokensToShiftFromShort;
   }
