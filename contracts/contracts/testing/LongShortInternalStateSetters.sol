@@ -119,27 +119,29 @@ contract LongShortInternalStateSetters is LongShort {
 
   function setPerformOustandingBatchedSettlementsGlobals(
     uint32 marketIndex,
-    uint256 batchedAmountOfPaymentTokenToDepositLong,
-    uint256 batchedAmountOfPaymentTokenToDepositShort,
-    uint256 batchedAmountOfSynthTokensToRedeemLong,
-    uint256 batchedAmountOfSynthTokensToRedeemShort,
+    uint256 batched_amountOfPaymentTokenToDepositLong,
+    uint256 batched_amountOfPaymentTokenToDepositShort,
+    uint256 batched_amountOfSynthTokensToRedeemLong,
+    uint256 batched_amountOfSynthTokensToRedeemShort,
     uint256 batchedAmountOfSynthTokensToShiftFromLong,
     uint256 batchedAmountOfSynthTokensToShiftFromShort
   ) external {
-    batchedAmountOfPaymentTokenToDeposit[marketIndex][
+    batched_amountOfPaymentTokenToDeposit[marketIndex][
       true
-    ] = batchedAmountOfPaymentTokenToDepositLong;
-    batchedAmountOfPaymentTokenToDeposit[marketIndex][
+    ] = batched_amountOfPaymentTokenToDepositLong;
+    batched_amountOfPaymentTokenToDeposit[marketIndex][
       false
-    ] = batchedAmountOfPaymentTokenToDepositShort;
-    batchedAmountOfSynthTokensToRedeem[marketIndex][true] = batchedAmountOfSynthTokensToRedeemLong;
-    batchedAmountOfSynthTokensToRedeem[marketIndex][
+    ] = batched_amountOfPaymentTokenToDepositShort;
+    batched_amountOfSynthTokensToRedeem[marketIndex][
+      true
+    ] = batched_amountOfSynthTokensToRedeemLong;
+    batched_amountOfSynthTokensToRedeem[marketIndex][
       false
-    ] = batchedAmountOfSynthTokensToRedeemShort;
-    batchedAmountOfSynthTokensToShiftMarketSide[marketIndex][
+    ] = batched_amountOfSynthTokensToRedeemShort;
+    batched_amountOfSynthTokensToShiftMarketSide[marketIndex][
       true
     ] = batchedAmountOfSynthTokensToShiftFromLong;
-    batchedAmountOfSynthTokensToShiftMarketSide[marketIndex][
+    batched_amountOfSynthTokensToShiftMarketSide[marketIndex][
       false
     ] = batchedAmountOfSynthTokensToShiftFromShort;
   }

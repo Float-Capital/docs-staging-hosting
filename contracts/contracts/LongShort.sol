@@ -60,9 +60,9 @@ contract LongShort is ILongShort, Initializable {
   mapping(uint32 => mapping(bool => mapping(uint256 => uint256)))
     public syntheticTokenPriceSnapshot;
 
-  mapping(uint32 => mapping(bool => uint256)) public batchedAmountOfPaymentTokenToDeposit;
-  mapping(uint32 => mapping(bool => uint256)) public batchedAmountOfSynthTokensToRedeem;
-  mapping(uint32 => mapping(bool => uint256)) public batchedAmountOfSynthTokensToShiftMarketSide;
+  mapping(uint32 => mapping(bool => uint256)) public batched_amountOfPaymentTokenToDeposit;
+  mapping(uint32 => mapping(bool => uint256)) public batched_amountOfSynthTokensToRedeem;
+  mapping(uint32 => mapping(bool => uint256)) public batched_amountOfSynthTokensToShiftMarketSide;
 
   // User specific
   mapping(uint32 => mapping(address => uint256)) public userNextPrice_currentUpdateIndex;
@@ -799,7 +799,7 @@ contract LongShort is ILongShort, Initializable {
   {
     _depositFunds(marketIndex, amount);
 
-    batchedAmountOfPaymentTokenToDeposit[marketIndex][isLong] += amount;
+    batched_amountOfPaymentTokenToDeposit[marketIndex][isLong] += amount;
     userNextPrice_depositAmount[marketIndex][isLong][msg.sender] += amount;
     userNextPrice_currentUpdateIndex[marketIndex][msg.sender] = marketUpdateIndex[marketIndex] + 1;
 
@@ -856,7 +856,7 @@ contract LongShort is ILongShort, Initializable {
     userNextPrice_redemptionAmount[marketIndex][isLong][msg.sender] += tokensToRedeem;
     userNextPrice_currentUpdateIndex[marketIndex][msg.sender] = marketUpdateIndex[marketIndex] + 1;
 
-    batchedAmountOfSynthTokensToRedeem[marketIndex][isLong] += tokensToRedeem;
+    batched_amountOfSynthTokensToRedeem[marketIndex][isLong] += tokensToRedeem;
 
     emit NextPriceRedeem(
       marketIndex,
@@ -913,7 +913,9 @@ contract LongShort is ILongShort, Initializable {
     ] += synthTokensToShift;
     userNextPrice_currentUpdateIndex[marketIndex][msg.sender] = marketUpdateIndex[marketIndex] + 1;
 
-    batchedAmountOfSynthTokensToShiftMarketSide[marketIndex][isShiftFromLong] += synthTokensToShift;
+    batched_amountOfSynthTokensToShiftMarketSide[marketIndex][
+      isShiftFromLong
+    ] += synthTokensToShift;
 
     emit NextPriceSyntheticPositionShift(
       marketIndex,
@@ -1154,48 +1156,48 @@ contract LongShort is ILongShort, Initializable {
 
 
       uint256 batchedAmountOfPaymentTokensToDepositOrShiftToLong
-     = batchedAmountOfPaymentTokenToDeposit[marketIndex][true];
+     = batched_amountOfPaymentTokenToDeposit[marketIndex][true];
 
 
       uint256 batchedAmountOfPaymentTokensToDepositOrShiftToShort
-     = batchedAmountOfPaymentTokenToDeposit[marketIndex][false];
+     = batched_amountOfPaymentTokenToDeposit[marketIndex][false];
 
     // NOTE: These variables currently only includes the amount to shift
     //       to save variable space (precious EVM stack) we share and update the same variable later to include the reedem.
 
 
-      uint256 batchedAmountOfSynthTokensToRedeemOrShiftFromLong
-     = batchedAmountOfSynthTokensToShiftMarketSide[marketIndex][true];
+      uint256 batched_amountOfSynthTokensToRedeemOrShiftFromLong
+     = batched_amountOfSynthTokensToShiftMarketSide[marketIndex][true];
 
 
-      uint256 batchedAmountOfSynthTokensToRedeemOrShiftFromShort
-     = batchedAmountOfSynthTokensToShiftMarketSide[marketIndex][false];
+      uint256 batched_amountOfSynthTokensToRedeemOrShiftFromShort
+     = batched_amountOfSynthTokensToShiftMarketSide[marketIndex][false];
 
     // Handle shift tokens from LONG to SHORT
-    if (batchedAmountOfSynthTokensToRedeemOrShiftFromLong > 0) {
+    if (batched_amountOfSynthTokensToRedeemOrShiftFromLong > 0) {
       batchedAmountOfPaymentTokensToDepositOrShiftToShort += _getAmountPaymentToken(
-        batchedAmountOfSynthTokensToRedeemOrShiftFromLong,
+        batched_amountOfSynthTokensToRedeemOrShiftFromLong,
         syntheticTokenPriceLong
       );
 
-      batchedAmountOfSynthTokensToShiftMarketSide[marketIndex][true] = 0;
+      batched_amountOfSynthTokensToShiftMarketSide[marketIndex][true] = 0;
     }
 
     // Handle shift tokens from SHORT to LONG
-    if (batchedAmountOfSynthTokensToRedeemOrShiftFromShort > 0) {
+    if (batched_amountOfSynthTokensToRedeemOrShiftFromShort > 0) {
       batchedAmountOfPaymentTokensToDepositOrShiftToLong += _getAmountPaymentToken(
-        batchedAmountOfSynthTokensToRedeemOrShiftFromShort,
+        batched_amountOfSynthTokensToRedeemOrShiftFromShort,
         syntheticTokenPriceShort
       );
 
-      batchedAmountOfSynthTokensToShiftMarketSide[marketIndex][false] = 0;
+      batched_amountOfSynthTokensToShiftMarketSide[marketIndex][false] = 0;
     }
 
     // Handle batched deposits LONG
     if (batchedAmountOfPaymentTokensToDepositOrShiftToLong > 0) {
       valueChangeForLong += int256(batchedAmountOfPaymentTokensToDepositOrShiftToLong);
 
-      batchedAmountOfPaymentTokenToDeposit[marketIndex][true] = 0;
+      batched_amountOfPaymentTokenToDeposit[marketIndex][true] = 0;
 
       longChangeInSynthTokensTotalSupply += int256(
         _getAmountSynthToken(
@@ -1209,7 +1211,7 @@ contract LongShort is ILongShort, Initializable {
     if (batchedAmountOfPaymentTokensToDepositOrShiftToShort > 0) {
       valueChangeForShort += int256(batchedAmountOfPaymentTokensToDepositOrShiftToShort);
 
-      batchedAmountOfPaymentTokenToDeposit[marketIndex][false] = 0;
+      batched_amountOfPaymentTokenToDeposit[marketIndex][false] = 0;
 
       shortChangeInSynthTokensTotalSupply += int256(
         _getAmountSynthToken(
@@ -1220,39 +1222,39 @@ contract LongShort is ILongShort, Initializable {
     }
 
     // Handle batched redeems LONG
-    batchedAmountOfSynthTokensToRedeemOrShiftFromLong += batchedAmountOfSynthTokensToRedeem[
+    batched_amountOfSynthTokensToRedeemOrShiftFromLong += batched_amountOfSynthTokensToRedeem[
       marketIndex
     ][true];
-    if (batchedAmountOfSynthTokensToRedeemOrShiftFromLong > 0) {
+    if (batched_amountOfSynthTokensToRedeemOrShiftFromLong > 0) {
       valueChangeForLong -= int256(
         _getAmountPaymentToken(
-          batchedAmountOfSynthTokensToRedeemOrShiftFromLong,
+          batched_amountOfSynthTokensToRedeemOrShiftFromLong,
           syntheticTokenPriceLong
         )
       );
       longChangeInSynthTokensTotalSupply -= int256(
-        batchedAmountOfSynthTokensToRedeemOrShiftFromLong
+        batched_amountOfSynthTokensToRedeemOrShiftFromLong
       );
 
-      batchedAmountOfSynthTokensToRedeem[marketIndex][true] = 0;
+      batched_amountOfSynthTokensToRedeem[marketIndex][true] = 0;
     }
 
     // Handle batched redeems SHORT
-    batchedAmountOfSynthTokensToRedeemOrShiftFromShort += batchedAmountOfSynthTokensToRedeem[
+    batched_amountOfSynthTokensToRedeemOrShiftFromShort += batched_amountOfSynthTokensToRedeem[
       marketIndex
     ][false];
-    if (batchedAmountOfSynthTokensToRedeemOrShiftFromShort > 0) {
+    if (batched_amountOfSynthTokensToRedeemOrShiftFromShort > 0) {
       valueChangeForShort -= int256(
         _getAmountPaymentToken(
-          batchedAmountOfSynthTokensToRedeemOrShiftFromShort,
+          batched_amountOfSynthTokensToRedeemOrShiftFromShort,
           syntheticTokenPriceShort
         )
       );
       shortChangeInSynthTokensTotalSupply -= int256(
-        batchedAmountOfSynthTokensToRedeemOrShiftFromShort
+        batched_amountOfSynthTokensToRedeemOrShiftFromShort
       );
 
-      batchedAmountOfSynthTokensToRedeem[marketIndex][false] = 0;
+      batched_amountOfSynthTokensToRedeem[marketIndex][false] = 0;
     }
 
     int256 totalValueChangeForMarket = valueChangeForLong + valueChangeForShort;

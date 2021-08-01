@@ -310,9 +310,9 @@ let testUnit =
 
         let%AwaitThen _ = setup(~isShiftFromLong, ~testWallet);
 
-        let%AwaitThen updatedBatchedAmountOfSynthTokensToShiftMarketSide =
+        let%AwaitThen updatedbatched_amountOfSynthTokensToShiftMarketSide =
           contracts.contents.longShort
-          ->LongShort.batchedAmountOfSynthTokensToShiftMarketSide(
+          ->LongShort.batched_amountOfSynthTokensToShiftMarketSide(
               marketIndex,
               isShiftFromLong,
             );
@@ -334,8 +334,8 @@ let testUnit =
 
         Chai.bnEqual(
           ~message=
-            "batchedAmountOfSynthTokensToShiftMarketSide not updated correctly",
-          updatedBatchedAmountOfSynthTokensToShiftMarketSide,
+            "batched_amountOfSynthTokensToShiftMarketSide not updated correctly",
+          updatedbatched_amountOfSynthTokensToShiftMarketSide,
           amount,
         );
 
