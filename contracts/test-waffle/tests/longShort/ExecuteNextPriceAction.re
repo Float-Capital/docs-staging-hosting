@@ -120,7 +120,7 @@ let testUnit =
               (isLong ? longSynthSmocked : shortSynthSmocked).contents
               ->SyntheticTokenSmocked.transferCalls;
             let expectedAmountOfSynthToRecieve =
-              Contract.LongShortHelpers.calcAmountSynthToken(
+              Contract.LongShortHelpers.calcAmountSyntheticToken(
                 ~amountPaymentToken=userNextPrice_redemptionAmount,
                 ~price=syntheticTokenPriceSnapshot,
               );
@@ -134,7 +134,7 @@ let testUnit =
             "should emit the ExecuteNextPriceMintSettlementUser event with the correct arguments",
             () => {
               let expectedAmountOfSynthToRecieve =
-                Contract.LongShortHelpers.calcAmountSynthToken(
+                Contract.LongShortHelpers.calcAmountSyntheticToken(
                   ~amountPaymentToken=userNextPrice_redemptionAmount,
                   ~price=syntheticTokenPriceSnapshot,
                 );
@@ -275,7 +275,7 @@ let testUnit =
               paymentTokenSmocked.contents->ERC20MockSmocked.transferCalls;
             let expectedAmountOfPaymentTokenToRecieve =
               Contract.LongShortHelpers.calcAmountPaymentToken(
-                ~amountSynthToken=userNextPrice_redemptionAmount,
+                ~amountSyntheticToken=userNextPrice_redemptionAmount,
                 ~price=syntheticTokenPriceSnapshot,
               );
             Chai.recordArrayDeepEqualFlat(
@@ -294,7 +294,7 @@ let testUnit =
             () => {
               let expectedAmountOfPaymentTokenToRecieve =
                 Contract.LongShortHelpers.calcAmountPaymentToken(
-                  ~amountSynthToken=userNextPrice_redemptionAmount,
+                  ~amountSyntheticToken=userNextPrice_redemptionAmount,
                   ~price=syntheticTokenPriceSnapshot,
                 );
 
@@ -368,7 +368,7 @@ let testUnit =
         );
       };
       let testExecuteOutstandingNextPriceRedeems = (~isShiftFromLong) => {
-        describe("synthTokensShiftedAwayFromMarketSide == 0", () => {
+        describe("syntheticTokensShiftedAwayFromMarketSide == 0", () => {
           let executeOutstandingNextPriceRedeemsTx =
             ref("Undefined"->Obj.magic);
 
@@ -452,12 +452,12 @@ let testUnit =
 
             let expectedAmountOfPaymentTokenToRecieve =
               Contract.LongShortHelpers.calcAmountPaymentToken(
-                ~amountSynthToken=userNextPrice_amountSynthToShiftFromMarketSide,
+                ~amountSyntheticToken=userNextPrice_amountSynthToShiftFromMarketSide,
                 ~price=syntheticTokenPriceSnapshotShiftedFrom,
               );
 
-            let expectedAmountOfOtherSynthTokenToRecieve =
-              Contract.LongShortHelpers.calcAmountSynthToken(
+            let expectedAmountOfOtherSyntheticTokenToRecieve =
+              Contract.LongShortHelpers.calcAmountSyntheticToken(
                 ~amountPaymentToken=expectedAmountOfPaymentTokenToRecieve,
                 ~price=syntheticTokenPriceSnapshotShiftedTo,
               );
@@ -466,7 +466,7 @@ let testUnit =
               [|
                 {
                   recipient: user,
-                  amount: expectedAmountOfOtherSynthTokenToRecieve,
+                  amount: expectedAmountOfOtherSyntheticTokenToRecieve,
                 },
               |],
             );
@@ -477,11 +477,11 @@ let testUnit =
             () => {
               let expectedAmountOfPaymentTokenToRecieve =
                 Contract.LongShortHelpers.calcAmountPaymentToken(
-                  ~amountSynthToken=userNextPrice_amountSynthToShiftFromMarketSide,
+                  ~amountSyntheticToken=userNextPrice_amountSynthToShiftFromMarketSide,
                   ~price=syntheticTokenPriceSnapshotShiftedFrom,
                 );
-              let expectedAmountOfOtherSynthTokenToRecieve =
-                Contract.LongShortHelpers.calcAmountSynthToken(
+              let expectedAmountOfOtherSyntheticTokenToRecieve =
+                Contract.LongShortHelpers.calcAmountSyntheticToken(
                   ~amountPaymentToken=expectedAmountOfPaymentTokenToRecieve,
                   ~price=syntheticTokenPriceSnapshotShiftedTo,
                 );
@@ -495,7 +495,7 @@ let testUnit =
                   user,
                   marketIndex,
                   isShiftFromLong,
-                  expectedAmountOfOtherSynthTokenToRecieve,
+                  expectedAmountOfOtherSyntheticTokenToRecieve,
                 );
             },
           );

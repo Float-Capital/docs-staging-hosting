@@ -245,7 +245,7 @@ let initializeStakerUnit = () => {
     LongShort.make(),
     FloatToken.make(),
     SyntheticToken.make(
-      ~name="baseTestSynthToken",
+      ~name="baseTestSyntheticToken",
       ~symbol="BTST",
       ~longShort=CONSTANTS.zeroAddress,
       ~staker=CONSTANTS.zeroAddress,
@@ -304,7 +304,7 @@ let initializeLongShortUnit = () => {
       ),
       OracleManagerMock.make(~admin=CONSTANTS.zeroAddress),
       SyntheticToken.make(
-        ~name="baseTestSynthToken",
+        ~name="baseTestSyntheticToken",
         ~symbol="BTST",
         ~longShort=CONSTANTS.zeroAddress,
         ~staker=CONSTANTS.zeroAddress,

@@ -89,7 +89,7 @@ contract StakerInternalStateSetters is Staker {
     uint32 marketIndex,
     bool isShiftFromLong,
     address user,
-    uint256 synthTokensToShift,
+    uint256 syntheticTokensToShift,
     uint256 _userAmountStaked,
     uint256 _shiftIndex,
     uint256 _nextTokenShiftIndex,
@@ -99,9 +99,9 @@ contract StakerInternalStateSetters is Staker {
     nextTokenShiftIndex[marketIndex] = _nextTokenShiftIndex;
 
     if (isShiftFromLong) {
-      amountToShiftFromLongUser[marketIndex][user] = synthTokensToShift;
+      amountToShiftFromLongUser[marketIndex][user] = syntheticTokensToShift;
     } else {
-      amountToShiftFromShortUser[marketIndex][user] = synthTokensToShift;
+      amountToShiftFromShortUser[marketIndex][user] = syntheticTokensToShift;
     }
 
     syntheticTokens[marketIndex][isShiftFromLong] = syntheticToken;

@@ -203,13 +203,13 @@ let testUnit =
     let marketIndex = 1;
     let marketUpdateIndex = Helpers.randomInteger();
     let amount = Helpers.randomTokenAmount();
-    let smockedSynthToken = ref(SyntheticTokenSmocked.uninitializedValue);
+    let smockedSyntheticToken = ref(SyntheticTokenSmocked.uninitializedValue);
 
     let setup = (~isLong, ~testWallet: Ethers.walletType) => {
       let {longSynth} = contracts.contents.markets->Array.getUnsafe(0);
       let%AwaitThen longSynthSmocked = longSynth->SyntheticTokenSmocked.make;
       longSynthSmocked->SyntheticTokenSmocked.mockTransferFromToReturn(true);
-      smockedSynthToken := longSynthSmocked;
+      smockedSyntheticToken := longSynthSmocked;
 
       let%AwaitThen _ =
         contracts.contents.longShort->LongShortSmocked.InternalMock.setup;
@@ -279,7 +279,8 @@ let testUnit =
         let%Await _ = setup(~isLong, ~testWallet);
 
         let transferFromCalls =
-          smockedSynthToken.contents->SyntheticTokenSmocked.transferFromCalls;
+          smockedSyntheticToken.contents
+          ->SyntheticTokenSmocked.transferFromCalls;
 
         transferFromCalls->Chai.recordArrayDeepEqualFlat([|
           {
@@ -295,9 +296,9 @@ let testUnit =
 
         let%AwaitThen _ = setup(~isLong, ~testWallet);
 
-        let%AwaitThen updatedbatched_amountOfSynthTokensToRedeem =
+        let%AwaitThen updatedbatched_amountOfSyntheticTokensToRedeem =
           contracts.contents.longShort
-          ->LongShort.batched_amountOfSynthTokensToRedeem(
+          ->LongShort.batched_amountOfSyntheticTokensToRedeem(
               marketIndex,
               isLong,
             );
@@ -318,8 +319,9 @@ let testUnit =
             );
 
         Chai.bnEqual(
-          ~message="batched_amountOfSynthTokensToRedeem not updated correctly",
-          updatedbatched_amountOfSynthTokensToRedeem,
+          ~message=
+            "batched_amountOfSyntheticTokensToRedeem not updated correctly",
+          updatedbatched_amountOfSyntheticTokensToRedeem,
           amount,
         );
 

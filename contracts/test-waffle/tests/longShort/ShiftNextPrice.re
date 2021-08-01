@@ -75,7 +75,7 @@ let testIntegration =
           let%AwaitThen _ =
             longShortUserConnected->redeemNextPriceFunction(
               ~marketIndex,
-              ~synthTokensToShift=usersBalanceAvailableForShift,
+              ~syntheticTokensToShift=usersBalanceAvailableForShift,
             );
           let%AwaitThen usersBalanceAfterNextPriceShift =
             fromSynth->SyntheticToken.balanceOf(~account=testUser.address);
@@ -87,7 +87,7 @@ let testIntegration =
             CONSTANTS.zeroBn,
           );
 
-          let%AwaitThen otherSynthTokenBalanceBeforeShift =
+          let%AwaitThen otherSyntheticTokenBalanceBeforeShift =
             toSynth->SyntheticToken.balanceOf(~account=testUser.address);
 
           let%AwaitThen previousPrice =
@@ -118,7 +118,7 @@ let testIntegration =
               latestUpdateIndex,
             );
 
-          let amountSynthTokenExpectedToRecieveOnOtherSide =
+          let amountSyntheticTokenExpectedToRecieveOnOtherSide =
             usersBalanceAvailableForShift
             ->mul(shiftPriceFromSynth)
             ->div(shiftPriceToSynth);
@@ -133,12 +133,14 @@ let testIntegration =
             toSynth->SyntheticToken.balanceOf(~account=testUser.address);
 
           let deltaBalanceChange =
-            toSynthBalanceAfterShift->sub(otherSynthTokenBalanceBeforeShift);
+            toSynthBalanceAfterShift->sub(
+              otherSyntheticTokenBalanceBeforeShift,
+            );
 
           Chai.bnEqual(
             ~message="Balance of paymentToken didn't update correctly",
             deltaBalanceChange,
-            amountSynthTokenExpectedToRecieveOnOtherSide,
+            amountSyntheticTokenExpectedToRecieveOnOtherSide,
           );
         },
       );
@@ -154,7 +156,7 @@ let testUnit =
     ) => {
   describe("shiftNextPrice external functions", () => {
     let marketIndex = 1;
-    let synthTokensToShift = Helpers.randomTokenAmount();
+    let syntheticTokensToShift = Helpers.randomTokenAmount();
 
     let setup = () => {
       contracts.contents.longShort->LongShortSmocked.InternalMock.setup;
@@ -174,14 +176,14 @@ let testUnit =
           contracts.contents.longShort
           ->LongShort.shiftPositionFromLongNextPrice(
               ~marketIndex,
-              ~synthTokensToShift,
+              ~syntheticTokensToShift,
             );
 
         let shiftPositionNextPriceCalls =
           LongShortSmocked.InternalMock._shiftPositionNextPriceCalls();
 
         shiftPositionNextPriceCalls->Chai.recordArrayDeepEqualFlat([|
-          {marketIndex, synthTokensToShift, isShiftFromLong: true},
+          {marketIndex, syntheticTokensToShift, isShiftFromLong: true},
         |]);
       })
     });
@@ -200,14 +202,14 @@ let testUnit =
           contracts.contents.longShort
           ->LongShort.shiftPositionFromShortNextPrice(
               ~marketIndex,
-              ~synthTokensToShift,
+              ~syntheticTokensToShift,
             );
 
         let shiftPositionNextPriceCalls =
           LongShortSmocked.InternalMock._shiftPositionNextPriceCalls();
 
         shiftPositionNextPriceCalls->Chai.recordArrayDeepEqualFlat([|
-          {marketIndex, synthTokensToShift, isShiftFromLong: false},
+          {marketIndex, syntheticTokensToShift, isShiftFromLong: false},
         |]);
       })
     });
@@ -217,7 +219,7 @@ let testUnit =
     let marketIndex = 1;
     let marketUpdateIndex = Helpers.randomInteger();
     let amount = Helpers.randomTokenAmount();
-    let smockedSynthToken = ref(SyntheticTokenSmocked.uninitializedValue);
+    let smockedSyntheticToken = ref(SyntheticTokenSmocked.uninitializedValue);
 
     let setup = (~isShiftFromLong, ~testWallet: Ethers.walletType) => {
       let {longShort, markets} = contracts.contents;
@@ -225,7 +227,7 @@ let testUnit =
 
       let%AwaitThen longSynthSmocked = longSynth->SyntheticTokenSmocked.make;
       longSynthSmocked->SyntheticTokenSmocked.mockTransferFromToReturn(true);
-      smockedSynthToken := longSynthSmocked;
+      smockedSyntheticToken := longSynthSmocked;
 
       let%AwaitThen _ = longShort->LongShortSmocked.InternalMock.setup;
 
@@ -246,7 +248,7 @@ let testUnit =
 
       longShort->LongShort.Exposed._shiftPositionNextPriceExposed(
         ~marketIndex,
-        ~synthTokensToShift=amount,
+        ~syntheticTokensToShift=amount,
         ~isShiftFromLong,
       );
     };
@@ -290,7 +292,8 @@ let testUnit =
         let%Await _ = setup(~isShiftFromLong, ~testWallet);
 
         let transferFrom =
-          smockedSynthToken.contents->SyntheticTokenSmocked.transferFromCalls;
+          smockedSyntheticToken.contents
+          ->SyntheticTokenSmocked.transferFromCalls;
 
         transferFrom->Chai.recordArrayDeepEqualFlat([|
           {
@@ -306,9 +309,9 @@ let testUnit =
 
         let%AwaitThen _ = setup(~isShiftFromLong, ~testWallet);
 
-        let%AwaitThen updatedbatched_amountOfSynthTokensToShiftMarketSide =
+        let%AwaitThen updatedbatched_amountOfSyntheticTokensToShiftMarketSide =
           contracts.contents.longShort
-          ->LongShort.batched_amountOfSynthTokensToShiftFromMarketSide(
+          ->LongShort.batched_amountOfSyntheticTokensToShiftFromMarketSide(
               marketIndex,
               isShiftFromLong,
             );
@@ -330,8 +333,8 @@ let testUnit =
 
         Chai.bnEqual(
           ~message=
-            "batched_amountOfSynthTokensToShiftMarketSide not updated correctly",
-          updatedbatched_amountOfSynthTokensToShiftMarketSide,
+            "batched_amountOfSyntheticTokensToShiftMarketSide not updated correctly",
+          updatedbatched_amountOfSyntheticTokensToShiftMarketSide,
           amount,
         );
 

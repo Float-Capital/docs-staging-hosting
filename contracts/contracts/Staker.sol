@@ -122,7 +122,7 @@ contract Staker is IStaker, Initializable {
 
   event FloatPercentageUpdated(uint256 floatPercentage);
 
-  event SynthTokensShifted();
+  event SyntheticTokensShifted();
 
   /*╔═════════════════════════════╗
     ║          MODIFIERS          ║
@@ -566,7 +566,7 @@ contract Staker is IStaker, Initializable {
         1;
       nextTokenShiftIndex[marketIndex] += 1;
 
-      emit SynthTokensShifted();
+      emit SyntheticTokensShifted();
     }
 
     // Time delta is fetched twice in below code, can pass through? Which is less gas?
@@ -633,7 +633,7 @@ contract Staker is IStaker, Initializable {
 
       // Update the users balances
       if (amountToShiftFromLongUser[marketIndex][user] > 0) {
-        amountStakedShort += ILongShort(longShort).getAmountSynthTokenToMintOnTargetSide(
+        amountStakedShort += ILongShort(longShort).getAmountSyntheticTokenToMintOnTargetSide(
           marketIndex,
           amountToShiftFromLongUser[marketIndex][user],
           true,
@@ -645,7 +645,7 @@ contract Staker is IStaker, Initializable {
       }
 
       if (amountToShiftFromShortUser[marketIndex][user] > 0) {
-        amountStakedLong += ILongShort(longShort).getAmountSynthTokenToMintOnTargetSide(
+        amountStakedLong += ILongShort(longShort).getAmountSyntheticTokenToMintOnTargetSide(
           marketIndex,
           amountToShiftFromShortUser[marketIndex][user],
           false,
@@ -791,13 +791,13 @@ contract Staker is IStaker, Initializable {
 
   // Token shifting
   function shiftTokens(
-    uint256 synthTokensToShift,
+    uint256 syntheticTokensToShift,
     uint32 marketIndex,
     bool isShiftFromLong
   ) external virtual {
     address token = syntheticTokens[marketIndex][isShiftFromLong];
     require(
-      userAmountStaked[token][msg.sender] >= synthTokensToShift,
+      userAmountStaked[token][msg.sender] >= syntheticTokensToShift,
       "Not enough tokens to shift"
     );
 
@@ -811,11 +811,11 @@ contract Staker is IStaker, Initializable {
     }
 
     if (isShiftFromLong) {
-      ILongShort(longShort).shiftPositionFromLongNextPrice(marketIndex, synthTokensToShift);
-      amountToShiftFromLongUser[marketIndex][msg.sender] += synthTokensToShift;
+      ILongShort(longShort).shiftPositionFromLongNextPrice(marketIndex, syntheticTokensToShift);
+      amountToShiftFromLongUser[marketIndex][msg.sender] += syntheticTokensToShift;
     } else {
-      ILongShort(longShort).shiftPositionFromShortNextPrice(marketIndex, synthTokensToShift);
-      amountToShiftFromShortUser[marketIndex][msg.sender] += synthTokensToShift;
+      ILongShort(longShort).shiftPositionFromShortNextPrice(marketIndex, syntheticTokensToShift);
+      amountToShiftFromShortUser[marketIndex][msg.sender] += syntheticTokensToShift;
     }
 
     shiftIndex[marketIndex][msg.sender] = nextTokenShiftIndex[marketIndex];

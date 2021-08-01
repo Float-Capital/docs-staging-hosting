@@ -179,8 +179,8 @@ const redeemShortNextPriceWithSystemUpdate = async (
 };
 
 const stakeSynth = async (amount, synth, user) => {
-  const usersSynthTokenBalance = new BN(await synth.balanceOf(user));
-  if (usersSynthTokenBalance.gt(new BN("0"))) {
+  const usersSyntheticTokenBalance = new BN(await synth.balanceOf(user));
+  if (usersSyntheticTokenBalance.gt(new BN("0"))) {
     await synth.stake(new BN(amount), { from: user });
   } else {
     console.log("user doesn't have any synth tokens");

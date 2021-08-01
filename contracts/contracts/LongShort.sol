@@ -61,9 +61,9 @@ contract LongShort is ILongShort, Initializable {
     public syntheticTokenPriceSnapshot;
 
   mapping(uint32 => mapping(bool => uint256)) public batched_amountOfPaymentTokenToDeposit;
-  mapping(uint32 => mapping(bool => uint256)) public batched_amountOfSynthTokensToRedeem;
+  mapping(uint32 => mapping(bool => uint256)) public batched_amountOfSyntheticTokensToRedeem;
   mapping(uint32 => mapping(bool => uint256))
-    public batched_amountOfSynthTokensToShiftFromMarketSide;
+    public batched_amountOfSyntheticTokensToShiftFromMarketSide;
 
   // User specific
   mapping(uint32 => mapping(address => uint256)) public userNextPrice_currentUpdateIndex;
@@ -385,54 +385,52 @@ contract LongShort is ILongShort, Initializable {
   /// @notice Calculates the conversion rate from synthetic tokens to payment tokens.
   /// @dev Synth tokens have a fixed 18 decimals.
   /// @param amountPaymentTokenBackingSynth Amount of payment tokens in that token's lowest denomination.
-  /// @param amountSynthToken Amount of synth token in wei.
+  /// @param amountSyntheticToken Amount of synth token in wei.
   /// @return syntheticTokenPrice The calculated conversion rate in base 1e18.
-  function _getSyntheticTokenPrice(uint256 amountPaymentTokenBackingSynth, uint256 amountSynthToken)
-    internal
-    pure
-    virtual
-    returns (uint256 syntheticTokenPrice)
-  {
-    return (amountPaymentTokenBackingSynth * 1e18) / amountSynthToken;
+  function _getSyntheticTokenPrice(
+    uint256 amountPaymentTokenBackingSynth,
+    uint256 amountSyntheticToken
+  ) internal pure virtual returns (uint256 syntheticTokenPrice) {
+    return (amountPaymentTokenBackingSynth * 1e18) / amountSyntheticToken;
   }
 
   /// @notice Converts synth token amounts to payment token amounts at a synth token price.
   /// @dev Price assumed base 1e18.
-  /// @param amountSynthToken Amount of synth token in wei.
+  /// @param amountSyntheticToken Amount of synth token in wei.
   /// @param syntheticTokenPriceInPaymentTokens The conversion rate from synth to payment tokens in base 1e18.
   /// @return amountPaymentToken The calculated amount of payment tokens in token's lowest denomination.
   function _getAmountPaymentToken(
-    uint256 amountSynthToken,
+    uint256 amountSyntheticToken,
     uint256 syntheticTokenPriceInPaymentTokens
   ) internal pure virtual returns (uint256 amountPaymentToken) {
-    return (amountSynthToken * syntheticTokenPriceInPaymentTokens) / 1e18;
+    return (amountSyntheticToken * syntheticTokenPriceInPaymentTokens) / 1e18;
   }
 
   /// @notice Converts payment token amounts to synth token amounts at a synth token price.
   /// @dev  Price assumed base 1e18.
   /// @param amountPaymentTokenBackingSynth Amount of payment tokens in that token's lowest denomination.
   /// @param syntheticTokenPriceInPaymentTokens The conversion rate from synth to payment tokens in base 1e18.
-  /// @return amountSynthToken The calculated amount of synthetic token in wei.
-  function _getAmountSynthToken(
+  /// @return amountSyntheticToken The calculated amount of synthetic token in wei.
+  function _getAmountSyntheticToken(
     uint256 amountPaymentTokenBackingSynth,
     uint256 syntheticTokenPriceInPaymentTokens
-  ) internal pure virtual returns (uint256 amountSynthToken) {
+  ) internal pure virtual returns (uint256 amountSyntheticToken) {
     return (amountPaymentTokenBackingSynth * 1e18) / syntheticTokenPriceInPaymentTokens;
   }
 
   /// @notice Given an executed next price shift from tokens on one market side to the other, determines how many other side tokens the shift was worth.
   /// @dev Intended for use primarily by Staker.sol
   /// @param marketIndex An uint32 which uniquely identifies a market.
-  /// @param amountSynthTokenToRedeemOnOriginSide Amount of synth token in wei.
+  /// @param amountSyntheticTokenToRedeemOnOriginSide Amount of synth token in wei.
   /// @param isShiftFromLong Whether the token shift is from long to short (true), or short to long (false).
   /// @param priceSnapshotIndex Index which identifies which synth prices to use.
-  /// @return amountSynthTokensToMintOnTargetSide The amount in wei of tokens for the other side that the shift was worth.
-  function getAmountSynthTokenToMintOnTargetSide(
+  /// @return amountSyntheticTokensToMintOnTargetSide The amount in wei of tokens for the other side that the shift was worth.
+  function getAmountSyntheticTokenToMintOnTargetSide(
     uint32 marketIndex,
-    uint256 amountSynthTokenToRedeemOnOriginSide,
+    uint256 amountSyntheticTokenToRedeemOnOriginSide,
     bool isShiftFromLong,
     uint256 priceSnapshotIndex
-  ) public view virtual override returns (uint256 amountSynthTokensToMintOnTargetSide) {
+  ) public view virtual override returns (uint256 amountSyntheticTokensToMintOnTargetSide) {
     uint256 syntheticTokenPriceOnOriginSide = syntheticTokenPriceSnapshot[marketIndex][
       isShiftFromLong
     ][priceSnapshotIndex];
@@ -440,8 +438,8 @@ contract LongShort is ILongShort, Initializable {
       !isShiftFromLong
     ][priceSnapshotIndex];
 
-    amountSynthTokensToMintOnTargetSide = _getEquivalentAmountSynthTokensOnTargetSide(
-      amountSynthTokenToRedeemOnOriginSide,
+    amountSyntheticTokensToMintOnTargetSide = _getEquivalentAmountSyntheticTokensOnTargetSide(
+      amountSyntheticTokenToRedeemOnOriginSide,
       syntheticTokenPriceOnOriginSide,
       syntheticTokenPriceOnTargetSide
     );
@@ -487,18 +485,18 @@ contract LongShort is ILongShort, Initializable {
           currentMarketUpdateIndex
         ];
 
-        confirmedButNotSettledBalance += _getAmountSynthToken(
+        confirmedButNotSettledBalance += _getAmountSyntheticToken(
           amountPaymentTokenDeposited,
           syntheticTokenPrice
         );
       }
 
 
-        uint256 amountSynthTokensToBeShiftedAwayFromOriginSide
+        uint256 amountSyntheticTokensToBeShiftedAwayFromOriginSide
        = userNextPrice_amountSynthToShiftFromMarketSide[marketIndex][!isLong][user];
 
       // TODO STENT optimize this like https://github.com/Float-Capital/monorepo/pull/990
-      if (amountSynthTokensToBeShiftedAwayFromOriginSide > 0) {
+      if (amountSyntheticTokensToBeShiftedAwayFromOriginSide > 0) {
         uint256 syntheticTokenPriceOnOriginSide = syntheticTokenPriceSnapshot[marketIndex][!isLong][
           currentMarketUpdateIndex
         ];
@@ -506,8 +504,8 @@ contract LongShort is ILongShort, Initializable {
           currentMarketUpdateIndex
         ];
 
-        confirmedButNotSettledBalance += _getEquivalentAmountSynthTokensOnTargetSide(
-          amountSynthTokensToBeShiftedAwayFromOriginSide,
+        confirmedButNotSettledBalance += _getEquivalentAmountSyntheticTokensOnTargetSide(
+          amountSyntheticTokensToBeShiftedAwayFromOriginSide,
           syntheticTokenPriceOnOriginSide,
           syntheticTokenPriceOnTargetSide
         );
@@ -519,7 +517,7 @@ contract LongShort is ILongShort, Initializable {
   ///         amount of payment tokens as X many synthetic tokens on side A.
   ///
   /// The resulting equation comes from simplifying this function combo:
-  /// _getAmountSynthToken(
+  /// _getAmountSyntheticToken(
   ///   _getAmountPaymentToken(
   ///     amountOriginSynth,
   ///     priceOriginSynth
@@ -532,17 +530,17 @@ contract LongShort is ILongShort, Initializable {
   /// And simplifying this we get:
   /// (amountOriginSynth * priceOriginSynth) / priceTagretSynth
   ///
-  /// @param amountSynthTokensOnSideA Amount of synthetic tokens on side A
+  /// @param amountSyntheticTokensOnSideA Amount of synthetic tokens on side A
   /// @param syntheticTokenPriceOnSideA Price of side A's synthetic token
   /// @param syntheticTokenPriceOnSideB Price of side B's synthetic token
-  /// @return equivalentAmountSynthTokensOnTargetSide Amount of synthetic token on side B
-  function _getEquivalentAmountSynthTokensOnTargetSide(
-    uint256 amountSynthTokensOnSideA,
+  /// @return equivalentAmountSyntheticTokensOnTargetSide Amount of synthetic token on side B
+  function _getEquivalentAmountSyntheticTokensOnTargetSide(
+    uint256 amountSyntheticTokensOnSideA,
     uint256 syntheticTokenPriceOnSideA,
     uint256 syntheticTokenPriceOnSideB
-  ) internal pure virtual returns (uint256 equivalentAmountSynthTokensOnTargetSide) {
-    equivalentAmountSynthTokensOnTargetSide =
-      (amountSynthTokensOnSideA * syntheticTokenPriceOnSideA) /
+  ) internal pure virtual returns (uint256 equivalentAmountSyntheticTokensOnTargetSide) {
+    equivalentAmountSyntheticTokensOnTargetSide =
+      (amountSyntheticTokensOnSideA * syntheticTokenPriceOnSideA) /
       syntheticTokenPriceOnSideB;
   }
 
@@ -856,7 +854,7 @@ contract LongShort is ILongShort, Initializable {
     userNextPrice_redemptionAmount[marketIndex][isLong][msg.sender] += tokensToRedeem;
     userNextPrice_currentUpdateIndex[marketIndex][msg.sender] = marketUpdateIndex[marketIndex] + 1;
 
-    batched_amountOfSynthTokensToRedeem[marketIndex][isLong] += tokensToRedeem;
+    batched_amountOfSyntheticTokensToRedeem[marketIndex][isLong] += tokensToRedeem;
 
     emit NextPriceRedeem(
       marketIndex,
@@ -888,11 +886,11 @@ contract LongShort is ILongShort, Initializable {
   /// @notice  Allows users to shift their position from one side of the market to the other in a single transaction. To prevent front-running these shifts are executed on the next price update from the oracle.
   /// @dev Called by external functions to shift either way. Intended for primary use by Staker.sol
   /// @param marketIndex An int32 which uniquely identifies a market.
-  /// @param synthTokensToShift Amount in wei of synthetic tokens to shift from the one side to the other at the next oracle price update.
+  /// @param syntheticTokensToShift Amount in wei of synthetic tokens to shift from the one side to the other at the next oracle price update.
   /// @param isShiftFromLong Whether the token shift is from long to short (true), or short to long (false).
   function _shiftPositionNextPrice(
     uint32 marketIndex,
-    uint256 synthTokensToShift,
+    uint256 syntheticTokensToShift,
     bool isShiftFromLong
   )
     internal
@@ -904,23 +902,23 @@ contract LongShort is ILongShort, Initializable {
       ISyntheticToken(syntheticTokens[marketIndex][isShiftFromLong]).transferFrom(
         msg.sender,
         address(this),
-        synthTokensToShift
+        syntheticTokensToShift
       )
     );
 
     userNextPrice_amountSynthToShiftFromMarketSide[marketIndex][isShiftFromLong][
       msg.sender
-    ] += synthTokensToShift;
+    ] += syntheticTokensToShift;
     userNextPrice_currentUpdateIndex[marketIndex][msg.sender] = marketUpdateIndex[marketIndex] + 1;
 
-    batched_amountOfSynthTokensToShiftFromMarketSide[marketIndex][
+    batched_amountOfSyntheticTokensToShiftFromMarketSide[marketIndex][
       isShiftFromLong
-    ] += synthTokensToShift;
+    ] += syntheticTokensToShift;
 
     emit NextPriceSyntheticPositionShift(
       marketIndex,
       isShiftFromLong,
-      synthTokensToShift,
+      syntheticTokensToShift,
       msg.sender,
       marketUpdateIndex[marketIndex] + 1
     );
@@ -928,22 +926,22 @@ contract LongShort is ILongShort, Initializable {
 
   /// @notice Allows users to shift their position from long to short in a single transaction. To prevent front-running these shifts are executed on the next price update from the oracle.
   /// @param marketIndex An int32 which uniquely identifies a market.
-  /// @param synthTokensToShift Amount in wei of synthetic tokens to shift from long to short the next oracle price update.
-  function shiftPositionFromLongNextPrice(uint32 marketIndex, uint256 synthTokensToShift)
+  /// @param syntheticTokensToShift Amount in wei of synthetic tokens to shift from long to short the next oracle price update.
+  function shiftPositionFromLongNextPrice(uint32 marketIndex, uint256 syntheticTokensToShift)
     external
     override
   {
-    _shiftPositionNextPrice(marketIndex, synthTokensToShift, true);
+    _shiftPositionNextPrice(marketIndex, syntheticTokensToShift, true);
   }
 
   /// @notice Allows users to shift their position from short to long in a single transaction. To prevent front-running these shifts are executed on the next price update from the oracle.
   /// @param marketIndex An int32 which uniquely identifies a market.
-  /// @param synthTokensToShift Amount in wei of synthetic tokens to shift from the short to long at the next oracle price update.
-  function shiftPositionFromShortNextPrice(uint32 marketIndex, uint256 synthTokensToShift)
+  /// @param syntheticTokensToShift Amount in wei of synthetic tokens to shift from the short to long at the next oracle price update.
+  function shiftPositionFromShortNextPrice(uint32 marketIndex, uint256 syntheticTokensToShift)
     external
     override
   {
-    _shiftPositionNextPrice(marketIndex, synthTokensToShift, false);
+    _shiftPositionNextPrice(marketIndex, syntheticTokensToShift, false);
   }
 
   /*╔════════════════════════════════╗
@@ -963,7 +961,7 @@ contract LongShort is ILongShort, Initializable {
     uint256 currentDepositAmount = userNextPrice_depositAmount[marketIndex][isLong][user];
     if (currentDepositAmount > 0) {
       userNextPrice_depositAmount[marketIndex][isLong][user] = 0;
-      uint256 tokensToTransferToUser = _getAmountSynthToken(
+      uint256 tokensToTransferToUser = _getAmountSyntheticToken(
         currentDepositAmount,
         syntheticTokenPriceSnapshot[marketIndex][isLong][
           userNextPrice_currentUpdateIndex[marketIndex][user]
@@ -1012,13 +1010,13 @@ contract LongShort is ILongShort, Initializable {
     address user,
     bool isShiftFromLong
   ) internal virtual {
-    uint256 synthTokensShiftedAwayFromMarketSide = userNextPrice_amountSynthToShiftFromMarketSide[
-      marketIndex
-    ][isShiftFromLong][user];
-    if (synthTokensShiftedAwayFromMarketSide > 0) {
-      uint256 amountSynthTokenToShiftToOppositeSide = getAmountSynthTokenToMintOnTargetSide(
+
+      uint256 syntheticTokensShiftedAwayFromMarketSide
+     = userNextPrice_amountSynthToShiftFromMarketSide[marketIndex][isShiftFromLong][user];
+    if (syntheticTokensShiftedAwayFromMarketSide > 0) {
+      uint256 amountSyntheticTokenToShiftToOppositeSide = getAmountSyntheticTokenToMintOnTargetSide(
         marketIndex,
-        synthTokensShiftedAwayFromMarketSide,
+        syntheticTokensShiftedAwayFromMarketSide,
         isShiftFromLong,
         userNextPrice_currentUpdateIndex[marketIndex][user]
       );
@@ -1028,7 +1026,7 @@ contract LongShort is ILongShort, Initializable {
       require(
         ISyntheticToken(syntheticTokens[marketIndex][!isShiftFromLong]).transfer(
           user,
-          amountSynthTokenToShiftToOppositeSide
+          amountSyntheticTokenToShiftToOppositeSide
         )
       );
 
@@ -1036,7 +1034,7 @@ contract LongShort is ILongShort, Initializable {
         user,
         marketIndex,
         isShiftFromLong,
-        amountSynthTokenToShiftToOppositeSide
+        amountSyntheticTokenToShiftToOppositeSide
       );
     }
   }
@@ -1115,20 +1113,20 @@ contract LongShort is ILongShort, Initializable {
   /// @dev When all batched next price actions are executed total supply for a synth can either increase or decrease.
   /// @param marketIndex An int32 which uniquely identifies a market.
   /// @param isLong Whether this function should execute for the long or short synth for the market.
-  /// @param changeInSynthTokensTotalSupply The amount in wei by which synth token supply should change.
-  function _handleChangeInSynthTokensTotalSupply(
+  /// @param changeInSyntheticTokensTotalSupply The amount in wei by which synth token supply should change.
+  function _handleChangeInSyntheticTokensTotalSupply(
     uint32 marketIndex,
     bool isLong,
-    int256 changeInSynthTokensTotalSupply
+    int256 changeInSyntheticTokensTotalSupply
   ) internal virtual {
-    if (changeInSynthTokensTotalSupply > 0) {
+    if (changeInSyntheticTokensTotalSupply > 0) {
       ISyntheticToken(syntheticTokens[marketIndex][isLong]).mint(
         address(this),
-        uint256(changeInSynthTokensTotalSupply)
+        uint256(changeInSyntheticTokensTotalSupply)
       );
-    } else if (changeInSynthTokensTotalSupply < 0) {
+    } else if (changeInSyntheticTokensTotalSupply < 0) {
       ISyntheticToken(syntheticTokens[marketIndex][isLong]).burn(
-        uint256(-changeInSynthTokensTotalSupply)
+        uint256(-changeInSyntheticTokensTotalSupply)
       );
     }
   }
@@ -1157,14 +1155,14 @@ contract LongShort is ILongShort, Initializable {
     virtual
     returns (int256 paymentTokenValueChangeForLong, int256 paymentTokenValueChangeForShort)
   {
-    int256 longChangeInSynthTokensTotalSupply;
-    int256 shortChangeInSynthTokensTotalSupply;
+    int256 longChangeInSyntheticTokensTotalSupply;
+    int256 shortChangeInSyntheticTokensTotalSupply;
 
     // NOTE: the only reason we are re-uising this for all actions (redeemLong, redeemShort, mintLong, mintShort, shiftFromLong, shiftFromShort) is to reduce stack usage
 
 
       uint256 amountForCurrentActionWorkingVariable
-     = batched_amountOfSynthTokensToShiftFromMarketSide[marketIndex][true];
+     = batched_amountOfSyntheticTokensToShiftFromMarketSide[marketIndex][true];
 
     // Handle shift tokens from LONG to SHORT
     if (amountForCurrentActionWorkingVariable > 0) {
@@ -1175,20 +1173,20 @@ contract LongShort is ILongShort, Initializable {
       paymentTokenValueChangeForLong -= paymentTokenValueChangeForShiftToShort;
       paymentTokenValueChangeForShort += paymentTokenValueChangeForShiftToShort;
 
-      longChangeInSynthTokensTotalSupply -= int256(amountForCurrentActionWorkingVariable);
-      shortChangeInSynthTokensTotalSupply += int256(
-        _getEquivalentAmountSynthTokensOnTargetSide(
+      longChangeInSyntheticTokensTotalSupply -= int256(amountForCurrentActionWorkingVariable);
+      shortChangeInSyntheticTokensTotalSupply += int256(
+        _getEquivalentAmountSyntheticTokensOnTargetSide(
           amountForCurrentActionWorkingVariable,
           syntheticTokenPriceLong,
           syntheticTokenPriceShort
         )
       );
 
-      batched_amountOfSynthTokensToShiftFromMarketSide[marketIndex][true] = 0;
+      batched_amountOfSyntheticTokensToShiftFromMarketSide[marketIndex][true] = 0;
     }
 
     // Handle shift tokens from SHORT to LONG
-    amountForCurrentActionWorkingVariable = batched_amountOfSynthTokensToShiftFromMarketSide[
+    amountForCurrentActionWorkingVariable = batched_amountOfSyntheticTokensToShiftFromMarketSide[
       marketIndex
     ][false];
     if (amountForCurrentActionWorkingVariable > 0) {
@@ -1199,16 +1197,16 @@ contract LongShort is ILongShort, Initializable {
       paymentTokenValueChangeForShort -= paymentTokenValueChangeForShiftToLong;
       paymentTokenValueChangeForLong += paymentTokenValueChangeForShiftToLong;
 
-      shortChangeInSynthTokensTotalSupply -= int256(amountForCurrentActionWorkingVariable);
-      longChangeInSynthTokensTotalSupply += int256(
-        _getEquivalentAmountSynthTokensOnTargetSide(
+      shortChangeInSyntheticTokensTotalSupply -= int256(amountForCurrentActionWorkingVariable);
+      longChangeInSyntheticTokensTotalSupply += int256(
+        _getEquivalentAmountSyntheticTokensOnTargetSide(
           amountForCurrentActionWorkingVariable,
           syntheticTokenPriceShort,
           syntheticTokenPriceLong
         )
       );
 
-      batched_amountOfSynthTokensToShiftFromMarketSide[marketIndex][true] = 0;
+      batched_amountOfSyntheticTokensToShiftFromMarketSide[marketIndex][true] = 0;
     }
 
     // Handle batched deposits LONG
@@ -1220,8 +1218,8 @@ contract LongShort is ILongShort, Initializable {
 
       batched_amountOfPaymentTokenToDeposit[marketIndex][true] = 0;
 
-      longChangeInSynthTokensTotalSupply += int256(
-        _getAmountSynthToken(amountForCurrentActionWorkingVariable, syntheticTokenPriceLong)
+      longChangeInSyntheticTokensTotalSupply += int256(
+        _getAmountSyntheticToken(amountForCurrentActionWorkingVariable, syntheticTokenPriceLong)
       );
     }
 
@@ -1234,32 +1232,35 @@ contract LongShort is ILongShort, Initializable {
 
       batched_amountOfPaymentTokenToDeposit[marketIndex][false] = 0;
 
-      shortChangeInSynthTokensTotalSupply += int256(
-        _getAmountSynthToken(amountForCurrentActionWorkingVariable, syntheticTokenPriceShort)
+      shortChangeInSyntheticTokensTotalSupply += int256(
+        _getAmountSyntheticToken(amountForCurrentActionWorkingVariable, syntheticTokenPriceShort)
       );
     }
 
     // Handle batched redeems LONG
-    amountForCurrentActionWorkingVariable = batched_amountOfSynthTokensToRedeem[marketIndex][true];
+    amountForCurrentActionWorkingVariable = batched_amountOfSyntheticTokensToRedeem[marketIndex][
+      true
+    ];
     if (amountForCurrentActionWorkingVariable > 0) {
       paymentTokenValueChangeForLong -= int256(
         _getAmountPaymentToken(amountForCurrentActionWorkingVariable, syntheticTokenPriceLong)
       );
-      longChangeInSynthTokensTotalSupply -= int256(amountForCurrentActionWorkingVariable);
+      longChangeInSyntheticTokensTotalSupply -= int256(amountForCurrentActionWorkingVariable);
 
-      batched_amountOfSynthTokensToRedeem[marketIndex][true] = 0;
+      batched_amountOfSyntheticTokensToRedeem[marketIndex][true] = 0;
     }
 
     // Handle batched redeems SHORT
-
-    amountForCurrentActionWorkingVariable = batched_amountOfSynthTokensToRedeem[marketIndex][false];
+    amountForCurrentActionWorkingVariable = batched_amountOfSyntheticTokensToRedeem[marketIndex][
+      false
+    ];
     if (amountForCurrentActionWorkingVariable > 0) {
       paymentTokenValueChangeForShort -= int256(
         _getAmountPaymentToken(amountForCurrentActionWorkingVariable, syntheticTokenPriceShort)
       );
-      shortChangeInSynthTokensTotalSupply -= int256(amountForCurrentActionWorkingVariable);
+      shortChangeInSyntheticTokensTotalSupply -= int256(amountForCurrentActionWorkingVariable);
 
-      batched_amountOfSynthTokensToRedeem[marketIndex][true] = 0;
+      batched_amountOfSyntheticTokensToRedeem[marketIndex][false] = 0;
     }
 
     // Batch settle payment tokens
@@ -1268,7 +1269,15 @@ contract LongShort is ILongShort, Initializable {
       paymentTokenValueChangeForLong + paymentTokenValueChangeForShort
     );
     // Batch settle synthetic tokens
-    _handleChangeInSynthTokensTotalSupply(marketIndex, true, longChangeInSynthTokensTotalSupply);
-    _handleChangeInSynthTokensTotalSupply(marketIndex, false, shortChangeInSynthTokensTotalSupply);
+    _handleChangeInSyntheticTokensTotalSupply(
+      marketIndex,
+      true,
+      longChangeInSyntheticTokensTotalSupply
+    );
+    _handleChangeInSyntheticTokensTotalSupply(
+      marketIndex,
+      false,
+      shortChangeInSyntheticTokensTotalSupply
+    );
   }
 }

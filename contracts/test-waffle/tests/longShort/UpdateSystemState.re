@@ -138,7 +138,7 @@ let testUnit =
         let%AwaitThen predictedLongPrice =
           longShort->LongShort.Exposed._getSyntheticTokenPriceExposed(
             ~amountPaymentTokenBackingSynth=oldLongValueAfterYield,
-            ~amountSynthToken=longSynthSupply,
+            ~amountSyntheticToken=longSynthSupply,
           );
 
         potentialNewLongPrice := predictedLongPrice;
@@ -146,7 +146,7 @@ let testUnit =
         let%AwaitThen predictedShortPrice =
           longShort->LongShort.Exposed._getSyntheticTokenPriceExposed(
             ~amountPaymentTokenBackingSynth=oldShortValueAfterYield,
-            ~amountSynthToken=shortSynthSupply,
+            ~amountSyntheticToken=shortSynthSupply,
           );
 
         potentialNewShortPrice := predictedShortPrice;

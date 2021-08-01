@@ -64,24 +64,26 @@ module LongShortHelpers = {
 
     syntheticTokenPrice;
   };
-  let calcSyntheticTokenPrice = (~amountPaymentToken, ~amountSynthToken) => {
-    amountPaymentToken->mul(CONSTANTS.tenToThe18)->div(amountSynthToken);
+  let calcSyntheticTokenPrice = (~amountPaymentToken, ~amountSyntheticToken) => {
+    amountPaymentToken->mul(CONSTANTS.tenToThe18)->div(amountSyntheticToken);
   };
-  let calcAmountPaymentToken = (~amountSynthToken, ~price) => {
-    amountSynthToken->mul(price)->div(CONSTANTS.tenToThe18);
+  let calcAmountPaymentToken = (~amountSyntheticToken, ~price) => {
+    amountSyntheticToken->mul(price)->div(CONSTANTS.tenToThe18);
   };
-  let calcAmountSynthToken = (~amountPaymentToken, ~price) => {
+  let calcAmountSyntheticToken = (~amountPaymentToken, ~price) => {
     amountPaymentToken->mul(CONSTANTS.tenToThe18)->div(price);
   };
-  let calcEquivalentAmountSynthTokensOnTargetSide =
-      (~amountSynthTokenOriginSide, ~priceOriginSide, ~priceTargetSide) => {
-    amountSynthTokenOriginSide->mul(priceOriginSide)->div(priceTargetSide);
+  let calcEquivalentAmountSyntheticTokensOnTargetSide =
+      (~amountSyntheticTokenOriginSide, ~priceOriginSide, ~priceTargetSide) => {
+    amountSyntheticTokenOriginSide
+    ->mul(priceOriginSide)
+    ->div(priceTargetSide);
   };
 };
 
 module SyntheticTokenHelpers = {
-  let getIsLong = synthToken => {
-    let%Await isLong = synthToken->SyntheticToken.isLong;
+  let getIsLong = syntheticToken => {
+    let%Await isLong = syntheticToken->SyntheticToken.isLong;
     isLong == true /*long*/;
   };
 };
