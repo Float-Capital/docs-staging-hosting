@@ -1176,6 +1176,7 @@ contract LongShort is ILongShort, Initializable {
       paymentTokenValueChangeForLong -= paymentTokenValueChangeForShiftToShort;
       paymentTokenValueChangeForShort += paymentTokenValueChangeForShiftToShort;
 
+      longChangeInSynthTokensTotalSupply -= int256(amountForCurrentActionWorkingVariable);
       shortChangeInSynthTokensTotalSupply += int256(
         _getEquivalentAmountSynthTokensOnSideB(
           amountForCurrentActionWorkingVariable,
@@ -1187,19 +1188,20 @@ contract LongShort is ILongShort, Initializable {
       batched_amountOfSynthTokensToShiftFromMarketSide[marketIndex][true] = 0;
     }
 
-    // Handle shift tokens from SHORT to Long
+    // Handle shift tokens from SHORT to LONG
     amountForCurrentActionWorkingVariable = batched_amountOfSynthTokensToShiftFromMarketSide[
       marketIndex
     ][false];
     if (amountForCurrentActionWorkingVariable > 0) {
       int256 paymentTokenValueChangeForShiftToLong = int256(
-        _getAmountPaymentToken(amountForCurrentActionWorkingVariable, syntheticTokenPriceLong)
+        _getAmountPaymentToken(amountForCurrentActionWorkingVariable, syntheticTokenPriceShort)
       );
 
       paymentTokenValueChangeForShort -= paymentTokenValueChangeForShiftToLong;
       paymentTokenValueChangeForLong += paymentTokenValueChangeForShiftToLong;
 
-      shortChangeInSynthTokensTotalSupply += int256(
+      shortChangeInSynthTokensTotalSupply -= int256(amountForCurrentActionWorkingVariable);
+      longChangeInSynthTokensTotalSupply += int256(
         _getEquivalentAmountSynthTokensOnSideB(
           amountForCurrentActionWorkingVariable,
           syntheticTokenPriceShort,
