@@ -65,7 +65,7 @@ contract LongShort is ILongShort, Initializable {
   mapping(uint32 => mapping(bool => uint256)) public batchedAmountOfSynthTokensToShiftMarketSide;
 
   // User specific
-  mapping(uint32 => mapping(address => uint256)) public userCurrentNextPriceUpdateIndex;
+  mapping(uint32 => mapping(address => uint256)) public userNextPrice_currentUpdateIndex;
 
   mapping(uint32 => mapping(bool => mapping(address => uint256)))
     public userNextPrice_depositAmount;
@@ -477,8 +477,8 @@ contract LongShort is ILongShort, Initializable {
   {
     uint256 currentMarketUpdateIndex = marketUpdateIndex[marketIndex];
     if (
-      userCurrentNextPriceUpdateIndex[marketIndex][user] != 0 &&
-      userCurrentNextPriceUpdateIndex[marketIndex][user] <= currentMarketUpdateIndex
+      userNextPrice_currentUpdateIndex[marketIndex][user] != 0 &&
+      userNextPrice_currentUpdateIndex[marketIndex][user] <= currentMarketUpdateIndex
     ) {
       uint256 amountPaymentTokenDeposited = userNextPrice_depositAmount[marketIndex][isLong][user];
 
@@ -667,7 +667,7 @@ contract LongShort is ILongShort, Initializable {
       ];
       // if there is a price change and the 'staker' contract has pending updates, push the stakers price snapshot index to the staker
       // (so the staker can handle its internal accounting)
-      if (userCurrentNextPriceUpdateIndex[marketIndex][staker] > 0 && assetPriceChanged) {
+      if (userNextPrice_currentUpdateIndex[marketIndex][staker] > 0 && assetPriceChanged) {
         IStaker(staker).addNewStateForFloatRewards(
           marketIndex,
           syntheticTokenPriceLong,
@@ -675,7 +675,7 @@ contract LongShort is ILongShort, Initializable {
           syntheticTokenPoolValue[marketIndex][true],
           syntheticTokenPoolValue[marketIndex][false],
           // This variable could allow users to do any next price actions in the future (not just synthetic side shifts)
-          userCurrentNextPriceUpdateIndex[marketIndex][staker]
+          userNextPrice_currentUpdateIndex[marketIndex][staker]
         );
       } else {
         IStaker(staker).addNewStateForFloatRewards(
@@ -801,7 +801,7 @@ contract LongShort is ILongShort, Initializable {
 
     batchedAmountOfPaymentTokenToDeposit[marketIndex][isLong] += amount;
     userNextPrice_depositAmount[marketIndex][isLong][msg.sender] += amount;
-    userCurrentNextPriceUpdateIndex[marketIndex][msg.sender] = marketUpdateIndex[marketIndex] + 1;
+    userNextPrice_currentUpdateIndex[marketIndex][msg.sender] = marketUpdateIndex[marketIndex] + 1;
 
     emit NextPriceDeposit(
       marketIndex,
@@ -854,7 +854,7 @@ contract LongShort is ILongShort, Initializable {
     );
 
     userNextPrice_redemptionAmount[marketIndex][isLong][msg.sender] += tokensToRedeem;
-    userCurrentNextPriceUpdateIndex[marketIndex][msg.sender] = marketUpdateIndex[marketIndex] + 1;
+    userNextPrice_currentUpdateIndex[marketIndex][msg.sender] = marketUpdateIndex[marketIndex] + 1;
 
     batchedAmountOfSynthTokensToRedeem[marketIndex][isLong] += tokensToRedeem;
 
@@ -911,7 +911,7 @@ contract LongShort is ILongShort, Initializable {
     userNextPrice_amountSynthToShiftFromMarketSide[marketIndex][isShiftFromLong][
       msg.sender
     ] += synthTokensToShift;
-    userCurrentNextPriceUpdateIndex[marketIndex][msg.sender] = marketUpdateIndex[marketIndex] + 1;
+    userNextPrice_currentUpdateIndex[marketIndex][msg.sender] = marketUpdateIndex[marketIndex] + 1;
 
     batchedAmountOfSynthTokensToShiftMarketSide[marketIndex][isShiftFromLong] += synthTokensToShift;
 
@@ -964,7 +964,7 @@ contract LongShort is ILongShort, Initializable {
       uint256 tokensToTransferToUser = _getAmountSynthToken(
         currentDepositAmount,
         syntheticTokenPriceSnapshot[marketIndex][isLong][
-          userCurrentNextPriceUpdateIndex[marketIndex][user]
+          userNextPrice_currentUpdateIndex[marketIndex][user]
         ]
       );
       require(
@@ -990,7 +990,7 @@ contract LongShort is ILongShort, Initializable {
       uint256 amountToRedeem = _getAmountPaymentToken(
         currentRedemptions,
         syntheticTokenPriceSnapshot[marketIndex][isLong][
-          userCurrentNextPriceUpdateIndex[marketIndex][user]
+          userNextPrice_currentUpdateIndex[marketIndex][user]
         ]
       );
       // This means all erc20 tokens we use as payment tokens must return a boolean
@@ -1018,7 +1018,7 @@ contract LongShort is ILongShort, Initializable {
         marketIndex,
         synthTokensShiftedAwayFromMarketSide,
         isShiftFromLong,
-        userCurrentNextPriceUpdateIndex[marketIndex][user]
+        userNextPrice_currentUpdateIndex[marketIndex][user]
       );
 
       userNextPrice_amountSynthToShiftFromMarketSide[marketIndex][isShiftFromLong][user] = 0;
@@ -1047,7 +1047,7 @@ contract LongShort is ILongShort, Initializable {
     internal
     virtual
   {
-    uint256 userCurrentUpdateIndex = userCurrentNextPriceUpdateIndex[marketIndex][user];
+    uint256 userCurrentUpdateIndex = userNextPrice_currentUpdateIndex[marketIndex][user];
     if (userCurrentUpdateIndex != 0 && userCurrentUpdateIndex <= marketUpdateIndex[marketIndex]) {
       _executeOutstandingNextPriceMints(marketIndex, user, true);
       _executeOutstandingNextPriceMints(marketIndex, user, false);
@@ -1056,7 +1056,7 @@ contract LongShort is ILongShort, Initializable {
       _executeOutstandingNextPriceTokenShifts(marketIndex, user, true);
       _executeOutstandingNextPriceTokenShifts(marketIndex, user, false);
 
-      userCurrentNextPriceUpdateIndex[marketIndex][user] = 0;
+      userNextPrice_currentUpdateIndex[marketIndex][user] = 0;
 
       emit ExecuteNextPriceSettlementsUser(user, marketIndex);
     }

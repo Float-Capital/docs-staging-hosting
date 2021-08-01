@@ -10,11 +10,11 @@ let testUnit =
   describe("executeOutstandingNextPriceSettlements", () => {
     let marketIndex = 1;
     let user = Helpers.randomAddress();
-    let defaultUserCurrentNextPriceUpdateIndex = bnFromInt(22);
+    let defaultuserNextPrice_currentUpdateIndex = bnFromInt(22);
     let defaultMarketUpdateIndex =
-      defaultUserCurrentNextPriceUpdateIndex->add(oneBn);
+      defaultuserNextPrice_currentUpdateIndex->add(oneBn);
 
-    let setup = (~userCurrentNextPriceUpdateIndex, ~marketUpdateIndex) => {
+    let setup = (~userNextPrice_currentUpdateIndex, ~marketUpdateIndex) => {
       let%AwaitThen _ =
         contracts.contents.longShort->LongShortSmocked.InternalMock.setup;
 
@@ -29,7 +29,7 @@ let testUnit =
         ->LongShort.Exposed.setExecuteOutstandingNextPriceSettlementsGlobals(
             ~marketIndex,
             ~user,
-            ~userCurrentNextPriceUpdateIndex,
+            ~userNextPrice_currentUpdateIndex,
             ~marketUpdateIndex,
           );
 
@@ -43,7 +43,7 @@ let testUnit =
     describe("happy case", () => {
       before_once'(() =>
         setup(
-          ~userCurrentNextPriceUpdateIndex=defaultUserCurrentNextPriceUpdateIndex,
+          ~userNextPrice_currentUpdateIndex=defaultuserNextPrice_currentUpdateIndex,
           ~marketUpdateIndex=defaultMarketUpdateIndex,
         )
       );
@@ -73,12 +73,12 @@ let testUnit =
         |]);
       });
 
-      it("sets userCurrentNextPriceUpdateIndex[marketIndex][user] to 0", () => {
-        let%Await updatedUserCurrentNextPriceUpdateIndex =
+      it("sets userNextPrice_currentUpdateIndex[marketIndex][user] to 0", () => {
+        let%Await updateduserNextPrice_currentUpdateIndex =
           contracts^.longShort
-          ->LongShort.userCurrentNextPriceUpdateIndex(marketIndex, user);
+          ->LongShort.userNextPrice_currentUpdateIndex(marketIndex, user);
 
-        Chai.bnEqual(updatedUserCurrentNextPriceUpdateIndex, zeroBn);
+        Chai.bnEqual(updateduserNextPrice_currentUpdateIndex, zeroBn);
       });
 
       it(
@@ -87,7 +87,7 @@ let testUnit =
         Chai.callEmitEvents(
           ~call=
             setup(
-              ~userCurrentNextPriceUpdateIndex=defaultUserCurrentNextPriceUpdateIndex,
+              ~userNextPrice_currentUpdateIndex=defaultuserNextPrice_currentUpdateIndex,
               ~marketUpdateIndex=defaultMarketUpdateIndex,
             ),
           ~eventName="ExecuteNextPriceSettlementsUser",
@@ -99,12 +99,12 @@ let testUnit =
 
     describe("sad cases", () => {
       it(
-        "doesn't emit ExecuteNextPriceSettlementsUser event if userCurrentNextPriceUpdateIndex[marketIndex][user] = 0",
+        "doesn't emit ExecuteNextPriceSettlementsUser event if userNextPrice_currentUpdateIndex[marketIndex][user] = 0",
         () => {
         Chai.callEmitEvents(
           ~call=
             setup(
-              ~userCurrentNextPriceUpdateIndex=bnFromInt(0),
+              ~userNextPrice_currentUpdateIndex=bnFromInt(0),
               ~marketUpdateIndex=defaultMarketUpdateIndex,
             ),
           ~eventName="ExecuteNextPriceSettlementsUser",
@@ -114,11 +114,11 @@ let testUnit =
       });
 
       it(
-        "doesn't call nextPriceMint/nextPriceRedeem functions if userCurrentNextPriceUpdateIndex[marketIndex][user] = 0",
+        "doesn't call nextPriceMint/nextPriceRedeem functions if userNextPrice_currentUpdateIndex[marketIndex][user] = 0",
         () => {
           let%Await _ =
             setup(
-              ~userCurrentNextPriceUpdateIndex=bnFromInt(0),
+              ~userNextPrice_currentUpdateIndex=bnFromInt(0),
               ~marketUpdateIndex=defaultMarketUpdateIndex,
             );
 
@@ -139,14 +139,14 @@ let testUnit =
       );
 
       it(
-        "doesn't emit ExecuteNextPriceSettlementsUser event if userCurrentNextPriceUpdateIndex[marketIndex][user] > marketUpdateIndex[marketIndex]",
+        "doesn't emit ExecuteNextPriceSettlementsUser event if userNextPrice_currentUpdateIndex[marketIndex][user] > marketUpdateIndex[marketIndex]",
         () => {
         Chai.callEmitEvents(
           ~call=
             setup(
-              ~userCurrentNextPriceUpdateIndex=defaultUserCurrentNextPriceUpdateIndex,
+              ~userNextPrice_currentUpdateIndex=defaultuserNextPrice_currentUpdateIndex,
               ~marketUpdateIndex=
-                defaultUserCurrentNextPriceUpdateIndex->sub(oneBn),
+                defaultuserNextPrice_currentUpdateIndex->sub(oneBn),
             ),
           ~eventName="ExecuteNextPriceSettlementsUser",
           ~contract=contracts.contents.longShort->Obj.magic,
@@ -155,13 +155,13 @@ let testUnit =
       });
 
       it(
-        "doesn't call nextPriceMint/nextPriceRedeem functions if userCurrentNextPriceUpdateIndex[marketIndex][user] > marketUpdateIndex[marketIndex]",
+        "doesn't call nextPriceMint/nextPriceRedeem functions if userNextPrice_currentUpdateIndex[marketIndex][user] > marketUpdateIndex[marketIndex]",
         () => {
           let%Await _ =
             setup(
-              ~userCurrentNextPriceUpdateIndex=defaultUserCurrentNextPriceUpdateIndex,
+              ~userNextPrice_currentUpdateIndex=defaultuserNextPrice_currentUpdateIndex,
               ~marketUpdateIndex=
-                defaultUserCurrentNextPriceUpdateIndex->sub(oneBn),
+                defaultuserNextPrice_currentUpdateIndex->sub(oneBn),
             );
 
           let executeOutstandingNextPriceMintsCalls =

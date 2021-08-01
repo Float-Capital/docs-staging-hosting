@@ -20,7 +20,7 @@ let testUnit =
           (
             ~isLong,
             ~userNextPrice_redemptionAmount,
-            ~userCurrentNextPriceUpdateIndex,
+            ~userNextPrice_currentUpdateIndex,
             ~syntheticTokenPriceSnapshot,
           ) => {
         let {longShort, markets} = contracts.contents;
@@ -42,7 +42,7 @@ let testUnit =
           ~syntheticToken=
             (isLong ? smockedLongSynth : smockedShortSynth).address,
           ~userNextPrice_redemptionAmount,
-          ~userCurrentNextPriceUpdateIndex,
+          ~userNextPrice_currentUpdateIndex,
           ~syntheticTokenPriceSnapshot,
         );
       };
@@ -56,7 +56,7 @@ let testUnit =
               setup(
                 ~isLong,
                 ~userNextPrice_redemptionAmount=zeroBn,
-                ~userCurrentNextPriceUpdateIndex=Helpers.randomInteger(),
+                ~userNextPrice_currentUpdateIndex=Helpers.randomInteger(),
                 ~syntheticTokenPriceSnapshot=Helpers.randomTokenAmount(),
               );
 
@@ -99,7 +99,7 @@ let testUnit =
               setup(
                 ~isLong,
                 ~userNextPrice_redemptionAmount,
-                ~userCurrentNextPriceUpdateIndex=Helpers.randomInteger(),
+                ~userNextPrice_currentUpdateIndex=Helpers.randomInteger(),
                 ~syntheticTokenPriceSnapshot,
               );
 
@@ -179,7 +179,7 @@ let testUnit =
           (
             ~isLong,
             ~userNextPrice_redemptionAmount,
-            ~userCurrentNextPriceUpdateIndex,
+            ~userNextPrice_currentUpdateIndex,
             ~syntheticTokenPriceSnapshot,
           ) => {
         let {longShort, markets} = contracts^;
@@ -197,7 +197,7 @@ let testUnit =
           ~isLong,
           ~paymentToken=smockedPaymentToken.address,
           ~userNextPrice_redemptionAmount,
-          ~userCurrentNextPriceUpdateIndex,
+          ~userNextPrice_currentUpdateIndex,
           ~syntheticTokenPriceSnapshot,
         );
       };
@@ -211,7 +211,7 @@ let testUnit =
               setup(
                 ~isLong,
                 ~userNextPrice_redemptionAmount=zeroBn,
-                ~userCurrentNextPriceUpdateIndex=Helpers.randomInteger(),
+                ~userNextPrice_currentUpdateIndex=Helpers.randomInteger(),
                 ~syntheticTokenPriceSnapshot=Helpers.randomTokenAmount(),
               );
 
@@ -254,7 +254,7 @@ let testUnit =
               setup(
                 ~isLong,
                 ~userNextPrice_redemptionAmount,
-                ~userCurrentNextPriceUpdateIndex=Helpers.randomInteger(),
+                ~userNextPrice_currentUpdateIndex=Helpers.randomInteger(),
                 ~syntheticTokenPriceSnapshot,
               );
 
@@ -339,7 +339,7 @@ let testUnit =
           (
             ~isShiftFromLong,
             ~userNextPrice_amountSynthToShiftFromMarketSide,
-            ~userCurrentNextPriceUpdateIndex,
+            ~userNextPrice_currentUpdateIndex,
             ~syntheticTokenPriceSnapshotShiftedFrom,
             ~syntheticTokenPriceSnapshotShiftedTo,
           ) => {
@@ -362,7 +362,7 @@ let testUnit =
           ~syntheticTokenShiftedTo=
             (isShiftFromLong ? smockedShortSynth : smockedLongSynth).address,
           ~userNextPrice_amountSynthToShiftFromMarketSide,
-          ~userCurrentNextPriceUpdateIndex,
+          ~userNextPrice_currentUpdateIndex,
           ~syntheticTokenPriceSnapshotShiftedFrom,
           ~syntheticTokenPriceSnapshotShiftedTo,
         );
@@ -377,7 +377,7 @@ let testUnit =
               setup(
                 ~isShiftFromLong,
                 ~userNextPrice_amountSynthToShiftFromMarketSide=zeroBn,
-                ~userCurrentNextPriceUpdateIndex=Helpers.randomInteger(),
+                ~userNextPrice_currentUpdateIndex=Helpers.randomInteger(),
                 ~syntheticTokenPriceSnapshotShiftedFrom=
                   Helpers.randomTokenAmount(),
                 ~syntheticTokenPriceSnapshotShiftedTo=
@@ -428,7 +428,7 @@ let testUnit =
               setup(
                 ~isShiftFromLong,
                 ~userNextPrice_amountSynthToShiftFromMarketSide,
-                ~userCurrentNextPriceUpdateIndex=Helpers.randomInteger(),
+                ~userNextPrice_currentUpdateIndex=Helpers.randomInteger(),
                 ~syntheticTokenPriceSnapshotShiftedFrom,
                 ~syntheticTokenPriceSnapshotShiftedTo,
               );

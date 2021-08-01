@@ -272,9 +272,9 @@ let testUnit =
               testWallet.address,
             );
 
-        let%Await updatedUserCurrentNextPriceUpdateIndex =
+        let%Await updateduserNextPrice_currentUpdateIndex =
           contracts.contents.longShort
-          ->LongShort.userCurrentNextPriceUpdateIndex(
+          ->LongShort.userNextPrice_currentUpdateIndex(
               marketIndex,
               testWallet.address,
             );
@@ -293,8 +293,8 @@ let testUnit =
         );
 
         Chai.bnEqual(
-          ~message="userCurrentNextPriceUpdateIndex not updated correctly",
-          updatedUserCurrentNextPriceUpdateIndex,
+          ~message="userNextPrice_currentUpdateIndex not updated correctly",
+          updateduserNextPrice_currentUpdateIndex,
           marketUpdateIndex->add(oneBn),
         );
       });
