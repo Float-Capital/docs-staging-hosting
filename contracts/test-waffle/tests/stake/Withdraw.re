@@ -23,7 +23,7 @@ let testUnit =
       let setup = amountStaked => {
         userWallet := accounts.contents->Array.getUnsafe(5);
         let {staker, syntheticTokenSmocked} = contracts.contents;
-        let%AwaitThen _ =
+        let%Await _ =
           staker->Staker.Exposed.set_withdrawGlobals(
             ~marketIndex,
             ~syntheticToken=syntheticTokenSmocked.address,
@@ -34,10 +34,6 @@ let testUnit =
         syntheticTokenSmocked->SyntheticTokenSmocked.mockTransferToReturn(
           true,
         );
-        let%Await _ =
-          staker->StakerSmocked.InternalMock.setupFunctionForUnitTesting(
-            ~functionName="_withdraw",
-          );
         StakerSmocked.InternalMock.mock_mintAccumulatedFloatToReturn();
 
         connectedStaker :=
