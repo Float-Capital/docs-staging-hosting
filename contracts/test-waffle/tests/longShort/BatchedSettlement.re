@@ -9,7 +9,7 @@ let testUnit =
     ) => {
   describeUnit("Batched Settlement", () => {
     let marketIndex = Helpers.randomJsInteger();
-    describe("_performOustandingBatchedSettlements", () => {
+    describe("_batchConfirmOutstandingPendingActions", () => {
       let syntheticTokenPrice_inPaymentTokens_long =
         Helpers.randomTokenAmount();
       let syntheticTokenPrice_inPaymentTokens_short =
@@ -27,7 +27,7 @@ let testUnit =
         let {longShort} = contracts.contents;
         let%AwaitThen _ =
           longShort->LongShortSmocked.InternalMock.setupFunctionForUnitTesting(
-            ~functionName="_performOustandingBatchedSettlements",
+            ~functionName="_batchConfirmOutstandingPendingActions",
           );
 
         LongShortSmocked.InternalMock.mock_handleTotalPaymentTokenValueChangeForMarketWithYieldManagerToReturn();
@@ -44,7 +44,7 @@ let testUnit =
             ~batchedAmountSyntheticTokenToShiftFromShort,
           );
 
-        longShort->LongShort.Exposed._performOustandingBatchedSettlementsExposedCall(
+        longShort->LongShort.Exposed._batchConfirmOutstandingPendingActionsExposedCall(
           ~marketIndex,
           ~syntheticTokenPrice_inPaymentTokens_long,
           ~syntheticTokenPrice_inPaymentTokens_short,
