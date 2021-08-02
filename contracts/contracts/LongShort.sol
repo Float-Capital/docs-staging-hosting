@@ -636,7 +636,8 @@ contract LongShort is ILongShort, Initializable {
       totalValueLockedInMarket
     );
 
-    uint256 marketAmount = IYieldManager(yieldManagers[marketIndex]).claimYieldAndGetMarketAmount(
+    uint256 marketAmount = IYieldManager(yieldManagers[marketIndex])
+    .distributeYieldForTreasuryAndReturnMarketAllocation(
       totalValueLockedInMarket,
       treasuryYieldPercentE18
     );

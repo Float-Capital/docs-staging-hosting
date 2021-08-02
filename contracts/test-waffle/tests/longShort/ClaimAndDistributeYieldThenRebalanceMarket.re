@@ -81,7 +81,7 @@ let testUnit =
         );
 
         contracts.contents.yieldManagerSmocked
-        ->YieldManagerAaveSmocked.mockClaimYieldAndGetMarketAmountToReturn(
+        ->YieldManagerAaveSmocked.mockDistributeYieldForTreasuryAndReturnMarketAllocationToReturn(
             marketAmountFromYieldManager,
           );
       });
@@ -109,10 +109,10 @@ let testUnit =
             |])
         });
         it(
-          "gets the treasuryYieldPercent from _getYieldSplit and calls claimYieldAndGetMarketAmount on the yieldManager with correct amount",
+          "gets the treasuryYieldPercent from _getYieldSplit and calls distributeYieldForTreasuryAndReturnMarketAllocation on the yieldManager with correct amount",
           () => {
           contracts.contents.yieldManagerSmocked
-          ->YieldManagerAaveSmocked.claimYieldAndGetMarketAmountCalls
+          ->YieldManagerAaveSmocked.distributeYieldForTreasuryAndReturnMarketAllocationCalls
           ->Chai.recordArrayDeepEqualFlat([|
               {
                 totalValueRealizedForMarket: totalValueLockedInMarket,
