@@ -273,19 +273,21 @@ contract LongShort is ILongShort, Initializable {
     latestMarket++;
 
     // Create new synthetic long token.
-    syntheticTokens[latestMarket][true] = ITokenFactory(tokenFactory).createTokenLong(
-      syntheticName,
-      syntheticSymbol,
+    syntheticTokens[latestMarket][true] = ITokenFactory(tokenFactory).createSyntheticToken(
+      string(abi.encodePacked("Float Up ", syntheticName)),
+      string(abi.encodePacked("fu", syntheticSymbol)),
       staker,
-      latestMarket
+      latestMarket,
+      true
     );
 
     // Create new synthetic short token.
-    syntheticTokens[latestMarket][false] = ITokenFactory(tokenFactory).createTokenShort(
-      syntheticName,
-      syntheticSymbol,
+    syntheticTokens[latestMarket][false] = ITokenFactory(tokenFactory).createSyntheticToken(
+      string(abi.encodePacked("Float Down ", syntheticName)),
+      string(abi.encodePacked("fd", syntheticSymbol)),
       staker,
-      latestMarket
+      latestMarket,
+      false
     );
 
     // Initial market state.
