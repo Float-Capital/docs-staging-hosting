@@ -47,7 +47,8 @@ contract LongShortInternalStateSetters is LongShort {
     address oracleManager,
     address _staker,
     address synthLong,
-    address synthShort
+    address synthShort,
+    uint256 stakerNextPrice_currentUpdateIndex
   ) public {
     marketExists[marketIndex] = true;
     marketUpdateIndex[marketIndex] = _latestUpdateIndexForMarket;
@@ -68,6 +69,8 @@ contract LongShortInternalStateSetters is LongShort {
     syntheticTokens[marketIndex][false] = synthShort;
 
     staker = _staker;
+
+    userNextPrice_currentUpdateIndex[marketIndex][_staker] = stakerNextPrice_currentUpdateIndex;
   }
 
   function setUseexecuteOutstandingNextPriceSettlementsMock(bool shouldUseMock) public {
