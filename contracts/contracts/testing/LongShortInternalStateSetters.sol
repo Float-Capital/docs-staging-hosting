@@ -59,8 +59,8 @@ contract LongShortInternalStateSetters is LongShort {
       _latestUpdateIndexForMarket
     ] = syntheticTokenPriceShort;
 
-    syntheticToken_amountPaymentToken_backedValue[marketIndex][true] = longValue;
-    syntheticToken_amountPaymentToken_backedValue[marketIndex][false] = shortValue;
+    marketSideValueInPaymentToken[marketIndex][true] = longValue;
+    marketSideValueInPaymentToken[marketIndex][false] = shortValue;
 
     assetPrice[marketIndex] = _assetPrice;
     oracleManagers[marketIndex] = oracleManager;
@@ -98,7 +98,7 @@ contract LongShortInternalStateSetters is LongShort {
     uint256 _userNextPrice_paymentToken_depositAmount_isLong,
     uint256 _syntheticToken_priceSnapshot_isLong,
     uint256 _syntheticToken_priceSnapshot_notIsLong,
-    uint256 _userNextPrice_syntheticToken_shift_from_marketSide_notIsLong
+    uint256 _userNextPrice_syntheticToken_toShiftAwayFrom_marketSide_notIsLong
   ) external {
     marketExists[marketIndex] = true;
     userNextPrice_currentUpdateIndex[marketIndex][user] = _userNextPrice_currentUpdateIndex;
@@ -116,10 +116,10 @@ contract LongShortInternalStateSetters is LongShort {
       _marketUpdateIndex
     ] = _syntheticToken_priceSnapshot_notIsLong;
 
-    userNextPrice_syntheticToken_shift_from_marketSide[marketIndex][!isLong][
+    userNextPrice_syntheticToken_toShiftAwayFrom_marketSide[marketIndex][!isLong][
       user
-    ] = _userNextPrice_syntheticToken_shift_from_marketSide_notIsLong;
-    userNextPrice_syntheticToken_shift_from_marketSide[marketIndex][isLong][user] = 0; // reset other side for good measure
+    ] = _userNextPrice_syntheticToken_toShiftAwayFrom_marketSide_notIsLong;
+    userNextPrice_syntheticToken_toShiftAwayFrom_marketSide[marketIndex][isLong][user] = 0; // reset other side for good measure
   }
 
   function setPerformOustandingBatchedSettlementsGlobals(
@@ -141,10 +141,10 @@ contract LongShortInternalStateSetters is LongShort {
     batched_amountSyntheticToken_redeem[marketIndex][
       false
     ] = batched_amountSyntheticToken_redeemShort;
-    batched_amountSyntheticToken_shift_from_marketSide[marketIndex][
+    batched_amountSyntheticToken_toShiftAwayFrom_marketSide[marketIndex][
       true
     ] = batchedAmountSyntheticTokenToShiftFromLong;
-    batched_amountSyntheticToken_shift_from_marketSide[marketIndex][
+    batched_amountSyntheticToken_toShiftAwayFrom_marketSide[marketIndex][
       false
     ] = batchedAmountSyntheticTokenToShiftFromShort;
   }
@@ -232,14 +232,14 @@ contract LongShortInternalStateSetters is LongShort {
     address user,
     bool isShiftFromLong,
     address syntheticTokenShiftedTo,
-    uint256 _userNextPrice_syntheticToken_shift_from_marketSide,
+    uint256 _userNextPrice_syntheticToken_toShiftAwayFrom_marketSide,
     uint256 _userNextPrice_currentUpdateIndex,
     uint256 _syntheticToken_priceSnapshotShiftedFrom,
     uint256 _syntheticToken_priceSnapshotShiftedTo
   ) external {
-    userNextPrice_syntheticToken_shift_from_marketSide[marketIndex][isShiftFromLong][
+    userNextPrice_syntheticToken_toShiftAwayFrom_marketSide[marketIndex][isShiftFromLong][
       user
-    ] = _userNextPrice_syntheticToken_shift_from_marketSide;
+    ] = _userNextPrice_syntheticToken_toShiftAwayFrom_marketSide;
     userNextPrice_currentUpdateIndex[marketIndex][user] = _userNextPrice_currentUpdateIndex;
     syntheticToken_priceSnapshot[marketIndex][isShiftFromLong][
       _userNextPrice_currentUpdateIndex
@@ -262,16 +262,12 @@ contract LongShortInternalStateSetters is LongShort {
 
   function setClaimAndDistributeYieldThenRebalanceMarketGlobals(
     uint32 marketIndex,
-    uint256 _syntheticToken_amountPaymentToken_backedValueLong,
-    uint256 _syntheticToken_amountPaymentToken_backedValueShort,
+    uint256 _marketSideValueInPaymentTokenLong,
+    uint256 _marketSideValueInPaymentTokenShort,
     address yieldManager
   ) external {
-    syntheticToken_amountPaymentToken_backedValue[marketIndex][
-      true
-    ] = _syntheticToken_amountPaymentToken_backedValueLong;
-    syntheticToken_amountPaymentToken_backedValue[marketIndex][
-      false
-    ] = _syntheticToken_amountPaymentToken_backedValueShort;
+    marketSideValueInPaymentToken[marketIndex][true] = _marketSideValueInPaymentTokenLong;
+    marketSideValueInPaymentToken[marketIndex][false] = _marketSideValueInPaymentTokenShort;
     yieldManagers[marketIndex] = yieldManager;
   }
 

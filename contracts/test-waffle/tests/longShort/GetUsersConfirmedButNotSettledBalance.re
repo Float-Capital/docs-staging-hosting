@@ -30,7 +30,7 @@ let testUnit =
         let marketUpdateIndex = twoBn;
 
         describe(
-          "userNextPriceDepositAmount non-zero and userNextPrice_syntheticToken_shift_from_marketSide zero",
+          "userNextPriceDepositAmount non-zero and userNextPrice_syntheticToken_toShiftAwayFrom_marketSide zero",
           () => {
             let userNextPrice_paymentToken_depositAmount_isLong =
               Helpers.randomTokenAmount();
@@ -38,7 +38,7 @@ let testUnit =
               Helpers.randomTokenAmount();
             let syntheticToken_priceSnapshot_notIsLong =
               Helpers.randomTokenAmount();
-            let userNextPrice_syntheticToken_shift_from_marketSide_notIsLong = zeroBn;
+            let userNextPrice_syntheticToken_toShiftAwayFrom_marketSide_notIsLong = zeroBn;
 
             it("should return correct result", () => {
               let%Await _ =
@@ -52,7 +52,7 @@ let testUnit =
                     ~userNextPrice_paymentToken_depositAmount_isLong,
                     ~syntheticToken_priceSnapshot_isLong,
                     ~syntheticToken_priceSnapshot_notIsLong,
-                    ~userNextPrice_syntheticToken_shift_from_marketSide_notIsLong,
+                    ~userNextPrice_syntheticToken_toShiftAwayFrom_marketSide_notIsLong,
                   );
 
               let expectedResult =
@@ -72,14 +72,14 @@ let testUnit =
         );
 
         describe(
-          "userNextPriceDepositAmount zero and userNextPrice_syntheticToken_shift_from_marketSide non-zero",
+          "userNextPriceDepositAmount zero and userNextPrice_syntheticToken_toShiftAwayFrom_marketSide non-zero",
           () => {
             let userNextPrice_paymentToken_depositAmount_isLong = zeroBn;
             let syntheticToken_priceSnapshot_isLong =
               Helpers.randomTokenAmount();
             let syntheticToken_priceSnapshot_notIsLong =
               Helpers.randomTokenAmount();
-            let userNextPrice_syntheticToken_shift_from_marketSide_notIsLong =
+            let userNextPrice_syntheticToken_toShiftAwayFrom_marketSide_notIsLong =
               Helpers.randomTokenAmount();
 
             it("should return correct result", () => {
@@ -94,11 +94,11 @@ let testUnit =
                     ~userNextPrice_paymentToken_depositAmount_isLong,
                     ~syntheticToken_priceSnapshot_isLong,
                     ~syntheticToken_priceSnapshot_notIsLong,
-                    ~userNextPrice_syntheticToken_shift_from_marketSide_notIsLong,
+                    ~userNextPrice_syntheticToken_toShiftAwayFrom_marketSide_notIsLong,
                   );
 
               let expectedResult =
-                userNextPrice_syntheticToken_shift_from_marketSide_notIsLong
+                userNextPrice_syntheticToken_toShiftAwayFrom_marketSide_notIsLong
                 ->mul(syntheticToken_priceSnapshot_notIsLong)
                 ->div(syntheticToken_priceSnapshot_isLong);
               let%Await actualResult =
@@ -113,7 +113,7 @@ let testUnit =
           },
         );
         describe(
-          "userNextPriceDepositAmount non-zero and userNextPrice_syntheticToken_shift_from_marketSide non-zero",
+          "userNextPriceDepositAmount non-zero and userNextPrice_syntheticToken_toShiftAwayFrom_marketSide non-zero",
           () => {
             let userNextPrice_paymentToken_depositAmount_isLong =
               Helpers.randomTokenAmount();
@@ -121,7 +121,7 @@ let testUnit =
               Helpers.randomTokenAmount();
             let syntheticToken_priceSnapshot_notIsLong =
               Helpers.randomTokenAmount();
-            let userNextPrice_syntheticToken_shift_from_marketSide_notIsLong =
+            let userNextPrice_syntheticToken_toShiftAwayFrom_marketSide_notIsLong =
               Helpers.randomTokenAmount();
 
             it("should return correct result", () => {
@@ -136,11 +136,11 @@ let testUnit =
                     ~userNextPrice_paymentToken_depositAmount_isLong,
                     ~syntheticToken_priceSnapshot_isLong,
                     ~syntheticToken_priceSnapshot_notIsLong,
-                    ~userNextPrice_syntheticToken_shift_from_marketSide_notIsLong,
+                    ~userNextPrice_syntheticToken_toShiftAwayFrom_marketSide_notIsLong,
                   );
 
               let expectedResult =
-                userNextPrice_syntheticToken_shift_from_marketSide_notIsLong
+                userNextPrice_syntheticToken_toShiftAwayFrom_marketSide_notIsLong
                 ->mul(syntheticToken_priceSnapshot_notIsLong)
                 ->div(syntheticToken_priceSnapshot_isLong)
                 ->add(
@@ -169,7 +169,7 @@ let testUnit =
         let syntheticToken_priceSnapshot_isLong = Helpers.randomTokenAmount();
         let syntheticToken_priceSnapshot_notIsLong =
           Helpers.randomTokenAmount();
-        let userNextPrice_syntheticToken_shift_from_marketSide_notIsLong =
+        let userNextPrice_syntheticToken_toShiftAwayFrom_marketSide_notIsLong =
           Helpers.randomTokenAmount();
 
         let setup = (~userNextPrice_currentUpdateIndex, ~marketUpdateIndex) => {
@@ -183,7 +183,7 @@ let testUnit =
               ~userNextPrice_paymentToken_depositAmount_isLong,
               ~syntheticToken_priceSnapshot_isLong,
               ~syntheticToken_priceSnapshot_notIsLong,
-              ~userNextPrice_syntheticToken_shift_from_marketSide_notIsLong,
+              ~userNextPrice_syntheticToken_toShiftAwayFrom_marketSide_notIsLong,
             );
         };
 

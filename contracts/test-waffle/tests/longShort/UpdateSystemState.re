@@ -437,35 +437,28 @@ let testUnit =
         });
 
         it(
-          "should mutate syntheticToken_amountPaymentToken_backedValues for long and short correctly",
+          "should mutate marketSideValueInPaymentTokens for long and short correctly",
           () => {
-            let%AwaitThen _ =
-              setupWithPriceChange(
-                ~fromStaker=false,
-                ~stakerNextPrice_currentUpdateIndex=zeroBn,
-              );
-            let%AwaitThen newLongValue =
-              contracts.contents.longShort
-              ->LongShort.syntheticToken_amountPaymentToken_backedValue(
-                  marketIndex,
-                  true,
-                );
-
-            let%Await newShortValue =
-              contracts.contents.longShort
-              ->LongShort.syntheticToken_amountPaymentToken_backedValue(
-                  marketIndex,
-                  false,
-                );
-
-            newLongValue->Chai.bnEqual(
-              oldLongValueAfterYield->add(valueChangeLong),
+          let%AwaitThen _ =
+            setupWithPriceChange(
+              ~fromStaker=false,
+              ~stakerNextPrice_currentUpdateIndex=zeroBn,
             );
-            newShortValue->Chai.bnEqual(
-              oldShortValueAfterYield->add(valueChangeShort),
-            );
-          },
-        );
+          let%AwaitThen newLongValue =
+            contracts.contents.longShort
+            ->LongShort.marketSideValueInPaymentToken(marketIndex, true);
+
+          let%Await newShortValue =
+            contracts.contents.longShort
+            ->LongShort.marketSideValueInPaymentToken(marketIndex, false);
+
+          newLongValue->Chai.bnEqual(
+            oldLongValueAfterYield->add(valueChangeLong),
+          );
+          newShortValue->Chai.bnEqual(
+            oldShortValueAfterYield->add(valueChangeShort),
+          );
+        });
 
         it("it should update the (underlying) asset price correctly", () => {
           let%AwaitThen _ =
@@ -607,7 +600,7 @@ let testIntegration =
           let amountOfYieldToAward = bnFromString("3216543216543216542");
 
           let%Await amountToMintToGuaranteeImbalance =
-            longShort->LongShort.syntheticToken_amountPaymentToken_backedValue(
+            longShort->LongShort.marketSideValueInPaymentToken(
               marketIndex,
               !longIsOverBalanced,
             );
@@ -625,12 +618,12 @@ let testIntegration =
 
           // get total balance pools etc before (and amount for treasury)
           let%Await longTokenPoolValueBefore =
-            longShort->LongShort.syntheticToken_amountPaymentToken_backedValue(
+            longShort->LongShort.marketSideValueInPaymentToken(
               marketIndex,
               true,
             );
           let%Await shortTokenPoolValueBefore =
-            longShort->LongShort.syntheticToken_amountPaymentToken_backedValue(
+            longShort->LongShort.marketSideValueInPaymentToken(
               marketIndex,
               false,
             );
@@ -661,12 +654,12 @@ let testIntegration =
 
           // get total balance pools after and amount for treasury
           let%Await longTokenPoolValueAfter =
-            longShort->LongShort.syntheticToken_amountPaymentToken_backedValue(
+            longShort->LongShort.marketSideValueInPaymentToken(
               marketIndex,
               true,
             );
           let%Await shortTokenPoolValueAfter =
-            longShort->LongShort.syntheticToken_amountPaymentToken_backedValue(
+            longShort->LongShort.marketSideValueInPaymentToken(
               marketIndex,
               false,
             );

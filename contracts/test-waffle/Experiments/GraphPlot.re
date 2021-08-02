@@ -78,12 +78,12 @@ let generateTestData =
               let%AwaitThen _ =
                 longShort->LongShort.updateSystemState(~marketIndex);
               let%AwaitThen shortValue =
-                longShort->LongShort.syntheticToken_amountPaymentToken_backedValue(
+                longShort->LongShort.marketSideValueInPaymentToken(
                   marketIndex,
                   false /*short*/,
                 );
               let%AwaitThen longValue =
-                longShort->LongShort.syntheticToken_amountPaymentToken_backedValue(
+                longShort->LongShort.marketSideValueInPaymentToken(
                   marketIndex,
                   true /*long*/,
                 );
@@ -144,12 +144,12 @@ let generateTestData =
               let%AwaitThen _ =
                 longShort->LongShort.updateSystemState(~marketIndex);
               let%AwaitThen shortValue =
-                longShort->LongShort.syntheticToken_amountPaymentToken_backedValue(
+                longShort->LongShort.marketSideValueInPaymentToken(
                   marketIndex,
                   false /*short*/,
                 );
               let%AwaitThen longValue =
-                longShort->LongShort.syntheticToken_amountPaymentToken_backedValue(
+                longShort->LongShort.marketSideValueInPaymentToken(
                   marketIndex,
                   true /*long*/,
                 );

@@ -170,12 +170,12 @@ describe("Float System", () => {
           contracts.contents.longShort
           ->LongShort.changeMarketTreasurySplitGradient(
               ~marketIndex,
-              ~marketTreasurySplitGradientE18=newGradient,
+              ~marketTreasurySplitGradient_e18=newGradient,
             );
 
         let%Await updatedGradient =
           contracts.contents.longShort
-          ->LongShort.marketTreasurySplit_gradients_e18(marketIndex);
+          ->LongShort.marketTreasurySplitGradient_e18(marketIndex);
 
         Chai.bnEqual(updatedGradient, newGradient);
       });
@@ -189,7 +189,7 @@ describe("Float System", () => {
             ->ContractHelpers.connect(~address=attackerAddress)
             ->LongShort.changeMarketTreasurySplitGradient(
                 ~marketIndex,
-                ~marketTreasurySplitGradientE18=newGradient,
+                ~marketTreasurySplitGradient_e18=newGradient,
               ),
           ~reason="only admin",
         );

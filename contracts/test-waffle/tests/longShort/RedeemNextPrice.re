@@ -36,7 +36,7 @@ let testIntegration =
               ? LongShort.redeemLongNextPrice : LongShort.redeemShortNextPrice;
 
           let%AwaitThen _longValueBefore =
-            longShort->LongShort.syntheticToken_amountPaymentToken_backedValue(
+            longShort->LongShort.marketSideValueInPaymentToken(
               marketIndex,
               isLong,
             );

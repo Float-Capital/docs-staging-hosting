@@ -340,7 +340,7 @@ let testUnit =
       let setup =
           (
             ~isShiftFromLong,
-            ~userNextPrice_syntheticToken_shift_from_marketSide,
+            ~userNextPrice_syntheticToken_toShiftAwayFrom_marketSide,
             ~userNextPrice_currentUpdateIndex,
             ~syntheticToken_priceSnapshotShiftedFrom,
             ~syntheticToken_priceSnapshotShiftedTo,
@@ -363,7 +363,7 @@ let testUnit =
           ~isShiftFromLong,
           ~syntheticTokenShiftedTo=
             (isShiftFromLong ? smockedShortSynth : smockedLongSynth).address,
-          ~userNextPrice_syntheticToken_shift_from_marketSide,
+          ~userNextPrice_syntheticToken_toShiftAwayFrom_marketSide,
           ~userNextPrice_currentUpdateIndex,
           ~syntheticToken_priceSnapshotShiftedFrom,
           ~syntheticToken_priceSnapshotShiftedTo,
@@ -378,7 +378,7 @@ let testUnit =
             let%Await _ =
               setup(
                 ~isShiftFromLong,
-                ~userNextPrice_syntheticToken_shift_from_marketSide=zeroBn,
+                ~userNextPrice_syntheticToken_toShiftAwayFrom_marketSide=zeroBn,
                 ~userNextPrice_currentUpdateIndex=Helpers.randomInteger(),
                 ~syntheticToken_priceSnapshotShiftedFrom=
                   Helpers.randomTokenAmount(),
@@ -418,7 +418,7 @@ let testUnit =
         describe("userNextPriceDepositAmount > 0", () => {
           let executeOutstandingNextPriceRedeemsTx =
             ref("Undefined"->Obj.magic);
-          let userNextPrice_syntheticToken_shift_from_marketSide =
+          let userNextPrice_syntheticToken_toShiftAwayFrom_marketSide =
             Helpers.randomTokenAmount();
           let syntheticToken_priceSnapshotShiftedFrom =
             Helpers.randomTokenAmount();
@@ -429,7 +429,7 @@ let testUnit =
             let%Await _ =
               setup(
                 ~isShiftFromLong,
-                ~userNextPrice_syntheticToken_shift_from_marketSide,
+                ~userNextPrice_syntheticToken_toShiftAwayFrom_marketSide,
                 ~userNextPrice_currentUpdateIndex=Helpers.randomInteger(),
                 ~syntheticToken_priceSnapshotShiftedFrom,
                 ~syntheticToken_priceSnapshotShiftedTo,
@@ -454,7 +454,7 @@ let testUnit =
 
             let expectedAmountOfPaymentTokenToRecieve =
               Contract.LongShortHelpers.calcAmountPaymentToken(
-                ~amountSyntheticToken=userNextPrice_syntheticToken_shift_from_marketSide,
+                ~amountSyntheticToken=userNextPrice_syntheticToken_toShiftAwayFrom_marketSide,
                 ~price=syntheticToken_priceSnapshotShiftedFrom,
               );
 
@@ -479,7 +479,7 @@ let testUnit =
             () => {
               let expectedAmountOfPaymentTokenToRecieve =
                 Contract.LongShortHelpers.calcAmountPaymentToken(
-                  ~amountSyntheticToken=userNextPrice_syntheticToken_shift_from_marketSide,
+                  ~amountSyntheticToken=userNextPrice_syntheticToken_toShiftAwayFrom_marketSide,
                   ~price=syntheticToken_priceSnapshotShiftedFrom,
                 );
               let expectedAmountOfOtherSyntheticTokenToRecieve =
@@ -502,18 +502,18 @@ let testUnit =
             },
           );
           it(
-            "should reset userNextPrice_syntheticToken_shift_from_marketSide to zero",
+            "should reset userNextPrice_syntheticToken_toShiftAwayFrom_marketSide to zero",
             () => {
-            let%Await userNextPrice_syntheticToken_shift_from_marketSide =
+            let%Await userNextPrice_syntheticToken_toShiftAwayFrom_marketSide =
               contracts.contents.longShort
-              ->LongShort.userNextPrice_syntheticToken_shift_from_marketSide(
+              ->LongShort.userNextPrice_syntheticToken_toShiftAwayFrom_marketSide(
                   marketIndex,
                   isShiftFromLong,
                   user,
                 );
             Chai.bnEqual(
               zeroBn,
-              userNextPrice_syntheticToken_shift_from_marketSide,
+              userNextPrice_syntheticToken_toShiftAwayFrom_marketSide,
             );
           });
         });

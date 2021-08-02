@@ -37,7 +37,7 @@ let testIntegration =
               : LongShort.shiftPositionFromShortNextPrice;
 
           let%AwaitThen _longValueBefore =
-            longShort->LongShort.syntheticToken_amountPaymentToken_backedValue(
+            longShort->LongShort.marketSideValueInPaymentToken(
               marketIndex,
               isShiftFromLong,
             );
@@ -311,14 +311,14 @@ let testUnit =
 
         let%AwaitThen updatedbatched_amountSyntheticTokenToShiftMarketSide =
           contracts.contents.longShort
-          ->LongShort.batched_amountSyntheticToken_shift_from_marketSide(
+          ->LongShort.batched_amountSyntheticToken_toShiftAwayFrom_marketSide(
               marketIndex,
               isShiftFromLong,
             );
 
-        let%AwaitThen updateduserNextPrice_syntheticToken_shift_from_marketSide =
+        let%AwaitThen updateduserNextPrice_syntheticToken_toShiftAwayFrom_marketSide =
           contracts.contents.longShort
-          ->LongShort.userNextPrice_syntheticToken_shift_from_marketSide(
+          ->LongShort.userNextPrice_syntheticToken_toShiftAwayFrom_marketSide(
               marketIndex,
               isShiftFromLong,
               testWallet.address,
@@ -340,8 +340,8 @@ let testUnit =
 
         Chai.bnEqual(
           ~message=
-            "userNextPrice_syntheticToken_shift_from_marketSide not updated correctly",
-          updateduserNextPrice_syntheticToken_shift_from_marketSide,
+            "userNextPrice_syntheticToken_toShiftAwayFrom_marketSide not updated correctly",
+          updateduserNextPrice_syntheticToken_toShiftAwayFrom_marketSide,
           amount,
         );
 

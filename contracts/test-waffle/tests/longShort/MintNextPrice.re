@@ -27,7 +27,7 @@ let testIntegration =
         markets->Array.getUnsafe(0);
 
       let%AwaitThen _longValueBefore =
-        longShort->LongShort.syntheticToken_amountPaymentToken_backedValue(
+        longShort->LongShort.marketSideValueInPaymentToken(
           marketIndex,
           true /*long*/,
         );
