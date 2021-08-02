@@ -145,9 +145,10 @@ contract YieldManagerMock is IYieldManager {
     totalHeld = totalHeld - amount;
   }
 
-  function withdrawErc20TokenToTreasury(address erc20Token) external override treasuryOnly {
+  function claimAaveRewardsToTreasury() external override treasuryOnly {
     // Redeem other erc20 tokens.
     // Transfer tokens back to Treasury contract.
+    // TODO: fix
     mockHoldingAdditionalRewardYield();
     uint256 amount = ERC20PresetMinterPauser(erc20Token).balanceOf(address(this));
     ERC20PresetMinterPauser(erc20Token).transfer(treasury, amount);
