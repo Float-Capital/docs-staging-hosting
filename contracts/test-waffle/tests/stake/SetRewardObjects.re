@@ -95,8 +95,8 @@ let test =
 
       rewardParams->Chai.recordEqualFlat({
         timestamp: timestampRef^,
-        accumulativeFloatPerLongToken: longAccum,
-        accumulativeFloatPerShortToken: shortAccum,
+        accumulativeFloatPerSyntheticToken_long: longAccum,
+        accumulativeFloatPerSyntheticToken_short: shortAccum,
       });
     });
     it("emits StateAddedEvent", () => {

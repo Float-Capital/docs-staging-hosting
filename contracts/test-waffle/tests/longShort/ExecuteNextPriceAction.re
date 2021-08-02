@@ -370,7 +370,7 @@ let testUnit =
         );
       };
       let testExecuteOutstandingNextPriceRedeems = (~isShiftFromLong) => {
-        describe("syntheticTokensShiftedAwayFromMarketSide == 0", () => {
+        describe("syntheticToken_toShiftAwayFrom_marketSide == 0", () => {
           let executeOutstandingNextPriceRedeemsTx =
             ref("Undefined"->Obj.magic);
 

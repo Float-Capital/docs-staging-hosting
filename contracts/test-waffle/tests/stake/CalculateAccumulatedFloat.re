@@ -165,13 +165,18 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
       let rewardBeforeShiftInterval = Helpers.randomTokenAmount();
       let rewardAfterShiftInterval = Helpers.randomTokenAmount();
       let amountToShift = Helpers.randomTokenAmount();
-      let shiftIndex = Helpers.randomInteger();
-      let longShortMarketPriceSnapshotIndex = Helpers.randomInteger();
-      let nextTokenShiftIndex = shiftIndex->add(oneBn);
-      let tokenShiftIndexToStakerStateMapping =
+      let userNextPrice_stakedSyntheticTokenShiftIndex =
+        Helpers.randomInteger();
+      let takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping =
+        Helpers.randomInteger();
+      let batched_stakerNextTokenShiftIndex =
+        userNextPrice_stakedSyntheticTokenShiftIndex->add(oneBn);
+      let takerTokenShiftIndex_to_stakerStateIndex_mapping =
         usersLatestClaimedReward->add(Helpers.randomInteger());
       let newLatestRewardIndex =
-        tokenShiftIndexToStakerStateMapping->add(Helpers.randomInteger());
+        takerTokenShiftIndex_to_stakerStateIndex_mapping->add(
+          Helpers.randomInteger(),
+        );
       let amountOfStakeShifted = Helpers.randomTokenAmount();
       let amountStakedBothSidesInitially =
         amountToShift->add(amountOfStakeShifted);
@@ -208,10 +213,10 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
             ~user,
             ~shiftAmountLong=isShiftFromLong ? amountToShift : zeroBn,
             ~shiftAmountShort=isShiftFromLong ? zeroBn : amountToShift,
-            ~shiftIndex,
-            ~nextTokenShiftIndex,
-            ~longShortMarketPriceSnapshotIndex,
-            ~tokenShiftIndexToStakerStateMapping,
+            ~userNextPrice_stakedSyntheticTokenShiftIndex,
+            ~batched_stakerNextTokenShiftIndex,
+            ~takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping,
+            ~takerTokenShiftIndex_to_stakerStateIndex_mapping,
           );
         let%AwaitThen longShortSmocked = longShort->LongShortSmocked.make;
         let%AwaitThen _ =
@@ -269,7 +274,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
                 amountStakedLong: amountStakedBothSidesInitially,
                 amountStakedShort: amountStakedBothSidesInitially,
                 rewardIndexFrom: usersLatestClaimedReward,
-                rewardIndexTo: tokenShiftIndexToStakerStateMapping,
+                rewardIndexTo: takerTokenShiftIndex_to_stakerStateIndex_mapping,
               },
               {
                 marketIndex,
@@ -277,7 +282,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
                   isShiftFromLong ? stakeDecreasedSide : stakeIncreasedSide,
                 amountStakedShort:
                   isShiftFromLong ? stakeIncreasedSide : stakeDecreasedSide,
-                rewardIndexFrom: tokenShiftIndexToStakerStateMapping,
+                rewardIndexFrom: takerTokenShiftIndex_to_stakerStateIndex_mapping,
                 rewardIndexTo: newLatestRewardIndex,
               },
             |],
@@ -299,7 +304,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
                   marketIndex,
                   amountSyntheticToken_redeemOnOriginSide: amountToShift,
                   isShiftFromLong,
-                  priceSnapshotIndex: longShortMarketPriceSnapshotIndex,
+                  priceSnapshotIndex: takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping,
                 },
               |],
             );
@@ -309,7 +314,8 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
           "it should reset "
           ++ (
             isShiftFromLong
-              ? "amountToShiftFromLongUser" : "amountToShiftFromShortUser"
+              ? "userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_long"
+              : "userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_short"
           )
           ++ " to zero.",
           () => {
@@ -325,8 +331,8 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
 
             let getAmountToShiftFromSideUser =
               isShiftFromLong
-                ? Staker.amountToShiftFromLongUser
-                : Staker.amountToShiftFromShortUser;
+                ? Staker.userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_long
+                : Staker.userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_short;
 
             let%Await amountToShiftForSideAfter =
               contracts.contents.staker
@@ -343,7 +349,9 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
         runTestsForSide(~isShiftFromLong=false)
       );
 
-      it("it should reset the users shiftIndex to zero", () => {
+      it(
+        "it should reset the users userNextPrice_stakedSyntheticTokenShiftIndex to zero",
+        () => {
         let%Await _ = setup(~isShiftFromLong=true);
 
         // the setup function only simulates the call, it doesn't execute it, execute it here.
@@ -355,7 +363,11 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
             );
 
         let%Await usersShiftIndex =
-          contracts.contents.staker->Staker.shiftIndex(marketIndex, user);
+          contracts.contents.staker
+          ->Staker.userNextPrice_stakedSyntheticTokenShiftIndex(
+              marketIndex,
+              user,
+            );
 
         Chai.bnEqual(usersShiftIndex, zeroBn);
       });
