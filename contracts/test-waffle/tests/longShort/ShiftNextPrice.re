@@ -37,7 +37,7 @@ let testIntegration =
               : LongShort.shiftPositionFromShortNextPrice;
 
           let%AwaitThen _longValueBefore =
-            longShort->LongShort.syntheticTokenPoolValue(
+            longShort->LongShort.syntheticToken_amountPaymentToken_backedValue(
               marketIndex,
               isShiftFromLong,
             );
@@ -106,13 +106,13 @@ let testIntegration =
           let%AwaitThen latestUpdateIndex =
             longShort->LongShort.marketUpdateIndex(marketIndex);
           let%AwaitThen shiftPriceFromSynth =
-            longShort->LongShort.syntheticTokenPriceSnapshot(
+            longShort->LongShort.syntheticToken_priceSnapshot(
               marketIndex,
               isShiftFromLong,
               latestUpdateIndex,
             );
           let%AwaitThen shiftPriceToSynth =
-            longShort->LongShort.syntheticTokenPriceSnapshot(
+            longShort->LongShort.syntheticToken_priceSnapshot(
               marketIndex,
               !isShiftFromLong,
               latestUpdateIndex,
@@ -309,16 +309,16 @@ let testUnit =
 
         let%AwaitThen _ = setup(~isShiftFromLong, ~testWallet);
 
-        let%AwaitThen updatedbatched_amountOfSyntheticTokensToShiftMarketSide =
+        let%AwaitThen updatedbatched_amountSyntheticTokenToShiftMarketSide =
           contracts.contents.longShort
-          ->LongShort.batched_amountOfSyntheticTokensToShiftFromMarketSide(
+          ->LongShort.batched_amountSyntheticToken_shift_from_marketSide(
               marketIndex,
               isShiftFromLong,
             );
 
-        let%AwaitThen updateduserNextPrice_amountSynthToShiftFromMarketSide =
+        let%AwaitThen updateduserNextPrice_syntheticToken_shift_from_marketSide =
           contracts.contents.longShort
-          ->LongShort.userNextPrice_amountSynthToShiftFromMarketSide(
+          ->LongShort.userNextPrice_syntheticToken_shift_from_marketSide(
               marketIndex,
               isShiftFromLong,
               testWallet.address,
@@ -333,15 +333,15 @@ let testUnit =
 
         Chai.bnEqual(
           ~message=
-            "batched_amountOfSyntheticTokensToShiftMarketSide not updated correctly",
-          updatedbatched_amountOfSyntheticTokensToShiftMarketSide,
+            "batched_amountSyntheticTokenToShiftMarketSide not updated correctly",
+          updatedbatched_amountSyntheticTokenToShiftMarketSide,
           amount,
         );
 
         Chai.bnEqual(
           ~message=
-            "userNextPrice_amountSynthToShiftFromMarketSide not updated correctly",
-          updateduserNextPrice_amountSynthToShiftFromMarketSide,
+            "userNextPrice_syntheticToken_shift_from_marketSide not updated correctly",
+          updateduserNextPrice_syntheticToken_shift_from_marketSide,
           amount,
         );
 

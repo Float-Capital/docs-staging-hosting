@@ -30,15 +30,15 @@ let testUnit =
         let marketUpdateIndex = twoBn;
 
         describe(
-          "userNextPriceDepositAmount non-zero and userNextPrice_amountSynthToShiftFromMarketSide zero",
+          "userNextPriceDepositAmount non-zero and userNextPrice_syntheticToken_shift_from_marketSide zero",
           () => {
-            let userNextPrice_depositAmount_isLong =
+            let userNextPrice_paymentToken_depositAmount_isLong =
               Helpers.randomTokenAmount();
-            let syntheticTokenPriceSnapshot_isLong =
+            let syntheticToken_priceSnapshot_isLong =
               Helpers.randomTokenAmount();
-            let syntheticTokenPriceSnapshot_notIsLong =
+            let syntheticToken_priceSnapshot_notIsLong =
               Helpers.randomTokenAmount();
-            let userNextPrice_amountSynthToShiftFromMarketSide_notIsLong = zeroBn;
+            let userNextPrice_syntheticToken_shift_from_marketSide_notIsLong = zeroBn;
 
             it("should return correct result", () => {
               let%Await _ =
@@ -49,16 +49,16 @@ let testUnit =
                     ~isLong,
                     ~userNextPrice_currentUpdateIndex,
                     ~marketUpdateIndex,
-                    ~userNextPrice_depositAmount_isLong,
-                    ~syntheticTokenPriceSnapshot_isLong,
-                    ~syntheticTokenPriceSnapshot_notIsLong,
-                    ~userNextPrice_amountSynthToShiftFromMarketSide_notIsLong,
+                    ~userNextPrice_paymentToken_depositAmount_isLong,
+                    ~syntheticToken_priceSnapshot_isLong,
+                    ~syntheticToken_priceSnapshot_notIsLong,
+                    ~userNextPrice_syntheticToken_shift_from_marketSide_notIsLong,
                   );
 
               let expectedResult =
-                userNextPrice_depositAmount_isLong
+                userNextPrice_paymentToken_depositAmount_isLong
                 ->mul(tenToThe18)
-                ->div(syntheticTokenPriceSnapshot_isLong);
+                ->div(syntheticToken_priceSnapshot_isLong);
               let%Await actualResult =
                 contracts.contents.longShort
                 ->LongShort.getUsersConfirmedButNotSettledSynthBalance(
@@ -72,14 +72,14 @@ let testUnit =
         );
 
         describe(
-          "userNextPriceDepositAmount zero and userNextPrice_amountSynthToShiftFromMarketSide non-zero",
+          "userNextPriceDepositAmount zero and userNextPrice_syntheticToken_shift_from_marketSide non-zero",
           () => {
-            let userNextPrice_depositAmount_isLong = zeroBn;
-            let syntheticTokenPriceSnapshot_isLong =
+            let userNextPrice_paymentToken_depositAmount_isLong = zeroBn;
+            let syntheticToken_priceSnapshot_isLong =
               Helpers.randomTokenAmount();
-            let syntheticTokenPriceSnapshot_notIsLong =
+            let syntheticToken_priceSnapshot_notIsLong =
               Helpers.randomTokenAmount();
-            let userNextPrice_amountSynthToShiftFromMarketSide_notIsLong =
+            let userNextPrice_syntheticToken_shift_from_marketSide_notIsLong =
               Helpers.randomTokenAmount();
 
             it("should return correct result", () => {
@@ -91,16 +91,16 @@ let testUnit =
                     ~isLong,
                     ~userNextPrice_currentUpdateIndex,
                     ~marketUpdateIndex,
-                    ~userNextPrice_depositAmount_isLong,
-                    ~syntheticTokenPriceSnapshot_isLong,
-                    ~syntheticTokenPriceSnapshot_notIsLong,
-                    ~userNextPrice_amountSynthToShiftFromMarketSide_notIsLong,
+                    ~userNextPrice_paymentToken_depositAmount_isLong,
+                    ~syntheticToken_priceSnapshot_isLong,
+                    ~syntheticToken_priceSnapshot_notIsLong,
+                    ~userNextPrice_syntheticToken_shift_from_marketSide_notIsLong,
                   );
 
               let expectedResult =
-                userNextPrice_amountSynthToShiftFromMarketSide_notIsLong
-                ->mul(syntheticTokenPriceSnapshot_notIsLong)
-                ->div(syntheticTokenPriceSnapshot_isLong);
+                userNextPrice_syntheticToken_shift_from_marketSide_notIsLong
+                ->mul(syntheticToken_priceSnapshot_notIsLong)
+                ->div(syntheticToken_priceSnapshot_isLong);
               let%Await actualResult =
                 contracts.contents.longShort
                 ->LongShort.getUsersConfirmedButNotSettledSynthBalance(
@@ -113,15 +113,15 @@ let testUnit =
           },
         );
         describe(
-          "userNextPriceDepositAmount non-zero and userNextPrice_amountSynthToShiftFromMarketSide non-zero",
+          "userNextPriceDepositAmount non-zero and userNextPrice_syntheticToken_shift_from_marketSide non-zero",
           () => {
-            let userNextPrice_depositAmount_isLong =
+            let userNextPrice_paymentToken_depositAmount_isLong =
               Helpers.randomTokenAmount();
-            let syntheticTokenPriceSnapshot_isLong =
+            let syntheticToken_priceSnapshot_isLong =
               Helpers.randomTokenAmount();
-            let syntheticTokenPriceSnapshot_notIsLong =
+            let syntheticToken_priceSnapshot_notIsLong =
               Helpers.randomTokenAmount();
-            let userNextPrice_amountSynthToShiftFromMarketSide_notIsLong =
+            let userNextPrice_syntheticToken_shift_from_marketSide_notIsLong =
               Helpers.randomTokenAmount();
 
             it("should return correct result", () => {
@@ -133,20 +133,20 @@ let testUnit =
                     ~isLong,
                     ~userNextPrice_currentUpdateIndex,
                     ~marketUpdateIndex,
-                    ~userNextPrice_depositAmount_isLong,
-                    ~syntheticTokenPriceSnapshot_isLong,
-                    ~syntheticTokenPriceSnapshot_notIsLong,
-                    ~userNextPrice_amountSynthToShiftFromMarketSide_notIsLong,
+                    ~userNextPrice_paymentToken_depositAmount_isLong,
+                    ~syntheticToken_priceSnapshot_isLong,
+                    ~syntheticToken_priceSnapshot_notIsLong,
+                    ~userNextPrice_syntheticToken_shift_from_marketSide_notIsLong,
                   );
 
               let expectedResult =
-                userNextPrice_amountSynthToShiftFromMarketSide_notIsLong
-                ->mul(syntheticTokenPriceSnapshot_notIsLong)
-                ->div(syntheticTokenPriceSnapshot_isLong)
+                userNextPrice_syntheticToken_shift_from_marketSide_notIsLong
+                ->mul(syntheticToken_priceSnapshot_notIsLong)
+                ->div(syntheticToken_priceSnapshot_isLong)
                 ->add(
-                    userNextPrice_depositAmount_isLong
+                    userNextPrice_paymentToken_depositAmount_isLong
                     ->mul(tenToThe18)
-                    ->div(syntheticTokenPriceSnapshot_isLong),
+                    ->div(syntheticToken_priceSnapshot_isLong),
                   );
               let%Await actualResult =
                 contracts.contents.longShort
@@ -164,11 +164,12 @@ let testUnit =
     describe(
       {j|[sad case] [isLong: $isLong] userNextPrice_currentUpdateIndex out of bounds|j},
       () => {
-        let userNextPrice_depositAmount_isLong = Helpers.randomTokenAmount();
-        let syntheticTokenPriceSnapshot_isLong = Helpers.randomTokenAmount();
-        let syntheticTokenPriceSnapshot_notIsLong =
+        let userNextPrice_paymentToken_depositAmount_isLong =
           Helpers.randomTokenAmount();
-        let userNextPrice_amountSynthToShiftFromMarketSide_notIsLong =
+        let syntheticToken_priceSnapshot_isLong = Helpers.randomTokenAmount();
+        let syntheticToken_priceSnapshot_notIsLong =
+          Helpers.randomTokenAmount();
+        let userNextPrice_syntheticToken_shift_from_marketSide_notIsLong =
           Helpers.randomTokenAmount();
 
         let setup = (~userNextPrice_currentUpdateIndex, ~marketUpdateIndex) => {
@@ -179,10 +180,10 @@ let testUnit =
               ~isLong,
               ~userNextPrice_currentUpdateIndex,
               ~marketUpdateIndex,
-              ~userNextPrice_depositAmount_isLong,
-              ~syntheticTokenPriceSnapshot_isLong,
-              ~syntheticTokenPriceSnapshot_notIsLong,
-              ~userNextPrice_amountSynthToShiftFromMarketSide_notIsLong,
+              ~userNextPrice_paymentToken_depositAmount_isLong,
+              ~syntheticToken_priceSnapshot_isLong,
+              ~syntheticToken_priceSnapshot_notIsLong,
+              ~userNextPrice_syntheticToken_shift_from_marketSide_notIsLong,
             );
         };
 

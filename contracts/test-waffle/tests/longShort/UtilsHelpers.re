@@ -73,21 +73,33 @@ let testUnit =
     describe("_getYieldSplit", () => {
       let marketIndex = 1;
 
-      let test = (~syntheticTokenPoolValueLong, ~syntheticTokenPoolValueShort) => {
+      let test =
+          (
+            ~syntheticToken_amountPaymentToken_backedValueLong,
+            ~syntheticToken_amountPaymentToken_backedValueShort,
+          ) => {
         let totalValueLockedInMarket =
-          syntheticTokenPoolValueLong->add(syntheticTokenPoolValueShort);
+          syntheticToken_amountPaymentToken_backedValueLong->add(
+            syntheticToken_amountPaymentToken_backedValueShort,
+          );
 
         let isLongSideUnderbalanced =
-          syntheticTokenPoolValueShort->bnGte(syntheticTokenPoolValueLong);
+          syntheticToken_amountPaymentToken_backedValueShort->bnGte(
+            syntheticToken_amountPaymentToken_backedValueLong,
+          );
 
         let imbalance =
           isLongSideUnderbalanced
-            ? syntheticTokenPoolValueShort->sub(syntheticTokenPoolValueLong)
-            : syntheticTokenPoolValueLong->sub(syntheticTokenPoolValueShort);
+            ? syntheticToken_amountPaymentToken_backedValueShort->sub(
+                syntheticToken_amountPaymentToken_backedValueLong,
+              )
+            : syntheticToken_amountPaymentToken_backedValueLong->sub(
+                syntheticToken_amountPaymentToken_backedValueShort,
+              );
 
         let%AwaitThen marketTreasurySplitGradientE18 =
           contracts.contents.longShort
-          ->LongShort.marketTreasurySplitGradientsE18(marketIndex);
+          ->LongShort.marketTreasurySplit_gradients_e18(marketIndex);
 
         let marketPercentCalculatedE18 =
           imbalance
@@ -104,8 +116,8 @@ let testUnit =
           contracts.contents.longShort
           ->LongShort.Exposed._getYieldSplitExposed(
               ~marketIndex,
-              ~longValue=syntheticTokenPoolValueLong,
-              ~shortValue=syntheticTokenPoolValueShort,
+              ~longValue=syntheticToken_amountPaymentToken_backedValueLong,
+              ~shortValue=syntheticToken_amountPaymentToken_backedValueShort,
               ~totalValueLockedInMarket,
             );
         Chai.bnEqual(
@@ -117,24 +129,40 @@ let testUnit =
       };
 
       it("works as expected if longValue > shortValue", () => {
-        let syntheticTokenPoolValueShort = Helpers.randomTokenAmount();
-        let syntheticTokenPoolValueLong =
-          syntheticTokenPoolValueShort->add(Helpers.randomTokenAmount());
+        let syntheticToken_amountPaymentToken_backedValueShort =
+          Helpers.randomTokenAmount();
+        let syntheticToken_amountPaymentToken_backedValueLong =
+          syntheticToken_amountPaymentToken_backedValueShort->add(
+            Helpers.randomTokenAmount(),
+          );
 
-        test(~syntheticTokenPoolValueLong, ~syntheticTokenPoolValueShort);
+        test(
+          ~syntheticToken_amountPaymentToken_backedValueLong,
+          ~syntheticToken_amountPaymentToken_backedValueShort,
+        );
       });
       it("works as expected if shortValue > longValue", () => {
-        let syntheticTokenPoolValueLong = Helpers.randomTokenAmount();
-        let syntheticTokenPoolValueShort =
-          syntheticTokenPoolValueLong->add(Helpers.randomTokenAmount());
+        let syntheticToken_amountPaymentToken_backedValueLong =
+          Helpers.randomTokenAmount();
+        let syntheticToken_amountPaymentToken_backedValueShort =
+          syntheticToken_amountPaymentToken_backedValueLong->add(
+            Helpers.randomTokenAmount(),
+          );
 
-        test(~syntheticTokenPoolValueLong, ~syntheticTokenPoolValueShort);
+        test(
+          ~syntheticToken_amountPaymentToken_backedValueLong,
+          ~syntheticToken_amountPaymentToken_backedValueShort,
+        );
       });
       it("works as expected if shortValue == longValue", () => {
-        let syntheticTokenPoolValueLong = Helpers.randomTokenAmount();
-        let syntheticTokenPoolValueShort = syntheticTokenPoolValueLong;
+        let syntheticToken_amountPaymentToken_backedValueLong =
+          Helpers.randomTokenAmount();
+        let syntheticToken_amountPaymentToken_backedValueShort = syntheticToken_amountPaymentToken_backedValueLong;
 
-        test(~syntheticTokenPoolValueLong, ~syntheticTokenPoolValueShort);
+        test(
+          ~syntheticToken_amountPaymentToken_backedValueLong,
+          ~syntheticToken_amountPaymentToken_backedValueShort,
+        );
       });
     });
   });

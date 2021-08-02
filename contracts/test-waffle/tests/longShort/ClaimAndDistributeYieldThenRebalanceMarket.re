@@ -32,20 +32,31 @@ let testUnit =
     };
 
     let runTests =
-        (~syntheticTokenPoolValueLong, ~syntheticTokenPoolValueShort) => {
+        (
+          ~syntheticToken_amountPaymentToken_backedValueLong,
+          ~syntheticToken_amountPaymentToken_backedValueShort,
+        ) => {
       let totalValueLockedInMarket =
-        syntheticTokenPoolValueLong->add(syntheticTokenPoolValueShort);
+        syntheticToken_amountPaymentToken_backedValueLong->add(
+          syntheticToken_amountPaymentToken_backedValueShort,
+        );
 
       let (yieldDistributedValueLong, yieldDistributedValueShort) =
-        if (syntheticTokenPoolValueLong->bnGt(syntheticTokenPoolValueShort)) {
+        if (syntheticToken_amountPaymentToken_backedValueLong->bnGt(
+              syntheticToken_amountPaymentToken_backedValueShort,
+            )) {
           (
-            syntheticTokenPoolValueLong,
-            syntheticTokenPoolValueShort->add(marketAmountFromYieldManager),
+            syntheticToken_amountPaymentToken_backedValueLong,
+            syntheticToken_amountPaymentToken_backedValueShort->add(
+              marketAmountFromYieldManager,
+            ),
           );
         } else {
           (
-            syntheticTokenPoolValueLong->add(marketAmountFromYieldManager),
-            syntheticTokenPoolValueShort,
+            syntheticToken_amountPaymentToken_backedValueLong->add(
+              marketAmountFromYieldManager,
+            ),
+            syntheticToken_amountPaymentToken_backedValueShort,
           );
         };
 
@@ -54,13 +65,15 @@ let testUnit =
           contracts.contents.longShort
           ->LongShort.Exposed.setClaimAndDistributeYieldThenRebalanceMarketGlobals(
               ~marketIndex,
-              ~syntheticTokenPoolValueLong,
-              ~syntheticTokenPoolValueShort,
+              ~syntheticToken_amountPaymentToken_backedValueLong,
+              ~syntheticToken_amountPaymentToken_backedValueShort,
               ~yieldManager=contracts.contents.yieldManagerSmocked.address,
             );
 
         let isLongSideUnderbalanced =
-          syntheticTokenPoolValueLong->bnLt(syntheticTokenPoolValueShort);
+          syntheticToken_amountPaymentToken_backedValueLong->bnLt(
+            syntheticToken_amountPaymentToken_backedValueShort,
+          );
 
         LongShortSmocked.InternalMock.mock_getYieldSplitToReturn(
           isLongSideUnderbalanced,
@@ -89,8 +102,8 @@ let testUnit =
           ->Chai.recordArrayDeepEqualFlat([|
               {
                 marketIndex,
-                longValue: syntheticTokenPoolValueLong,
-                shortValue: syntheticTokenPoolValueShort,
+                longValue: syntheticToken_amountPaymentToken_backedValueLong,
+                shortValue: syntheticToken_amountPaymentToken_backedValueShort,
                 totalValueLockedInMarket,
               },
             |])
@@ -189,18 +202,30 @@ let testUnit =
     ();
 
     describe("Long Side is Overvalued", () => {
-      let syntheticTokenPoolValueShort = Helpers.randomTokenAmount();
-      let syntheticTokenPoolValueLong =
-        syntheticTokenPoolValueShort->add(Helpers.randomTokenAmount());
+      let syntheticToken_amountPaymentToken_backedValueShort =
+        Helpers.randomTokenAmount();
+      let syntheticToken_amountPaymentToken_backedValueLong =
+        syntheticToken_amountPaymentToken_backedValueShort->add(
+          Helpers.randomTokenAmount(),
+        );
 
-      runTests(~syntheticTokenPoolValueLong, ~syntheticTokenPoolValueShort);
+      runTests(
+        ~syntheticToken_amountPaymentToken_backedValueLong,
+        ~syntheticToken_amountPaymentToken_backedValueShort,
+      );
     });
     describe("Short Side is Overvalued", () => {
-      let syntheticTokenPoolValueLong = Helpers.randomTokenAmount();
-      let syntheticTokenPoolValueShort =
-        syntheticTokenPoolValueLong->add(Helpers.randomTokenAmount());
+      let syntheticToken_amountPaymentToken_backedValueLong =
+        Helpers.randomTokenAmount();
+      let syntheticToken_amountPaymentToken_backedValueShort =
+        syntheticToken_amountPaymentToken_backedValueLong->add(
+          Helpers.randomTokenAmount(),
+        );
 
-      runTests(~syntheticTokenPoolValueLong, ~syntheticTokenPoolValueShort);
+      runTests(
+        ~syntheticToken_amountPaymentToken_backedValueLong,
+        ~syntheticToken_amountPaymentToken_backedValueShort,
+      );
     });
   });
 };

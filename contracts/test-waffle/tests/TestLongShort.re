@@ -175,7 +175,7 @@ describe("Float System", () => {
 
         let%Await updatedGradient =
           contracts.contents.longShort
-          ->LongShort.marketTreasurySplitGradientsE18(marketIndex);
+          ->LongShort.marketTreasurySplit_gradients_e18(marketIndex);
 
         Chai.bnEqual(updatedGradient, newGradient);
       });
