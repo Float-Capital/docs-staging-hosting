@@ -68,7 +68,7 @@ let testUnit =
         );
 
         contracts.contents.yieldManagerSmocked
-        ->YieldManagerAaveSmocked.mockdistributeYieldForTreasuryAndReturnMarketAllocationToReturn(
+        ->YieldManagerAaveSmocked.mockDistributeYieldForTreasuryAndReturnMarketAllocationToReturn(
             marketAmountFromYieldManager,
           );
       });

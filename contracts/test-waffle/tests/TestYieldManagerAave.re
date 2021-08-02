@@ -37,7 +37,7 @@ describe("Float System", () => {
           ~paymentToken=paymentTokenSmocked.address,
           ~aToken=fundTokenAddress,
           ~lendingPool=lendingPoolSmocked.address,
-          ~aaveReferalCode=6543,
+          ~aaveReferralCode=6543,
         );
 
       contracts :=

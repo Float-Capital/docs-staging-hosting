@@ -32,8 +32,7 @@ contract YieldManagerAave is IYieldManager {
   /// @notice The specific Aave lending pool contract
   ILendingPool public lendingPool;
 
-  /// @notice An aave specific referralCode that has been a depricated feature
-  /// @dev Will be set to 0 for "no referral" at deployment
+  /// @dev An aave specific referralCode that has been a depricated feature. This will be set to 0 for "no referral" at deployment
   uint16 referralCode;
 
   /// @notice distributed yield not yet transferred to the treasury
@@ -107,7 +106,7 @@ contract YieldManagerAave is IYieldManager {
    @notice admin only function to update admin
    @param _admin New admin address
   */
-  function changeAdmin(address erc20Token) external adminOnly {
+  function changeAdmin(address _admin) external adminOnly {
     admin = _admin;
   }
 
