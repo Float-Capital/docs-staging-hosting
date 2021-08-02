@@ -435,33 +435,31 @@ contract LongShort is ILongShort, Initializable {
     return (amountPaymentTokenBackingSynth * 1e18) / syntheticTokenPriceInPaymentTokens;
   }
 
-  /// @notice Calculate the amount of target side synthetic tokens that are worth the same
-  ///         amount of payment tokens as X many synthetic tokens on origin side.
-  ///
-  /// The resulting equation comes from simplifying this function combo:
-  /// _getAmountSyntheticToken(
-  ///   _getAmountPaymentToken(
-  ///     amountOriginSynth,
-  ///     priceOriginSynth
-  ///   ),
-  ///   priceTagretSynth)
-  ///
-  /// Unpacking the function we get:
-  /// ((amountOriginSynth * priceOriginSynth) / 1e18) * 1e18 / priceTagretSynth
-  ///
-  /// And simplifying this we get:
-  /// (amountOriginSynth * priceOriginSynth) / priceTagretSynth
-  ///
-  /// @param amountSyntheticTokensOnSideA Amount of synthetic tokens on origin side
-  /// @param priceOfSyntheticTokenOnSideA Price of origin side's synthetic token
-  /// @param priceOfSyntheticTokenOnSideB Price of target side's synthetic token
-  /// @return equivalentAmountSyntheticTokensOnSideB Amount of synthetic token on target side
-  function _getEquivalentAmountSyntheticTokensOnSideB(
+  /**
+  @notice Calculate the amount of target side synthetic tokens that are worth the same
+          amount of payment tokens as X many synthetic tokens on origin side.
+          The resulting equation comes from simplifying this function combo:
+            _getAmountSyntheticToken(
+              _getAmountPaymentToken(
+                amountOriginSynth,
+                priceOriginSynth
+              ),
+              priceTagretSynth)
+              Unpacking the function we get:
+            ((amountOriginSynth * priceOriginSynth) / 1e18) * 1e18 / priceTagretSynth
+              And simplifying this we get:
+            (amountOriginSynth * priceOriginSynth) / priceTagretSynth
+  @param amountSyntheticTokensOnSideA Amount of synthetic tokens on origin side
+  @param priceOfSyntheticTokenOnSideA Price of origin side's synthetic token
+  @param priceOfSyntheticTokenOnSideB Price of target side's synthetic token
+  @return equivalentAmountSyntheticTokensOnTargetSide Amount of synthetic token on target side
+  */
+  function _getEquivalentAmountSyntheticTokensOnTargetSide(
     uint256 amountSyntheticTokensOnSideA,
     uint256 priceOfSyntheticTokenOnSideA,
     uint256 priceOfSyntheticTokenOnSideB
-  ) internal pure virtual returns (uint256 equivalentAmountSyntheticTokensOnSideB) {
-    equivalentAmountSyntheticTokensOnSideB =
+  ) internal pure virtual returns (uint256 equivalentAmountSyntheticTokensOnTargetSide) {
+    equivalentAmountSyntheticTokensOnTargetSide =
       (amountSyntheticTokensOnSideA * priceOfSyntheticTokenOnSideA) /
       priceOfSyntheticTokenOnSideB;
   }
