@@ -226,6 +226,39 @@ contract StakerInternalStateSetters is Staker {
     userIndexOfLastClaimedReward[marketIndex][user] = userLastRewardIndex;
   }
 
+  function set_withdrawGlobals(
+    uint32 marketIndex,
+    address syntheticToken,
+    address user,
+    uint256 amountStaked,
+    uint256 fees
+  ) external {
+    marketIndexOfToken[syntheticToken] = marketIndex;
+    marketUnstakeFeeBasisPoints[marketIndex] = fees;
+    userAmountStaked[syntheticToken][user] = amountStaked;
+  }
+
+  function setWithdrawGlobals(
+    uint32 marketIndex,
+    address _longShort,
+    address token
+  ) external {
+    marketIndexOfToken[token] = marketIndex;
+    longShort = _longShort;
+  }
+
+  function setWithdrawAllGlobals(
+    uint32 marketIndex,
+    address _longShort,
+    address user,
+    uint256 amountStaked,
+    address token
+  ) external {
+    marketIndexOfToken[token] = marketIndex;
+    longShort = _longShort;
+    userAmountStaked[token][user] = amountStaked;
+  }
+
   ///////////////////////////////////////////////////////
   //////////// Functions for Experimentation ////////////
   ///////////////////////////////////////////////////////

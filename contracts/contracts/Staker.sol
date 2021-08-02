@@ -841,7 +841,7 @@ contract Staker is IStaker, Initializable {
 
     IERC20(token).transfer(msg.sender, amount - amountFees);
 
-    emit StakeWithdrawn(msg.sender, address(token), amount);
+    emit StakeWithdrawn(msg.sender, token, amount);
   }
 
   function withdraw(address token, uint256 amount) external {
