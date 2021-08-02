@@ -43,7 +43,7 @@ abstract contract IYieldManager {
    * much is reserved for the market. The yield is split between
    * the market and the treasury so treasuryPercent = 1 - marketPercent.
    */
-  function claimYieldAndGetMarketAmount(
+  function distributeYieldForTreasuryAndReturnMarketAllocation(
     uint256 totalValueRealizedForMarket,
     uint256 treasuryYieldPercentE18
   ) public virtual returns (uint256 marketAmount);

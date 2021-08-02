@@ -540,9 +540,9 @@ contract LongShort is ILongShort, Initializable {
         );
       }
 
-
-        uint256 amountSyntheticTokensToBeShiftedAwayFromOriginSide
-       = userNextPrice_amountSynthToShiftFromMarketSide[marketIndex][!isLong][user];
+      uint256 amountSyntheticTokensToBeShiftedAwayFromOriginSide = userNextPrice_amountSynthToShiftFromMarketSide[
+          marketIndex
+        ][!isLong][user];
 
       if (amountSyntheticTokensToBeShiftedAwayFromOriginSide > 0) {
         uint256 syntheticTokenPriceOnOriginSide = syntheticTokenPriceSnapshot[marketIndex][!isLong][
@@ -630,10 +630,11 @@ contract LongShort is ILongShort, Initializable {
       totalValueLockedInMarket
     );
 
-    uint256 marketAmount = IYieldManager(yieldManagers[marketIndex]).claimYieldAndGetMarketAmount(
-      totalValueLockedInMarket,
-      treasuryYieldPercentE18
-    );
+    uint256 marketAmount = IYieldManager(yieldManagers[marketIndex])
+      .distributeYieldForTreasuryAndReturnMarketAllocation(
+        totalValueLockedInMarket,
+        treasuryYieldPercentE18
+      );
 
     if (marketAmount > 0) {
       if (isLongSideUnderbalanced) {
@@ -750,10 +751,10 @@ contract LongShort is ILongShort, Initializable {
         int256 paymentTokenValueChangeForLong,
         int256 paymentTokenValueChangeForShort
       ) = _performOustandingBatchedSettlements(
-        marketIndex,
-        syntheticTokenPriceLong,
-        syntheticTokenPriceShort
-      );
+          marketIndex,
+          syntheticTokenPriceLong,
+          syntheticTokenPriceShort
+        );
 
       newLongPoolValue = uint256(int256(newLongPoolValue) + paymentTokenValueChangeForLong);
       newShortPoolValue = uint256(int256(newShortPoolValue) + paymentTokenValueChangeForShort);
@@ -1041,9 +1042,9 @@ contract LongShort is ILongShort, Initializable {
     address user,
     bool isShiftFromLong
   ) internal virtual {
-
-      uint256 syntheticTokensShiftedAwayFromMarketSide
-     = userNextPrice_amountSynthToShiftFromMarketSide[marketIndex][isShiftFromLong][user];
+    uint256 syntheticTokensShiftedAwayFromMarketSide = userNextPrice_amountSynthToShiftFromMarketSide[
+        marketIndex
+      ][isShiftFromLong][user];
     if (syntheticTokensShiftedAwayFromMarketSide > 0) {
       uint256 amountSyntheticTokenToShiftToOppositeSide = getAmountSyntheticTokenToMintOnTargetSide(
         marketIndex,
