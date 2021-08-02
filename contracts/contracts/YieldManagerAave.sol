@@ -163,7 +163,6 @@ contract YieldManagerAave is IYieldManager {
   /*
    * Transfer payment tokens owed to the treasury to the treasury.
    */
-  // TODO STENT not unit tested
   function withdrawTreasuryFunds() external override {
     uint256 amountToWithdrawForTreasury = totalReservedForTreasury;
     totalReservedForTreasury = 0;

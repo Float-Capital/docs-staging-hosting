@@ -538,7 +538,6 @@ contract Staker is IStaker, Initializable {
     // Update latest index to point to new state point.
     latestRewardIndex[marketIndex] = newIndex;
 
-    // TODO STENT why is this called StateAdded? Should be called newFloatValues or something
     emit StateAdded(marketIndex, newIndex, newLongAccumaltiveValue, newShortAccumulativeValue);
   }
 

@@ -86,8 +86,6 @@ contract SyntheticToken is ISyntheticToken {
     uint256 amount
   ) public override returns (bool) {
     if (recipient == address(longShort) && msg.sender == address(longShort)) {
-      // TODO STENT so this means that the longShort contract is sending to itself?
-      //      There is no function call like this in the LongShort contract.
       _transfer(sender, recipient, amount);
       return true;
     } else {
