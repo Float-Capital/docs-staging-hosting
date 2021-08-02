@@ -368,6 +368,9 @@ contract LongShort is ILongShort, Initializable {
 
     marketTreasurySplitGradientsE18[marketIndex] = marketTreasurySplitGradientE18;
 
+    // Set this value to one initially - 0 is a null value and thus potentially bug prone.
+    marketUpdateIndex[marketIndex] = 1;
+
     // Add new staker funds with fresh synthetic tokens.
     IStaker(staker).addNewStakingFund(
       latestMarket,
@@ -684,9 +687,9 @@ contract LongShort is ILongShort, Initializable {
     int256 newAssetPrice = IOracleManager(oracleManagers[marketIndex]).updatePrice();
     int256 oldAssetPrice = int256(assetPrice[marketIndex]);
 
-    bool assetPriceChanged = oldAssetPrice != newAssetPrice;
+    bool assetPriceHasChanged = oldAssetPrice != newAssetPrice;
 
-    if (assetPriceChanged || msg.sender == staker) {
+    if (assetPriceHasChanged || msg.sender == staker) {
       uint256 syntheticTokenPriceLong = syntheticTokenPriceSnapshot[marketIndex][true][
         marketUpdateIndex[marketIndex]
       ];
@@ -695,7 +698,11 @@ contract LongShort is ILongShort, Initializable {
       ];
       // if there is a price change and the 'staker' contract has pending updates, push the stakers price snapshot index to the staker
       // (so the staker can handle its internal accounting)
-      if (userNextPrice_currentUpdateIndex[marketIndex][staker] > 0 && assetPriceChanged) {
+      if (
+        userNextPrice_currentUpdateIndex[marketIndex][staker] ==
+        marketUpdateIndex[marketIndex] + 1 &&
+        assetPriceHasChanged
+      ) {
         IStaker(staker).addNewStateForFloatRewards(
           marketIndex,
           syntheticTokenPriceLong,
@@ -718,7 +725,7 @@ contract LongShort is ILongShort, Initializable {
 
       // function will return here if the staker called this simply for the
       // purpose of adding a state point required in staker.sol for our rewards calculation
-      if (!assetPriceChanged) {
+      if (!assetPriceHasChanged) {
         return;
       }
 

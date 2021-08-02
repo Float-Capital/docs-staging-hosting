@@ -9,7 +9,7 @@ let testUnit =
     ) => {
   describeUnit("Batched Settlement", () => {
     let marketIndex = Helpers.randomJsInteger();
-    describe_only("_performOustandingBatchedSettlements", () => {
+    describe("_performOustandingBatchedSettlements", () => {
       let syntheticTokenPriceLong = Helpers.randomTokenAmount();
       let syntheticTokenPriceShort = Helpers.randomTokenAmount();
 
