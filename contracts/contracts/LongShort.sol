@@ -438,14 +438,16 @@ contract LongShort is ILongShort, Initializable {
   /**
   @notice Calculate the amount of target side synthetic tokens that are worth the same
           amount of payment tokens as X many synthetic tokens on origin side.
-          The resulting equation comes from simplifying this function combo:
+          The resulting equation comes from simplifying this function 
+
             _getAmountSyntheticToken(
               _getAmountPaymentToken(
                 amountOriginSynth,
                 priceOriginSynth
               ),
               priceTagretSynth)
-              Unpacking the function we get:
+
+            Unpacking the function we get:
             ((amountOriginSynth * priceOriginSynth) / 1e18) * 1e18 / priceTagretSynth
               And simplifying this we get:
             (amountOriginSynth * priceOriginSynth) / priceTagretSynth
