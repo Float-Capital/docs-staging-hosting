@@ -3,16 +3,41 @@
 
 var React = require("react");
 var Loader = require("../Base/Loader.js");
+var Tooltip = require("../Base/Tooltip.js");
 var CONSTANTS = require("../../../CONSTANTS.js");
 
 function isHotAPY(apy) {
   return apy > CONSTANTS.hotAPYThreshold;
 }
 
+function apyToStr(apy) {
+  return (apy * 100).toFixed(2);
+}
+
 function mapVal(apy) {
-  return (apy * 100).toFixed(2) + "%" + (
+  return apyToStr(apy) + "%" + (
           apy > CONSTANTS.hotAPYThreshold ? "🔥" : ""
         );
+}
+
+function apyComponent(heading, suffix, apy) {
+  return React.createElement("div", {
+              className: "flex flex-col items-center"
+            }, React.createElement("h3", {
+                  className: "text-xs mt-1"
+                }, React.createElement("span", {
+                      className: "font-bold"
+                    }, heading), " APY", suffix), React.createElement("p", {
+                  className: "text-xl tracking-widest font-alphbeta"
+                }, apyToStr(apy) + "%"));
+}
+
+function ifElement(condition, element) {
+  if (condition) {
+    return element;
+  } else {
+    return null;
+  }
 }
 
 function StakeCardSide(Props) {
@@ -21,12 +46,34 @@ function StakeCardSide(Props) {
   var isLong = Props.isLong;
   var apy = Props.apy;
   var floatApy = Props.floatApy;
+  var stakeApy = Props.stakeApy;
   var tmp;
-  tmp = typeof apy === "number" ? React.createElement(Loader.Mini.make, {}) : (
-      apy.TAG === /* Loaded */0 ? React.createElement("p", {
-              className: "text-xl tracking-widest font-alphbeta"
-            }, mapVal(apy._0)) : React.createElement(Loader.Mini.make, {})
-    );
+  var exit = 0;
+  if (typeof apy === "number" || apy.TAG !== /* Loaded */0) {
+    exit = 1;
+  } else {
+    var apyVal = apy._0;
+    if (typeof stakeApy === "number" || stakeApy.TAG !== /* Loaded */0) {
+      exit = 1;
+    } else {
+      var stakeApy$1 = stakeApy._0;
+      var apyGreaterThanZero = apyVal >= 0.01;
+      var stakeApyGreaterThanZero = stakeApy$1 >= 0.01;
+      var element = apyComponent("SYNTH", null, apyVal);
+      var element$1 = React.createElement("span", {
+            className: "mx-2"
+          }, "+");
+      var element$2 = apyComponent("STAKE", React.createElement("span", {
+                className: "ml-1"
+              }, React.createElement(Tooltip.make, {
+                    tip: "Expected yield from FLOAT buybacks"
+                  })), stakeApy$1);
+      tmp = React.createElement(React.Fragment, undefined, apyGreaterThanZero ? element : null, apyGreaterThanZero && stakeApyGreaterThanZero ? element$1 : null, stakeApyGreaterThanZero ? element$2 : null);
+    }
+  }
+  if (exit === 1) {
+    tmp = React.createElement(Loader.Mini.make, {});
+  }
   return React.createElement("div", {
               className: "order-" + String(orderPostionMobile) + " md:order-" + String(orderPostion) + " w-1/2 md:w-1/4 flex items-center flex grow flex-wrap flex-col"
             }, React.createElement("div", {
@@ -36,19 +83,18 @@ function StakeCardSide(Props) {
                     }, React.createElement("span", {
                           className: "font-bold"
                         }, isLong ? "LONG" : "SHORT"), " FLOAT rewards"), React.createElement("p", {
-                      className: "text-2xl md:text-4xl tracking-widest font-alphbeta"
+                      className: "text-2xl md:text-3xl tracking-widest font-alphbeta"
                     }, mapVal(floatApy))), React.createElement("div", {
-                  className: "flex flex-col items-center justify-center pt-0 text-gray-600"
-                }, React.createElement("h3", {
-                      className: "text-xxs mt-1"
-                    }, React.createElement("span", {
-                          className: "font-bold"
-                        }, isLong ? "LONG" : "SHORT"), " APY"), tmp));
+                  className: "flex items-center justify-center pt-0 text-gray-600"
+                }, tmp));
 }
 
 var make = StakeCardSide;
 
 exports.isHotAPY = isHotAPY;
+exports.apyToStr = apyToStr;
 exports.mapVal = mapVal;
+exports.apyComponent = apyComponent;
+exports.ifElement = ifElement;
 exports.make = make;
 /* react Not a pure module */

@@ -19,6 +19,7 @@ var Caml_option = require("rescript/lib/js/caml_option.js");
 
 var context = React.createContext({
       apy: /* Loading */0,
+      bigNumberApy: /* Loading */0,
       shouldFetchData: false,
       setShouldFetchData: (function (param) {
           
@@ -55,12 +56,16 @@ function APYProvider$GenericAPYProvider(Props) {
   var setApy = match[1];
   var apy = match[0];
   var match$1 = React.useState(function () {
+        return /* Loading */0;
+      });
+  var setBnApy = match$1[1];
+  var match$2 = React.useState(function () {
         return false;
       });
-  var shouldFetchData = match$1[0];
+  var shouldFetchData = match$2[0];
   React.useEffect((function () {
           if (apy === /* Loading */0 && shouldFetchData) {
-            Curry._1(apyDeterminer, setApy);
+            Curry._2(apyDeterminer, setApy, setBnApy);
           }
           
         }), [
@@ -71,8 +76,9 @@ function APYProvider$GenericAPYProvider(Props) {
   return React.createElement(APYProvider$APYProviderContext$Provider, {
               value: {
                 apy: apy,
+                bigNumberApy: match$1[0],
                 shouldFetchData: false,
-                setShouldFetchData: match$1[1]
+                setShouldFetchData: match$2[1]
               },
               children: children
             });
@@ -178,7 +184,7 @@ var AaveAPYResponse = {
   t_decode: t_decode
 };
 
-function determineAaveApy(setApy) {
+function determineAaveApy(setApy, setBnApy) {
   var logError = function (reasonOpt, param) {
     var reason = reasonOpt !== undefined ? Caml_option.valFromOption(reasonOpt) : undefined;
     if (reason !== undefined) {
@@ -208,11 +214,19 @@ function determineAaveApy(setApy) {
           if (inner === undefined) {
             return logError(undefined, undefined);
           }
-          var apy = Belt_Float.fromString(Ethers.Utils.formatEther(Ethers$1.BigNumber.from(inner.liquidityRate).div(CONSTANTS.tenToThe9)));
-          return Curry._1(setApy, (function (param) {
+          var bnApy = Ethers$1.BigNumber.from(inner.liquidityRate).div(CONSTANTS.tenToThe9);
+          var apy = Belt_Float.fromString(Ethers.Utils.formatEther(bnApy));
+          Curry._1(setApy, (function (param) {
+                  return {
+                          TAG: 0,
+                          _0: apy,
+                          [Symbol.for("name")]: "Loaded"
+                        };
+                }));
+          return Curry._1(setBnApy, (function (param) {
                         return {
                                 TAG: 0,
-                                _0: apy,
+                                _0: bnApy,
                                 [Symbol.for("name")]: "Loaded"
                               };
                       }));
@@ -246,6 +260,24 @@ function useAPY(param) {
   return match.apy;
 }
 
+function useBnApy(param) {
+  var match = React.useContext(context);
+  var setShouldFetchData = match.setShouldFetchData;
+  var shouldFetchData = match.shouldFetchData;
+  React.useEffect((function () {
+          if (!shouldFetchData) {
+            Curry._1(setShouldFetchData, (function (param) {
+                    return true;
+                  }));
+          }
+          
+        }), [
+        shouldFetchData,
+        setShouldFetchData
+      ]);
+  return match.bigNumberApy;
+}
+
 var make = APYProvider;
 
 exports.APYProviderContext = APYProviderContext;
@@ -254,4 +286,5 @@ exports.AaveAPYResponse = AaveAPYResponse;
 exports.determineAaveApy = determineAaveApy;
 exports.make = make;
 exports.useAPY = useAPY;
+exports.useBnApy = useBnApy;
 /* context Not a pure module */

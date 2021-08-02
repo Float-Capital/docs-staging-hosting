@@ -82,6 +82,8 @@ var equilibriumOffsetHardcode = zeroBN;
 
 var balanceIncentiveExponentHardcode = twoBN;
 
+var yieldGradientHardcode = tenToThe18;
+
 var daiDisplayToken = {
   name: "DAI",
   iconUrl: "/icons/dai.svg"
@@ -122,6 +124,7 @@ exports.kmultiplierHardcode = kmultiplierHardcode;
 exports.equilibriumOffsetHardcode = equilibriumOffsetHardcode;
 exports.balanceIncentiveExponentHardcode = balanceIncentiveExponentHardcode;
 exports.floatTokenDollarWorthHardcode = floatTokenDollarWorthHardcode;
+exports.yieldGradientHardcode = yieldGradientHardcode;
 exports.oneYearInSecondsMulTenToThe18 = oneYearInSecondsMulTenToThe18;
 exports.daiDisplayToken = daiDisplayToken;
 /* zeroAddress Not a pure module */

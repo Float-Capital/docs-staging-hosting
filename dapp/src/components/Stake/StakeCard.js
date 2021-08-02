@@ -9,16 +9,37 @@ var CONSTANTS = require("../../CONSTANTS.js");
 var MarketBar = require("../UI/MarketCard/MarketBar.js");
 var Link = require("next/link").default;
 var APYProvider = require("../../libraries/APYProvider.js");
+var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var Router = require("next/router");
 var StakeCardSide = require("../UI/StakeCard/StakeCardSide.js");
+var Belt_HashMapString = require("rescript/lib/js/belt_HashMapString.js");
 var MarketCalculationHelpers = require("../../libraries/MarketCalculationHelpers.js");
 
 function calculateDollarValue(tokenPrice, amountStaked) {
   return tokenPrice.mul(amountStaked).div(CONSTANTS.tenToThe18);
 }
 
+function mapStakeApy(apyDict, key) {
+  if (typeof apyDict === "number") {
+    return /* Loading */0;
+  } else if (apyDict.TAG === /* Loaded */0) {
+    return {
+            TAG: 0,
+            _0: Belt_Option.getExn(Belt_HashMapString.get(apyDict._0, key)),
+            [Symbol.for("name")]: "Loaded"
+          };
+  } else {
+    return {
+            TAG: 1,
+            _0: apyDict._0,
+            [Symbol.for("name")]: "Error"
+          };
+  }
+}
+
 function StakeCard(Props) {
   var param = Props.syntheticMarket;
+  var _stakeApys = Props._stakeApys;
   var match = param.latestSystemState;
   var totalValueLocked = match.totalValueLocked;
   var totalLockedShort = match.totalLockedShort;
@@ -37,8 +58,8 @@ function StakeCard(Props) {
   var totalDollarValueStake = longDollarValueStaked.add(shortDollarValueStaked);
   var longApy = MarketCalculationHelpers.calculateLendingProviderAPYForSideMapped(apy, Number(Ethers.Utils.formatEther(totalLockedLong)), Number(Ethers.Utils.formatEther(totalLockedShort)), "long");
   var shortApy = MarketCalculationHelpers.calculateLendingProviderAPYForSideMapped(apy, Number(Ethers.Utils.formatEther(totalLockedLong)), Number(Ethers.Utils.formatEther(totalLockedShort)), "short");
-  var longFloatApy = MarketCalculationHelpers.calculateFloatAPY(totalLockedLong, totalLockedShort, CONSTANTS.kperiodHardcode, CONSTANTS.kmultiplierHardcode, timestampCreated, currentTimestamp, CONSTANTS.equilibriumOffsetHardcode, CONSTANTS.balanceIncentiveExponentHardcode, CONSTANTS.floatTokenDollarWorthHardcode, "long");
-  var shortFloatApy = MarketCalculationHelpers.calculateFloatAPY(totalLockedLong, totalLockedShort, CONSTANTS.kperiodHardcode, CONSTANTS.kmultiplierHardcode, timestampCreated, currentTimestamp, CONSTANTS.equilibriumOffsetHardcode, CONSTANTS.balanceIncentiveExponentHardcode, CONSTANTS.floatTokenDollarWorthHardcode, "short");
+  var longFloatApy = MarketCalculationHelpers.calculateFloatAPY(totalLockedLong, totalLockedShort, CONSTANTS.kperiodHardcode, CONSTANTS.kmultiplierHardcode, timestampCreated, currentTimestamp, CONSTANTS.equilibriumOffsetHardcode, CONSTANTS.balanceIncentiveExponentHardcode, "long");
+  var shortFloatApy = MarketCalculationHelpers.calculateFloatAPY(totalLockedLong, totalLockedShort, CONSTANTS.kperiodHardcode, CONSTANTS.kmultiplierHardcode, timestampCreated, currentTimestamp, CONSTANTS.equilibriumOffsetHardcode, CONSTANTS.balanceIncentiveExponentHardcode, "short");
   var stakeButtons = function (param) {
     return React.createElement("div", {
                 className: "flex flex-wrap justify-evenly"
@@ -87,7 +108,8 @@ function StakeCard(Props) {
                             orderPostionMobile: 2,
                             isLong: true,
                             apy: longApy,
-                            floatApy: Number(Ethers.Utils.formatEther(longFloatApy))
+                            floatApy: Number(Ethers.Utils.formatEther(longFloatApy)),
+                            stakeApy: mapStakeApy(_stakeApys, match$2.id)
                           }), React.createElement("div", {
                             className: "w-full md:w-1/2 flex items-center flex-col order-1 md:order-2"
                           }, React.createElement("div", {
@@ -119,7 +141,8 @@ function StakeCard(Props) {
                             orderPostionMobile: 3,
                             isLong: false,
                             apy: shortApy,
-                            floatApy: Number(Ethers.Utils.formatEther(shortFloatApy))
+                            floatApy: Number(Ethers.Utils.formatEther(shortFloatApy)),
+                            stakeApy: mapStakeApy(_stakeApys, match$1.id)
                           }), React.createElement("div", {
                             className: "block md:hidden pt-5 order-4 w-full"
                           }, stakeButtons(undefined))))
@@ -129,5 +152,6 @@ function StakeCard(Props) {
 var make = StakeCard;
 
 exports.calculateDollarValue = calculateDollarValue;
+exports.mapStakeApy = mapStakeApy;
 exports.make = make;
 /* Misc Not a pure module */

@@ -15,6 +15,25 @@ let liftGraphResponse2 = (a, b) => {
   }
 }
 
+@ocaml.doc(`Combines three graphql responses into a single tuple response.`)
+let liftGraphResponse3 = (a, b, c) => {
+  switch a {
+  | Response(ar) =>
+    switch b {
+    | Response(br) =>
+      switch c {
+      | Response(cr) => Response((ar, br, cr))
+      | GraphError(x) => GraphError(x)
+      | Loading => Loading
+      }
+    | GraphError(x) => GraphError(x)
+    | Loading => Loading
+    }
+  | GraphError(x) => GraphError(x)
+  | Loading => Loading
+  }
+}
+
 @ocaml.doc(`Returns details of the given user's staked tokens.`)
 let {ethAdrToLowerStr} = module(Globals)
 
@@ -66,7 +85,8 @@ let useTotalClaimableFloatForUser = (~userId, ~synthTokens) => {
         switch curState {
         | Loading => Loading
         | GraphError(msg) => GraphError(msg)
-        | Response((totalClaimable, totalPredicted)) => if stake.currentStake.withdrawn {
+        | Response((totalClaimable, totalPredicted)) =>
+          if stake.currentStake.withdrawn {
             Response((totalClaimable, totalPredicted))
           } else {
             let amount = stake.currentStake.amount
@@ -521,6 +541,33 @@ module Util = {
     | {data: Some(response)} => Response(response)
     | _ => Loading
     }
+  }
+
+  let apyToResponse = (a: APYProvider.t<'a>) => {
+    switch a {
+    | Loaded(a) => Response(a)
+    | Error(a) => GraphError(a)
+    | _ => Loading
+    }
+  }
+}
+
+let useStakingAPYs = () => {
+  let marketsQuery = Queries.MarketDetails.use()
+  let globalQuery = Queries.GlobalState.use()
+  let apy = APYProvider.useBnApy()
+
+  switch liftGraphResponse3(
+    Util.queryToResponse(marketsQuery),
+    Util.queryToResponse(globalQuery),
+    Util.apyToResponse(apy),
+  ) {
+  | Response({syntheticMarkets}, {globalStates: [global]}, apy) =>
+    APYProvider.Loaded(
+      MarketCalculationHelpers.calculateStakeAPYS(~syntheticMarkets, ~global, ~apy),
+    )
+  | GraphError(a) => Error(a)
+  | _ => Loading
   }
 }
 

@@ -1,5 +1,3 @@
-open APYProvider
-
 let calculateDollarValue = (~tokenPrice: Ethers.BigNumber.t, ~amountStaked: Ethers.BigNumber.t) => {
   tokenPrice->Ethers.BigNumber.mul(amountStaked)->Ethers.BigNumber.div(CONSTANTS.tenToThe18)
 }
@@ -9,6 +7,14 @@ type handleStakeButtonPress =
   | Loading
   | Form(string)
   | Redirect({marketIndex: string, actionOption: string})
+
+let mapStakeApy = (apyDict, key) => {
+  switch apyDict {
+  | APYProvider.Loaded(a) => APYProvider.Loaded(a->HashMap.String.get(key)->Option.getExn)
+  | Loading => Loading
+  | Error(e) => Error(e)
+  }
+}
 
 @react.component
 let make = (
@@ -24,13 +30,14 @@ let make = (
       longTokenPrice: {price: {price: longTokenPrice}},
       shortTokenPrice: {price: {price: shortTokenPrice}},
     },
-    syntheticShort: {totalStaked: shortTotalStaked, tokenAddress: shortTokenAddress},
-    syntheticLong: {totalStaked: longTotalStaked, tokenAddress: longTokenAddress},
+    syntheticShort: {totalStaked: shortTotalStaked, tokenAddress: shortTokenAddress, id: shortId},
+    syntheticLong: {totalStaked: longTotalStaked, tokenAddress: longTokenAddress, id: longId},
   }: Queries.SyntheticMarketInfo.t,
+  ~_stakeApys,
 ) => {
   let router = Next.Router.useRouter()
 
-  let apy = useAPY()
+  let apy = APYProvider.useAPY()
 
   let longDollarValueStaked = calculateDollarValue(
     ~tokenPrice=longTokenPrice,
@@ -64,7 +71,6 @@ let make = (
     currentTimestamp,
     CONSTANTS.equilibriumOffsetHardcode,
     CONSTANTS.balanceIncentiveExponentHardcode,
-    CONSTANTS.floatTokenDollarWorthHardcode,
     "long",
   )
 
@@ -77,7 +83,6 @@ let make = (
     currentTimestamp,
     CONSTANTS.equilibriumOffsetHardcode,
     CONSTANTS.balanceIncentiveExponentHardcode,
-    CONSTANTS.floatTokenDollarWorthHardcode,
     "short",
   )
 
@@ -127,6 +132,7 @@ let make = (
           orderPostion={1}
           isLong={true}
           apy={longApy}
+          stakeApy={_stakeApys->mapStakeApy(longId)}
           floatApy={longFloatApy->Ethers.Utils.formatEther->Js.Float.fromString}
         />
         <div className="w-full md:w-1/2 flex items-center flex-col order-1 md:order-2">
@@ -173,6 +179,7 @@ let make = (
           orderPostion={3}
           isLong={false}
           apy={shortApy}
+          stakeApy={_stakeApys->mapStakeApy(shortId)}
           floatApy={shortFloatApy->Ethers.Utils.formatEther->Js.Float.fromString}
         />
         <div className="block md:hidden pt-5 order-4 w-full"> {stakeButtons()} </div>

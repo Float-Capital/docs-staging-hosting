@@ -49,7 +49,6 @@ let make = (
     currentTimestamp,
     CONSTANTS.equilibriumOffsetHardcode,
     CONSTANTS.balanceIncentiveExponentHardcode,
-    CONSTANTS.floatTokenDollarWorthHardcode,
     "long",
   )
 
@@ -62,7 +61,6 @@ let make = (
     currentTimestamp,
     CONSTANTS.equilibriumOffsetHardcode,
     CONSTANTS.balanceIncentiveExponentHardcode,
-    CONSTANTS.floatTokenDollarWorthHardcode,
     "short",
   )
 

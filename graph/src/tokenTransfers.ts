@@ -27,7 +27,7 @@ import {
   updateBalanceFloatTransfer,
   updateCollatoralBalanceTransfer,
 } from "./utils/helperFunctions";
-import { GLOBAL_STATE_ID, ONE, ZERO } from "./CONSTANTS";
+import { GLOBAL_STATE_ID, ONE, ZERO, ZERO_ADDRESS } from "./CONSTANTS";
 import { getOrCreateUser } from "./utils/globalStateManager";
 
 function saveTransferToStateChange(
@@ -69,6 +69,14 @@ export function handleTransfer(event: TransferEvent): void {
   if (isFloatToken) {
     updateBalanceFloatTransfer(fromAddress, amount, true, event);
     updateBalanceFloatTransfer(toAddress, amount, false, event);
+    if(toAddressString == ZERO_ADDRESS){
+      // token burn
+      let globalState = GlobalState.load(GLOBAL_STATE_ID);
+      if(globalState != null){
+        globalState.totalFloatMinted = globalState.totalFloatMinted.minus(amount);
+        globalState.save();
+      }
+    }
     saveTransferToStateChange(event, stateChangeParams, bothUsers);
   } else {
     let syntheticToken = SyntheticToken.load(tokenAddressString);

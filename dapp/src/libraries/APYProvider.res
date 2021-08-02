@@ -1,7 +1,8 @@
-type t = Loading | Loaded(float) | Error(string)
+type t<'a> = Loading | Loaded('a) | Error(string)
 
 type providerT = {
-  apy: t,
+  apy: t<float>,
+  bigNumberApy: t<Ethers.BigNumber.t>,
   shouldFetchData: bool,
   setShouldFetchData: (bool => bool) => unit,
 }
@@ -9,6 +10,7 @@ type providerT = {
 module APYProviderContext = {
   let context = React.createContext({
     apy: Loading,
+    bigNumberApy: Loading,
     shouldFetchData: false,
     setShouldFetchData: _ => (),
   })
@@ -27,16 +29,22 @@ module GenericAPYProvider = {
   @react.component
   let make = (~apyDeterminer, ~children) => {
     let (apy, setApy) = React.useState(_ => Loading)
+    let (bnApy, setBnApy) = React.useState(_ => Loading)
     let (shouldFetchData, setShouldFetchData) = React.useState(_ => false)
     React.useEffect3(_ => {
       if apy == Loading && shouldFetchData {
-        apyDeterminer(setApy)
+        apyDeterminer(setApy, setBnApy)
       }
       None
     }, (shouldFetchData, apy, apyDeterminer))
 
     <APYProviderContext.Provider
-      value={{setShouldFetchData: setShouldFetchData, shouldFetchData: false, apy: apy}}>
+      value={{
+        setShouldFetchData: setShouldFetchData,
+        shouldFetchData: false,
+        apy: apy,
+        bigNumberApy: bnApy,
+      }}>
       {children}
     </APYProviderContext.Provider>
   }
@@ -50,7 +58,7 @@ module AaveAPYResponse = {
   @decco.decode type t = {data: inner}
 }
 
-let determineAaveApy = setApy => {
+let determineAaveApy = (setApy, setBnApy) => {
   let logError = (~reason=None, ()) => {
     switch reason {
     | Some(r) => {
@@ -78,13 +86,14 @@ let determineAaveApy = setApy => {
           let inner = result.data.reserves[0]
           switch inner {
           | Some(inner) =>
-            let apy =
-              Ethers.BigNumber.fromUnsafe(inner.liquidityRate)
-              ->Ethers.BigNumber.div(CONSTANTS.tenToThe9) // input is 1e27
-              ->Ethers.Utils.formatEther
-              ->Float.fromString
-              ->Option.getUnsafe
+            let bnApy =
+              Ethers.BigNumber.fromUnsafe(inner.liquidityRate)->Ethers.BigNumber.div(
+                CONSTANTS.tenToThe9,
+              ) // input is 1e27
+
+            let apy = bnApy->Ethers.Utils.formatEther->Float.fromString->Option.getUnsafe
             setApy(_ => Loaded(apy))
+            setBnApy(_ => Loaded(bnApy))
 
           | _ => logError()
           }
@@ -111,4 +120,17 @@ let useAPY = () => {
     None
   }, (shouldFetchData, setShouldFetchData))
   apy
+}
+
+let useBnApy = () => {
+  let {shouldFetchData, setShouldFetchData, bigNumberApy} = React.useContext(
+    APYProviderContext.context,
+  )
+  React.useEffect2(_ => {
+    if !shouldFetchData {
+      setShouldFetchData(_ => true)
+    }
+    None
+  }, (shouldFetchData, setShouldFetchData))
+  bigNumberApy
 }

@@ -53,6 +53,7 @@ let kmultiplierHardcode = Ethers.BigNumber.fromUnsafe("5000000000000000000")
 let equilibriumOffsetHardcode = zeroBN
 let balanceIncentiveExponentHardcode = twoBN
 let floatTokenDollarWorthHardcode = tenToThe18->Ethers.BigNumber.div(eightBN)
+let yieldGradientHardcode = tenToThe18
 // ^ thumbsuck to make apy not too ridiculous = 0.125 dollars
 
 let oneYearInSecondsMulTenToThe18 =

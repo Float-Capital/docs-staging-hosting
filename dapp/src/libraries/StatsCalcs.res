@@ -44,7 +44,6 @@ let trendingStakes = (~syntheticMarkets: array<Queries.SyntheticMarketInfo.t>, ~
       currentTimestamp,
       CONSTANTS.equilibriumOffsetHardcode,
       CONSTANTS.balanceIncentiveExponentHardcode,
-      CONSTANTS.floatTokenDollarWorthHardcode,
       "long",
     )
 
@@ -57,7 +56,6 @@ let trendingStakes = (~syntheticMarkets: array<Queries.SyntheticMarketInfo.t>, ~
       currentTimestamp,
       CONSTANTS.equilibriumOffsetHardcode,
       CONSTANTS.balanceIncentiveExponentHardcode,
-      CONSTANTS.floatTokenDollarWorthHardcode,
       "short",
     )
 

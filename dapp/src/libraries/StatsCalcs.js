@@ -17,8 +17,8 @@ function trendingStakes(syntheticMarkets, apy) {
                         var marketName = param.name;
                         var longApy = MarketCalculationHelpers.calculateLendingProviderAPYForSide(apy, Number(Ethers.Utils.formatEther(totalLockedLong)), Number(Ethers.Utils.formatEther(totalLockedShort)), "long");
                         var shortApy = MarketCalculationHelpers.calculateLendingProviderAPYForSide(apy, Number(Ethers.Utils.formatEther(totalLockedLong)), Number(Ethers.Utils.formatEther(totalLockedShort)), "short");
-                        var longFloatApy = MarketCalculationHelpers.calculateFloatAPY(totalLockedLong, totalLockedShort, CONSTANTS.kperiodHardcode, CONSTANTS.kmultiplierHardcode, timestampCreated, currentTimestamp, CONSTANTS.equilibriumOffsetHardcode, CONSTANTS.balanceIncentiveExponentHardcode, CONSTANTS.floatTokenDollarWorthHardcode, "long");
-                        var shortFloatApy = MarketCalculationHelpers.calculateFloatAPY(totalLockedLong, totalLockedShort, CONSTANTS.kperiodHardcode, CONSTANTS.kmultiplierHardcode, timestampCreated, currentTimestamp, CONSTANTS.equilibriumOffsetHardcode, CONSTANTS.balanceIncentiveExponentHardcode, CONSTANTS.floatTokenDollarWorthHardcode, "short");
+                        var longFloatApy = MarketCalculationHelpers.calculateFloatAPY(totalLockedLong, totalLockedShort, CONSTANTS.kperiodHardcode, CONSTANTS.kmultiplierHardcode, timestampCreated, currentTimestamp, CONSTANTS.equilibriumOffsetHardcode, CONSTANTS.balanceIncentiveExponentHardcode, "long");
+                        var shortFloatApy = MarketCalculationHelpers.calculateFloatAPY(totalLockedLong, totalLockedShort, CONSTANTS.kperiodHardcode, CONSTANTS.kmultiplierHardcode, timestampCreated, currentTimestamp, CONSTANTS.equilibriumOffsetHardcode, CONSTANTS.balanceIncentiveExponentHardcode, "short");
                         return Belt_Array.concat(previous, [
                                     {
                                       marketName: marketName,

@@ -24,8 +24,8 @@ function MarketStakeCard(Props) {
   var apy = APYProvider.useAPY(undefined);
   var longApy = MarketCalculationHelpers.calculateLendingProviderAPYForSideMapped(apy, Number(Ethers.Utils.formatEther(totalLockedLong)), Number(Ethers.Utils.formatEther(totalLockedShort)), "long");
   var shortApy = MarketCalculationHelpers.calculateLendingProviderAPYForSideMapped(apy, Number(Ethers.Utils.formatEther(totalLockedLong)), Number(Ethers.Utils.formatEther(totalLockedShort)), "short");
-  var longFloatApy = MarketCalculationHelpers.calculateFloatAPY(totalLockedLong, totalLockedShort, CONSTANTS.kperiodHardcode, CONSTANTS.kmultiplierHardcode, timestampCreated, currentTimestamp, CONSTANTS.equilibriumOffsetHardcode, CONSTANTS.balanceIncentiveExponentHardcode, CONSTANTS.floatTokenDollarWorthHardcode, "long");
-  var shortFloatApy = MarketCalculationHelpers.calculateFloatAPY(totalLockedLong, totalLockedShort, CONSTANTS.kperiodHardcode, CONSTANTS.kmultiplierHardcode, timestampCreated, currentTimestamp, CONSTANTS.equilibriumOffsetHardcode, CONSTANTS.balanceIncentiveExponentHardcode, CONSTANTS.floatTokenDollarWorthHardcode, "short");
+  var longFloatApy = MarketCalculationHelpers.calculateFloatAPY(totalLockedLong, totalLockedShort, CONSTANTS.kperiodHardcode, CONSTANTS.kmultiplierHardcode, timestampCreated, currentTimestamp, CONSTANTS.equilibriumOffsetHardcode, CONSTANTS.balanceIncentiveExponentHardcode, "long");
+  var shortFloatApy = MarketCalculationHelpers.calculateFloatAPY(totalLockedLong, totalLockedShort, CONSTANTS.kperiodHardcode, CONSTANTS.kmultiplierHardcode, timestampCreated, currentTimestamp, CONSTANTS.equilibriumOffsetHardcode, CONSTANTS.balanceIncentiveExponentHardcode, "short");
   return React.createElement("div", {
               className: "p-4 rounded-lg flex flex-col justify-center bg-white bg-opacity-75 shadow-lg h-full"
             }, React.createElement("div", {
