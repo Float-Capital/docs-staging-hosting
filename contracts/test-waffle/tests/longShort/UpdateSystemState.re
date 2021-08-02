@@ -49,7 +49,7 @@ let testUnit =
 
       let newAssetPrice = oldAssetPrice->add(oneBn);
 
-      let latestUpdateIndexForMarket = twoBn;
+      let latestUpdateIndexForMarket = Helpers.randomInteger();
 
       let staker: ref(StakerSmocked.t) = ref(None->Obj.magic);
       let oracle: ref(OracleManagerMockSmocked.t) = ref(None->Obj.magic);
@@ -260,7 +260,8 @@ let testUnit =
       it(
         "calls addNewStateForFloatRewards on the staker if the staker has pending nextPrice shifts",
         () => {
-          let stakerNextPrice_currentUpdateIndex = Helpers.randomInteger();
+          let stakerNextPrice_currentUpdateIndex =
+            latestUpdateIndexForMarket->add(oneBn);
           let%Await _ =
             setup(
               ~oldAssetPrice,
