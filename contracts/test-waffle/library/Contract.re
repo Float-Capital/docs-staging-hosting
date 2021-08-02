@@ -34,12 +34,12 @@ module LongShortHelpers = {
   };
   let getMarketBalance = (longShort, ~marketIndex) => {
     let%AwaitThen longValue =
-      longShort->LongShort.syntheticTokenPoolValue(
+      longShort->LongShort.marketSideValueInPaymentToken(
         marketIndex,
         true /*long*/,
       );
     let%Await shortValue =
-      longShort->LongShort.syntheticTokenPoolValue(
+      longShort->LongShort.marketSideValueInPaymentToken(
         marketIndex,
         false /*short*/,
       );
@@ -56,11 +56,13 @@ module LongShortHelpers = {
     let%AwaitThen totalSupply =
       synthContract->Obj.magic->SyntheticToken.totalSupply;
 
-    let%Await syntheticTokenPoolValue =
-      longShort->LongShort.syntheticTokenPoolValue(marketIndex, isLong);
+    let%Await marketSideValueInPaymentToken =
+      longShort->LongShort.marketSideValueInPaymentToken(marketIndex, isLong);
 
     let syntheticTokenPrice =
-      syntheticTokenPoolValue->mul(CONSTANTS.tenToThe18)->div(totalSupply);
+      marketSideValueInPaymentToken
+      ->mul(CONSTANTS.tenToThe18)
+      ->div(totalSupply);
 
     syntheticTokenPrice;
   };

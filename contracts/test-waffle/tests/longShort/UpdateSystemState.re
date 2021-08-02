@@ -214,7 +214,7 @@ let testUnit =
 
         let%AwaitThen newLongPrice =
           contracts.contents.longShort
-          ->LongShort.syntheticTokenPriceSnapshot(
+          ->LongShort.syntheticToken_priceSnapshot(
               marketIndex,
               true,
               updateIndex,
@@ -222,7 +222,7 @@ let testUnit =
 
         let%AwaitThen newShortPrice =
           contracts.contents.longShort
-          ->LongShort.syntheticTokenPriceSnapshot(
+          ->LongShort.syntheticToken_priceSnapshot(
               marketIndex,
               false,
               updateIndex,
@@ -408,7 +408,7 @@ let testUnit =
         });
 
         it(
-          "should mutate syntheticTokenPriceSnapshots for long and short correctly",
+          "should mutate syntheticToken_priceSnapshots for long and short correctly",
           () => {
           let%Await _ =
             setupWithPriceChange(
@@ -418,7 +418,7 @@ let testUnit =
           let newUpdateIndex = latestUpdateIndexForMarket->add(oneBn);
           let%AwaitThen newLongPrice =
             contracts.contents.longShort
-            ->LongShort.syntheticTokenPriceSnapshot(
+            ->LongShort.syntheticToken_priceSnapshot(
                 marketIndex,
                 true,
                 newUpdateIndex,
@@ -426,7 +426,7 @@ let testUnit =
 
           let%Await newShortPrice =
             contracts.contents.longShort
-            ->LongShort.syntheticTokenPriceSnapshot(
+            ->LongShort.syntheticToken_priceSnapshot(
                 marketIndex,
                 false,
                 newUpdateIndex,
@@ -437,7 +437,7 @@ let testUnit =
         });
 
         it(
-          "should mutate syntheticTokenPoolValues for long and short correctly",
+          "should mutate marketSideValueInPaymentTokens for long and short correctly",
           () => {
           let%AwaitThen _ =
             setupWithPriceChange(
@@ -446,11 +446,11 @@ let testUnit =
             );
           let%AwaitThen newLongValue =
             contracts.contents.longShort
-            ->LongShort.syntheticTokenPoolValue(marketIndex, true);
+            ->LongShort.marketSideValueInPaymentToken(marketIndex, true);
 
           let%Await newShortValue =
             contracts.contents.longShort
-            ->LongShort.syntheticTokenPoolValue(marketIndex, false);
+            ->LongShort.marketSideValueInPaymentToken(marketIndex, false);
 
           newLongValue->Chai.bnEqual(
             oldLongValueAfterYield->add(valueChangeLong),
@@ -600,7 +600,7 @@ let testIntegration =
           let amountOfYieldToAward = bnFromString("3216543216543216542");
 
           let%Await amountToMintToGuaranteeImbalance =
-            longShort->LongShort.syntheticTokenPoolValue(
+            longShort->LongShort.marketSideValueInPaymentToken(
               marketIndex,
               !longIsOverBalanced,
             );
@@ -618,9 +618,15 @@ let testIntegration =
 
           // get total balance pools etc before (and amount for treasury)
           let%Await longTokenPoolValueBefore =
-            longShort->LongShort.syntheticTokenPoolValue(marketIndex, true);
+            longShort->LongShort.marketSideValueInPaymentToken(
+              marketIndex,
+              true,
+            );
           let%Await shortTokenPoolValueBefore =
-            longShort->LongShort.syntheticTokenPoolValue(marketIndex, false);
+            longShort->LongShort.marketSideValueInPaymentToken(
+              marketIndex,
+              false,
+            );
 
           let%Await totalDueForTreasuryBefore =
             yieldManager->YieldManagerMock.totalReservedForTreasury;
@@ -648,9 +654,15 @@ let testIntegration =
 
           // get total balance pools after and amount for treasury
           let%Await longTokenPoolValueAfter =
-            longShort->LongShort.syntheticTokenPoolValue(marketIndex, true);
+            longShort->LongShort.marketSideValueInPaymentToken(
+              marketIndex,
+              true,
+            );
           let%Await shortTokenPoolValueAfter =
-            longShort->LongShort.syntheticTokenPoolValue(marketIndex, false);
+            longShort->LongShort.marketSideValueInPaymentToken(
+              marketIndex,
+              false,
+            );
           let%Await totalDueForTreasuryAfter =
             yieldManager->YieldManagerMock.totalReservedForTreasury;
           let totalValueRelatedToMarketAfter =

@@ -297,7 +297,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
               [|
                 {
                   marketIndex,
-                  amountSyntheticTokenToRedeemOnOriginSide: amountToShift,
+                  amountSyntheticToken_redeemOnOriginSide: amountToShift,
                   isShiftFromLong,
                   priceSnapshotIndex: longShortMarketPriceSnapshotIndex,
                 },

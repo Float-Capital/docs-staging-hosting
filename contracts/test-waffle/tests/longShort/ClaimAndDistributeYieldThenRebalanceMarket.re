@@ -32,20 +32,31 @@ let testUnit =
     };
 
     let runTests =
-        (~syntheticTokenPoolValueLong, ~syntheticTokenPoolValueShort) => {
+        (
+          ~marketSideValueInPaymentTokenLong,
+          ~marketSideValueInPaymentTokenShort,
+        ) => {
       let totalValueLockedInMarket =
-        syntheticTokenPoolValueLong->add(syntheticTokenPoolValueShort);
+        marketSideValueInPaymentTokenLong->add(
+          marketSideValueInPaymentTokenShort,
+        );
 
       let (yieldDistributedValueLong, yieldDistributedValueShort) =
-        if (syntheticTokenPoolValueLong->bnGt(syntheticTokenPoolValueShort)) {
+        if (marketSideValueInPaymentTokenLong->bnGt(
+              marketSideValueInPaymentTokenShort,
+            )) {
           (
-            syntheticTokenPoolValueLong,
-            syntheticTokenPoolValueShort->add(marketAmountFromYieldManager),
+            marketSideValueInPaymentTokenLong,
+            marketSideValueInPaymentTokenShort->add(
+              marketAmountFromYieldManager,
+            ),
           );
         } else {
           (
-            syntheticTokenPoolValueLong->add(marketAmountFromYieldManager),
-            syntheticTokenPoolValueShort,
+            marketSideValueInPaymentTokenLong->add(
+              marketAmountFromYieldManager,
+            ),
+            marketSideValueInPaymentTokenShort,
           );
         };
 
@@ -54,13 +65,15 @@ let testUnit =
           contracts.contents.longShort
           ->LongShort.Exposed.setClaimAndDistributeYieldThenRebalanceMarketGlobals(
               ~marketIndex,
-              ~syntheticTokenPoolValueLong,
-              ~syntheticTokenPoolValueShort,
+              ~marketSideValueInPaymentTokenLong,
+              ~marketSideValueInPaymentTokenShort,
               ~yieldManager=contracts.contents.yieldManagerSmocked.address,
             );
 
         let isLongSideUnderbalanced =
-          syntheticTokenPoolValueLong->bnLt(syntheticTokenPoolValueShort);
+          marketSideValueInPaymentTokenLong->bnLt(
+            marketSideValueInPaymentTokenShort,
+          );
 
         LongShortSmocked.InternalMock.mock_getYieldSplitToReturn(
           isLongSideUnderbalanced,
@@ -89,8 +102,8 @@ let testUnit =
           ->Chai.recordArrayDeepEqualFlat([|
               {
                 marketIndex,
-                longValue: syntheticTokenPoolValueLong,
-                shortValue: syntheticTokenPoolValueShort,
+                longValue: marketSideValueInPaymentTokenLong,
+                shortValue: marketSideValueInPaymentTokenShort,
                 totalValueLockedInMarket,
               },
             |])
@@ -189,18 +202,24 @@ let testUnit =
     ();
 
     describe("Long Side is Overvalued", () => {
-      let syntheticTokenPoolValueShort = Helpers.randomTokenAmount();
-      let syntheticTokenPoolValueLong =
-        syntheticTokenPoolValueShort->add(Helpers.randomTokenAmount());
+      let marketSideValueInPaymentTokenShort = Helpers.randomTokenAmount();
+      let marketSideValueInPaymentTokenLong =
+        marketSideValueInPaymentTokenShort->add(Helpers.randomTokenAmount());
 
-      runTests(~syntheticTokenPoolValueLong, ~syntheticTokenPoolValueShort);
+      runTests(
+        ~marketSideValueInPaymentTokenLong,
+        ~marketSideValueInPaymentTokenShort,
+      );
     });
     describe("Short Side is Overvalued", () => {
-      let syntheticTokenPoolValueLong = Helpers.randomTokenAmount();
-      let syntheticTokenPoolValueShort =
-        syntheticTokenPoolValueLong->add(Helpers.randomTokenAmount());
+      let marketSideValueInPaymentTokenLong = Helpers.randomTokenAmount();
+      let marketSideValueInPaymentTokenShort =
+        marketSideValueInPaymentTokenLong->add(Helpers.randomTokenAmount());
 
-      runTests(~syntheticTokenPoolValueLong, ~syntheticTokenPoolValueShort);
+      runTests(
+        ~marketSideValueInPaymentTokenLong,
+        ~marketSideValueInPaymentTokenShort,
+      );
     });
   });
 };

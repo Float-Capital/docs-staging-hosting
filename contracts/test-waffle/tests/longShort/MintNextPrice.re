@@ -27,7 +27,7 @@ let testIntegration =
         markets->Array.getUnsafe(0);
 
       let%AwaitThen _longValueBefore =
-        longShort->LongShort.syntheticTokenPoolValue(
+        longShort->LongShort.marketSideValueInPaymentToken(
           marketIndex,
           true /*long*/,
         );
@@ -257,16 +257,13 @@ let testUnit =
 
         let%AwaitThen _ = setup(~isLong, ~testWallet);
 
-        let%AwaitThen updatedBatchedAmountOfTokensToDeposit =
+        let%AwaitThen updatedBatchedAmountOfTokens_deposit =
           contracts.contents.longShort
-          ->LongShort.batched_amountOfPaymentTokenToDeposit(
-              marketIndex,
-              isLong,
-            );
+          ->LongShort.batched_amountPaymentToken_deposit(marketIndex, isLong);
 
         let%AwaitThen updatedUserNextPriceDepositAmount =
           contracts.contents.longShort
-          ->LongShort.userNextPrice_depositAmount(
+          ->LongShort.userNextPrice_paymentToken_depositAmount(
               marketIndex,
               isLong,
               testWallet.address,
@@ -280,9 +277,8 @@ let testUnit =
             );
 
         Chai.bnEqual(
-          ~message=
-            "batched_amountOfPaymentTokenToDeposit not updated correctly",
-          updatedBatchedAmountOfTokensToDeposit,
+          ~message="batched_amountPaymentToken_deposit not updated correctly",
+          updatedBatchedAmountOfTokens_deposit,
           amount,
         );
 

@@ -116,7 +116,7 @@ let createSyntheticMarket = (
         ~initialMarketSeed,
         ~balanceIncentiveCurveExponent=bnFromInt(5),
         ~balanceIncentiveCurveEquilibriumOffset=bnFromInt(0),
-        ~marketTreasurySplitGradientE18=bnFromInt(1),
+        ~marketTreasurySplitGradient_e18=bnFromInt(1),
       )
     })
   })

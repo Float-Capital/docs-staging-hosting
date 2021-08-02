@@ -36,7 +36,10 @@ let testIntegration =
               ? LongShort.redeemLongNextPrice : LongShort.redeemShortNextPrice;
 
           let%AwaitThen _longValueBefore =
-            longShort->LongShort.syntheticTokenPoolValue(marketIndex, isLong);
+            longShort->LongShort.marketSideValueInPaymentToken(
+              marketIndex,
+              isLong,
+            );
 
           let%AwaitThen _ =
             paymentToken->ERC20Mock.mint(
@@ -71,7 +74,7 @@ let testIntegration =
           let%AwaitThen _ =
             longShortUserConnected->redeemNextPriceFunction(
               ~marketIndex,
-              ~tokensToRedeem=usersBalanceAvailableForRedeem,
+              ~tokens_redeem=usersBalanceAvailableForRedeem,
             );
           let%AwaitThen usersBalanceAfterNextPriceRedeem =
             testSynth->SyntheticToken.balanceOf(~account=testUser.address);
@@ -102,7 +105,7 @@ let testIntegration =
           let%AwaitThen latestUpdateIndex =
             longShort->LongShort.marketUpdateIndex(marketIndex);
           let%AwaitThen redemptionPriceWithFees =
-            longShort->LongShort.syntheticTokenPriceSnapshot(
+            longShort->LongShort.syntheticToken_priceSnapshot(
               marketIndex,
               isLong,
               latestUpdateIndex,
@@ -146,7 +149,7 @@ let testUnit =
     ) => {
   describe("redeemNextPrice external functions", () => {
     let marketIndex = 1;
-    let tokensToRedeem = Helpers.randomTokenAmount();
+    let tokens_redeem = Helpers.randomTokenAmount();
 
     let setup = () => {
       contracts.contents.longShort->LongShortSmocked.InternalMock.setup;
@@ -164,13 +167,13 @@ let testUnit =
 
         let%Await _ =
           contracts.contents.longShort
-          ->LongShort.redeemLongNextPrice(~marketIndex, ~tokensToRedeem);
+          ->LongShort.redeemLongNextPrice(~marketIndex, ~tokens_redeem);
 
         let redeemNextPriceCalls =
           LongShortSmocked.InternalMock._redeemNextPriceCalls();
 
         redeemNextPriceCalls->Chai.recordArrayDeepEqualFlat([|
-          {marketIndex, tokensToRedeem, isLong: true},
+          {marketIndex, tokens_redeem, isLong: true},
         |]);
       })
     });
@@ -187,13 +190,13 @@ let testUnit =
 
         let%Await _ =
           contracts.contents.longShort
-          ->LongShort.redeemShortNextPrice(~marketIndex, ~tokensToRedeem);
+          ->LongShort.redeemShortNextPrice(~marketIndex, ~tokens_redeem);
 
         let redeemNextPriceCalls =
           LongShortSmocked.InternalMock._redeemNextPriceCalls();
 
         redeemNextPriceCalls->Chai.recordArrayDeepEqualFlat([|
-          {marketIndex, tokensToRedeem, isLong: false},
+          {marketIndex, tokens_redeem, isLong: false},
         |]);
       })
     });
@@ -235,7 +238,7 @@ let testUnit =
 
       longShort->LongShort.Exposed._redeemNextPriceExposed(
         ~marketIndex,
-        ~tokensToRedeem=amount,
+        ~tokens_redeem=amount,
         ~isLong,
       );
     };
@@ -296,16 +299,16 @@ let testUnit =
 
         let%AwaitThen _ = setup(~isLong, ~testWallet);
 
-        let%AwaitThen updatedbatched_amountOfSyntheticTokensToRedeem =
+        let%AwaitThen updatedbatched_amountSyntheticToken_redeem =
           contracts.contents.longShort
-          ->LongShort.batched_amountOfSyntheticTokensToRedeem(
+          ->LongShort.batched_amountSyntheticToken_redeem(
               marketIndex,
               isLong,
             );
 
         let%AwaitThen updatedUserNextPriceRedemptionAmount =
           contracts.contents.longShort
-          ->LongShort.userNextPrice_redemptionAmount(
+          ->LongShort.userNextPrice_syntheticToken_redeemAmount(
               marketIndex,
               isLong,
               testWallet.address,
@@ -319,9 +322,8 @@ let testUnit =
             );
 
         Chai.bnEqual(
-          ~message=
-            "batched_amountOfSyntheticTokensToRedeem not updated correctly",
-          updatedbatched_amountOfSyntheticTokensToRedeem,
+          ~message="batched_amountSyntheticToken_redeem not updated correctly",
+          updatedbatched_amountSyntheticToken_redeem,
           amount,
         );
 
