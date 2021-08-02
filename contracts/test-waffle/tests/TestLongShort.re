@@ -245,11 +245,6 @@ describe("Float System", () => {
 
       contracts := deployedContracts;
     });
-    describeUnit("Unit tests", () => {
-      ClaimAndDistributeYieldThenRebalanceMarket.testUnit(
-        ~contracts,
-        ~accounts,
-      )
-    });
+
   });
 });

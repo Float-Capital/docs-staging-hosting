@@ -200,7 +200,7 @@ contract Staker is IStaker, Initializable {
   }
 
   function _changeFloatPercentage(uint256 newFloatPercentage) internal virtual {
-    require(newFloatPercentage <= 1e18 && newFloatPercentage > 0); // less than 100% and greater than 0%
+    require(newFloatPercentage <= 1e18 && newFloatPercentage > 0); // less than or equal to 100% and greater than 0%
     floatPercentage = newFloatPercentage;
   }
 
