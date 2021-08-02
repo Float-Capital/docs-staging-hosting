@@ -30,14 +30,13 @@ contract YieldManagerAave is IYieldManager {
   /// @dev ADAI token
   IERC20Upgradeable public aToken;
   /// @notice The specific Aave lending pool contract
-  /// @dev ADAI token
   ILendingPool public lendingPool;
 
   /// @notice An aave specific referralCode that has been a depricated feature
   /// @dev Will be set to 0 for "no referral" at deployment
   uint16 referralCode;
 
-  /// @notice claimed yield not yet transferred to the treasury
+  /// @notice distributed yield not yet transferred to the treasury
   uint256 public override totalReservedForTreasury;
 
   /*╔═════════════════════════════╗
@@ -104,8 +103,11 @@ contract YieldManagerAave is IYieldManager {
     ║       MULTI-SIG ADMIN       ║
     ╚═════════════════════════════╝*/
 
-  /// @notice admin only function to update admin
-  function changeAdmin(address _admin) external adminOnly {
+  /** 
+   @notice admin only function to update admin
+   @param _admin New admin address
+  */
+  function changeAdmin(address erc20Token) external adminOnly {
     admin = _admin;
   }
 
@@ -113,7 +115,10 @@ contract YieldManagerAave is IYieldManager {
     ║     IMPLEMENTATION     ║
     ╚════════════════════════╝*/
 
-  /// @notice Allows the LongShort contract to deposit tokens into the aave pool
+  /** 
+   @notice Allows the LongShort contract to deposit tokens into the aave pool
+   @param amount Amount of payment token to deposit
+  */
   function depositPaymentToken(uint256 amount) public override longShortOnly {
     // Transfer tokens to manager contract.
     paymentToken.transferFrom(longShort, address(this), amount);
@@ -123,6 +128,7 @@ contract YieldManagerAave is IYieldManager {
   }
 
   /// @notice Allows the LongShort contract to redeem aTokens for the payment token
+  /// @param amount Amount of payment token to withdraw
   /// @dev This will fail if not enough liquidity is avaiable on aave.
   function withdrawPaymentToken(uint256 amount) public override longShortOnly {
     lendingPool.withdraw(address(paymentToken), amount, address(this));
@@ -133,6 +139,7 @@ contract YieldManagerAave is IYieldManager {
 
   /**  
     @notice Allows for withdrawal of other erc20 tokens to the treasury contract
+    @param erc20Token Erc20 token that is to be withdrawn
     @dev This is specifically implemented to allow withdrawal of aave reward wMatic tokens accrued, requires calling aave's claimRewardsOnBehalf: https://docs.aave.com/developers/guides/liquidity-mining
   */
   function withdrawErc20TokenToTreasury(address erc20Token) external override treasuryOnly {
@@ -150,6 +157,8 @@ contract YieldManagerAave is IYieldManager {
   /**    
     @notice Calculates and updates the yield allocation to the treasury and the market
     @dev treasuryPercent = 1 - marketPercent
+    @param totalValueRealizedForMarket total value of long and short side of the market
+    @param treasuryYieldPercentE18 Percentage of yield in base 1e18 that is allocated to the treasury
     @return The market allocation of the yield
   */
   function distributeYieldForTreasuryAndReturnMarketAllocation(
