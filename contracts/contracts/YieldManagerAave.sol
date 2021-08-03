@@ -143,12 +143,12 @@ contract YieldManagerAave is IYieldManager {
     @notice Calculates and updates the yield allocation to the treasury and the market
     @dev treasuryPercent = 1 - marketPercent
     @param totalValueRealizedForMarket total value of long and short side of the market
-    @param treasuryYieldPercentE18 Percentage of yield in base 1e18 that is allocated to the treasury
+    @param treasuryYieldPercent_e18 Percentage of yield in base 1e18 that is allocated to the treasury
     @return The market allocation of the yield
   */
   function distributeYieldForTreasuryAndReturnMarketAllocation(
     uint256 totalValueRealizedForMarket,
-    uint256 treasuryYieldPercentE18
+    uint256 treasuryYieldPercent_e18
   ) public override longShortOnly returns (uint256) {
     uint256 totalHeld = aToken.balanceOf(address(this));
 
@@ -161,12 +161,12 @@ contract YieldManagerAave is IYieldManager {
     // will revert in case totalRealized > totalHeld which should be never.
     uint256 unrealizedYield = totalHeld - totalRealized;
 
-    uint256 amountForTreasury = (unrealizedYield * treasuryYieldPercentE18) / 1e18;
+    uint256 amountForTreasury = (unrealizedYield * treasuryYieldPercent_e18) / 1e18;
     uint256 amountForMarketIncentives = unrealizedYield - amountForTreasury;
 
     totalReservedForTreasury += amountForTreasury;
 
-    emit YieldDistributed(unrealizedYield, treasuryYieldPercentE18);
+    emit YieldDistributed(unrealizedYield, treasuryYieldPercent_e18);
 
     return amountForMarketIncentives;
   }

@@ -574,14 +574,14 @@ contract LongShort is ILongShort, Initializable {
   /// @param shortValue The current total payment token value of the short side of the market.
   /// @param totalValueLockedInMarket Total payment token value of both sides of the market.
   /// @return isLongSideUnderbalanced Whether the long side initially had less value than the short side.
-  /// @return treasuryYieldPercentE18 The percentage in base 1e18 of how much of the accrued yield
+  /// @return treasuryYieldPercent_e18 The percentage in base 1e18 of how much of the accrued yield
   /// for a market should be allocated to treasury.
   function _getYieldSplit(
     uint32 marketIndex,
     uint256 longValue,
     uint256 shortValue,
     uint256 totalValueLockedInMarket
-  ) internal view virtual returns (bool isLongSideUnderbalanced, uint256 treasuryYieldPercentE18) {
+  ) internal view virtual returns (bool isLongSideUnderbalanced, uint256 treasuryYieldPercent_e18) {
     isLongSideUnderbalanced = longValue < shortValue;
     uint256 imbalance;
 
@@ -597,12 +597,12 @@ contract LongShort is ILongShort, Initializable {
     // quicker.
     // See this equation in latex: https://gateway.pinata.cloud/ipfs/QmXsW4cHtxpJ5BFwRcMSUw7s5G11Qkte13NTEfPLTKEx4x
     // Interact with this equation: https://www.desmos.com/calculator/pnl43tfv5b
-    uint256 marketPercentCalculatedE18 = (imbalance *
+    uint256 marketPercentCalculated_e18 = (imbalance *
       marketTreasurySplitGradient_e18[marketIndex]) / totalValueLockedInMarket;
 
-    uint256 marketPercentE18 = _getMin(marketPercentCalculatedE18, 1e18);
+    uint256 marketPercent_e18 = _getMin(marketPercentCalculated_e18, 1e18);
 
-    treasuryYieldPercentE18 = 1e18 - marketPercentE18;
+    treasuryYieldPercent_e18 = 1e18 - marketPercent_e18;
   }
 
   /*╔══════════════════════════════╗
@@ -633,7 +633,7 @@ contract LongShort is ILongShort, Initializable {
     shortValue = marketSideValueInPaymentToken[marketIndex][false];
     uint256 totalValueLockedInMarket = longValue + shortValue;
 
-    (bool isLongSideUnderbalanced, uint256 treasuryYieldPercentE18) = _getYieldSplit(
+    (bool isLongSideUnderbalanced, uint256 treasuryYieldPercent_e18) = _getYieldSplit(
       marketIndex,
       longValue,
       shortValue,
@@ -643,7 +643,7 @@ contract LongShort is ILongShort, Initializable {
     uint256 marketAmount = IYieldManager(yieldManagers[marketIndex])
     .distributeYieldForTreasuryAndReturnMarketAllocation(
       totalValueLockedInMarket,
-      treasuryYieldPercentE18
+      treasuryYieldPercent_e18
     );
 
     if (marketAmount > 0) {
