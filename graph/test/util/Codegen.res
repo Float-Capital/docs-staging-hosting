@@ -24,9 +24,10 @@ let paramTypeToRescriptType = paramType =>
   | "uint256" => "bn"
   | "string" => "string"
   | "address" => "address"
-  | unkownType =>
-    Js.log(`Please handle all types - ${unkownType} isn't handled by this script.`)
-    "unkownType"
+  | "address[]" => "array<Ethers.ethAddress>"
+  | unknownType =>
+    Js.log(`Please handle all types - ${unknownType} isn't handled by this script.`)
+    "unknownType"
   }
 
 let _ = allStateChangesRaw->JsPromise.map(allStateChanges => {

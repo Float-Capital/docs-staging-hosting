@@ -37,6 +37,8 @@ function getRescriptType(typeString) {
     return "bytes32";
   } else if (typeString === "uint16" || typeString === "uint32") {
     return "int";
+  } else if (typeString === "address[]") {
+    return "array<Ethers.ethAddress>";
   } else if (typeString === "string") {
     return "string";
   } else if (typeString === "uint32[]") {
@@ -51,7 +53,7 @@ function getRescriptType(typeString) {
     return "bytes4";
   } else {
     console.log("Please handle all types - " + typeString + " isn't handled by this script.");
-    return "unkownType";
+    return "unknownType";
   }
 }
 
