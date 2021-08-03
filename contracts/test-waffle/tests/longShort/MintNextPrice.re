@@ -245,7 +245,7 @@ let testUnit =
         let%Await _ = setup(~isLong, ~testWallet);
 
         let depositFundsCalls =
-          LongShortSmocked.InternalMock._depositFundsCalls();
+          LongShortSmocked.InternalMock._pullPaymentTokensFromUserToLongShortCalls();
 
         depositFundsCalls->Chai.recordArrayDeepEqualFlat([|
           {marketIndex, amount},

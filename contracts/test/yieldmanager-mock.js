@@ -83,7 +83,7 @@ contract("YieldManagerMock (interface)", (accounts) => {
   });
 
   it("withdrawing from yield manager sets correct holdings", async () => {
-    await yieldManager.withdrawPaymentToken(fifty, {
+    await yieldManager.removePaymentTokenFromMarket(fifty, {
       from: user,
     });
 

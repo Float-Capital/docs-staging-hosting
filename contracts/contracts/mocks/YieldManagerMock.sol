@@ -119,13 +119,23 @@ contract YieldManagerMock is IYieldManager {
     totalHeld = totalHeld + amount;
   }
 
-  function withdrawPaymentToken(uint256 amount) public override longShortOnly {
+  /// @notice Allows the LongShort pay out a user from tokens already withdrawn from Aave
+  /// @param user User to recieve the payout
+  /// @param amount Amount of payment token to pay to user
+  function payUserPaymentTokensFromYieldManager(address user, uint256 amount)
+    public
+    override
+    longShortOnly
+  {
+    // Transfer tokens back to LongShort contract.
+    token.transfer(longShort, amount);
+  }
+
+  function removePaymentTokenFromMarket(uint256 amount) public override longShortOnly {
     // Ensure token state is current.
     settle();
     require(amount <= totalHeld);
 
-    // Transfer tokens back to LongShort contract.
-    token.transfer(longShort, amount);
     totalHeld = totalHeld - amount;
   }
 

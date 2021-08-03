@@ -10,7 +10,7 @@ let testUnit =
     let amount = Helpers.randomTokenAmount();
     let marketIndex = 1;
 
-    describe("_depositFunds", () => {
+    describe("_pullPaymentTokensFromUserToLongShort", () => {
       let paymentTokenSmocked = ref(ERC20MockSmocked.uninitializedValue);
 
       let setup = (~testWallet: Ethers.walletType) => {
@@ -19,8 +19,8 @@ let testUnit =
         let%Await _ =
           contracts.contents.longShort
           ->LongShortSmocked.InternalMock.setupFunctionForUnitTesting(
-          ~functionName="_depositFunds",
-        );
+              ~functionName="_pullPaymentTokensFromUserToLongShort",
+            );
 
         let%AwaitThen smockedPaymentToken =
           ERC20MockSmocked.make(paymentToken);
@@ -38,7 +38,7 @@ let testUnit =
           contracts.contents.longShort
           ->ContractHelpers.connect(~address=testWallet);
 
-        longShort->LongShort.Exposed._depositFundsExposed(
+        longShort->LongShort.Exposed._pullPaymentTokensFromUserToLongShortExposed(
           ~marketIndex,
           ~amount,
         );
@@ -91,9 +91,11 @@ let testUnit =
         ->LongShort.Exposed._lockFundsInMarketExposed(~marketIndex, ~amount);
       });
 
-      it("calls _depositFunds with correct arguments", () => {
+      it(
+        "calls _pullPaymentTokensFromUserToLongShort with correct arguments",
+        () => {
         let depositFundsCalls =
-          LongShortSmocked.InternalMock._depositFundsCalls();
+          LongShortSmocked.InternalMock._pullPaymentTokensFromUserToLongShortCalls();
 
         depositFundsCalls->Chai.recordArrayDeepEqualFlat([|
           {marketIndex, amount},

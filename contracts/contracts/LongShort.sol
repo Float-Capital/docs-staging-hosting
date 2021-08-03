@@ -813,18 +813,25 @@ contract LongShort is ILongShort, Initializable {
 
   /// @notice Transfers payment tokens for a market from msg.sender to this contract.
   /// @dev Transferred to this contract to be deposited to the yield manager on batch execution of next price actions.
+  ///      Since we check the return value of the transferFrom method, all payment tokens we use must conform to the ERC20 standard.
   /// @param marketIndex An int32 which uniquely identifies a market.
   /// @param amount Amount of payment tokens in that token's lowest denominationto deposit.
-  function _depositFunds(uint32 marketIndex, uint256 amount) internal virtual {
+  function _pullPaymentTokensFromUserToLongShort(uint32 marketIndex, uint256 amount)
+    internal
+    virtual
+  {
     require(IERC20(paymentTokens[marketIndex]).transferFrom(msg.sender, address(this), amount));
   }
 
   /// @notice Transfer payment tokens to the contract then lock them in yield manager.
   /// @dev Only used in seeding a market.
+  ///      A possible optimization would be to let the yield manager pull the tokens directly from the user.
+  ///      While this would save a small amout of gas, it makes the UX worse, since user would need to approve every separate yield manager independently.
+  ///      Currently you only need to approve a single yield manager.
   /// @param marketIndex An int32 which uniquely identifies a market.
   /// @param amount Amount of payment tokens in that token's lowest denominationto deposit.
   function _lockFundsInMarket(uint32 marketIndex, uint256 amount) internal virtual {
-    _depositFunds(marketIndex, amount);
+    _pullPaymentTokensFromUserToLongShort(marketIndex, amount);
     IYieldManager(yieldManagers[marketIndex]).depositPaymentToken(amount);
   }
 
@@ -847,7 +854,7 @@ contract LongShort is ILongShort, Initializable {
     updateSystemStateMarket(marketIndex)
     executeOutstandingNextPriceSettlements(msg.sender, marketIndex)
   {
-    _depositFunds(marketIndex, amount);
+    _pullPaymentTokensFromUserToLongShort(marketIndex, amount);
 
     batched_amountPaymentToken_deposit[marketIndex][isLong] += amount;
     userNextPrice_paymentToken_depositAmount[marketIndex][isLong][msg.sender] += amount;
@@ -1057,8 +1064,6 @@ contract LongShort is ILongShort, Initializable {
           userNextPrice_currentUpdateIndex[marketIndex][user]
         ]
       );
-      // This means all erc20 tokens we use as payment tokens must return a boolean
-      require(IERC20(paymentTokens[marketIndex]).transfer(user, amountPaymentToken_toRedeem));
 
       emit ExecuteNextPriceRedeemSettlementUser(
         user,
@@ -1174,7 +1179,7 @@ contract LongShort is ILongShort, Initializable {
     } else if (totalPaymentTokenValueChangeForMarket < 0) {
       // NB there will be issues here if not enough liquidity exists to withdraw
       // Boolean should be returned from yield manager and think how to appropriately handle this
-      IYieldManager(yieldManagers[marketIndex]).withdrawPaymentToken(
+      IYieldManager(yieldManagers[marketIndex]).removePaymentTokenFromMarket(
         uint256(-totalPaymentTokenValueChangeForMarket)
       );
     }
