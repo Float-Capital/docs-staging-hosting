@@ -10,8 +10,9 @@ let testUnit =
     let amount = Helpers.randomTokenAmount();
     let marketIndex = 1;
 
-    describe("_pullPaymentTokensFromUserToLongShort", () => {
+    describe("_transferPaymentTokensFromUserToYieldManager", () => {
       let paymentTokenSmocked = ref(ERC20MockSmocked.uninitializedValue);
+      let testYieldManager = Helpers.randomAddress();
 
       let setup = (~testWallet: Ethers.walletType) => {
         let {paymentToken} = contracts.contents.markets->Array.getUnsafe(0);
@@ -19,7 +20,7 @@ let testUnit =
         let%Await _ =
           contracts.contents.longShort
           ->LongShortSmocked.InternalMock.setupFunctionForUnitTesting(
-              ~functionName="_pullPaymentTokensFromUserToLongShort",
+              ~functionName="_transferPaymentTokensFromUserToYieldManager",
             );
 
         let%AwaitThen smockedPaymentToken =
@@ -32,13 +33,14 @@ let testUnit =
           ->LongShort.Exposed.setDepositFundsGlobals(
               ~marketIndex,
               ~paymentToken=smockedPaymentToken.address,
+              ~yieldManager=testYieldManager,
             );
 
         let longShort =
           contracts.contents.longShort
           ->ContractHelpers.connect(~address=testWallet);
 
-        longShort->LongShort.Exposed._pullPaymentTokensFromUserToLongShortExposed(
+        longShort->LongShort.Exposed._transferPaymentTokensFromUserToYieldManagerExposed(
           ~marketIndex,
           ~amount,
         );
@@ -52,11 +54,7 @@ let testUnit =
           paymentTokenSmocked.contents->ERC20MockSmocked.transferFromCalls;
 
         transferFromCalls->Chai.recordArrayDeepEqualFlat([|
-          {
-            sender: testWallet.address,
-            recipient: contracts.contents.longShort.address,
-            amount,
-          },
+          {sender: testWallet.address, recipient: testYieldManager, amount},
         |]);
       });
     });
@@ -92,10 +90,10 @@ let testUnit =
       });
 
       it(
-        "calls _pullPaymentTokensFromUserToLongShort with correct arguments",
+        "calls _transferPaymentTokensFromUserToYieldManager with correct arguments",
         () => {
         let depositFundsCalls =
-          LongShortSmocked.InternalMock._pullPaymentTokensFromUserToLongShortCalls();
+          LongShortSmocked.InternalMock._transferPaymentTokensFromUserToYieldManagerCalls();
 
         depositFundsCalls->Chai.recordArrayDeepEqualFlat([|
           {marketIndex, amount},
