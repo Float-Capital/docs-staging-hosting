@@ -77,12 +77,7 @@ let createSyntheticMarket = (
 ) => {
   JsPromise.all3((
     OracleManagerMock.make(~admin),
-    YieldManagerMock.make(
-      ~admin,
-      ~longShort=longShort.address,
-      ~token=paymentToken.address,
-      ~treasury,
-    ),
+    YieldManagerMock.make(~longShort=longShort.address, ~token=paymentToken.address, ~treasury),
     paymentToken
     ->ERC20Mock.mint(~_to=admin, ~amount=initialMarketSeed->mul(bnFromInt(100)))
     ->JsPromise.then(_ =>
@@ -291,7 +286,6 @@ let initializeLongShortUnit = () => {
       FloatToken.make(),
       TokenFactory.make(~longShort=CONSTANTS.zeroAddress),
       YieldManagerAave.make(
-        ~admin=CONSTANTS.zeroAddress,
         ~longShort=CONSTANTS.zeroAddress,
         ~treasury=CONSTANTS.zeroAddress,
         ~paymentToken=paymentToken.address,

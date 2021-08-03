@@ -1,10 +1,9 @@
 open Globals;
 open Mocha;
-open LetOps;
 
 let testUnit =
     (~contracts: ref(Contract.YieldManagerAaveHelpers.contractsType)) => {
-  describe_only("Claiming Aave reward tokens", () => {
+  describe("Claiming Aave reward tokens", () => {
     describe("claimAaveRewardsToTreasuryTxPromise", () => {
       let claimAaveRewardsToTreasuryTxPromise = ref("NotSetYet"->Obj.magic);
       let randomRewardAmount = Helpers.randomTokenAmount();
@@ -12,8 +11,6 @@ let testUnit =
       before_once'(() => {
         let aaveIncentivesControllerSmockedContract =
           (contracts.contents)#aaveIncentivesController;
-
-        let treasury = (contracts.contents)#treasury;
 
         aaveIncentivesControllerSmockedContract->AaveIncentivesControllerMockSmocked.mockGetUserUnclaimedRewardsToReturn(
           randomRewardAmount,
@@ -25,7 +22,6 @@ let testUnit =
 
         claimAaveRewardsToTreasuryTxPromise :=
           (contracts.contents)#yieldManagerAave
-          ->ContractHelpers.connect(~address=treasury)
           ->YieldManagerAave.claimAaveRewardsToTreasury;
 
         claimAaveRewardsToTreasuryTxPromise.contents;
@@ -41,8 +37,6 @@ let testUnit =
       it(
         "it calls claimRewards with the correct parameters on the AaveIncentiveController",
         () => {
-          let%Await _ = claimAaveRewardsToTreasuryTxPromise.contents;
-
           let aaveIncentivesControllerSmockedContract =
             (contracts.contents)#aaveIncentivesController;
 
@@ -56,8 +50,6 @@ let testUnit =
       it(
         "it calls claimRewards with the correct parameters on the AaveIncentiveController",
         () => {
-          let%Await _ = claimAaveRewardsToTreasuryTxPromise.contents;
-
           let aaveIncentivesControllerSmockedContract =
             (contracts.contents)#aaveIncentivesController;
 

@@ -69,7 +69,6 @@ const deployTestMarket = async (
   let fundTokenAddress;
   if (networkName == "mumbai") {
     yieldManager = await YieldManagerAave.new(
-      admin,
       longShortInstance.address,
       treasuryInstance.address,
       mumbaiDaiAddress,
@@ -81,7 +80,6 @@ const deployTestMarket = async (
     fundTokenAddress = mumbaiDaiAddress;
   } else {
     yieldManager = await YieldManagerMock.new(
-      admin,
       longShortInstance.address,
       treasuryInstance.address,
       paymentToken.address

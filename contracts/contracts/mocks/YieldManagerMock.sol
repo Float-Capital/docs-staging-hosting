@@ -42,18 +42,8 @@ contract YieldManagerMock is IYieldManager {
   /////////// MODIFIERS //////////////
   ////////////////////////////////////
 
-  modifier adminOnly() {
-    require(msg.sender == admin, "Not admin");
-    _;
-  }
-
   modifier longShortOnly() {
     require(msg.sender == longShort, "Not longShort");
-    _;
-  }
-
-  modifier treasuryOnly() {
-    require(msg.sender == treasury, "Not longShort");
     _;
   }
 
@@ -62,13 +52,11 @@ contract YieldManagerMock is IYieldManager {
   ////////////////////////////////////
 
   constructor(
-    address _admin,
     address _longShort,
     address _treasury,
     address _token
   ) {
     // Admin contracts.
-    admin = _admin;
     longShort = _longShort;
     treasury = _treasury;
 
@@ -98,7 +86,7 @@ contract YieldManagerMock is IYieldManager {
   /**
    * Adds the given yield percent to the token holdings.
    */
-  function settleWithYieldPercent(uint256 yieldPercent) public adminOnly {
+  function settleWithYieldPercent(uint256 yieldPercent) public {
     uint256 totalYield = (totalHeld * yieldPercent) / TEN_TO_THE_18;
 
     lastSettled = block.timestamp;
@@ -109,7 +97,7 @@ contract YieldManagerMock is IYieldManager {
   /**
    * Adds the given absolute yield to the token holdings.
    */
-  function settleWithYieldAbsolute(uint256 totalYield) public adminOnly {
+  function settleWithYieldAbsolute(uint256 totalYield) public {
     lastSettled = block.timestamp;
     totalHeld = totalHeld + totalYield;
     token.mint(address(this), totalYield);
@@ -118,7 +106,7 @@ contract YieldManagerMock is IYieldManager {
   /**
    * Sets the yield percentage per second for the given token.
    */
-  function setYieldRate(uint256 _yieldRate) public adminOnly {
+  function setYieldRate(uint256 _yieldRate) public {
     yieldRate = _yieldRate;
   }
 

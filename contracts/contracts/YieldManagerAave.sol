@@ -17,11 +17,9 @@ contract YieldManagerAave is IYieldManager {
     ║          VARIABLES          ║
     ╚═════════════════════════════╝*/
 
-  /// @notice address of admin role
-  address public admin;
   /// @notice address of longShort contract
   address public longShort;
-  /// @notice address of treasury contract
+  /// @notice address of treasury contract - this is the address that can claim aave incentives rewards
   address public treasury;
 
   /// @notice The payment token the yield manager supports
@@ -51,21 +49,9 @@ contract YieldManagerAave is IYieldManager {
     ║          MODIFIERS          ║
     ╚═════════════════════════════╝*/
 
-  /// @dev only allow admin to execute modified functions
-  modifier adminOnly() {
-    require(msg.sender == admin, "Not admin");
-    _;
-  }
-
   /// @dev only allow longShort contract to execute modified functions
   modifier longShortOnly() {
     require(msg.sender == longShort, "Not longShort");
-    _;
-  }
-
-  /// @dev only allow treasury contract to execute modified functions
-  modifier treasuryOnly() {
-    require(msg.sender == treasury, "Not treasury");
     _;
   }
 
@@ -75,7 +61,6 @@ contract YieldManagerAave is IYieldManager {
 
   /** 
     @notice Constructor for initializing the aave yield manager with a given payment token and corresponding Aave contracts
-    @param _admin address of admin
     @param _longShort address of the longShort contract
     @param _treasury address of the treasury contract
     @param _paymentToken address of the payment token
@@ -85,7 +70,6 @@ contract YieldManagerAave is IYieldManager {
     @dev referral code will be set to 0, depricated Aave feature
   */
   constructor(
-    address _admin,
     address _longShort,
     address _treasury,
     address _paymentToken,
@@ -94,7 +78,6 @@ contract YieldManagerAave is IYieldManager {
     address _aaveIncentivesController,
     uint16 _aaveReferralCode
   ) {
-    admin = _admin;
     longShort = _longShort;
     treasury = _treasury;
 
@@ -107,18 +90,6 @@ contract YieldManagerAave is IYieldManager {
 
     // Approve tokens for aave lending pool maximally.
     paymentToken.approve(address(lendingPool), type(uint256).max);
-  }
-
-  /*╔═════════════════════════════╗
-    ║       MULTI-SIG ADMIN       ║
-    ╚═════════════════════════════╝*/
-
-  /** 
-   @notice admin only function to update admin
-   @param _admin New admin address
-  */
-  function changeAdmin(address _admin) external adminOnly {
-    admin = _admin;
   }
 
   /*╔════════════════════════╗
@@ -151,7 +122,7 @@ contract YieldManagerAave is IYieldManager {
     @notice Allows for withdrawal of aave rewards to the treasury contract    
     @dev This is specifically implemented to allow withdrawal of aave reward wMatic tokens accrued    
   */
-  function claimAaveRewardsToTreasury() external treasuryOnly {
+  function claimAaveRewardsToTreasury() external {
     uint256 amount = IAaveIncentivesController(aaveIncentivesController).getUserUnclaimedRewards(
       address(this)
     );
