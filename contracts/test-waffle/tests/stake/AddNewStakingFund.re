@@ -56,8 +56,8 @@ let test =
             ~kInitialMultiplier,
             ~kPeriod,
             ~unstakeFeeBasisPoints,
-            ~balanceIncentiveCurveExponent=bnFromInt(5),
-            ~balanceIncentiveCurveEquilibriumOffset=bnFromInt(0),
+            ~balanceIncentive_curveExponent=bnFromInt(5),
+            ~balanceIncentiveCurve_equilibriumOffset=bnFromInt(0),
           );
       promiseRef := promise;
       let%Await _ = promise;
@@ -97,8 +97,8 @@ let test =
 
       params->Chai.recordEqualFlat({
         timestamp: Ethers.BigNumber.fromInt(timestampRef^ + 1), // one second per block in hardhat
-        accumulativeFloatPerLongToken: CONSTANTS.zeroBn,
-        accumulativeFloatPerShortToken: CONSTANTS.zeroBn,
+        accumulativeFloatPerSyntheticToken_long: CONSTANTS.zeroBn,
+        accumulativeFloatPerSyntheticToken_short: CONSTANTS.zeroBn,
       });
     });
 

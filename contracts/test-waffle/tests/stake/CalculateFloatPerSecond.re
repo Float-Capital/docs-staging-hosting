@@ -56,7 +56,7 @@ let test =
       (overBalancedSideRate, underBalancedSideRate);
     };
 
-    let balanceIncentiveCurveExponent = ref(None->Obj.magic);
+    let balanceIncentive_curveExponent = ref(None->Obj.magic);
 
     before_each(() => {
       let%Await _ =
@@ -65,9 +65,9 @@ let test =
           ~contracts,
           ~accounts,
         );
-      let%Await balanceIncentiveCurveExponentFetched =
-        contracts^.staker->Staker.balanceIncentiveCurveExponent(marketIndex);
-      balanceIncentiveCurveExponent := balanceIncentiveCurveExponentFetched;
+      let%Await balanceIncentive_curveExponentFetched =
+        contracts^.staker->Staker.balanceIncentive_curveExponent(marketIndex);
+      balanceIncentive_curveExponent := balanceIncentive_curveExponentFetched;
 
       StakerSmocked.InternalMock.mock_getKValueToReturn(kVal);
     });
@@ -93,7 +93,7 @@ let test =
         let (longRate, shortRate) =
           calculateFloatPerSecondPerPaymentTokenLocked(
             ~underBalancedSideValue=shortValue,
-            ~exponent=balanceIncentiveCurveExponent^,
+            ~exponent=balanceIncentive_curveExponent^,
             ~equilibriumOffsetMarket=CONSTANTS.zeroBn,
             ~totalLocked,
             ~requiredBitShifting,
@@ -109,7 +109,7 @@ let test =
         let (shortRate, longRate) =
           calculateFloatPerSecondPerPaymentTokenLocked(
             ~underBalancedSideValue=longValue,
-            ~exponent=balanceIncentiveCurveExponent^,
+            ~exponent=balanceIncentive_curveExponent^,
             ~equilibriumOffsetMarket=CONSTANTS.zeroBn,
             ~totalLocked,
             ~requiredBitShifting,

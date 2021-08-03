@@ -25,6 +25,7 @@ let solASTTypeToRescriptType = typeDescrStr =>
   | "uint32" => "int"
   | "uint16[]"
   | "uint32[]" => "array<int>"
+  | "address[]" => "array<Ethers.ethAddress>"
   | t if t->containsRe(%re("/\\[/g")) => {
       Js.Console.warn(
         `Rescript type conversion for array types for type ${t} currently limited. YOu'll have to put in the correct bindings for this type when you call it`,

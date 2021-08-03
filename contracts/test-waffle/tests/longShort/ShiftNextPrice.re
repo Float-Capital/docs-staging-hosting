@@ -75,7 +75,7 @@ let testIntegration =
           let%AwaitThen _ =
             longShortUserConnected->redeemNextPriceFunction(
               ~marketIndex,
-              ~syntheticTokensToShift=usersBalanceAvailableForShift,
+              ~amountSyntheticTokensToShift=usersBalanceAvailableForShift,
             );
           let%AwaitThen usersBalanceAfterNextPriceShift =
             fromSynth->SyntheticToken.balanceOf(~account=testUser.address);
@@ -156,7 +156,7 @@ let testUnit =
     ) => {
   describe("shiftNextPrice external functions", () => {
     let marketIndex = 1;
-    let syntheticTokensToShift = Helpers.randomTokenAmount();
+    let amountSyntheticTokensToShift = Helpers.randomTokenAmount();
 
     let setup = () => {
       contracts.contents.longShort->LongShortSmocked.InternalMock.setup;
@@ -176,14 +176,14 @@ let testUnit =
           contracts.contents.longShort
           ->LongShort.shiftPositionFromLongNextPrice(
               ~marketIndex,
-              ~syntheticTokensToShift,
+              ~amountSyntheticTokensToShift,
             );
 
         let shiftPositionNextPriceCalls =
           LongShortSmocked.InternalMock._shiftPositionNextPriceCalls();
 
         shiftPositionNextPriceCalls->Chai.recordArrayDeepEqualFlat([|
-          {marketIndex, syntheticTokensToShift, isShiftFromLong: true},
+          {marketIndex, amountSyntheticTokensToShift, isShiftFromLong: true},
         |]);
       })
     });
@@ -202,14 +202,14 @@ let testUnit =
           contracts.contents.longShort
           ->LongShort.shiftPositionFromShortNextPrice(
               ~marketIndex,
-              ~syntheticTokensToShift,
+              ~amountSyntheticTokensToShift,
             );
 
         let shiftPositionNextPriceCalls =
           LongShortSmocked.InternalMock._shiftPositionNextPriceCalls();
 
         shiftPositionNextPriceCalls->Chai.recordArrayDeepEqualFlat([|
-          {marketIndex, syntheticTokensToShift, isShiftFromLong: false},
+          {marketIndex, amountSyntheticTokensToShift, isShiftFromLong: false},
         |]);
       })
     });
@@ -248,7 +248,7 @@ let testUnit =
 
       longShort->LongShort.Exposed._shiftPositionNextPriceExposed(
         ~marketIndex,
-        ~syntheticTokensToShift=amount,
+        ~amountSyntheticTokensToShift=amount,
         ~isShiftFromLong,
       );
     };
