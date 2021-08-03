@@ -14,11 +14,16 @@ abstract contract IYieldManager {
 
   /// @notice Deposits the given amount of payment tokens into this yield manager.
   /// @param amount Amount of payment token to deposit
-  function depositPaymentToken(uint256 amount) public virtual;
+  function depositPaymentToken(uint256 amount) external virtual;
+
+  /// @notice Allows the LongShort pay out a user from tokens already withdrawn from Aave
+  /// @param user User to recieve the payout
+  /// @param amount Amount of payment token to pay to user
+  function transferPaymentTokensToUser(address user, uint256 amount) external virtual;
 
   /// @notice Withdraws the given amount of tokens from this yield manager.
   /// @param amount Amount of payment token to withdraw
-  function withdrawPaymentToken(uint256 amount) public virtual;
+  function removePaymentTokenFromMarket(uint256 amount) external virtual;
 
   /**    
     @notice Calculates and updates the yield allocation to the treasury and the market
@@ -30,7 +35,7 @@ abstract contract IYieldManager {
   function distributeYieldForTreasuryAndReturnMarketAllocation(
     uint256 totalValueRealizedForMarket,
     uint256 treasuryYieldPercentE18
-  ) public virtual returns (uint256 amountForMarketIncentives);
+  ) external virtual returns (uint256 amountForMarketIncentives);
 
   /// @notice Withdraw treasury allocated accrued yield from the lending pool to the treasury contract
   /// @dev This will fail if not enough liquidity is avaiable in the yield provider liquidity pool

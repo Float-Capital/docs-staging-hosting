@@ -39,6 +39,10 @@ contract YieldManagerAave is IYieldManager {
   /// @notice distributed yield not yet transferred to the treasury
   uint256 public override totalReservedForTreasury;
 
+  /// @dev This value will likely remain zero forever. It exists to handle the rare edge case that Aave doesn't have enough liquidity for a withdrawal.
+  ///      In this case this variable would keep track of that so that the withdrawal can happen after the fact when liquidity becomes available.
+  uint256 public amountReservedInCaseOfInsufficientAaveLiquidity;
+
   /*╔═════════════════════════════╗
     ║           EVENTS            ║
     ╚═════════════════════════════╝*/
@@ -100,22 +104,54 @@ contract YieldManagerAave is IYieldManager {
    @notice Allows the LongShort contract to deposit tokens into the aave pool
    @param amount Amount of payment token to deposit
   */
-  function depositPaymentToken(uint256 amount) public override longShortOnly {
-    // Transfer tokens to manager contract.
-    paymentToken.transferFrom(longShort, address(this), amount);
+  function depositPaymentToken(uint256 amount) external override longShortOnly {
+    // If amountReservedInCaseOfInsufficientAaveLiquidity isn't zero, then efficiently net the difference between the amount
+    //    It basically always be zero besides extreme and unlikely situations with aave.
+    if (amountReservedInCaseOfInsufficientAaveLiquidity != 0) {
+      if (amountReservedInCaseOfInsufficientAaveLiquidity > amount) {
+        amountReservedInCaseOfInsufficientAaveLiquidity -= amount;
+        // Return early, nothing to deposit into the lending pool
+        return;
+      } else {
+        amount -= amountReservedInCaseOfInsufficientAaveLiquidity;
+        amountReservedInCaseOfInsufficientAaveLiquidity = 0;
+      }
+    }
 
-    // Deposit the desired amount of tokens into the aave pool
     lendingPool.deposit(address(paymentToken), amount, address(this), referralCode);
+  }
+
+  /// @notice Allows the LongShort pay out a user from tokens already withdrawn from Aave
+  /// @param user User to recieve the payout
+  /// @param amount Amount of payment token to pay to user
+  function transferPaymentTokensToUser(address user, uint256 amount)
+    external
+    override
+    longShortOnly
+  {
+    try paymentToken.transfer(user, amount) returns (bool transferSuccess) {
+      if (transferSuccess) {
+        // If the transfer is successful return early, otherwise try pay the user out with the amountReservedInCaseOfInsufficientAaveLiquidity
+        return;
+      }
+    } catch {}
+
+    amountReservedInCaseOfInsufficientAaveLiquidity -= amount;
+
+    // If this reverts (ie aave unable to make payout), then the whole transaction will revent. User will have to wait until sufficient liquidity available.
+    lendingPool.withdraw(address(paymentToken), amount, user);
   }
 
   /// @notice Allows the LongShort contract to redeem aTokens for the payment token
   /// @param amount Amount of payment token to withdraw
-  /// @dev This will fail if not enough liquidity is avaiable on aave.
-  function withdrawPaymentToken(uint256 amount) public override longShortOnly {
-    lendingPool.withdraw(address(paymentToken), amount, address(this));
-
-    // Transfer payment tokens back to LongShort contract.
-    paymentToken.transfer(longShort, amount);
+  /// @dev This will update the amountReservedInCaseOfInsufficientAaveLiquidity if not enough liquidity is avaiable on aave.
+  ///      This means that our system can continue to operate even if there is insufficient liquidity in Aave for any reason.
+  function removePaymentTokenFromMarket(uint256 amount) external override longShortOnly {
+    try lendingPool.withdraw(address(paymentToken), amount, address(this)) {} catch {
+      // In theory we should only catch `VL_CURRENT_AVAILABLE_LIQUIDITY_NOT_ENOUGH` errors.
+      // Safe to revert on all errors, if aave completely blocks withdrawals the amountReservedInCaseOfInsufficientAaveLiquidity can grow until it is fixed without problems.
+      amountReservedInCaseOfInsufficientAaveLiquidity += amount;
+    }
   }
 
   /**  
@@ -149,10 +185,12 @@ contract YieldManagerAave is IYieldManager {
   function distributeYieldForTreasuryAndReturnMarketAllocation(
     uint256 totalValueRealizedForMarket,
     uint256 treasuryYieldPercentE18
-  ) public override longShortOnly returns (uint256) {
+  ) external override longShortOnly returns (uint256) {
     uint256 totalHeld = aToken.balanceOf(address(this));
 
-    uint256 totalRealized = totalValueRealizedForMarket + totalReservedForTreasury;
+    uint256 totalRealized = totalValueRealizedForMarket +
+      totalReservedForTreasury +
+      amountReservedInCaseOfInsufficientAaveLiquidity;
 
     if (totalRealized == totalHeld) {
       return 0;
