@@ -68,7 +68,7 @@ let randomAddress = () => Ethers.Wallet.createRandom().address
 
 let createSyntheticMarket = (
   ~admin,
-  ~initialMarketSeed=bnFromString("500000000000000000"),
+  ~initialMarketSeedForEachMarketSide=bnFromString("500000000000000000"),
   ~paymentToken: ERC20Mock.t,
   ~treasury,
   ~marketName,
@@ -79,11 +79,11 @@ let createSyntheticMarket = (
     OracleManagerMock.make(~admin),
     YieldManagerMock.make(~longShort=longShort.address, ~token=paymentToken.address, ~treasury),
     paymentToken
-    ->ERC20Mock.mint(~_to=admin, ~amount=initialMarketSeed->mul(bnFromInt(100)))
+    ->ERC20Mock.mint(~_to=admin, ~amount=initialMarketSeedForEachMarketSide->mul(bnFromInt(100)))
     ->JsPromise.then(_ =>
       paymentToken->ERC20Mock.approve(
         ~spender=longShort.address,
-        ~amount=initialMarketSeed->mul(bnFromInt(100)),
+        ~amount=initialMarketSeedForEachMarketSide->mul(bnFromInt(100)),
       )
     ),
   ))->JsPromise.then(((oracleManager, yieldManager, _)) => {
@@ -108,7 +108,7 @@ let createSyntheticMarket = (
         ~kInitialMultiplier=Ethers.BigNumber.fromUnsafe("1000000000000000000"),
         ~kPeriod=Ethers.BigNumber.fromInt(0),
         ~unstakeFee_e18=Ethers.BigNumber.fromInt(50),
-        ~initialMarketSeed,
+        ~initialMarketSeedForEachMarketSide,
         ~balanceIncentive_curveExponent=bnFromInt(5),
         ~balanceIncentiveCurve_equilibriumOffset=bnFromInt(0),
         ~marketTreasurySplitGradient_e18=bnFromInt(1),

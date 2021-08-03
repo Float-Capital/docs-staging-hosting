@@ -315,32 +315,35 @@ contract LongShort is ILongShort, Initializable {
 
   /// @notice Seeds a new market with initial capital.
   /// @dev Only called when initializing a market.
-  /// @param initialMarketSeed Amount in wei for which to seed both sides of the market.
+  /// @param initialMarketSeedForEachMarketSide Amount in wei for which to seed both sides of the market.
   /// @param marketIndex An int32 which uniquely identifies a market.
-  function _seedMarketInitially(uint256 initialMarketSeed, uint32 marketIndex) internal virtual {
+  function _seedMarketInitially(uint256 initialMarketSeedForEachMarketSide, uint32 marketIndex)
+    internal
+    virtual
+  {
     require(
       // You require at least 10^17 of the underlying payment token to seed the market.
-      initialMarketSeed > 0.1 ether,
+      initialMarketSeedForEachMarketSide > 0.1 ether,
       "Insufficient market seed"
     );
 
-    uint256 amount = initialMarketSeed * 2;
-    _depositFunds(marketIndex, amount);
-    IYieldManager(yieldManagers[marketIndex]).depositPaymentToken(amount);
+    uint256 amountToLockInYieldManager = initialMarketSeedForEachMarketSide * 2;
+    _transferPaymentTokensFromUserToYieldManager(marketIndex, amountToLockInYieldManager);
+    IYieldManager(yieldManagers[marketIndex]).depositPaymentToken(amountToLockInYieldManager);
 
     ISyntheticToken(syntheticTokens[latestMarket][true]).mint(
       PERMANENT_INITIAL_LIQUIDITY_HOLDER,
-      initialMarketSeed
+      initialMarketSeedForEachMarketSide
     );
     ISyntheticToken(syntheticTokens[latestMarket][false]).mint(
       PERMANENT_INITIAL_LIQUIDITY_HOLDER,
-      initialMarketSeed
+      initialMarketSeedForEachMarketSide
     );
 
-    marketSideValueInPaymentToken[marketIndex][true] = initialMarketSeed;
-    marketSideValueInPaymentToken[marketIndex][false] = initialMarketSeed;
+    marketSideValueInPaymentToken[marketIndex][true] = initialMarketSeedForEachMarketSide;
+    marketSideValueInPaymentToken[marketIndex][false] = initialMarketSeedForEachMarketSide;
 
-    emit NewMarketLaunchedAndSeeded(marketIndex, initialMarketSeed);
+    emit NewMarketLaunchedAndSeeded(marketIndex, initialMarketSeedForEachMarketSide);
   }
 
   /// @notice Sets a market as active once it has already been setup by createNewSyntheticMarket.
@@ -353,13 +356,13 @@ contract LongShort is ILongShort, Initializable {
   /// for market sides in unbalanced markets. See Staker.sol
   /// @param balanceIncentiveCurve_equilibriumOffset An offset to account for naturally imbalanced markets
   /// when Float token issuance should differ for market sides. See Staker.sol
-  /// @param initialMarketSeed Amount of payment token that will be deposited in each market side to seed the market.
+  /// @param initialMarketSeedForEachMarketSide Amount of payment token that will be deposited in each market side to seed the market.
   function initializeMarket(
     uint32 marketIndex,
     uint256 kInitialMultiplier,
     uint256 kPeriod,
     uint256 unstakeFee_e18,
-    uint256 initialMarketSeed,
+    uint256 initialMarketSeedForEachMarketSide,
     uint256 balanceIncentive_curveExponent,
     int256 balanceIncentiveCurve_equilibriumOffset,
     uint256 _marketTreasurySplitGradient_e18
@@ -386,7 +389,7 @@ contract LongShort is ILongShort, Initializable {
       balanceIncentiveCurve_equilibriumOffset
     );
 
-    _seedMarketInitially(initialMarketSeed, marketIndex);
+    _seedMarketInitially(initialMarketSeedForEachMarketSide, marketIndex);
   }
 
   /*╔══════════════════════════════╗
