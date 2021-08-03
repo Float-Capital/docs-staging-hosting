@@ -26,11 +26,11 @@ let test =
   ) =
     Helpers.Tuple.make7(Helpers.randomInteger);
 
-  describe("setRewardObjects", () => {
+  describe("setCurrentAccumulativeIssuancePerStakeStakedSynthSnapshot", () => {
     before_once'(() => {
       let%AwaitThen _ =
         deployAndSetupStakerToUnitTest(
-          ~functionName="setRewardObjects",
+          ~functionName="setCurrentAccumulativeIssuancePerStakeStakedSynthSnapshot",
           ~contracts,
           ~accounts,
         );
@@ -52,7 +52,7 @@ let test =
 
       promiseRef :=
         contracts^.staker
-        ->Staker.Exposed._setRewardObjectsExposed(
+        ->Staker.Exposed._setCurrentAccumulativeIssuancePerStakeStakedSynthSnapshotExposed(
             ~marketIndex,
             ~longPrice,
             ~shortPrice,
