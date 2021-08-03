@@ -212,7 +212,7 @@ contract LongShortInternalStateSetters is LongShort {
     uint32 marketIndex,
     address user,
     bool isLong,
-    address paymentToken,
+    address yieldManager,
     uint256 _userNextPrice_syntheticToken_redeemAmount,
     uint256 _userNextPrice_currentUpdateIndex,
     uint256 _syntheticToken_priceSnapshot
@@ -224,7 +224,7 @@ contract LongShortInternalStateSetters is LongShort {
     syntheticToken_priceSnapshot[marketIndex][isLong][
       _userNextPrice_currentUpdateIndex
     ] = _syntheticToken_priceSnapshot;
-    paymentTokens[marketIndex] = paymentToken;
+    yieldManagers[marketIndex] = yieldManager;
   }
 
   function setExecuteOutstandingNextPriceTokenShiftsGlobals(
@@ -271,8 +271,13 @@ contract LongShortInternalStateSetters is LongShort {
     yieldManagers[marketIndex] = yieldManager;
   }
 
-  function setDepositFundsGlobals(uint32 marketIndex, address paymentToken) external {
+  function setDepositFundsGlobals(
+    uint32 marketIndex,
+    address paymentToken,
+    address yieldManager
+  ) external {
     paymentTokens[marketIndex] = paymentToken;
+    yieldManagers[marketIndex] = yieldManager;
   }
 
   function setLockFundsInMarketGlobals(uint32 marketIndex, address yieldManager) external {
