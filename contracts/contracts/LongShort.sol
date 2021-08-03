@@ -202,7 +202,7 @@ contract LongShort is ILongShort, Initializable {
     address _treasury,
     address _tokenFactory,
     address _staker
-  ) public virtual initializer {
+  ) external virtual initializer {
     admin = _admin;
     treasury = _treasury;
     tokenFactory = _tokenFactory;
@@ -314,30 +314,35 @@ contract LongShort is ILongShort, Initializable {
 
   /// @notice Seeds a new market with initial capital.
   /// @dev Only called when initializing a market.
-  /// @param initialMarketSeed Amount in wei for which to seed both sides of the market.
+  /// @param initialMarketSeedForEachMarketSide Amount in wei for which to seed both sides of the market.
   /// @param marketIndex An int32 which uniquely identifies a market.
-  function _seedMarketInitially(uint256 initialMarketSeed, uint32 marketIndex) internal virtual {
+  function _seedMarketInitially(uint256 initialMarketSeedForEachMarketSide, uint32 marketIndex)
+    internal
+    virtual
+  {
     require(
       // You require at least 10^17 of the underlying payment token to seed the market.
-      initialMarketSeed > 0.1 ether,
+      initialMarketSeedForEachMarketSide > 0.1 ether,
       "Insufficient market seed"
     );
 
-    _lockFundsInMarket(marketIndex, initialMarketSeed * 2);
+    uint256 amountToLockInYieldManager = initialMarketSeedForEachMarketSide * 2;
+    _transferPaymentTokensFromUserToYieldManager(marketIndex, amountToLockInYieldManager);
+    IYieldManager(yieldManagers[marketIndex]).depositPaymentToken(amountToLockInYieldManager);
 
     ISyntheticToken(syntheticTokens[latestMarket][true]).mint(
       PERMANENT_INITIAL_LIQUIDITY_HOLDER,
-      initialMarketSeed
+      initialMarketSeedForEachMarketSide
     );
     ISyntheticToken(syntheticTokens[latestMarket][false]).mint(
       PERMANENT_INITIAL_LIQUIDITY_HOLDER,
-      initialMarketSeed
+      initialMarketSeedForEachMarketSide
     );
 
-    marketSideValueInPaymentToken[marketIndex][true] = initialMarketSeed;
-    marketSideValueInPaymentToken[marketIndex][false] = initialMarketSeed;
+    marketSideValueInPaymentToken[marketIndex][true] = initialMarketSeedForEachMarketSide;
+    marketSideValueInPaymentToken[marketIndex][false] = initialMarketSeedForEachMarketSide;
 
-    emit NewMarketLaunchedAndSeeded(marketIndex, initialMarketSeed);
+    emit NewMarketLaunchedAndSeeded(marketIndex, initialMarketSeedForEachMarketSide);
   }
 
   /// @notice Sets a market as active once it has already been setup by createNewSyntheticMarket.
@@ -350,13 +355,13 @@ contract LongShort is ILongShort, Initializable {
   /// for market sides in unbalanced markets. See Staker.sol
   /// @param balanceIncentiveCurve_equilibriumOffset An offset to account for naturally imbalanced markets
   /// when Float token issuance should differ for market sides. See Staker.sol
-  /// @param initialMarketSeed Amount of payment token that will be deposited in each market side to seed the market.
+  /// @param initialMarketSeedForEachMarketSide Amount of payment token that will be deposited in each market side to seed the market.
   function initializeMarket(
     uint32 marketIndex,
     uint256 kInitialMultiplier,
     uint256 kPeriod,
     uint256 unstakeFee_e18,
-    uint256 initialMarketSeed,
+    uint256 initialMarketSeedForEachMarketSide,
     uint256 balanceIncentive_curveExponent,
     int256 balanceIncentiveCurve_equilibriumOffset,
     uint256 _marketTreasurySplitGradient_e18
@@ -383,7 +388,7 @@ contract LongShort is ILongShort, Initializable {
       balanceIncentiveCurve_equilibriumOffset
     );
 
-    _seedMarketInitially(initialMarketSeed, marketIndex);
+    _seedMarketInitially(initialMarketSeedForEachMarketSide, marketIndex);
   }
 
   /*╔══════════════════════════════╗
@@ -448,12 +453,12 @@ contract LongShort is ILongShort, Initializable {
                 amountOriginSynth,
                 priceOriginSynth
               ),
-              priceTagretSynth)
+              priceTargetSynth)
 
             Unpacking the function we get:
-            ((amountOriginSynth * priceOriginSynth) / 1e18) * 1e18 / priceTagretSynth
+            ((amountOriginSynth * priceOriginSynth) / 1e18) * 1e18 / priceTargetSynth
               And simplifying this we get:
-            (amountOriginSynth * priceOriginSynth) / priceTagretSynth
+            (amountOriginSynth * priceOriginSynth) / priceTargetSynth
   @param amountSyntheticTokens_originSide Amount of synthetic tokens on origin side
   @param syntheticTokenPrice_originSide Price of origin side's synthetic token
   @param syntheticTokenPrice_targetSide Price of target side's synthetic token
@@ -811,24 +816,25 @@ contract LongShort is ILongShort, Initializable {
   }
 
   /*╔════════════════════════════════╗
-    ║      DEPOSIT + WITHDRAWAL      ║
+    ║           DEPOSIT              ║
     ╚════════════════════════════════╝*/
 
   /// @notice Transfers payment tokens for a market from msg.sender to this contract.
-  /// @dev Transferred to this contract to be deposited to the yield manager on batch execution of next price actions.
+  /// @dev Tokens are transferred directly to this contract to be deposited by the yield manager in the batch to earn yield.
+  ///      Since we check the return value of the transferFrom method, all payment tokens we use must conform to the ERC20 standard.
   /// @param marketIndex An int32 which uniquely identifies a market.
   /// @param amount Amount of payment tokens in that token's lowest denominationto deposit.
-  function _depositFunds(uint32 marketIndex, uint256 amount) internal virtual {
-    require(IERC20(paymentTokens[marketIndex]).transferFrom(msg.sender, address(this), amount));
-  }
-
-  /// @notice Transfer payment tokens to the contract then lock them in yield manager.
-  /// @dev Only used in seeding a market.
-  /// @param marketIndex An int32 which uniquely identifies a market.
-  /// @param amount Amount of payment tokens in that token's lowest denominationto deposit.
-  function _lockFundsInMarket(uint32 marketIndex, uint256 amount) internal virtual {
-    _depositFunds(marketIndex, amount);
-    IYieldManager(yieldManagers[marketIndex]).depositPaymentToken(amount);
+  function _transferPaymentTokensFromUserToYieldManager(uint32 marketIndex, uint256 amount)
+    internal
+    virtual
+  {
+    require(
+      IERC20(paymentTokens[marketIndex]).transferFrom(
+        msg.sender,
+        yieldManagers[marketIndex],
+        amount
+      )
+    );
   }
 
   /*╔═══════════════════════════╗
@@ -850,7 +856,7 @@ contract LongShort is ILongShort, Initializable {
     updateSystemStateMarket(marketIndex)
     executeOutstandingNextPriceSettlements(msg.sender, marketIndex)
   {
-    _depositFunds(marketIndex, amount);
+    _transferPaymentTokensFromUserToYieldManager(marketIndex, amount);
 
     batched_amountPaymentToken_deposit[marketIndex][isLong] += amount;
     userNextPrice_paymentToken_depositAmount[marketIndex][isLong][msg.sender] += amount;
@@ -1060,8 +1066,11 @@ contract LongShort is ILongShort, Initializable {
           userNextPrice_currentUpdateIndex[marketIndex][user]
         ]
       );
-      // This means all erc20 tokens we use as payment tokens must return a boolean
-      require(IERC20(paymentTokens[marketIndex]).transfer(user, amountPaymentToken_toRedeem));
+
+      IYieldManager(yieldManagers[marketIndex]).transferPaymentTokensToUser(
+        user,
+        amountPaymentToken_toRedeem
+      );
 
       emit ExecuteNextPriceRedeemSettlementUser(
         user,
@@ -1162,7 +1171,8 @@ contract LongShort is ILongShort, Initializable {
     ║   BATCHED NEXT PRICE SETTLEMENT ACTIONS   ║
     ╚═══════════════════════════════════════════╝*/
 
-  /// @notice Either transfers funds to the yield manager, or deposits them, based on whether market value has increased or decreased.
+  /// @notice Either transfers funds from the yield manager to this contract if redeems > deposits,
+  /// and visa versa. The yield manager handles depositing and withdrawing the funds from a yield market.
   /// @dev When all batched next price actions are handled the total value in the market can either increase or decrease based on the value of mints and redeems.
   /// @param marketIndex An int32 which uniquely identifies a market.
   /// @param totalPaymentTokenValueChangeForMarket An int256 which indicates the magnitude and direction of the change in market value.
@@ -1177,7 +1187,7 @@ contract LongShort is ILongShort, Initializable {
     } else if (totalPaymentTokenValueChangeForMarket < 0) {
       // NB there will be issues here if not enough liquidity exists to withdraw
       // Boolean should be returned from yield manager and think how to appropriately handle this
-      IYieldManager(yieldManagers[marketIndex]).withdrawPaymentToken(
+      IYieldManager(yieldManagers[marketIndex]).removePaymentTokenFromMarket(
         uint256(-totalPaymentTokenValueChangeForMarket)
       );
     }

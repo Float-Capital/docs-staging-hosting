@@ -174,7 +174,8 @@ let testUnit =
     });
 
     describe("_executeOutstandingNextPriceRedeems", () => {
-      let paymentTokenSmocked = ref(ERC20MockSmocked.uninitializedValue);
+      let yieldManagerSmocked =
+        ref(YieldManagerMockSmocked.uninitializedValue);
 
       let setup =
           (
@@ -184,19 +185,18 @@ let testUnit =
             ~syntheticToken_priceSnapshot,
           ) => {
         let {longShort, markets} = contracts^;
-        let {paymentToken} = markets->Array.getUnsafe(0);
+        let {yieldManager} = markets->Array.getUnsafe(0);
 
-        let%Await smockedPaymentToken = ERC20MockSmocked.make(paymentToken);
+        let%Await smockedYieldManeger =
+          YieldManagerMockSmocked.make(yieldManager);
 
-        smockedPaymentToken->ERC20MockSmocked.mockTransferToReturn(true);
-
-        paymentTokenSmocked := smockedPaymentToken;
+        yieldManagerSmocked := smockedYieldManeger;
 
         longShort->LongShort.Exposed.setExecuteOutstandingNextPriceRedeemsGlobals(
           ~marketIndex,
           ~user,
           ~isLong,
-          ~paymentToken=smockedPaymentToken.address,
+          ~yieldManager=smockedYieldManeger.address,
           ~userNextPrice_syntheticToken_redeemAmount,
           ~userNextPrice_currentUpdateIndex,
           ~syntheticToken_priceSnapshot,
@@ -228,7 +228,8 @@ let testUnit =
             let%Await _ = executeOutstandingNextPriceRedeemsTx.contents;
 
             let transferCalls =
-              paymentTokenSmocked.contents->ERC20MockSmocked.transferCalls;
+              yieldManagerSmocked.contents
+              ->YieldManagerMockSmocked.transferPaymentTokensToUserCalls;
 
             Chai.recordArrayDeepEqualFlat(transferCalls, [||]);
           });
@@ -274,7 +275,8 @@ let testUnit =
             () => {
             let%Await _ = executeOutstandingNextPriceRedeemsTx.contents;
             let transferCalls =
-              paymentTokenSmocked.contents->ERC20MockSmocked.transferCalls;
+              yieldManagerSmocked.contents
+              ->YieldManagerMockSmocked.transferPaymentTokensToUserCalls;
             let expectedAmountOfPaymentTokenToRecieve =
               Contract.LongShortHelpers.calcAmountPaymentToken(
                 ~amountSyntheticToken=userNextPrice_syntheticToken_redeemAmount,
@@ -282,12 +284,7 @@ let testUnit =
               );
             Chai.recordArrayDeepEqualFlat(
               transferCalls,
-              [|
-                {
-                  recipient: user,
-                  amount: expectedAmountOfPaymentTokenToRecieve,
-                },
-              |],
+              [|{user, amount: expectedAmountOfPaymentTokenToRecieve}|],
             );
           });
 

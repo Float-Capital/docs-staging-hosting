@@ -184,21 +184,15 @@ contract Staker is IStaker, Initializable {
     address _floatToken,
     address _floatCapital,
     uint256 _floatPercentage
-  ) public virtual initializer {
-    require(
-      _admin != address(0) &&
-        _floatCapital != address(0) &&
-        _longShort != address(0) &&
-        _floatToken != address(0)
-    );
+  ) external virtual initializer {
     admin = _admin;
     floatCapital = _floatCapital;
-    longShort = (_longShort);
-    floatToken = (_floatToken);
+    longShort = _longShort;
+    floatToken = _floatToken;
 
     _changeFloatPercentage(_floatPercentage);
 
-    emit StakerV1(_floatToken, floatPercentage);
+    emit StakerV1(_floatToken, _floatPercentage);
   }
 
   /*╔═════════════════════════════╗
@@ -367,7 +361,7 @@ contract Staker is IStaker, Initializable {
   {
     uint256 period = marketLaunchIncentive_period[marketIndex];
     uint256 multiplier = marketLaunchIncentive_multipliers[marketIndex];
-    if (multiplier < 1) {
+    if (multiplier < 1e18) {
       multiplier = 1e18; // multiplier of 1 by default
     }
 

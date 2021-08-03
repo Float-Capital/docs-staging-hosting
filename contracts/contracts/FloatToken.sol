@@ -19,7 +19,7 @@ contract FloatToken is IFloatToken, ERC20PresetMinterPauserUpgradeable {
     string calldata name,
     string calldata symbol,
     address stakerAddress
-  ) public initializer {
+  ) external initializer {
     initialize(name, symbol);
 
     _setupRole(DEFAULT_ADMIN_ROLE, stakerAddress);

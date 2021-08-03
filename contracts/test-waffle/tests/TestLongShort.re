@@ -19,13 +19,11 @@ describe("Float System", () => {
       contracts := deployedContracts;
       let setupUser = accounts.contents->Array.getUnsafe(2);
 
-      let%Await _ =
-        HelperActions.stakeRandomlyInBothSidesOfMarket(
-          ~marketsToStakeIn=deployedContracts.markets,
-          ~userToStakeWith=setupUser,
-          ~longShort=deployedContracts.longShort,
-        );
-      ();
+      HelperActions.stakeRandomlyInBothSidesOfMarket(
+        ~marketsToStakeIn=deployedContracts.markets,
+        ~userToStakeWith=setupUser,
+        ~longShort=deployedContracts.longShort,
+      );
     });
 
     UpdateSystemState.testIntegration(~contracts, ~accounts);

@@ -437,7 +437,7 @@ let testUnit =
         let _ =
           smockedYieldManager->YieldManagerMockSmocked.mockDepositPaymentTokenToReturn;
         let _ =
-          smockedYieldManager->YieldManagerMockSmocked.mockWithdrawPaymentTokenToReturn;
+          smockedYieldManager->YieldManagerMockSmocked.mockRemovePaymentTokenFromMarketToReturn;
 
         longShort->LongShort.Exposed.setHandleTotalValueChangeForMarketWithYieldManagerGlobals(
           ~marketIndex,
@@ -467,10 +467,10 @@ let testUnit =
             );
           },
         );
-        it("should NOT call the withdrawPaymentToken function.", () => {
+        it("should NOT call the removePaymentTokenFromMarket function.", () => {
           let burnCalls =
             yieldManagerRef.contents
-            ->YieldManagerMockSmocked.withdrawPaymentTokenCalls;
+            ->YieldManagerMockSmocked.removePaymentTokenFromMarketCalls;
           Chai.recordArrayDeepEqualFlat(burnCalls, [||]);
         });
       });
@@ -495,11 +495,11 @@ let testUnit =
           },
         );
         it(
-          "should call the withdrawPaymentToken function on the correct synthetic token with correct arguments.",
+          "should call the removePaymentTokenFromMarket function on the correct synthetic token with correct arguments.",
           () => {
             let burnCalls =
               yieldManagerRef.contents
-              ->YieldManagerMockSmocked.withdrawPaymentTokenCalls;
+              ->YieldManagerMockSmocked.removePaymentTokenFromMarketCalls;
             Chai.recordArrayDeepEqualFlat(
               burnCalls,
               [|
@@ -511,25 +511,26 @@ let testUnit =
       });
       describe("totalPaymentTokenValueChangeForMarket == 0", () => {
         it(
-          "should call NEITHER the depositPaymentToken NOR withdrawPaymentToken function.",
+          "should call NEITHER the depositPaymentToken NOR removePaymentTokenFromMarket function.",
           () => {
-          let totalPaymentTokenValueChangeForMarket = zeroBn;
-          let {longShort} = contracts.contents;
+            let totalPaymentTokenValueChangeForMarket = zeroBn;
+            let {longShort} = contracts.contents;
 
-          let%Await _ =
-            longShort->LongShort.Exposed._handleTotalPaymentTokenValueChangeForMarketWithYieldManagerExposed(
-              ~marketIndex,
-              ~totalPaymentTokenValueChangeForMarket,
-            );
-          let mintCalls =
-            yieldManagerRef.contents
-            ->YieldManagerMockSmocked.depositPaymentTokenCalls;
-          let burnCalls =
-            yieldManagerRef.contents
-            ->YieldManagerMockSmocked.withdrawPaymentTokenCalls;
-          Chai.recordArrayDeepEqualFlat(mintCalls, [||]);
-          Chai.recordArrayDeepEqualFlat(burnCalls, [||]);
-        })
+            let%Await _ =
+              longShort->LongShort.Exposed._handleTotalPaymentTokenValueChangeForMarketWithYieldManagerExposed(
+                ~marketIndex,
+                ~totalPaymentTokenValueChangeForMarket,
+              );
+            let mintCalls =
+              yieldManagerRef.contents
+              ->YieldManagerMockSmocked.depositPaymentTokenCalls;
+            let burnCalls =
+              yieldManagerRef.contents
+              ->YieldManagerMockSmocked.removePaymentTokenFromMarketCalls;
+            Chai.recordArrayDeepEqualFlat(mintCalls, [||]);
+            Chai.recordArrayDeepEqualFlat(burnCalls, [||]);
+          },
+        )
       });
     });
   });

@@ -21,7 +21,7 @@ contract Treasury_v0 is Initializable {
     ║        CONTRACT SETUP        ║
     ╚══════════════════════════════╝*/
 
-  function initialize(address _admin) public initializer {
+  function initialize(address _admin) external initializer {
     admin = _admin;
   }
 
