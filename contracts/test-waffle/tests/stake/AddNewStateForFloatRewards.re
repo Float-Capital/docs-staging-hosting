@@ -24,7 +24,7 @@ let testUnit =
           ~stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted,
           ~timeDelta,
         ) => {
-      StakerSmocked.InternalMock.mock_calculateTimeDeltaFromLastAccumulativeIssancePerStakedSynthSnapshotToReturn(
+      StakerSmocked.InternalMock.mock_calculateTimeDeltaFromLastAccumulativeIssuancePerStakedSynthSnapshotToReturn(
         timeDelta,
       );
 
@@ -70,7 +70,7 @@ let testUnit =
       );
 
       it("calls calculateTimeDelta with correct arguments", () => {
-        StakerSmocked.InternalMock._calculateTimeDeltaFromLastAccumulativeIssancePerStakedSynthSnapshotCalls()
+        StakerSmocked.InternalMock._calculateTimeDeltaFromLastAccumulativeIssuancePerStakedSynthSnapshotCalls()
         ->Chai.recordArrayDeepEqualFlat([|{marketIndex: marketIndex}|])
       });
 

@@ -15,7 +15,7 @@ let test =
     let sampleMockAddress = Helpers.randomAddress();
     let kInitialMultiplier = Helpers.randomInteger();
     let kPeriod = Helpers.randomInteger();
-    let unstakeFeeBasisPoints = Helpers.randomInteger();
+    let unstakeFee_e18 = Helpers.randomInteger();
 
     let timestampRef = ref(0);
 
@@ -55,7 +55,7 @@ let test =
             ~shortToken=sampleShortAddress,
             ~kInitialMultiplier,
             ~kPeriod,
-            ~unstakeFeeBasisPoints,
+            ~unstakeFee_e18,
             ~balanceIncentive_curveExponent=bnFromInt(5),
             ~balanceIncentiveCurve_equilibriumOffset=bnFromInt(0),
           );
@@ -87,7 +87,7 @@ let test =
       ->Array.getUnsafe(0)
       ->Chai.recordEqualFlat({
           marketIndex,
-          newMarketUnstakeFeeBasisPoints: unstakeFeeBasisPoints,
+          newMarketUnstakeFee_e18: unstakeFee_e18,
         })
     });
 
@@ -126,11 +126,11 @@ let test =
       Chai.intEqual(marketIndex, shortMarketIndex);
     });
 
-    it("emits AccumulativeIssancePerStakedSynthSnapshotEvent", () => {
+    it("emits AccumulativeIssuancePerStakedSynthSnapshotEvent", () => {
       Chai.callEmitEvents(
         ~call=promiseRef^,
         ~contract=contracts^.staker->Obj.magic,
-        ~eventName="AccumulativeIssancePerStakedSynthSnapshot",
+        ~eventName="AccumulativeIssuancePerStakedSynthSnapshot",
       )
       ->Chai.withArgs4(
           marketIndex,
