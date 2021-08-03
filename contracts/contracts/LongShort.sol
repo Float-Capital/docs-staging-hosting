@@ -203,7 +203,7 @@ contract LongShort is ILongShort, Initializable {
     address _treasury,
     address _tokenFactory,
     address _staker
-  ) public virtual initializer {
+  ) external virtual initializer {
     admin = _admin;
     treasury = _treasury;
     tokenFactory = _tokenFactory;

@@ -86,7 +86,7 @@ contract YieldManagerMock is IYieldManager {
   /**
    * Adds the given yield percent to the token holdings.
    */
-  function settleWithYieldPercent(uint256 yieldPercent) public {
+  function settleWithYieldPercent(uint256 yieldPercent) external {
     uint256 totalYield = (totalHeld * yieldPercent) / TEN_TO_THE_18;
 
     lastSettled = block.timestamp;
@@ -97,7 +97,7 @@ contract YieldManagerMock is IYieldManager {
   /**
    * Adds the given absolute yield to the token holdings.
    */
-  function settleWithYieldAbsolute(uint256 totalYield) public {
+  function settleWithYieldAbsolute(uint256 totalYield) external {
     lastSettled = block.timestamp;
     totalHeld = totalHeld + totalYield;
     token.mint(address(this), totalYield);
@@ -106,11 +106,11 @@ contract YieldManagerMock is IYieldManager {
   /**
    * Sets the yield percentage per second for the given token.
    */
-  function setYieldRate(uint256 _yieldRate) public {
+  function setYieldRate(uint256 _yieldRate) external {
     yieldRate = _yieldRate;
   }
 
-  function depositPaymentToken(uint256 amount) public override longShortOnly {
+  function depositPaymentToken(uint256 amount) external override longShortOnly {
     // Ensure token state is current.
     settle();
 
@@ -121,12 +121,16 @@ contract YieldManagerMock is IYieldManager {
   /// @notice Allows the LongShort pay out a user from tokens already withdrawn from Aave
   /// @param user User to recieve the payout
   /// @param amount Amount of payment token to pay to user
-  function transferPaymentTokensToUser(address user, uint256 amount) public override longShortOnly {
+  function transferPaymentTokensToUser(address user, uint256 amount)
+    external
+    override
+    longShortOnly
+  {
     // Transfer tokens back to LongShort contract.
     token.transfer(user, amount);
   }
 
-  function removePaymentTokenFromMarket(uint256 amount) public override longShortOnly {
+  function removePaymentTokenFromMarket(uint256 amount) external override longShortOnly {
     // Ensure token state is current.
     settle();
     require(amount <= totalHeld);
@@ -137,7 +141,7 @@ contract YieldManagerMock is IYieldManager {
   function distributeYieldForTreasuryAndReturnMarketAllocation(
     uint256 totalValueRealizedForMarket,
     uint256 treasuryYieldPercentE18
-  ) public override longShortOnly returns (uint256) {
+  ) external override longShortOnly returns (uint256) {
     uint256 unrealizedYield = totalHeld - totalValueRealizedForMarket - totalReservedForTreasury;
 
     if (unrealizedYield == 0) {
