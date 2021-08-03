@@ -93,7 +93,7 @@ contract Staker is IStaker, Initializable {
     int256 balanceIncentiveEquilibriumOffset
   );
 
-  event AccumulativeIssancePerStakedSynthSnapshot(
+  event AccumulativeIssancePerStakedSynthSnapshotCreated(
     uint32 marketIndex,
     uint256 accumulativeFloatIssuanceSnapshotIndex,
     uint256 accumulativeLong,
@@ -349,7 +349,7 @@ contract Staker is IStaker, Initializable {
       _balanceIncentiveCurve_equilibriumOffset
     );
 
-    emit AccumulativeIssancePerStakedSynthSnapshot(marketIndex, 0, 0, 0);
+    emit AccumulativeIssancePerStakedSynthSnapshotCreated(marketIndex, 0, 0, 0);
   }
 
   /*╔═════════════════════════════════════════════════════════════════════════╗
@@ -560,7 +560,7 @@ contract Staker is IStaker, Initializable {
     // Update latest index to point to new state point.
     latestRewardIndex[marketIndex] = newIndex;
 
-    emit AccumulativeIssancePerStakedSynthSnapshot(
+    emit AccumulativeIssancePerStakedSynthSnapshotCreated(
       marketIndex,
       newIndex,
       newLongAccumaltiveValue,
