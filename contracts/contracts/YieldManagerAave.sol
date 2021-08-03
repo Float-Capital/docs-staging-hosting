@@ -113,7 +113,7 @@ contract YieldManagerAave is IYieldManager {
   }
 
   /// @notice Allows the LongShort contract to redeem aTokens for the payment token
-  /// @param amount Amount of payment token to withdraw  
+  /// @param amount Amount of payment token to withdraw
   function withdrawPaymentToken(uint256 amount) public override longShortOnly {
     lendingPool.withdraw(address(paymentToken), amount, address(this));
 
@@ -174,7 +174,7 @@ contract YieldManagerAave is IYieldManager {
     return amountForMarketIncentives;
   }
 
-  /// @notice Withdraw treasury allocated accrued yield from the lending pool to the treasury contract  
+  /// @notice Withdraw treasury allocated accrued yield from the lending pool to the treasury contract
   function withdrawTreasuryFunds() external override {
     uint256 amountToWithdrawForTreasury = totalReservedForTreasury;
     totalReservedForTreasury = 0;
