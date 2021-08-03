@@ -663,6 +663,8 @@ contract LongShort is ILongShort, Initializable {
     // $50 * 10% = $5 gained for short side and conversely $5 lost for long side.
     int256 underbalancedSideValue = int256(_getMin(longValue, shortValue));
 
+    // See this equation in latex: https://gateway.pinata.cloud/ipfs/QmPeJ3SZdn1GfxqCD4GDYyWTJGPMSHkjPJaxrzk2qTTPSE
+    // Interact with this equation: https://www.desmos.com/calculator/t8gr6j5vsq
     int256 valueChange = ((newAssetPrice - oldAssetPrice) * underbalancedSideValue) / oldAssetPrice;
 
     if (valueChange > 0) {
