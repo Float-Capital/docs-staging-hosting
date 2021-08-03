@@ -33,7 +33,7 @@ contract Staker is IStaker, Initializable {
   // Market specific
   mapping(uint32 => uint256) public marketLaunchIncentive_period; // seconds
   mapping(uint32 => uint256) public marketLaunchIncentive_multipliers; // e18 scale
-  mapping(uint32 => uint256) public marketUnstakeFeeBasis_points;
+  mapping(uint32 => uint256) public marketUnstakeFee_e18;
   mapping(uint32 => uint256) public balanceIncentive_curveExponent;
   mapping(uint32 => int256) public balanceIncentiveCurve_equilibriumOffset;
 
@@ -86,7 +86,7 @@ contract Staker is IStaker, Initializable {
 
   event MarketAddedToStaker(
     uint32 marketIndex,
-    uint256 exitFeeBasisPoints,
+    uint256 exitFee_e18,
     uint256 period,
     uint256 multiplier,
     uint256 balanceIncentiveExponent,
@@ -104,17 +104,8 @@ contract Staker is IStaker, Initializable {
 
   event StakeWithdrawn(address user, address token, uint256 amount);
 
-  // TODO: remove `FloatMinted` and replace it with `FloatMintedNew`
-  event FloatMinted(
-    address user,
-    uint32 marketIndex,
-    uint256 amountLong,
-    uint256 amountShort,
-    uint256 lastMintIndex
-  );
-
   // Note: the `amountFloatMinted` isn't strictly needed by the graph, but it is good to add it to validate calculations are accurate.
-  event FloatMintedNew(address user, uint32 marketIndex, uint256 amountFloatMinted);
+  event FloatMinted(address user, uint32 marketIndex, uint256 amountFloatMinted);
 
   event MarketLaunchIncentiveParametersChanges(
     uint32 marketIndex,
@@ -221,8 +212,8 @@ contract Staker is IStaker, Initializable {
   }
 
   function _changeUnstakeFee(uint32 marketIndex, uint256 newMarketUnstakeFee_e18) internal virtual {
-    require(newMarketUnstakeFee_e18 <= 5e16); // 5% fee is the max fee possible.
-    marketUnstakeFeeBasis_points[marketIndex] = newMarketUnstakeFee_e18;
+    require(newMarketUnstakeFee_e18 <= 5e16); // Explicitely stating 5% fee as the max fee possible.
+    marketUnstakeFee_e18[marketIndex] = newMarketUnstakeFee_e18;
   }
 
   function changeUnstakeFee(uint32 marketIndex, uint256 newMarketUnstakeFee_e18)
@@ -321,9 +312,9 @@ contract Staker is IStaker, Initializable {
 
     accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][0].timestamp = block.timestamp;
     accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][0]
-      .accumulativeFloatPerSyntheticToken_long = 0;
+    .accumulativeFloatPerSyntheticToken_long = 0;
     accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][0]
-      .accumulativeFloatPerSyntheticToken_short = 0;
+    .accumulativeFloatPerSyntheticToken_short = 0;
 
     syntheticTokens[marketIndex][true] = longToken;
     syntheticTokens[marketIndex][false] = shortToken;
@@ -387,7 +378,7 @@ contract Staker is IStaker, Initializable {
     assert(kInitialMultiplier >= 1e18);
 
     uint256 initialTimestamp = accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][0]
-      .timestamp;
+    .timestamp;
 
     if (block.timestamp - initialTimestamp <= kPeriod) {
       return
@@ -489,7 +480,7 @@ contract Staker is IStaker, Initializable {
     return
       block.timestamp -
       accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][latestRewardIndex[marketIndex]]
-        .timestamp;
+      .timestamp;
   }
 
   /**
@@ -528,9 +519,9 @@ contract Staker is IStaker, Initializable {
     // Compute new cumulative 'r' value total.
     return (
       accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][latestRewardIndex[marketIndex]]
-        .accumulativeFloatPerSyntheticToken_long + (timeDelta * longFloatPerSecond),
+      .accumulativeFloatPerSyntheticToken_long + (timeDelta * longFloatPerSecond),
       accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][latestRewardIndex[marketIndex]]
-        .accumulativeFloatPerSyntheticToken_short + (timeDelta * shortFloatPerSecond)
+      .accumulativeFloatPerSyntheticToken_short + (timeDelta * shortFloatPerSecond)
     );
   }
 
@@ -550,23 +541,23 @@ contract Staker is IStaker, Initializable {
     uint256 shortValue
   ) internal virtual {
     (
-      uint256 newLongAccumaltiveValue,
+      uint256 newLongAccumulativeValue,
       uint256 newShortAccumulativeValue
     ) = _calculateNewCumulativeIssuancePerStakedSynth(
-        marketIndex,
-        longPrice,
-        shortPrice,
-        longValue,
-        shortValue
-      );
+      marketIndex,
+      longPrice,
+      shortPrice,
+      longValue,
+      shortValue
+    );
 
     uint256 newIndex = latestRewardIndex[marketIndex] + 1;
 
     // Set cumulative 'r' value on new accumulativeIssuancePerStakedSynthSnapshot.
     accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][newIndex]
-      .accumulativeFloatPerSyntheticToken_long = newLongAccumaltiveValue;
+    .accumulativeFloatPerSyntheticToken_long = newLongAccumulativeValue;
     accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][newIndex]
-      .accumulativeFloatPerSyntheticToken_short = newShortAccumulativeValue;
+    .accumulativeFloatPerSyntheticToken_short = newShortAccumulativeValue;
 
     // Set timestamp on new accumulativeIssuancePerStakedSynthSnapshot.
     accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][newIndex].timestamp = block.timestamp;
@@ -577,7 +568,7 @@ contract Staker is IStaker, Initializable {
     emit AccumulativeIssuancePerStakedSynthSnapshotCreated(
       marketIndex,
       newIndex,
-      newLongAccumaltiveValue,
+      newLongAccumulativeValue,
       newShortAccumulativeValue
     );
   }
@@ -642,18 +633,20 @@ contract Staker is IStaker, Initializable {
     if (amountStakedLong > 0) {
       uint256 accumDeltaLong = accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][
         rewardIndexTo
-      ].accumulativeFloatPerSyntheticToken_long -
+      ]
+      .accumulativeFloatPerSyntheticToken_long -
         accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][rewardIndexFrom]
-          .accumulativeFloatPerSyntheticToken_long;
+        .accumulativeFloatPerSyntheticToken_long;
       floatReward += (accumDeltaLong * amountStakedLong) / FLOAT_ISSUANCE_FIXED_DECIMAL;
     }
 
     if (amountStakedShort > 0) {
       uint256 accumDeltaShort = accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][
         rewardIndexTo
-      ].accumulativeFloatPerSyntheticToken_short -
+      ]
+      .accumulativeFloatPerSyntheticToken_short -
         accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][rewardIndexFrom]
-          .accumulativeFloatPerSyntheticToken_short;
+        .accumulativeFloatPerSyntheticToken_short;
       floatReward += (accumDeltaShort * amountStakedShort) / FLOAT_ISSUANCE_FIXED_DECIMAL;
     }
   }
@@ -754,15 +747,7 @@ contract Staker is IStaker, Initializable {
       userIndexOfLastClaimedReward[marketIndex][user] = latestRewardIndex[marketIndex];
 
       _mintFloat(user, floatToMint);
-      // TODO: remove `FloatMinted` and replace it with `FloatMintedNew`
-      emit FloatMinted(
-        user,
-        marketIndex,
-        floatToMint,
-        0, /*Setting this to zero has no effect on the graph, just here so the graph doesn't break in the mean time*/
-        latestRewardIndex[marketIndex]
-      );
-      emit FloatMintedNew(user, marketIndex, floatToMint);
+      emit FloatMinted(user, marketIndex, floatToMint);
     }
   }
 
@@ -780,15 +765,7 @@ contract Staker is IStaker, Initializable {
 
         floatTotal += floatToMint;
 
-        // TODO: remove `FloatMinted` and replace it with `FloatMintedNew`
-        emit FloatMinted(
-          user,
-          marketIndexes[i],
-          floatToMint,
-          0, /*Setting this to zero has no effect on the graph, just here so the graph doesn't break in the mean time*/
-          latestRewardIndex[marketIndexes[i]]
-        );
-        emit FloatMintedNew(user, marketIndexes[i], floatToMint);
+        emit FloatMinted(user, marketIndexes[i], floatToMint);
       }
     }
     if (floatTotal > 0) {
@@ -913,8 +890,7 @@ contract Staker is IStaker, Initializable {
 
     userAmountStaked[token][msg.sender] = userAmountStaked[token][msg.sender] - amount;
 
-    // TODO STENT what happens with the fees that are left in this contract?
-    uint256 amountFees = (amount * marketUnstakeFeeBasis_points[marketIndex]) / 1e18;
+    uint256 amountFees = (amount * marketUnstakeFee_e18[marketIndex]) / 1e18;
 
     IERC20(token).transfer(msg.sender, amount - amountFees);
 
