@@ -88,10 +88,13 @@ let test =
       latestRewardIndex->Chai.bnEqual(mutatedIndex);
     });
 
-    it("mutates syntheticRewardParams", () => {
+    it("mutates accumulativeFloatPerSyntheticTokenSnapshots", () => {
       let%Await rewardParams =
         contracts^.staker
-        ->Staker.syntheticRewardParams(marketIndex, mutatedIndex);
+        ->Staker.accumulativeFloatPerSyntheticTokenSnapshots(
+            marketIndex,
+            mutatedIndex,
+          );
 
       rewardParams->Chai.recordEqualFlat({
         timestamp: timestampRef^,
@@ -99,11 +102,11 @@ let test =
         accumulativeFloatPerSyntheticToken_short: shortAccum,
       });
     });
-    it("emits StateAddedEvent", () => {
+    it("emits AccumulativeIssancePerStakedSynthSnapshotEvent", () => {
       Chai.callEmitEvents(
         ~call=promiseRef^,
         ~contract=contracts^.staker->Obj.magic,
-        ~eventName="StateAdded",
+        ~eventName="AccumulativeIssancePerStakedSynthSnapshot",
       )
       ->Chai.withArgs4(marketIndex, mutatedIndex, longAccum, shortAccum)
     });

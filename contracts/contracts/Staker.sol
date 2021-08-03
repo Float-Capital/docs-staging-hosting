@@ -43,8 +43,9 @@ contract Staker is IStaker, Initializable {
 
   // Reward specific
   mapping(uint32 => uint256) public latestRewardIndex;
-  mapping(uint32 => mapping(uint256 => RewardState)) public syntheticRewardParams;
-  struct RewardState {
+  mapping(uint32 => mapping(uint256 => AccumulativeIssancePerStakedSynthSnapshot))
+    public accumulativeFloatPerSyntheticTokenSnapshots;
+  struct AccumulativeIssancePerStakedSynthSnapshot {
     uint256 timestamp;
     uint256 accumulativeFloatPerSyntheticToken_long;
     uint256 accumulativeFloatPerSyntheticToken_short;
@@ -58,10 +59,11 @@ contract Staker is IStaker, Initializable {
   mapping(uint32 => uint256) public batched_stakerNextTokenShiftIndex;
   /**
   @notice Used to link a token shift to a staker state
-  @dev tokenShiftIndex => stakerStateIndex
-    POSSIBLE OPTIMIZATION - could pack takerTokenShiftIndex_to_stakerStateIndex_mapping and takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping into a struct of two uint128 for storage space optimization.
+  @dev tokenShiftIndex => accumulativeFloatIssuanceSnapshotIndex
+    POSSIBLE OPTIMIZATION - could pack stakerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping and takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping into a struct of two uint128 for storage space optimization.
   */
-  mapping(uint256 => uint256) public takerTokenShiftIndex_to_stakerStateIndex_mapping;
+  mapping(uint256 => uint256)
+    public stakerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping;
   /// @notice Used to fetch the price from LongShort at that point in time
   /// @dev tokenShiftIndex => longShortMarketPriceSnapshotIndex
   mapping(uint256 => uint256)
@@ -91,9 +93,9 @@ contract Staker is IStaker, Initializable {
     int256 balanceIncentiveEquilibriumOffset
   );
 
-  event StateAdded(
+  event AccumulativeIssancePerStakedSynthSnapshot(
     uint32 marketIndex,
-    uint256 stateIndex,
+    uint256 accumulativeFloatIssuanceSnapshotIndex,
     uint256 accumulativeLong,
     uint256 accumulativeShort
   );
@@ -320,9 +322,11 @@ contract Staker is IStaker, Initializable {
     marketIndexOfToken[longToken] = marketIndex;
     marketIndexOfToken[shortToken] = marketIndex;
 
-    syntheticRewardParams[marketIndex][0].timestamp = block.timestamp;
-    syntheticRewardParams[marketIndex][0].accumulativeFloatPerSyntheticToken_long = 0;
-    syntheticRewardParams[marketIndex][0].accumulativeFloatPerSyntheticToken_short = 0;
+    accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][0].timestamp = block.timestamp;
+    accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][0]
+    .accumulativeFloatPerSyntheticToken_long = 0;
+    accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][0]
+    .accumulativeFloatPerSyntheticToken_short = 0;
 
     syntheticTokens[marketIndex][true] = longToken;
     syntheticTokens[marketIndex][false] = shortToken;
@@ -345,12 +349,12 @@ contract Staker is IStaker, Initializable {
       _balanceIncentiveCurve_equilibriumOffset
     );
 
-    emit StateAdded(marketIndex, 0, 0, 0);
+    emit AccumulativeIssancePerStakedSynthSnapshot(marketIndex, 0, 0, 0);
   }
 
-  /*╔═════════════════════════════════════╗
-    ║    GLOBAL REWARD STATE FUNCTIONS    ║
-    ╚═════════════════════════════════════╝*/
+  /*╔═════════════════════════════════════════════════════════════════════════╗
+    ║    GLOBAL FLT REWARD ACCUMULATION CALCULATION AND TRACKING FUNCTIONS    ║
+    ╚═════════════════════════════════════════════════════════════════════════╝*/
 
   /*
    * Returns the K factor parameters for the given market with sensible
@@ -382,7 +386,8 @@ contract Staker is IStaker, Initializable {
     // *never* be set to a value < 1e18, as there are guards against this.
     assert(kInitialMultiplier >= 1e18);
 
-    uint256 initialTimestamp = syntheticRewardParams[marketIndex][0].timestamp;
+    uint256 initialTimestamp = accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][0]
+    .timestamp;
 
     if (block.timestamp - initialTimestamp <= kPeriod) {
       return
@@ -471,12 +476,18 @@ contract Staker is IStaker, Initializable {
   }
 
   /*
-   * Computes the time since last state point for the given token in seconds.
+   * Computes the time since last accumulativeIssancePerStakedSynthSnapshot for the given token in seconds.
    */
-  function _calculateTimeDelta(uint32 marketIndex) internal view virtual returns (uint256) {
+  function _calculateTimeDeltaFromLastAccumulativeIssancePerStakedSynthSnapshot(uint32 marketIndex)
+    internal
+    view
+    virtual
+    returns (uint256)
+  {
     return
       block.timestamp -
-      syntheticRewardParams[marketIndex][latestRewardIndex[marketIndex]].timestamp;
+      accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][latestRewardIndex[marketIndex]]
+      .timestamp;
   }
 
   /*
@@ -501,13 +512,15 @@ contract Staker is IStaker, Initializable {
     );
 
     // Compute time since last state point for the given token.
-    uint256 timeDelta = _calculateTimeDelta(marketIndex);
+    uint256 timeDelta = _calculateTimeDeltaFromLastAccumulativeIssancePerStakedSynthSnapshot(
+      marketIndex
+    );
 
     // Compute new cumulative 'r' value total.
     return (
-      syntheticRewardParams[marketIndex][latestRewardIndex[marketIndex]]
+      accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][latestRewardIndex[marketIndex]]
       .accumulativeFloatPerSyntheticToken_long + (timeDelta * longFloatPerSecond),
-      syntheticRewardParams[marketIndex][latestRewardIndex[marketIndex]]
+      accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][latestRewardIndex[marketIndex]]
       .accumulativeFloatPerSyntheticToken_short + (timeDelta * shortFloatPerSecond)
     );
   }
@@ -536,18 +549,23 @@ contract Staker is IStaker, Initializable {
     uint256 newIndex = latestRewardIndex[marketIndex] + 1;
 
     // Set cumulative 'r' value on new state point.
-    syntheticRewardParams[marketIndex][newIndex]
+    accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][newIndex]
     .accumulativeFloatPerSyntheticToken_long = newLongAccumaltiveValue;
-    syntheticRewardParams[marketIndex][newIndex]
+    accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][newIndex]
     .accumulativeFloatPerSyntheticToken_short = newShortAccumulativeValue;
 
     // Set timestamp on new state point.
-    syntheticRewardParams[marketIndex][newIndex].timestamp = block.timestamp;
+    accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][newIndex].timestamp = block.timestamp;
 
     // Update latest index to point to new state point.
     latestRewardIndex[marketIndex] = newIndex;
 
-    emit StateAdded(marketIndex, newIndex, newLongAccumaltiveValue, newShortAccumulativeValue);
+    emit AccumulativeIssancePerStakedSynthSnapshot(
+      marketIndex,
+      newIndex,
+      newLongAccumaltiveValue,
+      newShortAccumulativeValue
+    );
   }
 
   /*
@@ -560,16 +578,16 @@ contract Staker is IStaker, Initializable {
     uint256 shortPrice,
     uint256 longValue,
     uint256 shortValue,
-    uint256 takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted // This value should be ALWAYS be zero if no shift occured
+    uint256 stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted // This value should be ALWAYS be zero if no shift occured
   ) external override onlyLongShort {
     // Only add a new state point if some time has passed.
 
-    // the `takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted` value will be 0 if there is no staker related action in an executed batch
-    if (takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted > 0) {
+    // the `stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted` value will be 0 if there is no staker related action in an executed batch
+    if (stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted > 0) {
       takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping[
         batched_stakerNextTokenShiftIndex[marketIndex]
-      ] = takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted;
-      takerTokenShiftIndex_to_stakerStateIndex_mapping[
+      ] = stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted;
+      stakerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping[
         batched_stakerNextTokenShiftIndex[marketIndex]
       ] = latestRewardIndex[marketIndex] + 1;
       batched_stakerNextTokenShiftIndex[marketIndex] += 1;
@@ -578,7 +596,7 @@ contract Staker is IStaker, Initializable {
     }
 
     // Time delta is fetched twice in below code, can pass through? Which is less gas?
-    if (_calculateTimeDelta(marketIndex) > 0) {
+    if (_calculateTimeDeltaFromLastAccumulativeIssancePerStakedSynthSnapshot(marketIndex) > 0) {
       _setRewardObjects(marketIndex, longPrice, shortPrice, longValue, shortValue);
     }
   }
@@ -596,16 +614,21 @@ contract Staker is IStaker, Initializable {
     uint256 rewardIndexTo
   ) internal view virtual returns (uint256 floatReward) {
     if (amountStakedLong > 0) {
-      uint256 accumDeltaLong = syntheticRewardParams[marketIndex][rewardIndexTo]
+      uint256 accumDeltaLong = accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][
+        rewardIndexTo
+      ]
       .accumulativeFloatPerSyntheticToken_long -
-        syntheticRewardParams[marketIndex][rewardIndexFrom].accumulativeFloatPerSyntheticToken_long;
+        accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][rewardIndexFrom]
+        .accumulativeFloatPerSyntheticToken_long;
       floatReward += (accumDeltaLong * amountStakedLong) / FLOAT_ISSUANCE_FIXED_DECIMAL;
     }
 
     if (amountStakedShort > 0) {
-      uint256 accumDeltaShort = syntheticRewardParams[marketIndex][rewardIndexTo]
+      uint256 accumDeltaShort = accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][
+        rewardIndexTo
+      ]
       .accumulativeFloatPerSyntheticToken_short -
-        syntheticRewardParams[marketIndex][rewardIndexFrom]
+        accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][rewardIndexFrom]
         .accumulativeFloatPerSyntheticToken_short;
       floatReward += (accumDeltaShort * amountStakedShort) / FLOAT_ISSUANCE_FIXED_DECIMAL;
     }
@@ -637,7 +660,7 @@ contract Staker is IStaker, Initializable {
         amountStakedLong,
         amountStakedShort,
         usersLastRewardIndex,
-        takerTokenShiftIndex_to_stakerStateIndex_mapping[usersShiftIndex]
+        stakerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping[usersShiftIndex]
       );
 
       // Update the users balances
@@ -678,7 +701,7 @@ contract Staker is IStaker, Initializable {
         marketIndex,
         amountStakedLong,
         amountStakedShort,
-        takerTokenShiftIndex_to_stakerStateIndex_mapping[usersShiftIndex],
+        stakerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping[usersShiftIndex],
         latestRewardIndex[marketIndex]
       );
 

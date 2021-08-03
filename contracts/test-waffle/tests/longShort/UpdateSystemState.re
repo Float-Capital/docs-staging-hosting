@@ -281,7 +281,7 @@ let testUnit =
                 shortPrice: oldShortPrice,
                 longValue: oldLongValue,
                 shortValue: oldShortValue,
-                takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted: stakerNextPrice_currentUpdateIndex,
+                stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted: stakerNextPrice_currentUpdateIndex,
               },
             |]);
         },
@@ -318,7 +318,7 @@ let testUnit =
                 shortPrice: oldShortPrice,
                 longValue: oldLongValue,
                 shortValue: oldShortValue,
-                takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted: zeroBn,
+                stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted: zeroBn,
               },
             |]);
 
@@ -352,7 +352,7 @@ let testUnit =
                   shortPrice: oldShortPrice,
                   longValue: oldLongValue,
                   shortValue: oldShortValue,
-                  takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted: zeroBn,
+                  stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted: zeroBn,
                 },
               |]);
           },

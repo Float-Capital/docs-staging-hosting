@@ -91,9 +91,13 @@ let test =
         })
     });
 
-    it("mutates syntheticRewardParams", () => {
+    it("mutates accumulativeFloatPerSyntheticTokenSnapshots", () => {
       let%Await params =
-        contracts^.staker->Staker.syntheticRewardParams(1, CONSTANTS.zeroBn);
+        contracts^.staker
+        ->Staker.accumulativeFloatPerSyntheticTokenSnapshots(
+            1,
+            CONSTANTS.zeroBn,
+          );
 
       params->Chai.recordEqualFlat({
         timestamp: Ethers.BigNumber.fromInt(timestampRef^ + 1), // one second per block in hardhat
@@ -122,11 +126,11 @@ let test =
       Chai.intEqual(marketIndex, shortMarketIndex);
     });
 
-    it("emits StateAddedEvent", () => {
+    it("emits AccumulativeIssancePerStakedSynthSnapshotEvent", () => {
       Chai.callEmitEvents(
         ~call=promiseRef^,
         ~contract=contracts^.staker->Obj.magic,
-        ~eventName="StateAdded",
+        ~eventName="AccumulativeIssancePerStakedSynthSnapshot",
       )
       ->Chai.withArgs4(
           marketIndex,

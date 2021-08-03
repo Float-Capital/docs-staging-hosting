@@ -28,7 +28,9 @@ let test = (~contracts: ref(Helpers.coreContracts)) => {
 
       let%Await delta =
         contracts^.staker
-        ->Staker.Exposed._calculateTimeDeltaExposed(~marketIndex);
+        ->Staker.Exposed._calculateTimeDeltaFromLastAccumulativeIssancePerStakedSynthSnapshotExposed(
+            ~marketIndex,
+          );
 
       delta->Chai.bnEqual(expectedDelta);
     })
