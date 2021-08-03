@@ -2,8 +2,6 @@
 
 pragma solidity 0.8.3;
 
-import "hardhat/console.sol";
-
 import "@openzeppelin/contracts/token/ERC20/presets/ERC20PresetMinterPauser.sol";
 
 import "../interfaces/IYieldManager.sol";

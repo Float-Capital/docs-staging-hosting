@@ -566,15 +566,19 @@ contract LongShort is ILongShort, Initializable {
     }
   }
 
-  /// @notice Calculates the percentage in base 1e18 of how much of the accrued yield
-  /// for a market should be allocated to treasury.
-  /// @dev For gas considerations also returns whether the long side is imbalanced.
-  /// @param longValue The current total payment token value of the long side of the market.
-  /// @param shortValue The current total payment token value of the short side of the market.
-  /// @param totalValueLockedInMarket Total payment token value of both sides of the market.
-  /// @return isLongSideUnderbalanced Whether the long side initially had less value than the short side.
-  /// @return treasuryYieldPercent_e18 The percentage in base 1e18 of how much of the accrued yield
-  /// for a market should be allocated to treasury.
+   /**
+   @notice Calculates the percentage in base 1e18 of how much of the accrued yield
+   for a market should be allocated to treasury.
+   @dev For gas considerations also returns whether the long side is imbalanced.
+   @dev For gas considerations totalValueLockedInMarket is passed as a parameter as the function
+  calling this function has pre calculated the value
+   @param longValue The current total payment token value of the long side of the market.
+   @param shortValue The current total payment token value of the short side of the market.
+   @param totalValueLockedInMarket Total payment token value of both sides of the market.
+   @return isLongSideUnderbalanced Whether the long side initially had less value than the short side.
+   @return treasuryYieldPercent_e18 The percentage in base 1e18 of how much of the accrued yield
+   for a market should be allocated to treasury.
+   */
   function _getYieldSplit(
     uint32 marketIndex,
     uint256 longValue,
@@ -631,7 +635,7 @@ contract LongShort is ILongShort, Initializable {
     longValue = marketSideValueInPaymentToken[marketIndex][true];
     shortValue = marketSideValueInPaymentToken[marketIndex][false];
     uint256 totalValueLockedInMarket = longValue + shortValue;
-
+    
     (bool isLongSideUnderbalanced, uint256 treasuryYieldPercent_e18) = _getYieldSplit(
       marketIndex,
       longValue,

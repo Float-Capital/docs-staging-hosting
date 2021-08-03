@@ -33,6 +33,5 @@ abstract contract IYieldManager {
   ) public virtual returns (uint256 amountForMarketIncentives);
 
   /// @notice Withdraw treasury allocated accrued yield from the lending pool to the treasury contract
-  /// @dev This will fail if not enough liquidity is avaiable in the yield provider liquidity pool
   function withdrawTreasuryFunds() external virtual;
 }

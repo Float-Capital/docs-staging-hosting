@@ -2,7 +2,6 @@
 
 pragma solidity 0.8.3;
 
-import "hardhat/console.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/presets/ERC20PresetMinterPauserUpgradeable.sol";
 
 import "./interfaces/IFloatToken.sol";
@@ -334,7 +333,7 @@ contract Staker is IStaker, Initializable {
 
     _changeUnstakeFee(marketIndex, unstakeFee_e18);
 
-    // Rather start this at 1 to prevent confusion.
+    // Set this value to one initially - 0 is a null value and thus potentially bug prone.
     batched_stakerNextTokenShiftIndex[marketIndex] = 1;
 
     emit MarketAddedToStaker(
