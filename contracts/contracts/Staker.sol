@@ -186,20 +186,14 @@ contract Staker is IStaker, Initializable {
     address _floatCapital,
     uint256 _floatPercentage
   ) public virtual initializer {
-    require(
-      _admin != address(0) &&
-        _floatCapital != address(0) &&
-        _longShort != address(0) &&
-        _floatToken != address(0)
-    );
     admin = _admin;
     floatCapital = _floatCapital;
-    longShort = (_longShort);
-    floatToken = (_floatToken);
+    longShort = _longShort;
+    floatToken = _floatToken;
 
     _changeFloatPercentage(_floatPercentage);
 
-    emit StakerV1(_floatToken, floatPercentage);
+    emit StakerV1(_floatToken, _floatPercentage);
   }
 
   /*╔═════════════════════════════╗
@@ -321,9 +315,9 @@ contract Staker is IStaker, Initializable {
 
     accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][0].timestamp = block.timestamp;
     accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][0]
-    .accumulativeFloatPerSyntheticToken_long = 0;
+      .accumulativeFloatPerSyntheticToken_long = 0;
     accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][0]
-    .accumulativeFloatPerSyntheticToken_short = 0;
+      .accumulativeFloatPerSyntheticToken_short = 0;
 
     syntheticTokens[marketIndex][true] = longToken;
     syntheticTokens[marketIndex][false] = shortToken;
@@ -365,7 +359,7 @@ contract Staker is IStaker, Initializable {
   {
     uint256 period = marketLaunchIncentive_period[marketIndex];
     uint256 multiplier = marketLaunchIncentive_multipliers[marketIndex];
-    if (multiplier < 1) {
+    if (multiplier < 1e18) {
       multiplier = 1e18; // multiplier of 1 by default
     }
 
@@ -384,7 +378,7 @@ contract Staker is IStaker, Initializable {
     assert(kInitialMultiplier >= 1e18);
 
     uint256 initialTimestamp = accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][0]
-    .timestamp;
+      .timestamp;
 
     if (block.timestamp - initialTimestamp <= kPeriod) {
       return
@@ -484,7 +478,7 @@ contract Staker is IStaker, Initializable {
     return
       block.timestamp -
       accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][latestRewardIndex[marketIndex]]
-      .timestamp;
+        .timestamp;
   }
 
   /*
@@ -516,9 +510,9 @@ contract Staker is IStaker, Initializable {
     // Compute new cumulative 'r' value total.
     return (
       accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][latestRewardIndex[marketIndex]]
-      .accumulativeFloatPerSyntheticToken_long + (timeDelta * longFloatPerSecond),
+        .accumulativeFloatPerSyntheticToken_long + (timeDelta * longFloatPerSecond),
       accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][latestRewardIndex[marketIndex]]
-      .accumulativeFloatPerSyntheticToken_short + (timeDelta * shortFloatPerSecond)
+        .accumulativeFloatPerSyntheticToken_short + (timeDelta * shortFloatPerSecond)
     );
   }
 
@@ -536,20 +530,20 @@ contract Staker is IStaker, Initializable {
       uint256 newLongAccumaltiveValue,
       uint256 newShortAccumulativeValue
     ) = _calculateNewCumulativeIssuancePerStakedSynth(
-      marketIndex,
-      longPrice,
-      shortPrice,
-      longValue,
-      shortValue
-    );
+        marketIndex,
+        longPrice,
+        shortPrice,
+        longValue,
+        shortValue
+      );
 
     uint256 newIndex = latestRewardIndex[marketIndex] + 1;
 
     // Set cumulative 'r' value on new state point.
     accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][newIndex]
-    .accumulativeFloatPerSyntheticToken_long = newLongAccumaltiveValue;
+      .accumulativeFloatPerSyntheticToken_long = newLongAccumaltiveValue;
     accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][newIndex]
-    .accumulativeFloatPerSyntheticToken_short = newShortAccumulativeValue;
+      .accumulativeFloatPerSyntheticToken_short = newShortAccumulativeValue;
 
     // Set timestamp on new state point.
     accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][newIndex].timestamp = block.timestamp;
@@ -613,20 +607,18 @@ contract Staker is IStaker, Initializable {
     if (amountStakedLong > 0) {
       uint256 accumDeltaLong = accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][
         rewardIndexTo
-      ]
-      .accumulativeFloatPerSyntheticToken_long -
+      ].accumulativeFloatPerSyntheticToken_long -
         accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][rewardIndexFrom]
-        .accumulativeFloatPerSyntheticToken_long;
+          .accumulativeFloatPerSyntheticToken_long;
       floatReward += (accumDeltaLong * amountStakedLong) / FLOAT_ISSUANCE_FIXED_DECIMAL;
     }
 
     if (amountStakedShort > 0) {
       uint256 accumDeltaShort = accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][
         rewardIndexTo
-      ]
-      .accumulativeFloatPerSyntheticToken_short -
+      ].accumulativeFloatPerSyntheticToken_short -
         accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][rewardIndexFrom]
-        .accumulativeFloatPerSyntheticToken_short;
+          .accumulativeFloatPerSyntheticToken_short;
       floatReward += (accumDeltaShort * amountStakedShort) / FLOAT_ISSUANCE_FIXED_DECIMAL;
     }
   }

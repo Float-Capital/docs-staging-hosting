@@ -49,7 +49,7 @@ contract FloatToken is IFloatToken, ERC20PresetMinterPauserUpgradeable {
   /// @param to TODO
   /// @param amount TODO
   function mint(address to, uint256 amount)
-    public
+    external
     override(IFloatToken, ERC20PresetMinterPauserUpgradeable)
   {
     ERC20PresetMinterPauserUpgradeable.mint(to, amount);
