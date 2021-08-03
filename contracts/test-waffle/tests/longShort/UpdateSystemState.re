@@ -79,7 +79,7 @@ let testUnit =
           oldLongValueAfterYield,
           oldShortValueAfterYield,
         );
-        LongShortSmocked.InternalMock.mock_performOustandingBatchedSettlementsToReturn(
+        LongShortSmocked.InternalMock.mock_batchConfirmOutstandingPendingActionsToReturn(
           valueChangeLong,
           valueChangeShort,
         );
@@ -156,8 +156,8 @@ let testUnit =
           longShort->LongShort.Exposed.set_updateSystemStateInternalGlobals(
             ~marketIndex,
             ~latestUpdateIndexForMarket,
-            ~syntheticTokenPriceLong=oldLongPrice,
-            ~syntheticTokenPriceShort=oldShortPrice,
+            ~syntheticTokenPrice_inPaymentTokens_long=oldLongPrice,
+            ~syntheticTokenPrice_inPaymentTokens_short=oldShortPrice,
             ~assetPrice=oldAssetPrice,
             ~oracleManager=oracleSmocked.address,
             ~staker=stakerSmocked.address,
@@ -196,7 +196,7 @@ let testUnit =
           LongShortSmocked.InternalMock._getSyntheticTokenPriceCalls()
           ->Array.length;
         let numberOfOutstandingSettlementCalls =
-          LongShortSmocked.InternalMock._performOustandingBatchedSettlementsCalls()
+          LongShortSmocked.InternalMock._batchConfirmOutstandingPendingActionsCalls()
           ->Array.length;
 
         let numberOfTotalSupplyLongCalls =
@@ -281,7 +281,7 @@ let testUnit =
                 shortPrice: oldShortPrice,
                 longValue: oldLongValue,
                 shortValue: oldShortValue,
-                longShortMarketPriceSnapshotIndexIfShiftExecuted: stakerNextPrice_currentUpdateIndex,
+                takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted: stakerNextPrice_currentUpdateIndex,
               },
             |]);
         },
@@ -318,7 +318,7 @@ let testUnit =
                 shortPrice: oldShortPrice,
                 longValue: oldLongValue,
                 shortValue: oldShortValue,
-                longShortMarketPriceSnapshotIndexIfShiftExecuted: zeroBn,
+                takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted: zeroBn,
               },
             |]);
 
@@ -352,7 +352,7 @@ let testUnit =
                   shortPrice: oldShortPrice,
                   longValue: oldLongValue,
                   shortValue: oldShortValue,
-                  longShortMarketPriceSnapshotIndexIfShiftExecuted: zeroBn,
+                  takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted: zeroBn,
                 },
               |]);
           },
@@ -380,12 +380,14 @@ let testUnit =
               ~fromStaker=false,
               ~stakerNextPrice_currentUpdateIndex=zeroBn,
             );
-          LongShortSmocked.InternalMock._performOustandingBatchedSettlementsCalls()
+          LongShortSmocked.InternalMock._batchConfirmOutstandingPendingActionsCalls()
           ->Chai.recordArrayDeepEqualFlat([|
               {
                 marketIndex,
-                syntheticTokenPriceLong: potentialNewLongPrice.contents,
-                syntheticTokenPriceShort: potentialNewShortPrice.contents,
+                syntheticTokenPrice_inPaymentTokens_long:
+                  potentialNewLongPrice.contents,
+                syntheticTokenPrice_inPaymentTokens_short:
+                  potentialNewShortPrice.contents,
               },
             |]);
         });

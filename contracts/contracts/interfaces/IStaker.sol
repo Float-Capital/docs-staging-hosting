@@ -10,8 +10,8 @@ abstract contract IStaker {
     uint256 kInitialMultiplier,
     uint256 kPeriod,
     uint256 unstakeFeeBasisPoints,
-    uint256 _balanceIncentiveCurveExponent,
-    int256 _balanceIncentiveCurveEquilibriumOffset
+    uint256 _balanceIncentive_curveExponent,
+    int256 _balanceIncentiveCurve_equilibriumOffset
   ) external virtual;
 
   function addNewStateForFloatRewards(
@@ -20,7 +20,7 @@ abstract contract IStaker {
     uint256 shortTokenPrice,
     uint256 longValue,
     uint256 shortValue,
-    uint256 longShortMarketPriceSnapshotIndexIfShiftExecuted
+    uint256 takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted
   ) external virtual;
 
   function stakeFromUser(address from, uint256 amount) public virtual;

@@ -114,8 +114,8 @@ let createSyntheticMarket = (
         ~kPeriod=Ethers.BigNumber.fromInt(0),
         ~unstakeFeeE18=Ethers.BigNumber.fromInt(50),
         ~initialMarketSeed,
-        ~balanceIncentiveCurveExponent=bnFromInt(5),
-        ~balanceIncentiveCurveEquilibriumOffset=bnFromInt(0),
+        ~balanceIncentive_curveExponent=bnFromInt(5),
+        ~balanceIncentiveCurve_equilibriumOffset=bnFromInt(0),
         ~marketTreasurySplitGradient_e18=bnFromInt(1),
       )
     })

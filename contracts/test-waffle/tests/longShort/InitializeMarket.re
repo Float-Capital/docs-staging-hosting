@@ -53,8 +53,8 @@ let testUnit =
               ~kInitialMultiplier=Ethers.BigNumber.fromUnsafe("6"),
               ~unstakeFeeE18=Ethers.BigNumber.fromUnsafe("5000000000000000"), // 0.5% or 50 basis points
               ~initialMarketSeed=Ethers.BigNumber.fromUnsafe("7"),
-              ~balanceIncentiveCurveExponent=bnFromInt(5),
-              ~balanceIncentiveCurveEquilibriumOffset=bnFromInt(0),
+              ~balanceIncentive_curveExponent=bnFromInt(5),
+              ~balanceIncentiveCurve_equilibriumOffset=bnFromInt(0),
               ~marketTreasurySplitGradient_e18=bnFromInt(1),
             );
 
@@ -71,8 +71,8 @@ let testUnit =
             kPeriod: Ethers.BigNumber.fromUnsafe("4"),
             unstakeFeeBasisPoints:
               Ethers.BigNumber.fromUnsafe("5000000000000000"), // 0.5% or 50 basis points
-            balanceIncentiveCurveExponent: bnFromInt(5),
-            balanceIncentiveCurveEquilibriumOffset: bnFromInt(0),
+            balanceIncentive_curveExponent: bnFromInt(5),
+            balanceIncentiveCurve_equilibriumOffset: bnFromInt(0),
           },
         );
 
@@ -114,8 +114,8 @@ let testUnit =
                 ~unstakeFeeE18=
                   Ethers.BigNumber.fromUnsafe("5000000000000000"), // 0.5% or 50 basis points
                 ~initialMarketSeed=Ethers.BigNumber.fromUnsafe("7"),
-                ~balanceIncentiveCurveExponent=bnFromInt(5),
-                ~balanceIncentiveCurveEquilibriumOffset=bnFromInt(0),
+                ~balanceIncentive_curveExponent=bnFromInt(5),
+                ~balanceIncentiveCurve_equilibriumOffset=bnFromInt(0),
                 ~marketTreasurySplitGradient_e18=bnFromInt(1),
               ),
         );
@@ -138,8 +138,8 @@ let testUnit =
                 ~unstakeFeeE18=
                   Ethers.BigNumber.fromUnsafe("5000000000000000"), // 0.5% or 50 basis points
                 ~initialMarketSeed=Ethers.BigNumber.fromUnsafe("7"),
-                ~balanceIncentiveCurveExponent=bnFromInt(5),
-                ~balanceIncentiveCurveEquilibriumOffset=bnFromInt(0),
+                ~balanceIncentive_curveExponent=bnFromInt(5),
+                ~balanceIncentiveCurve_equilibriumOffset=bnFromInt(0),
                 ~marketTreasurySplitGradient_e18=bnFromInt(1),
               ),
         );
@@ -166,8 +166,8 @@ let testIntegration =
               ~kPeriod=CONSTANTS.oneBn,
               ~unstakeFeeE18=Ethers.BigNumber.fromUnsafe("5000000000000000"), // 0.5% or 50 basis points
               ~initialMarketSeed=CONSTANTS.oneBn,
-              ~balanceIncentiveCurveExponent=bnFromInt(5),
-              ~balanceIncentiveCurveEquilibriumOffset=bnFromInt(0),
+              ~balanceIncentive_curveExponent=bnFromInt(5),
+              ~balanceIncentiveCurve_equilibriumOffset=bnFromInt(0),
               ~marketTreasurySplitGradient_e18=bnFromInt(1),
             ),
         ~reason="index too high",
@@ -188,8 +188,8 @@ let testIntegration =
             ~kPeriod=CONSTANTS.oneBn,
             ~unstakeFeeE18=Ethers.BigNumber.fromUnsafe("5000000000000000"), // 0.5% or 50 basis points
             ~initialMarketSeed=CONSTANTS.oneBn,
-            ~balanceIncentiveCurveExponent=bnFromInt(5),
-            ~balanceIncentiveCurveEquilibriumOffset=bnFromInt(0),
+            ~balanceIncentive_curveExponent=bnFromInt(5),
+            ~balanceIncentiveCurve_equilibriumOffset=bnFromInt(0),
             ~marketTreasurySplitGradient_e18=bnFromInt(1),
           ),
         ~reason="already initialized",
@@ -221,8 +221,8 @@ let testIntegration =
             ~kPeriod=CONSTANTS.oneBn,
             ~unstakeFeeE18=Ethers.BigNumber.fromUnsafe("5000000000000000"), // 0.5% or 50 basis points
             ~initialMarketSeed=CONSTANTS.oneBn,
-            ~balanceIncentiveCurveExponent=bnFromInt(5),
-            ~balanceIncentiveCurveEquilibriumOffset=bnFromInt(0),
+            ~balanceIncentive_curveExponent=bnFromInt(5),
+            ~balanceIncentiveCurve_equilibriumOffset=bnFromInt(0),
             ~marketTreasurySplitGradient_e18=bnFromInt(1),
           ),
         ~reason="Insufficient market seed",
