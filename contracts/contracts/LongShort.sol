@@ -347,9 +347,9 @@ contract LongShort is ILongShort, Initializable {
   /// @param kInitialMultiplier Linearly decreasing multiplier for Float token issuance for the market when staking synths.
   /// @param kPeriod Time which kInitialMultiplier will last
   /// @param unstakeFeeE18 Base 1e18 percentage fee levied when unstaking for the market.
-  /// @param balanceIncentiveCurveExponent Sets the degree to which Float token issuance differs
+  /// @param balanceIncentive_curveExponent Sets the degree to which Float token issuance differs
   /// for market sides in unbalanced markets. See Staker.sol
-  /// @param balanceIncentiveCurveEquilibriumOffset An offset to account for naturally imbalanced markets
+  /// @param balanceIncentiveCurve_equilibriumOffset An offset to account for naturally imbalanced markets
   /// when Float token issuance should differ for market sides. See Staker.sol
   /// @param initialMarketSeed Amount of payment token that will be deposited in each market side to seed the market.
   function initializeMarket(
@@ -358,8 +358,8 @@ contract LongShort is ILongShort, Initializable {
     uint256 kPeriod,
     uint256 unstakeFeeE18,
     uint256 initialMarketSeed,
-    uint256 balanceIncentiveCurveExponent,
-    int256 balanceIncentiveCurveEquilibriumOffset,
+    uint256 balanceIncentive_curveExponent,
+    int256 balanceIncentiveCurve_equilibriumOffset,
     uint256 _marketTreasurySplitGradient_e18
   ) external adminOnly {
     require(!marketExists[marketIndex], "already initialized");
@@ -380,8 +380,8 @@ contract LongShort is ILongShort, Initializable {
       kInitialMultiplier,
       kPeriod,
       unstakeFeeE18,
-      balanceIncentiveCurveExponent,
-      balanceIncentiveCurveEquilibriumOffset
+      balanceIncentive_curveExponent,
+      balanceIncentiveCurve_equilibriumOffset
     );
 
     _seedMarketInitially(initialMarketSeed, marketIndex);
@@ -693,12 +693,12 @@ contract LongShort is ILongShort, Initializable {
     bool assetPriceHasChanged = oldAssetPrice != newAssetPrice;
 
     if (assetPriceHasChanged || msg.sender == staker) {
-      uint256 syntheticTokenPriceLong = syntheticToken_priceSnapshot[marketIndex][true][
-        marketUpdateIndex[marketIndex]
-      ];
-      uint256 syntheticTokenPriceShort = syntheticToken_priceSnapshot[marketIndex][false][
-        marketUpdateIndex[marketIndex]
-      ];
+      uint256 syntheticTokenPrice_inPaymentTokens_long = syntheticToken_priceSnapshot[marketIndex][
+        true
+      ][marketUpdateIndex[marketIndex]];
+      uint256 syntheticTokenPrice_inPaymentTokens_short = syntheticToken_priceSnapshot[marketIndex][
+        false
+      ][marketUpdateIndex[marketIndex]];
       // if there is a price change and the 'staker' contract has pending updates, push the stakers price snapshot index to the staker
       // (so the staker can handle its internal accounting)
       if (
@@ -708,8 +708,8 @@ contract LongShort is ILongShort, Initializable {
       ) {
         IStaker(staker).addNewStateForFloatRewards(
           marketIndex,
-          syntheticTokenPriceLong,
-          syntheticTokenPriceShort,
+          syntheticTokenPrice_inPaymentTokens_long,
+          syntheticTokenPrice_inPaymentTokens_short,
           marketSideValueInPaymentToken[marketIndex][true],
           marketSideValueInPaymentToken[marketIndex][false],
           // This variable could allow users to do any next price actions in the future (not just synthetic side shifts)
@@ -718,8 +718,8 @@ contract LongShort is ILongShort, Initializable {
       } else {
         IStaker(staker).addNewStateForFloatRewards(
           marketIndex,
-          syntheticTokenPriceLong,
-          syntheticTokenPriceShort,
+          syntheticTokenPrice_inPaymentTokens_long,
+          syntheticTokenPrice_inPaymentTokens_short,
           marketSideValueInPaymentToken[marketIndex][true],
           marketSideValueInPaymentToken[marketIndex][false],
           0
@@ -737,11 +737,11 @@ contract LongShort is ILongShort, Initializable {
         uint256 newShortPoolValue
       ) = _claimAndDistributeYieldThenRebalanceMarket(marketIndex, newAssetPrice, oldAssetPrice);
 
-      syntheticTokenPriceLong = _getSyntheticTokenPrice(
+      syntheticTokenPrice_inPaymentTokens_long = _getSyntheticTokenPrice(
         newLongPoolValue,
         ISyntheticToken(syntheticTokens[marketIndex][true]).totalSupply()
       );
-      syntheticTokenPriceShort = _getSyntheticTokenPrice(
+      syntheticTokenPrice_inPaymentTokens_short = _getSyntheticTokenPrice(
         newShortPoolValue,
         ISyntheticToken(syntheticTokens[marketIndex][false]).totalSupply()
       );
@@ -751,23 +751,27 @@ contract LongShort is ILongShort, Initializable {
 
       syntheticToken_priceSnapshot[marketIndex][true][
         marketUpdateIndex[marketIndex]
-      ] = syntheticTokenPriceLong;
+      ] = syntheticTokenPrice_inPaymentTokens_long;
 
       syntheticToken_priceSnapshot[marketIndex][false][
         marketUpdateIndex[marketIndex]
-      ] = syntheticTokenPriceShort;
+      ] = syntheticTokenPrice_inPaymentTokens_short;
 
       (
-        int256 paymentTokenValueChangeForLong,
-        int256 paymentTokenValueChangeForShort
+        int256 long_changeInMarketValue_inPaymentToken,
+        int256 short_changeInMarketValue_inPaymentToken
       ) = _performOustandingBatchedSettlements(
         marketIndex,
-        syntheticTokenPriceLong,
-        syntheticTokenPriceShort
+        syntheticTokenPrice_inPaymentTokens_long,
+        syntheticTokenPrice_inPaymentTokens_short
       );
 
-      newLongPoolValue = uint256(int256(newLongPoolValue) + paymentTokenValueChangeForLong);
-      newShortPoolValue = uint256(int256(newShortPoolValue) + paymentTokenValueChangeForShort);
+      newLongPoolValue = uint256(
+        int256(newLongPoolValue) + long_changeInMarketValue_inPaymentToken
+      );
+      newShortPoolValue = uint256(
+        int256(newShortPoolValue) + short_changeInMarketValue_inPaymentToken
+      );
       marketSideValueInPaymentToken[marketIndex][true] = newLongPoolValue;
       marketSideValueInPaymentToken[marketIndex][false] = newShortPoolValue;
 
@@ -777,8 +781,8 @@ contract LongShort is ILongShort, Initializable {
         newAssetPrice,
         newLongPoolValue,
         newShortPoolValue,
-        syntheticTokenPriceLong,
-        syntheticTokenPriceShort
+        syntheticTokenPrice_inPaymentTokens_long,
+        syntheticTokenPrice_inPaymentTokens_short
       );
     }
   }
@@ -928,11 +932,11 @@ contract LongShort is ILongShort, Initializable {
   /// @notice  Allows users to shift their position from one side of the market to the other in a single transaction. To prevent front-running these shifts are executed on the next price update from the oracle.
   /// @dev Called by external functions to shift either way. Intended for primary use by Staker.sol
   /// @param marketIndex An int32 which uniquely identifies a market.
-  /// @param syntheticTokensToShift Amount in wei of synthetic tokens to shift from the one side to the other at the next oracle price update.
+  /// @param amountSyntheticTokensToShift Amount in wei of synthetic tokens to shift from the one side to the other at the next oracle price update.
   /// @param isShiftFromLong Whether the token shift is from long to short (true), or short to long (false).
   function _shiftPositionNextPrice(
     uint32 marketIndex,
-    uint256 syntheticTokensToShift,
+    uint256 amountSyntheticTokensToShift,
     bool isShiftFromLong
   )
     internal
@@ -944,23 +948,23 @@ contract LongShort is ILongShort, Initializable {
       ISyntheticToken(syntheticTokens[marketIndex][isShiftFromLong]).transferFrom(
         msg.sender,
         address(this),
-        syntheticTokensToShift
+        amountSyntheticTokensToShift
       )
     );
 
     userNextPrice_syntheticToken_toShiftAwayFrom_marketSide[marketIndex][isShiftFromLong][
       msg.sender
-    ] += syntheticTokensToShift;
+    ] += amountSyntheticTokensToShift;
     userNextPrice_currentUpdateIndex[marketIndex][msg.sender] = marketUpdateIndex[marketIndex] + 1;
 
     batched_amountSyntheticToken_toShiftAwayFrom_marketSide[marketIndex][
       isShiftFromLong
-    ] += syntheticTokensToShift;
+    ] += amountSyntheticTokensToShift;
 
     emit NextPriceSyntheticPositionShift(
       marketIndex,
       isShiftFromLong,
-      syntheticTokensToShift,
+      amountSyntheticTokensToShift,
       msg.sender,
       marketUpdateIndex[marketIndex] + 1
     );
@@ -968,22 +972,22 @@ contract LongShort is ILongShort, Initializable {
 
   /// @notice Allows users to shift their position from long to short in a single transaction. To prevent front-running these shifts are executed on the next price update from the oracle.
   /// @param marketIndex An int32 which uniquely identifies a market.
-  /// @param syntheticTokensToShift Amount in wei of synthetic tokens to shift from long to short the next oracle price update.
-  function shiftPositionFromLongNextPrice(uint32 marketIndex, uint256 syntheticTokensToShift)
+  /// @param amountSyntheticTokensToShift Amount in wei of synthetic tokens to shift from long to short the next oracle price update.
+  function shiftPositionFromLongNextPrice(uint32 marketIndex, uint256 amountSyntheticTokensToShift)
     external
     override
   {
-    _shiftPositionNextPrice(marketIndex, syntheticTokensToShift, true);
+    _shiftPositionNextPrice(marketIndex, amountSyntheticTokensToShift, true);
   }
 
   /// @notice Allows users to shift their position from short to long in a single transaction. To prevent front-running these shifts are executed on the next price update from the oracle.
   /// @param marketIndex An int32 which uniquely identifies a market.
-  /// @param syntheticTokensToShift Amount in wei of synthetic tokens to shift from the short to long at the next oracle price update.
-  function shiftPositionFromShortNextPrice(uint32 marketIndex, uint256 syntheticTokensToShift)
+  /// @param amountSyntheticTokensToShift Amount in wei of synthetic tokens to shift from the short to long at the next oracle price update.
+  function shiftPositionFromShortNextPrice(uint32 marketIndex, uint256 amountSyntheticTokensToShift)
     external
     override
   {
-    _shiftPositionNextPrice(marketIndex, syntheticTokensToShift, false);
+    _shiftPositionNextPrice(marketIndex, amountSyntheticTokensToShift, false);
   }
 
   /*╔════════════════════════════════╗
@@ -1000,22 +1004,30 @@ contract LongShort is ILongShort, Initializable {
     address user,
     bool isLong
   ) internal virtual {
-    uint256 currentDepositAmount = userNextPrice_paymentToken_depositAmount[marketIndex][isLong][
-      user
-    ];
-    if (currentDepositAmount > 0) {
+    uint256 currentPaymentTokenDepositAmount = userNextPrice_paymentToken_depositAmount[
+      marketIndex
+    ][isLong][user];
+    if (currentPaymentTokenDepositAmount > 0) {
       userNextPrice_paymentToken_depositAmount[marketIndex][isLong][user] = 0;
-      uint256 tokensToTransferToUser = _getAmountSyntheticToken(
-        currentDepositAmount,
+      uint256 amountSyntheticTokensToTransferToUser = _getAmountSyntheticToken(
+        currentPaymentTokenDepositAmount,
         syntheticToken_priceSnapshot[marketIndex][isLong][
           userNextPrice_currentUpdateIndex[marketIndex][user]
         ]
       );
       require(
-        ISyntheticToken(syntheticTokens[marketIndex][isLong]).transfer(user, tokensToTransferToUser)
+        ISyntheticToken(syntheticTokens[marketIndex][isLong]).transfer(
+          user,
+          amountSyntheticTokensToTransferToUser
+        )
       );
 
-      emit ExecuteNextPriceMintSettlementUser(user, marketIndex, isLong, tokensToTransferToUser);
+      emit ExecuteNextPriceMintSettlementUser(
+        user,
+        marketIndex,
+        isLong,
+        amountSyntheticTokensToTransferToUser
+      );
     }
   }
 
@@ -1028,21 +1040,26 @@ contract LongShort is ILongShort, Initializable {
     address user,
     bool isLong
   ) internal virtual {
-    uint256 currentRedemptions = userNextPrice_syntheticToken_redeemAmount[marketIndex][isLong][
-      user
-    ];
-    if (currentRedemptions > 0) {
+    uint256 currentSyntheticTokenRedemptions = userNextPrice_syntheticToken_redeemAmount[
+      marketIndex
+    ][isLong][user];
+    if (currentSyntheticTokenRedemptions > 0) {
       userNextPrice_syntheticToken_redeemAmount[marketIndex][isLong][user] = 0;
-      uint256 amount_redeem = _getAmountPaymentToken(
-        currentRedemptions,
+      uint256 amountPaymentToken_toRedeem = _getAmountPaymentToken(
+        currentSyntheticTokenRedemptions,
         syntheticToken_priceSnapshot[marketIndex][isLong][
           userNextPrice_currentUpdateIndex[marketIndex][user]
         ]
       );
       // This means all erc20 tokens we use as payment tokens must return a boolean
-      require(IERC20(paymentTokens[marketIndex]).transfer(user, amount_redeem));
+      require(IERC20(paymentTokens[marketIndex]).transfer(user, amountPaymentToken_toRedeem));
 
-      emit ExecuteNextPriceRedeemSettlementUser(user, marketIndex, isLong, amount_redeem);
+      emit ExecuteNextPriceRedeemSettlementUser(
+        user,
+        marketIndex,
+        isLong,
+        amountPaymentToken_toRedeem
+      );
     }
   }
 
@@ -1057,12 +1074,12 @@ contract LongShort is ILongShort, Initializable {
     bool isShiftFromLong
   ) internal virtual {
 
-      uint256 syntheticTokensShiftedAwayFromMarketSide
+      uint256 syntheticToken_toShiftAwayFrom_marketSide
      = userNextPrice_syntheticToken_toShiftAwayFrom_marketSide[marketIndex][isShiftFromLong][user];
-    if (syntheticTokensShiftedAwayFromMarketSide > 0) {
-      uint256 amountSyntheticTokenToShiftToOppositeSide = getAmountSyntheticTokenToMintOnTargetSide(
+    if (syntheticToken_toShiftAwayFrom_marketSide > 0) {
+      uint256 syntheticToken_toShiftTowardsTargetSide = getAmountSyntheticTokenToMintOnTargetSide(
         marketIndex,
-        syntheticTokensShiftedAwayFromMarketSide,
+        syntheticToken_toShiftAwayFrom_marketSide,
         isShiftFromLong,
         userNextPrice_currentUpdateIndex[marketIndex][user]
       );
@@ -1074,7 +1091,7 @@ contract LongShort is ILongShort, Initializable {
       require(
         ISyntheticToken(syntheticTokens[marketIndex][!isShiftFromLong]).transfer(
           user,
-          amountSyntheticTokenToShiftToOppositeSide
+          syntheticToken_toShiftTowardsTargetSide
         )
       );
 
@@ -1082,7 +1099,7 @@ contract LongShort is ILongShort, Initializable {
         user,
         marketIndex,
         isShiftFromLong,
-        amountSyntheticTokenToShiftToOppositeSide
+        syntheticToken_toShiftTowardsTargetSide
       );
     }
   }
@@ -1189,69 +1206,81 @@ contract LongShort is ILongShort, Initializable {
     The maths here is safe from rounding errors since it always over estimates on the batch with division. 
       (as an example (5/3) + (5/3) = 2 but (5+5)/3 = 10/3 = 3, so the batched action would mint one more)
   @param marketIndex An int32 which uniquely identifies a market.
-  @param syntheticTokenPriceLong The long synthetic token price for this oracle price update.
-  @param syntheticTokenPriceShort The short synthetic token price for this oracle price update.
-  @return paymentTokenValueChangeForLong The total value change for the long side after all batched actions are executed.
-  @return paymentTokenValueChangeForShort The total value change for the short side after all batched actions are executed.
+  @param syntheticTokenPrice_inPaymentTokens_long The long synthetic token price for this oracle price update.
+  @param syntheticTokenPrice_inPaymentTokens_short The short synthetic token price for this oracle price update.
+  @return long_changeInMarketValue_inPaymentToken The total value change for the long side after all batched actions are executed.
+  @return short_changeInMarketValue_inPaymentToken The total value change for the short side after all batched actions are executed.
   */
   function _performOustandingBatchedSettlements(
     uint32 marketIndex,
-    uint256 syntheticTokenPriceLong,
-    uint256 syntheticTokenPriceShort
+    uint256 syntheticTokenPrice_inPaymentTokens_long,
+    uint256 syntheticTokenPrice_inPaymentTokens_short
   )
     internal
     virtual
-    returns (int256 paymentTokenValueChangeForLong, int256 paymentTokenValueChangeForShort)
+    returns (
+      int256 long_changeInMarketValue_inPaymentToken,
+      int256 short_changeInMarketValue_inPaymentToken
+    )
   {
-    int256 longChangeInSyntheticTokensTotalSupply;
-    int256 shortChangeInSyntheticTokensTotalSupply;
+    int256 changeInSupply_syntheticToken_long;
+    int256 changeInSupply_syntheticToken_short;
 
-    // NOTE: the only reason we are re-uising this for all actions (redeemLong, redeemShort, mintLong, mintShort, shiftFromLong, shiftFromShort) is to reduce stack usage
-    uint256 amountForCurrentActionWorkingVariable = batched_amountPaymentToken_deposit[marketIndex][
-      true
-    ];
+    // NOTE: the only reason we are re-uising amountForCurrentAction_workingVariable for all actions (redeemLong, redeemShort, mintLong, mintShort, shiftFromLong, shiftFromShort) is to reduce stack usage
+    uint256 amountForCurrentAction_workingVariable = batched_amountPaymentToken_deposit[
+      marketIndex
+    ][true];
 
     // Handle batched deposits LONG
-    if (amountForCurrentActionWorkingVariable > 0) {
-      paymentTokenValueChangeForLong = int256(amountForCurrentActionWorkingVariable);
+    if (amountForCurrentAction_workingVariable > 0) {
+      long_changeInMarketValue_inPaymentToken = int256(amountForCurrentAction_workingVariable);
 
       batched_amountPaymentToken_deposit[marketIndex][true] = 0;
 
-      longChangeInSyntheticTokensTotalSupply = int256(
-        _getAmountSyntheticToken(amountForCurrentActionWorkingVariable, syntheticTokenPriceLong)
+      changeInSupply_syntheticToken_long = int256(
+        _getAmountSyntheticToken(
+          amountForCurrentAction_workingVariable,
+          syntheticTokenPrice_inPaymentTokens_long
+        )
       );
     }
 
     // Handle batched deposits SHORT
-    amountForCurrentActionWorkingVariable = batched_amountPaymentToken_deposit[marketIndex][false];
-    if (amountForCurrentActionWorkingVariable > 0) {
-      paymentTokenValueChangeForShort = int256(amountForCurrentActionWorkingVariable);
+    amountForCurrentAction_workingVariable = batched_amountPaymentToken_deposit[marketIndex][false];
+    if (amountForCurrentAction_workingVariable > 0) {
+      short_changeInMarketValue_inPaymentToken = int256(amountForCurrentAction_workingVariable);
 
       batched_amountPaymentToken_deposit[marketIndex][false] = 0;
 
-      shortChangeInSyntheticTokensTotalSupply = int256(
-        _getAmountSyntheticToken(amountForCurrentActionWorkingVariable, syntheticTokenPriceShort)
+      changeInSupply_syntheticToken_short = int256(
+        _getAmountSyntheticToken(
+          amountForCurrentAction_workingVariable,
+          syntheticTokenPrice_inPaymentTokens_short
+        )
       );
     }
 
     // Handle shift tokens from LONG to SHORT
-    amountForCurrentActionWorkingVariable = batched_amountSyntheticToken_toShiftAwayFrom_marketSide[
+    amountForCurrentAction_workingVariable = batched_amountSyntheticToken_toShiftAwayFrom_marketSide[
       marketIndex
     ][true];
-    if (amountForCurrentActionWorkingVariable > 0) {
+    if (amountForCurrentAction_workingVariable > 0) {
       int256 paymentTokenValueChangeForShiftToShort = int256(
-        _getAmountPaymentToken(amountForCurrentActionWorkingVariable, syntheticTokenPriceLong)
+        _getAmountPaymentToken(
+          amountForCurrentAction_workingVariable,
+          syntheticTokenPrice_inPaymentTokens_long
+        )
       );
 
-      paymentTokenValueChangeForLong -= paymentTokenValueChangeForShiftToShort;
-      paymentTokenValueChangeForShort += paymentTokenValueChangeForShiftToShort;
+      long_changeInMarketValue_inPaymentToken -= paymentTokenValueChangeForShiftToShort;
+      short_changeInMarketValue_inPaymentToken += paymentTokenValueChangeForShiftToShort;
 
-      longChangeInSyntheticTokensTotalSupply -= int256(amountForCurrentActionWorkingVariable);
-      shortChangeInSyntheticTokensTotalSupply += int256(
+      changeInSupply_syntheticToken_long -= int256(amountForCurrentAction_workingVariable);
+      changeInSupply_syntheticToken_short += int256(
         _getEquivalentAmountSyntheticTokensOnTargetSide(
-          amountForCurrentActionWorkingVariable,
-          syntheticTokenPriceLong,
-          syntheticTokenPriceShort
+          amountForCurrentAction_workingVariable,
+          syntheticTokenPrice_inPaymentTokens_long,
+          syntheticTokenPrice_inPaymentTokens_short
         )
       );
 
@@ -1259,23 +1288,26 @@ contract LongShort is ILongShort, Initializable {
     }
 
     // Handle shift tokens from SHORT to LONG
-    amountForCurrentActionWorkingVariable = batched_amountSyntheticToken_toShiftAwayFrom_marketSide[
+    amountForCurrentAction_workingVariable = batched_amountSyntheticToken_toShiftAwayFrom_marketSide[
       marketIndex
     ][false];
-    if (amountForCurrentActionWorkingVariable > 0) {
+    if (amountForCurrentAction_workingVariable > 0) {
       int256 paymentTokenValueChangeForShiftToLong = int256(
-        _getAmountPaymentToken(amountForCurrentActionWorkingVariable, syntheticTokenPriceShort)
+        _getAmountPaymentToken(
+          amountForCurrentAction_workingVariable,
+          syntheticTokenPrice_inPaymentTokens_short
+        )
       );
 
-      paymentTokenValueChangeForShort -= paymentTokenValueChangeForShiftToLong;
-      paymentTokenValueChangeForLong += paymentTokenValueChangeForShiftToLong;
+      short_changeInMarketValue_inPaymentToken -= paymentTokenValueChangeForShiftToLong;
+      long_changeInMarketValue_inPaymentToken += paymentTokenValueChangeForShiftToLong;
 
-      shortChangeInSyntheticTokensTotalSupply -= int256(amountForCurrentActionWorkingVariable);
-      longChangeInSyntheticTokensTotalSupply += int256(
+      changeInSupply_syntheticToken_short -= int256(amountForCurrentAction_workingVariable);
+      changeInSupply_syntheticToken_long += int256(
         _getEquivalentAmountSyntheticTokensOnTargetSide(
-          amountForCurrentActionWorkingVariable,
-          syntheticTokenPriceShort,
-          syntheticTokenPriceLong
+          amountForCurrentAction_workingVariable,
+          syntheticTokenPrice_inPaymentTokens_short,
+          syntheticTokenPrice_inPaymentTokens_long
         )
       );
 
@@ -1283,23 +1315,31 @@ contract LongShort is ILongShort, Initializable {
     }
 
     // Handle batched redeems LONG
-    amountForCurrentActionWorkingVariable = batched_amountSyntheticToken_redeem[marketIndex][true];
-    if (amountForCurrentActionWorkingVariable > 0) {
-      paymentTokenValueChangeForLong -= int256(
-        _getAmountPaymentToken(amountForCurrentActionWorkingVariable, syntheticTokenPriceLong)
+    amountForCurrentAction_workingVariable = batched_amountSyntheticToken_redeem[marketIndex][true];
+    if (amountForCurrentAction_workingVariable > 0) {
+      long_changeInMarketValue_inPaymentToken -= int256(
+        _getAmountPaymentToken(
+          amountForCurrentAction_workingVariable,
+          syntheticTokenPrice_inPaymentTokens_long
+        )
       );
-      longChangeInSyntheticTokensTotalSupply -= int256(amountForCurrentActionWorkingVariable);
+      changeInSupply_syntheticToken_long -= int256(amountForCurrentAction_workingVariable);
 
       batched_amountSyntheticToken_redeem[marketIndex][true] = 0;
     }
 
     // Handle batched redeems SHORT
-    amountForCurrentActionWorkingVariable = batched_amountSyntheticToken_redeem[marketIndex][false];
-    if (amountForCurrentActionWorkingVariable > 0) {
-      paymentTokenValueChangeForShort -= int256(
-        _getAmountPaymentToken(amountForCurrentActionWorkingVariable, syntheticTokenPriceShort)
+    amountForCurrentAction_workingVariable = batched_amountSyntheticToken_redeem[marketIndex][
+      false
+    ];
+    if (amountForCurrentAction_workingVariable > 0) {
+      short_changeInMarketValue_inPaymentToken -= int256(
+        _getAmountPaymentToken(
+          amountForCurrentAction_workingVariable,
+          syntheticTokenPrice_inPaymentTokens_short
+        )
       );
-      shortChangeInSyntheticTokensTotalSupply -= int256(amountForCurrentActionWorkingVariable);
+      changeInSupply_syntheticToken_short -= int256(amountForCurrentAction_workingVariable);
 
       batched_amountSyntheticToken_redeem[marketIndex][false] = 0;
     }
@@ -1307,18 +1347,18 @@ contract LongShort is ILongShort, Initializable {
     // Batch settle payment tokens
     _handleTotalPaymentTokenValueChangeForMarketWithYieldManager(
       marketIndex,
-      paymentTokenValueChangeForLong + paymentTokenValueChangeForShort
+      long_changeInMarketValue_inPaymentToken + short_changeInMarketValue_inPaymentToken
     );
     // Batch settle synthetic tokens
     _handleChangeInSyntheticTokensTotalSupply(
       marketIndex,
       true,
-      longChangeInSyntheticTokensTotalSupply
+      changeInSupply_syntheticToken_long
     );
     _handleChangeInSyntheticTokensTotalSupply(
       marketIndex,
       false,
-      shortChangeInSyntheticTokensTotalSupply
+      changeInSupply_syntheticToken_short
     );
   }
 }

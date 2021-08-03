@@ -10,8 +10,10 @@ let testUnit =
   describeUnit("Batched Settlement", () => {
     let marketIndex = Helpers.randomJsInteger();
     describe("_performOustandingBatchedSettlements", () => {
-      let syntheticTokenPriceLong = Helpers.randomTokenAmount();
-      let syntheticTokenPriceShort = Helpers.randomTokenAmount();
+      let syntheticTokenPrice_inPaymentTokens_long =
+        Helpers.randomTokenAmount();
+      let syntheticTokenPrice_inPaymentTokens_short =
+        Helpers.randomTokenAmount();
 
       let setup =
           (
@@ -44,8 +46,8 @@ let testUnit =
 
         longShort->LongShort.Exposed._performOustandingBatchedSettlementsExposedCall(
           ~marketIndex,
-          ~syntheticTokenPriceLong,
-          ~syntheticTokenPriceShort,
+          ~syntheticTokenPrice_inPaymentTokens_long,
+          ~syntheticTokenPrice_inPaymentTokens_short,
         );
       };
 
@@ -87,46 +89,46 @@ let testUnit =
           batchedAmountSyntheticTokenToMintLong :=
             Contract.LongShortHelpers.calcAmountSyntheticToken(
               ~amountPaymentToken=batched_amountPaymentToken_depositLong,
-              ~price=syntheticTokenPriceLong,
+              ~price=syntheticTokenPrice_inPaymentTokens_long,
             );
           batchedAmountSyntheticTokenToMintShort :=
             Contract.LongShortHelpers.calcAmountSyntheticToken(
               ~amountPaymentToken=batched_amountPaymentToken_depositShort,
-              ~price=syntheticTokenPriceShort,
+              ~price=syntheticTokenPrice_inPaymentTokens_short,
             );
           batchedAmountOfPaymentTokensToBurnLong :=
             Contract.LongShortHelpers.calcAmountPaymentToken(
               ~amountSyntheticToken=batched_amountSyntheticToken_redeemLong,
-              ~price=syntheticTokenPriceLong,
+              ~price=syntheticTokenPrice_inPaymentTokens_long,
             );
           batchedAmountOfPaymentTokensToBurnShort :=
             Contract.LongShortHelpers.calcAmountPaymentToken(
               ~amountSyntheticToken=batched_amountSyntheticToken_redeemShort,
-              ~price=syntheticTokenPriceShort,
+              ~price=syntheticTokenPrice_inPaymentTokens_short,
             );
 
           batchedAmountOfPaymentTokensToShiftToLong :=
             Contract.LongShortHelpers.calcAmountPaymentToken(
               ~amountSyntheticToken=batchedAmountSyntheticTokenToShiftFromShort,
-              ~price=syntheticTokenPriceShort,
+              ~price=syntheticTokenPrice_inPaymentTokens_short,
             );
           batchedAmountOfPaymentTokensToShiftToShort :=
             Contract.LongShortHelpers.calcAmountPaymentToken(
               ~amountSyntheticToken=batchedAmountSyntheticTokenToShiftFromLong,
-              ~price=syntheticTokenPriceLong,
+              ~price=syntheticTokenPrice_inPaymentTokens_long,
             );
 
           batchedAmountSyntheticTokenToShiftToShort :=
             Contract.LongShortHelpers.calcEquivalentAmountSyntheticTokensOnTargetSide(
               ~amountSyntheticTokenOriginSide=batchedAmountSyntheticTokenToShiftFromLong,
-              ~priceOriginSide=syntheticTokenPriceLong,
-              ~priceTargetSide=syntheticTokenPriceShort,
+              ~priceOriginSide=syntheticTokenPrice_inPaymentTokens_long,
+              ~priceTargetSide=syntheticTokenPrice_inPaymentTokens_short,
             );
           batchedAmountSyntheticTokenToShiftToLong :=
             Contract.LongShortHelpers.calcEquivalentAmountSyntheticTokensOnTargetSide(
               ~amountSyntheticTokenOriginSide=batchedAmountSyntheticTokenToShiftFromShort,
-              ~priceOriginSide=syntheticTokenPriceShort,
-              ~priceTargetSide=syntheticTokenPriceLong,
+              ~priceOriginSide=syntheticTokenPrice_inPaymentTokens_short,
+              ~priceTargetSide=syntheticTokenPrice_inPaymentTokens_long,
             );
 
           calculatedValueChangeForLong :=
@@ -197,9 +199,9 @@ let testUnit =
           Chai.recordEqualDeep(
             returnOfPerformOustandingBatchedSettlements.contents,
             {
-              paymentTokenValueChangeForLong:
+              long_changeInMarketValue_inPaymentToken:
                 calculatedValueChangeForLong.contents,
-              paymentTokenValueChangeForShort:
+              short_changeInMarketValue_inPaymentToken:
                 calculatedValueChangeForShort.contents,
             },
           )

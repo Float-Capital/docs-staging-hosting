@@ -156,8 +156,8 @@ let testUnit =
           longShort->LongShort.Exposed.set_updateSystemStateInternalGlobals(
             ~marketIndex,
             ~latestUpdateIndexForMarket,
-            ~syntheticTokenPriceLong=oldLongPrice,
-            ~syntheticTokenPriceShort=oldShortPrice,
+            ~syntheticTokenPrice_inPaymentTokens_long=oldLongPrice,
+            ~syntheticTokenPrice_inPaymentTokens_short=oldShortPrice,
             ~assetPrice=oldAssetPrice,
             ~oracleManager=oracleSmocked.address,
             ~staker=stakerSmocked.address,
@@ -281,7 +281,7 @@ let testUnit =
                 shortPrice: oldShortPrice,
                 longValue: oldLongValue,
                 shortValue: oldShortValue,
-                longShortMarketPriceSnapshotIndexIfShiftExecuted: stakerNextPrice_currentUpdateIndex,
+                takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted: stakerNextPrice_currentUpdateIndex,
               },
             |]);
         },
@@ -318,7 +318,7 @@ let testUnit =
                 shortPrice: oldShortPrice,
                 longValue: oldLongValue,
                 shortValue: oldShortValue,
-                longShortMarketPriceSnapshotIndexIfShiftExecuted: zeroBn,
+                takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted: zeroBn,
               },
             |]);
 
@@ -352,7 +352,7 @@ let testUnit =
                   shortPrice: oldShortPrice,
                   longValue: oldLongValue,
                   shortValue: oldShortValue,
-                  longShortMarketPriceSnapshotIndexIfShiftExecuted: zeroBn,
+                  takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted: zeroBn,
                 },
               |]);
           },
@@ -384,8 +384,10 @@ let testUnit =
           ->Chai.recordArrayDeepEqualFlat([|
               {
                 marketIndex,
-                syntheticTokenPriceLong: potentialNewLongPrice.contents,
-                syntheticTokenPriceShort: potentialNewShortPrice.contents,
+                syntheticTokenPrice_inPaymentTokens_long:
+                  potentialNewLongPrice.contents,
+                syntheticTokenPrice_inPaymentTokens_short:
+                  potentialNewShortPrice.contents,
               },
             |]);
         });

@@ -39,8 +39,8 @@ contract LongShortInternalStateSetters is LongShort {
   function set_updateSystemStateInternalGlobals(
     uint32 marketIndex,
     uint256 _latestUpdateIndexForMarket,
-    uint256 syntheticTokenPriceLong,
-    uint256 syntheticTokenPriceShort,
+    uint256 syntheticTokenPrice_inPaymentTokens_long,
+    uint256 syntheticTokenPrice_inPaymentTokens_short,
     uint256 _assetPrice,
     uint256 longValue,
     uint256 shortValue,
@@ -54,10 +54,10 @@ contract LongShortInternalStateSetters is LongShort {
     marketUpdateIndex[marketIndex] = _latestUpdateIndexForMarket;
     syntheticToken_priceSnapshot[marketIndex][true][
       _latestUpdateIndexForMarket
-    ] = syntheticTokenPriceLong;
+    ] = syntheticTokenPrice_inPaymentTokens_long;
     syntheticToken_priceSnapshot[marketIndex][false][
       _latestUpdateIndexForMarket
-    ] = syntheticTokenPriceShort;
+    ] = syntheticTokenPrice_inPaymentTokens_short;
 
     marketSideValueInPaymentToken[marketIndex][true] = longValue;
     marketSideValueInPaymentToken[marketIndex][false] = shortValue;
