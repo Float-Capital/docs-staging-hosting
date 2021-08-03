@@ -14,7 +14,7 @@ abstract contract IStaker {
     int256 _balanceIncentiveCurve_equilibriumOffset
   ) external virtual;
 
-  function addNewStateForFloatRewards(
+  function pushUpdatedMarketPricesToUpdateFloatIssuanceCalculations(
     uint32 marketIndex,
     uint256 longTokenPrice,
     uint256 shortTokenPrice,

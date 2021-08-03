@@ -96,7 +96,7 @@ let testUnit =
           );
 
         let _ =
-          stakerSmocked->StakerSmocked.mockAddNewStateForFloatRewardsToReturn;
+          stakerSmocked->StakerSmocked.mockPushUpdatedMarketPricesToUpdateFloatIssuanceCalculationsToReturn;
         let%AwaitThen oracleSmocked =
           contracts.contents.markets->Array.getExn(1).oracleManager
           ->OracleManagerMockSmocked.make;
@@ -184,7 +184,7 @@ let testUnit =
         if (checkNoStakerCalls) {
           let numberOfStakerCalls =
             staker.contents
-            ->StakerSmocked.addNewStateForFloatRewardsCalls
+            ->StakerSmocked.pushUpdatedMarketPricesToUpdateFloatIssuanceCalculationsCalls
             ->Array.length;
           Chai.intEqual(numberOfStakerCalls, 0);
         };
@@ -258,7 +258,7 @@ let testUnit =
       });
 
       it(
-        "calls addNewStateForFloatRewards on the staker if the staker has pending nextPrice shifts",
+        "calls pushUpdatedMarketPricesToUpdateFloatIssuanceCalculations on the staker if the staker has pending nextPrice shifts",
         () => {
           let stakerNextPrice_currentUpdateIndex =
             latestUpdateIndexForMarket->add(oneBn);
@@ -273,7 +273,7 @@ let testUnit =
             );
 
           staker.contents
-          ->StakerSmocked.addNewStateForFloatRewardsCalls
+          ->StakerSmocked.pushUpdatedMarketPricesToUpdateFloatIssuanceCalculationsCalls
           ->Chai.recordArrayDeepEqualFlat([|
               {
                 marketIndex,
@@ -301,7 +301,7 @@ let testUnit =
       );
 
       it(
-        "it should call the addNewStateForFloatRewards on the staker function if the `msg.sender` is the staker (with NO price change) but not update any state or call other functions in the LongShort contract",
+        "it should call the pushUpdatedMarketPricesToUpdateFloatIssuanceCalculations on the staker function if the `msg.sender` is the staker (with NO price change) but not update any state or call other functions in the LongShort contract",
         () => {
           let%AwaitThen _ =
             setupWithoutPriceChange(
@@ -310,7 +310,7 @@ let testUnit =
             );
 
           staker.contents
-          ->StakerSmocked.addNewStateForFloatRewardsCalls
+          ->StakerSmocked.pushUpdatedMarketPricesToUpdateFloatIssuanceCalculationsCalls
           ->Chai.recordArrayDeepEqualFlat([|
               {
                 marketIndex,
@@ -336,7 +336,7 @@ let testUnit =
           );
 
         it(
-          "it should call the addNewStateForFloatRewards on the staker function if the `msg.sender` is the staker (WITH a price change)",
+          "it should call the pushUpdatedMarketPricesToUpdateFloatIssuanceCalculations on the staker function if the `msg.sender` is the staker (WITH a price change)",
           () => {
             let%Await _ =
               setupWithPriceChange(
@@ -344,7 +344,7 @@ let testUnit =
                 ~stakerNextPrice_currentUpdateIndex=zeroBn,
               );
             staker.contents
-            ->StakerSmocked.addNewStateForFloatRewardsCalls
+            ->StakerSmocked.pushUpdatedMarketPricesToUpdateFloatIssuanceCalculationsCalls
             ->Chai.recordArrayDeepEqualFlat([|
                 {
                   marketIndex,

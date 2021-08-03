@@ -186,20 +186,14 @@ contract Staker is IStaker, Initializable {
     address _floatCapital,
     uint256 _floatPercentage
   ) public virtual initializer {
-    require(
-      _admin != address(0) &&
-        _floatCapital != address(0) &&
-        _longShort != address(0) &&
-        _floatToken != address(0)
-    );
     admin = _admin;
     floatCapital = _floatCapital;
-    longShort = (_longShort);
-    floatToken = (_floatToken);
+    longShort = _longShort;
+    floatToken = _floatToken;
 
     _changeFloatPercentage(_floatPercentage);
 
-    emit StakerV1(_floatToken, floatPercentage);
+    emit StakerV1(_floatToken, _floatPercentage);
   }
 
   /*╔═════════════════════════════╗
@@ -321,9 +315,9 @@ contract Staker is IStaker, Initializable {
 
     accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][0].timestamp = block.timestamp;
     accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][0]
-    .accumulativeFloatPerSyntheticToken_long = 0;
+      .accumulativeFloatPerSyntheticToken_long = 0;
     accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][0]
-    .accumulativeFloatPerSyntheticToken_short = 0;
+      .accumulativeFloatPerSyntheticToken_short = 0;
 
     syntheticTokens[marketIndex][true] = longToken;
     syntheticTokens[marketIndex][false] = shortToken;
@@ -353,10 +347,13 @@ contract Staker is IStaker, Initializable {
     ║    GLOBAL FLT REWARD ACCUMULATION CALCULATION AND TRACKING FUNCTIONS    ║
     ╚═════════════════════════════════════════════════════════════════════════╝*/
 
-  /*
-   * Returns the K factor parameters for the given market with sensible
-   * defaults if they haven't been set yet.
-   */
+  /**
+  @notice Returns the K factor parameters for the given market with sensible
+  defaults if they haven't been set yet.
+  @param marketIndex The market to change the parameters for.
+  @return period The period for which the k factor applies for in seconds.
+  @return multiplier The multiplier on Float generation in this period.
+  */
   function _getMarketLaunchIncentiveParameters(uint32 marketIndex)
     internal
     view
@@ -365,7 +362,7 @@ contract Staker is IStaker, Initializable {
   {
     uint256 period = marketLaunchIncentive_period[marketIndex];
     uint256 multiplier = marketLaunchIncentive_multipliers[marketIndex];
-    if (multiplier < 1) {
+    if (multiplier < 1e18) {
       multiplier = 1e18; // multiplier of 1 by default
     }
 
@@ -384,7 +381,7 @@ contract Staker is IStaker, Initializable {
     assert(kInitialMultiplier >= 1e18);
 
     uint256 initialTimestamp = accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][0]
-    .timestamp;
+      .timestamp;
 
     if (block.timestamp - initialTimestamp <= kPeriod) {
       return
@@ -472,9 +469,11 @@ contract Staker is IStaker, Initializable {
     }
   }
 
-  /*
-   * Computes the time since last accumulativeIssuancePerStakedSynthSnapshot for the given token in seconds.
-   */
+  /**
+  @notice Computes the time since last accumulativeIssuancePerStakedSynthSnapshot for the given market in seconds.
+  @param marketIndex The market referred to.
+  @return The time difference in seconds
+  */
   function _calculateTimeDeltaFromLastAccumulativeIssuancePerStakedSynthSnapshot(uint32 marketIndex)
     internal
     view
@@ -484,14 +483,21 @@ contract Staker is IStaker, Initializable {
     return
       block.timestamp -
       accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][latestRewardIndex[marketIndex]]
-      .timestamp;
+        .timestamp;
   }
 
-  /*
-   * Computes new cumulative sum of 'r' value since last state point. We use
-   * cumulative 'r' value to avoid looping during issuance. Note that the
-   * cumulative sum is kept in 1e42 scale (!!!) to avoid numerical issues.
-   */
+  /**
+  @notice Computes new cumulative sum of 'r' value since last accumulativeIssuancePerStakedSynthSnapshot. We use
+  cumulative 'r' value to avoid looping during issuance. Note that the
+  cumulative sum is kept in 1e42 scale (!!!) to avoid numerical issues.
+  @param shortValue The value locked in the short side of the market.
+  @param longValue The value locked in the long side of the market.
+  @param shortPrice The price of the short token as defined in LongShort.sol
+  @param longPrice The price of the long token as defined in LongShort.sol
+  @param marketIndex An identifier for the market.
+  @return longCumulativeRates The long cumulative sum.
+  @return shortCumulativeRates The short cumulative sum.
+  */
   function _calculateNewCumulativeIssuancePerStakedSynth(
     uint32 marketIndex,
     uint256 longPrice,
@@ -508,7 +514,7 @@ contract Staker is IStaker, Initializable {
       shortValue
     );
 
-    // Compute time since last state point for the given token.
+    // Compute time since last accumulativeIssuancePerStakedSynthSnapshot for the given token.
     uint256 timeDelta = _calculateTimeDeltaFromLastAccumulativeIssuancePerStakedSynthSnapshot(
       marketIndex
     );
@@ -516,16 +522,21 @@ contract Staker is IStaker, Initializable {
     // Compute new cumulative 'r' value total.
     return (
       accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][latestRewardIndex[marketIndex]]
-      .accumulativeFloatPerSyntheticToken_long + (timeDelta * longFloatPerSecond),
+        .accumulativeFloatPerSyntheticToken_long + (timeDelta * longFloatPerSecond),
       accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][latestRewardIndex[marketIndex]]
-      .accumulativeFloatPerSyntheticToken_short + (timeDelta * shortFloatPerSecond)
+        .accumulativeFloatPerSyntheticToken_short + (timeDelta * shortFloatPerSecond)
     );
   }
 
-  /*
-   * Creates a new state point for the given token and updates indexes.
-   */
-  function _setRewardObjects(
+  /**
+  @notice Creates a new accumulativeIssuancePerStakedSynthSnapshot for the given token and updates indexes.
+  @param shortValue The value locked in the short side of the market.
+  @param longValue The value locked in the long side of the market.
+  @param shortPrice The price of the short token as defined in LongShort.sol
+  @param longPrice The price of the long token as defined in LongShort.sol
+  @param marketIndex An identifier for the market.
+  */
+  function _setCurrentAccumulativeIssuancePerStakeStakedSynthSnapshot(
     uint32 marketIndex,
     uint256 longPrice,
     uint256 shortPrice,
@@ -536,25 +547,25 @@ contract Staker is IStaker, Initializable {
       uint256 newLongAccumaltiveValue,
       uint256 newShortAccumulativeValue
     ) = _calculateNewCumulativeIssuancePerStakedSynth(
-      marketIndex,
-      longPrice,
-      shortPrice,
-      longValue,
-      shortValue
-    );
+        marketIndex,
+        longPrice,
+        shortPrice,
+        longValue,
+        shortValue
+      );
 
     uint256 newIndex = latestRewardIndex[marketIndex] + 1;
 
-    // Set cumulative 'r' value on new state point.
+    // Set cumulative 'r' value on new accumulativeIssuancePerStakedSynthSnapshot.
     accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][newIndex]
-    .accumulativeFloatPerSyntheticToken_long = newLongAccumaltiveValue;
+      .accumulativeFloatPerSyntheticToken_long = newLongAccumaltiveValue;
     accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][newIndex]
-    .accumulativeFloatPerSyntheticToken_short = newShortAccumulativeValue;
+      .accumulativeFloatPerSyntheticToken_short = newShortAccumulativeValue;
 
-    // Set timestamp on new state point.
+    // Set timestamp on new accumulativeIssuancePerStakedSynthSnapshot.
     accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][newIndex].timestamp = block.timestamp;
 
-    // Update latest index to point to new state point.
+    // Update latest index to point to new accumulativeIssuancePerStakedSynthSnapshot.
     latestRewardIndex[marketIndex] = newIndex;
 
     emit AccumulativeIssuancePerStakedSynthSnapshotCreated(
@@ -565,11 +576,17 @@ contract Staker is IStaker, Initializable {
     );
   }
 
-  /*
-   * Adds new state points for the given long/short tokens. Called by the
-   * ILongShort contract whenever there is a state change for a market.
-   */
-  function addNewStateForFloatRewards(
+  /**
+  @notice Adds new accumulativeIssuancePerStakedSynthSnapshots for the given long/short tokens. Called by the
+  ILongShort contract whenever there is a state change for a market.
+  @param stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted Mapping from this contracts shifts to LongShort.sols
+  @param shortValue The value locked in the short side of the market.
+  @param longValue The value locked in the long side of the market.
+  @param shortPrice The price of the short token as defined in LongShort.sol
+  @param longPrice The price of the long token as defined in LongShort.sol
+  @param marketIndex An identifier for the market.
+  */
+  function pushUpdatedMarketPricesToUpdateFloatIssuanceCalculations(
     uint32 marketIndex,
     uint256 longPrice,
     uint256 shortPrice,
@@ -577,7 +594,7 @@ contract Staker is IStaker, Initializable {
     uint256 shortValue,
     uint256 stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted // This value should be ALWAYS be zero if no shift occured
   ) external override onlyLongShort {
-    // Only add a new state point if some time has passed.
+    // Only add a new accumulativeIssuancePerStakedSynthSnapshot if some time has passed.
 
     // the `stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted` value will be 0 if there is no staker related action in an executed batch
     if (stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted > 0) {
@@ -594,7 +611,13 @@ contract Staker is IStaker, Initializable {
 
     // Time delta is fetched twice in below code, can pass through? Which is less gas?
     if (_calculateTimeDeltaFromLastAccumulativeIssuancePerStakedSynthSnapshot(marketIndex) > 0) {
-      _setRewardObjects(marketIndex, longPrice, shortPrice, longValue, shortValue);
+      _setCurrentAccumulativeIssuancePerStakeStakedSynthSnapshot(
+        marketIndex,
+        longPrice,
+        shortPrice,
+        longValue,
+        shortValue
+      );
     }
   }
 
@@ -613,20 +636,18 @@ contract Staker is IStaker, Initializable {
     if (amountStakedLong > 0) {
       uint256 accumDeltaLong = accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][
         rewardIndexTo
-      ]
-      .accumulativeFloatPerSyntheticToken_long -
+      ].accumulativeFloatPerSyntheticToken_long -
         accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][rewardIndexFrom]
-        .accumulativeFloatPerSyntheticToken_long;
+          .accumulativeFloatPerSyntheticToken_long;
       floatReward += (accumDeltaLong * amountStakedLong) / FLOAT_ISSUANCE_FIXED_DECIMAL;
     }
 
     if (amountStakedShort > 0) {
       uint256 accumDeltaShort = accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][
         rewardIndexTo
-      ]
-      .accumulativeFloatPerSyntheticToken_short -
+      ].accumulativeFloatPerSyntheticToken_short -
         accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][rewardIndexFrom]
-        .accumulativeFloatPerSyntheticToken_short;
+          .accumulativeFloatPerSyntheticToken_short;
       floatReward += (accumDeltaShort * amountStakedShort) / FLOAT_ISSUANCE_FIXED_DECIMAL;
     }
   }
@@ -785,11 +806,13 @@ contract Staker is IStaker, Initializable {
     ║        STAKING        ║
     ╚═══════════════════════╝*/
 
-  /*
-   * A user with synthetic tokens stakes by calling stake on the token
-   * contract which calls this function. We need to first update the
-   * State of the system before staking to correctly calculate user rewards.
-   */
+  /**
+  @notice A user with synthetic tokens stakes by calling stake on the token
+  contract which calls this function. We need to first update the
+  State of the system before staking to correctly calculate user rewards.
+  @param amount Amount to stake.
+  @param from Address to stake for.
+  */
   function stakeFromUser(address from, uint256 amount)
     public
     virtual
@@ -871,10 +894,12 @@ contract Staker is IStaker, Initializable {
     ║    WITHDRAWAL & MINTING    ║
     ╚════════════════════════════╝*/
 
-  /*
-    Withdraw function.
-    Mint user any outstanding float before
-    */
+  /**
+  @notice Withdraw function.
+  Mint user any outstanding float before
+  @param amount Amount to withdraw.
+  @param token Synthetic token that was staked.
+  */
   function _withdraw(address token, uint256 amount) internal virtual {
     uint32 marketIndex = marketIndexOfToken[token];
     require(userAmountStaked[token][msg.sender] > 0, "nothing to withdraw");

@@ -6,7 +6,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) => {
     let marketIndex = 5;
 
     let initialMultiplier =
-      Helpers.randomInteger()->Ethers.BigNumber.add(CONSTANTS.oneBn);
+      CONSTANTS.tenToThe18->Ethers.BigNumber.add(Helpers.randomInteger());
     let initialPeriod = Helpers.randomInteger();
 
     let test =
