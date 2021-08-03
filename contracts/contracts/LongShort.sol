@@ -442,7 +442,7 @@ contract LongShort is ILongShort, Initializable {
   /**
   @notice Calculate the amount of target side synthetic tokens that are worth the same
           amount of payment tokens as X many synthetic tokens on origin side.
-          The resulting equation comes from simplifying this function 
+          The resulting equation comes from simplifying this function
 
             _getAmountSyntheticToken(
               _getAmountPaymentToken(
@@ -584,15 +584,19 @@ contract LongShort is ILongShort, Initializable {
   ) internal view virtual returns (bool isLongSideUnderbalanced, uint256 treasuryYieldPercentE18) {
     isLongSideUnderbalanced = longValue < shortValue;
     uint256 imbalance;
+
     if (isLongSideUnderbalanced) {
       imbalance = shortValue - longValue;
     } else {
       imbalance = longValue - shortValue;
     }
 
-    // Base case marketTreasurySplitGradient_e18[marketIndex] = 1e18
-    // marketTreasurySplitGradient_e18 may be increased to ensure yield is funnled
-    // to the market as opposed to the treasury at a quicker rate when the markets become imbalanced
+    // marketTreasurySplitGradient_e18 may be adjusted to ensure yield is given
+    // to the market at a desired rate e.g. if a market tends to become imbalanced
+    // frequently then the gradient can be increased to funnel yield to the market
+    // quicker.
+    // See this equation in latex: https://gateway.pinata.cloud/ipfs/QmXsW4cHtxpJ5BFwRcMSUw7s5G11Qkte13NTEfPLTKEx4x
+    // Interact with this equation: https://www.desmos.com/calculator/pnl43tfv5b
     uint256 marketPercentCalculatedE18 = (imbalance *
       marketTreasurySplitGradient_e18[marketIndex]) / totalValueLockedInMarket;
 
@@ -1184,9 +1188,9 @@ contract LongShort is ILongShort, Initializable {
 
   /**
   @notice Performs all batched next price actions on an oracle price update.
-  @dev Mints or burns all synthetic tokens for this contract. 
+  @dev Mints or burns all synthetic tokens for this contract.
     Users are transferred their owed tokens when _executeOutstandingNexPriceSettlements is called for that user.
-    The maths here is safe from rounding errors since it always over estimates on the batch with division. 
+    The maths here is safe from rounding errors since it always over estimates on the batch with division.
       (as an example (5/3) + (5/3) = 2 but (5+5)/3 = 10/3 = 3, so the batched action would mint one more)
   @param marketIndex An int32 which uniquely identifies a market.
   @param syntheticTokenPriceLong The long synthetic token price for this oracle price update.
