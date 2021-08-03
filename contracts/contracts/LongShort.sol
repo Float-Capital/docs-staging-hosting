@@ -712,7 +712,7 @@ contract LongShort is ILongShort, Initializable {
         marketUpdateIndex[marketIndex] + 1 &&
         assetPriceHasChanged
       ) {
-        IStaker(staker).addNewStateForFloatRewards(
+        IStaker(staker).pushUpdatedMarketPricesToUpdateFloatIssuanceCalculations(
           marketIndex,
           syntheticTokenPrice_inPaymentTokens_long,
           syntheticTokenPrice_inPaymentTokens_short,
@@ -722,7 +722,7 @@ contract LongShort is ILongShort, Initializable {
           userNextPrice_currentUpdateIndex[marketIndex][staker]
         );
       } else {
-        IStaker(staker).addNewStateForFloatRewards(
+        IStaker(staker).pushUpdatedMarketPricesToUpdateFloatIssuanceCalculations(
           marketIndex,
           syntheticTokenPrice_inPaymentTokens_long,
           syntheticTokenPrice_inPaymentTokens_short,
