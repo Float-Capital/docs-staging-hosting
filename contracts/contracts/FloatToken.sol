@@ -15,7 +15,7 @@ contract FloatToken is IFloatToken, ERC20PresetMinterPauserUpgradeable {
    @param symbol The ticker representing the token
    @param stakerAddress The staker contract that controls minting of the token
    */
-  function initialize(
+  function initializeFloatToken(
     string calldata name,
     string calldata symbol,
     address stakerAddress

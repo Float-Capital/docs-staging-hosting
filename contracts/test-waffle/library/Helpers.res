@@ -171,7 +171,7 @@ let initialize = (~admin: Ethers.Wallet.t, ~exposeInternals: bool) => {
   )) => {
     TokenFactory.make(~longShort=longShort.address)->JsPromise.then(tokenFactory => {
       JsPromise.all4((
-        floatToken->FloatToken.initialize(
+        floatToken->FloatToken.initializeFloatToken(
           ~name="Float token",
           ~symbol="FLOAT TOKEN",
           ~stakerAddress=staker.address,
