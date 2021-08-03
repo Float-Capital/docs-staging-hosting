@@ -12,7 +12,7 @@ let testUnit =
     let marketIndex = Helpers.randomJsInteger();
     let randomAddress1 = Helpers.randomAddress();
 
-    describe_only("changeAdmin", () => {
+    describe("changeAdmin", () => {
       it("should not allow non-admin to change admin", () => {
         let user1 = (accounts^)->Array.getUnsafe(5);
 
@@ -24,6 +24,7 @@ let testUnit =
               ->Staker.changeAdmin(~admin=randomAddress1),
             ~reason="not admin",
           );
+        ();
       });
 
       it("should allow admin to change admin correctly", () => {
@@ -46,7 +47,7 @@ let testUnit =
       });
     });
 
-    describe_only("changeFloatPercentage", () => {
+    describe("changeFloatPercentage", () => {
       let newFloatPerc = bnFromString("42000000000000000");
 
       let promiseRef: ref(JsPromise.t(ContractHelpers.transaction)) =
@@ -72,24 +73,18 @@ let testUnit =
             );
         promiseRef := promise;
         let%Await _ = promise;
+        ();
       });
 
-      // it("should not allow non-admin to change float percentage", () => {
+      it("should call the onlyAdmin modifier", () => {
+        let%Await _ =
+          contracts.contents.staker
+          ->Staker.changeFloatPercentage(~newFloatPercentage=newFloatPerc);
 
-      //   let definitelyNOTadmin = (accounts^)->Array.getUnsafe(5);
-
-      //   // this is not reverting, somehow definitelyNOTadmin has become admin?
-
-      //   let%Await _ =
-      //     Chai.expectRevert(
-      //       ~transaction=
-      //         contracts.contents.staker
-      //         ->ContractHelpers.connect(~address=definitelyNOTadmin)
-      //         ->Staker.changeFloatPercentage(~newFloatPercentage=newFloatPerc),
-      //       ~reason="not admin",
-      //     );
-      //   ();
-      // });
+        StakerSmocked.InternalMock.onlyAdminModifierLogicCalls()
+        ->Array.length
+        ->Chai.intEqual(1);
+      });
 
       it("should call _changeFloatPercentage with correct argument", () => {
         StakerSmocked.InternalMock._changeFloatPercentageCalls()
@@ -138,6 +133,7 @@ let testUnit =
                 ),
             ~reason="",
           );
+        ();
       });
 
       it("should update floatPercentage correctly", () => {
@@ -157,7 +153,7 @@ let testUnit =
       });
     });
 
-    describe_only("changeUnstakeFee", () => {
+    describe("changeUnstakeFee", () => {
       let unstakeFeeBasisPoints = Helpers.randomInteger();
 
       let promiseRef: ref(JsPromise.t(ContractHelpers.transaction)) =
@@ -179,10 +175,11 @@ let testUnit =
           ->ContractHelpers.connect(~address=stakerAddress)
           ->Staker.Exposed.changeUnstakeFee(
               ~marketIndex,
-              ~newMarketUnstakeFeeBasisPoints=unstakeFeeBasisPoints,
+              ~newMarketUnstakeFee_e18=unstakeFeeBasisPoints,
             );
         promiseRef := promise;
         let%Await _ = promise;
+        ();
       });
 
       it("should call _changeUnstakeFee with correct arguments", () => {
@@ -190,7 +187,7 @@ let testUnit =
         ->Array.getUnsafe(0)
         ->Chai.recordEqualFlat({
             marketIndex,
-            newMarketUnstakeFeeBasisPoints: unstakeFeeBasisPoints,
+            newMarketUnstakeFee_e18: unstakeFeeBasisPoints,
           })
       });
 
@@ -214,10 +211,11 @@ let testUnit =
               ->ContractHelpers.connect(~address=adminWallet)
               ->Staker.Exposed._changeUnstakeFeeExposed(
                   ~marketIndex,
-                  ~newMarketUnstakeFeeBasisPoints=sixPercent,
+                  ~newMarketUnstakeFee_e18=sixPercent,
                 ),
             ~reason="",
           );
+        ();
       });
 
       it("should update unstake fee correctly", () => {
@@ -230,12 +228,12 @@ let testUnit =
           ->ContractHelpers.connect(~address=adminWallet)
           ->Staker.Exposed._changeUnstakeFeeExposed(
               ~marketIndex=1,
-              ~newMarketUnstakeFeeBasisPoints=newFeePercentageRandom,
+              ~newMarketUnstakeFee_e18=newFeePercentageRandom,
             );
 
         let%Await feeAfterCall =
           contracts.contents.staker
-          ->Staker.Exposed.marketUnstakeFeeBasisPoints(1);
+          ->Staker.Exposed.marketUnstakeFeeBasis_points(1);
 
         Chai.bnEqual(feeAfterCall, newFeePercentageRandom);
       });
