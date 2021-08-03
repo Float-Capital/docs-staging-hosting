@@ -18,7 +18,7 @@ contract Staker is IStaker, Initializable {
   // Fixed-precision constants
   uint256 public constant FLOAT_ISSUANCE_FIXED_DECIMAL = 1e42;
   // 2^52 ~= 4.5e15
-  // With an exponent of 5, the largest total liquidity possible in market (to avoid integer overflow on exponentiation) is ~10^31 or 10 Trillion (10^13)
+  // With an exponent of 5, the largest total liquidity possible in a market (to avoid integer overflow on exponentiation) is ~10^31 or 10 Trillion (10^13)
   // NOTE: this also means if the total market value is less than 2^52 there will be a division by zero error
   uint256 public constant safeExponentBitShifting = 52;
 
@@ -43,9 +43,9 @@ contract Staker is IStaker, Initializable {
 
   // Reward specific
   mapping(uint32 => uint256) public latestRewardIndex;
-  mapping(uint32 => mapping(uint256 => AccumulativeIssancePerStakedSynthSnapshot))
+  mapping(uint32 => mapping(uint256 => AccumulativeIssuancePerStakedSynthSnapshot))
     public accumulativeFloatPerSyntheticTokenSnapshots;
-  struct AccumulativeIssancePerStakedSynthSnapshot {
+  struct AccumulativeIssuancePerStakedSynthSnapshot {
     uint256 timestamp;
     uint256 accumulativeFloatPerSyntheticToken_long;
     uint256 accumulativeFloatPerSyntheticToken_short;
@@ -93,7 +93,7 @@ contract Staker is IStaker, Initializable {
     int256 balanceIncentiveEquilibriumOffset
   );
 
-  event AccumulativeIssancePerStakedSynthSnapshotCreated(
+  event AccumulativeIssuancePerStakedSynthSnapshotCreated(
     uint32 marketIndex,
     uint256 accumulativeFloatIssuanceSnapshotIndex,
     uint256 accumulativeLong,
@@ -220,20 +220,28 @@ contract Staker is IStaker, Initializable {
     emit FloatPercentageUpdated(newFloatPercentage);
   }
 
-  function _changeUnstakeFee(uint32 marketIndex, uint256 newMarketUnstakeFeeBasisPoints)
-    internal
-    virtual
-  {
-    require(newMarketUnstakeFeeBasisPoints <= 5e16); // 5% fee is the max fee possible.
-    marketUnstakeFeeBasis_points[marketIndex] = newMarketUnstakeFeeBasisPoints;
+  function _changeUnstakeFee(uint32 marketIndex, uint256 newMarketUnstakeFee_e18) internal virtual {
+    require(newMarketUnstakeFee_e18 <= 5e16); // 5% fee is the max fee possible.
+    marketUnstakeFeeBasis_points[marketIndex] = newMarketUnstakeFee_e18;
   }
 
-  function changeUnstakeFee(uint32 marketIndex, uint256 newMarketUnstakeFeeBasisPoints)
+  function changeUnstakeFee(uint32 marketIndex, uint256 newMarketUnstakeFee_e18)
     external
     onlyAdmin
   {
-    _changeUnstakeFee(marketIndex, newMarketUnstakeFeeBasisPoints);
-    emit StakeWithdrawalFeeUpdated(marketIndex, newMarketUnstakeFeeBasisPoints);
+    _changeUnstakeFee(marketIndex, newMarketUnstakeFee_e18);
+    emit StakeWithdrawalFeeUpdated(marketIndex, newMarketUnstakeFee_e18);
+  }
+
+  function _changeMarketLaunchIncentiveParameters(
+    uint32 marketIndex,
+    uint256 period,
+    uint256 initialMultiplier
+  ) internal virtual {
+    require(initialMultiplier >= 1e18, "marketLaunchIncentiveMultiplier must be >= 1e18");
+
+    marketLaunchIncentive_period[marketIndex] = period;
+    marketLaunchIncentive_multipliers[marketIndex] = initialMultiplier;
   }
 
   function changeMarketLaunchIncentiveParameters(
@@ -246,18 +254,7 @@ contract Staker is IStaker, Initializable {
     emit MarketLaunchIncentiveParametersChanges(marketIndex, period, initialMultiplier);
   }
 
-  function _changeMarketLaunchIncentiveParameters(
-    uint32 marketIndex,
-    uint256 period,
-    uint256 initialMultiplier
-  ) internal virtual {
-    require(initialMultiplier >= 1e18, "marketLaunchIncentiveMultiplier must be >= 1e181");
-
-    marketLaunchIncentive_period[marketIndex] = period;
-    marketLaunchIncentive_multipliers[marketIndex] = initialMultiplier;
-  }
-
-  function _changBalanceIncentiveExponent(
+  function _changeBalanceIncentiveExponent(
     uint32 marketIndex,
     uint256 _balanceIncentive_curveExponent
   ) internal virtual {
@@ -270,16 +267,16 @@ contract Staker is IStaker, Initializable {
     balanceIncentive_curveExponent[marketIndex] = _balanceIncentive_curveExponent;
   }
 
-  function changBalanceIncentiveExponent(
+  function changeBalanceIncentiveExponent(
     uint32 marketIndex,
     uint256 _balanceIncentive_curveExponent
   ) external onlyAdmin {
-    _changBalanceIncentiveExponent(marketIndex, _balanceIncentive_curveExponent);
+    _changeBalanceIncentiveExponent(marketIndex, _balanceIncentive_curveExponent);
 
     emit BalanceIncentiveExponentUpdated(marketIndex, _balanceIncentive_curveExponent);
   }
 
-  function _changBalanceIncentiveEquilibriumOffset(
+  function _changeBalanceIncentiveEquilibriumOffset(
     uint32 marketIndex,
     int256 _balanceIncentiveCurve_equilibriumOffset
   ) internal virtual {
@@ -293,11 +290,11 @@ contract Staker is IStaker, Initializable {
     balanceIncentiveCurve_equilibriumOffset[marketIndex] = _balanceIncentiveCurve_equilibriumOffset;
   }
 
-  function changBalanceIncentiveEquilibriumOffset(
+  function changeBalanceIncentiveEquilibriumOffset(
     uint32 marketIndex,
     int256 _balanceIncentiveCurve_equilibriumOffset
   ) external onlyAdmin {
-    _changBalanceIncentiveEquilibriumOffset(marketIndex, _balanceIncentiveCurve_equilibriumOffset);
+    _changeBalanceIncentiveEquilibriumOffset(marketIndex, _balanceIncentiveCurve_equilibriumOffset);
 
     emit BalanceIncentiveEquilibriumOffsetUpdated(
       marketIndex,
@@ -315,7 +312,7 @@ contract Staker is IStaker, Initializable {
     address shortToken,
     uint256 kInitialMultiplier,
     uint256 kPeriod,
-    uint256 unstakeFeeBasisPoints,
+    uint256 unstakeFee_e18,
     uint256 _balanceIncentive_curveExponent,
     int256 _balanceIncentiveCurve_equilibriumOffset
   ) external override onlyLongShort {
@@ -331,25 +328,25 @@ contract Staker is IStaker, Initializable {
     syntheticTokens[marketIndex][true] = longToken;
     syntheticTokens[marketIndex][false] = shortToken;
 
-    _changBalanceIncentiveExponent(marketIndex, _balanceIncentive_curveExponent);
-    _changBalanceIncentiveEquilibriumOffset(marketIndex, _balanceIncentiveCurve_equilibriumOffset);
+    _changeBalanceIncentiveExponent(marketIndex, _balanceIncentive_curveExponent);
+    _changeBalanceIncentiveEquilibriumOffset(marketIndex, _balanceIncentiveCurve_equilibriumOffset);
     _changeMarketLaunchIncentiveParameters(marketIndex, kPeriod, kInitialMultiplier);
 
-    _changeUnstakeFee(marketIndex, unstakeFeeBasisPoints);
+    _changeUnstakeFee(marketIndex, unstakeFee_e18);
 
     // Rather start this at 1 to prevent confusion.
     batched_stakerNextTokenShiftIndex[marketIndex] = 1;
 
     emit MarketAddedToStaker(
       marketIndex,
-      unstakeFeeBasisPoints,
+      unstakeFee_e18,
       kPeriod,
       kInitialMultiplier,
       _balanceIncentive_curveExponent,
       _balanceIncentiveCurve_equilibriumOffset
     );
 
-    emit AccumulativeIssancePerStakedSynthSnapshotCreated(marketIndex, 0, 0, 0);
+    emit AccumulativeIssuancePerStakedSynthSnapshotCreated(marketIndex, 0, 0, 0);
   }
 
   /*╔═════════════════════════════════════════════════════════════════════════╗
@@ -476,9 +473,9 @@ contract Staker is IStaker, Initializable {
   }
 
   /*
-   * Computes the time since last accumulativeIssancePerStakedSynthSnapshot for the given token in seconds.
+   * Computes the time since last accumulativeIssuancePerStakedSynthSnapshot for the given token in seconds.
    */
-  function _calculateTimeDeltaFromLastAccumulativeIssancePerStakedSynthSnapshot(uint32 marketIndex)
+  function _calculateTimeDeltaFromLastAccumulativeIssuancePerStakedSynthSnapshot(uint32 marketIndex)
     internal
     view
     virtual
@@ -512,7 +509,7 @@ contract Staker is IStaker, Initializable {
     );
 
     // Compute time since last state point for the given token.
-    uint256 timeDelta = _calculateTimeDeltaFromLastAccumulativeIssancePerStakedSynthSnapshot(
+    uint256 timeDelta = _calculateTimeDeltaFromLastAccumulativeIssuancePerStakedSynthSnapshot(
       marketIndex
     );
 
@@ -560,7 +557,7 @@ contract Staker is IStaker, Initializable {
     // Update latest index to point to new state point.
     latestRewardIndex[marketIndex] = newIndex;
 
-    emit AccumulativeIssancePerStakedSynthSnapshotCreated(
+    emit AccumulativeIssuancePerStakedSynthSnapshotCreated(
       marketIndex,
       newIndex,
       newLongAccumaltiveValue,
@@ -596,7 +593,7 @@ contract Staker is IStaker, Initializable {
     }
 
     // Time delta is fetched twice in below code, can pass through? Which is less gas?
-    if (_calculateTimeDeltaFromLastAccumulativeIssancePerStakedSynthSnapshot(marketIndex) > 0) {
+    if (_calculateTimeDeltaFromLastAccumulativeIssuancePerStakedSynthSnapshot(marketIndex) > 0) {
       _setRewardObjects(marketIndex, longPrice, shortPrice, longValue, shortValue);
     }
   }
