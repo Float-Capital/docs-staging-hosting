@@ -18,6 +18,8 @@ external attachAtAddress: (contractFactory, ~contractAddress: Ethers.ethAddress)
 @send external deploy5: (contractFactory, 'a, 'b, 'c, 'd, 'e) => JsPromise.t<t> = "deploy"
 @send external deploy6: (contractFactory, 'a, 'b, 'c, 'd, 'e, 'f) => JsPromise.t<t> = "deploy"
 @send external deploy7: (contractFactory, 'a, 'b, 'c, 'd, 'e, 'f, 'g) => JsPromise.t<t> = "deploy"
+@send
+external deploy8: (contractFactory, 'a, 'b, 'c, 'd, 'e, 'f, 'g, 'h) => JsPromise.t<t> = "deploy"
 
 @send external deployed: t => JsPromise.t<unit> = "deployed"
 
@@ -93,6 +95,34 @@ let deployContract7 = (
       fifthParam,
       sixthParam,
       seventhParam,
+    ),
+  )
+  ->JsPromise.then(deployed)
+}
+
+let deployContract8 = (
+  contractName,
+  firstParam,
+  secondParam,
+  thirdParam,
+  fourthParam,
+  fifthParam,
+  sixthParam,
+  seventhParam,
+  eighthParam,
+) => {
+  getContractFactory(contractName)
+  ->JsPromise.then(
+    deploy8(
+      _,
+      firstParam,
+      secondParam,
+      thirdParam,
+      fourthParam,
+      fifthParam,
+      sixthParam,
+      seventhParam,
+      eighthParam,
     ),
   )
   ->JsPromise.then(deployed)

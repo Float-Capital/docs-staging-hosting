@@ -29,6 +29,13 @@ describe("Float System", () => {
       let%Await erc20Mock =
         ERC20Mock.make(~name="Test APaymentToken", ~symbol="APaymentToken");
 
+      let%Await aaveIncentivesControllerMock =
+        AaveIncentivesControllerMock.make();
+      let%Await aaveIncentivesControllerSmocked =
+        AaveIncentivesControllerMockSmocked.make(
+          aaveIncentivesControllerMock,
+        );
+
       let%Await yieldManagerAave =
         YieldManagerAave.make(
           ~admin=admin.address,
@@ -37,6 +44,7 @@ describe("Float System", () => {
           ~paymentToken=paymentTokenSmocked.address,
           ~aToken=fundTokenAddress,
           ~lendingPool=lendingPoolSmocked.address,
+          ~aaveIncentivesController=aaveIncentivesControllerSmocked.address,
           ~aaveReferralCode=6543,
         );
 
@@ -45,9 +53,11 @@ describe("Float System", () => {
           "erc20Mock": erc20Mock,
           "yieldManagerAave": yieldManagerAave,
           "paymentToken": paymentTokenSmocked,
+          "treasury": treasury,
+          "aaveIncentivesController": aaveIncentivesControllerSmocked,
         };
     });
 
-    WithdrawTokens.testUnit(~contracts, ~accounts);
+    ClaimAaveRewards.testUnit(~contracts);
   })
 });

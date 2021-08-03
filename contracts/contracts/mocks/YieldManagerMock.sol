@@ -7,6 +7,7 @@ import "hardhat/console.sol";
 import "@openzeppelin/contracts/token/ERC20/presets/ERC20PresetMinterPauser.sol";
 
 import "../interfaces/IYieldManager.sol";
+import "../interfaces/aave/IAaveIncentivesController.sol";
 
 // TODO: it would be better to deprecate this mock and rather mock aave and use the
 //       `YieldManagerAave` to avoid duplicate code/logic that can easily go out of sync.
@@ -34,6 +35,8 @@ contract YieldManagerMock is IYieldManager {
 
   uint256 public yieldRate; // pcnt per sec
   uint256 public lastSettled; // secs after epoch
+
+  event ClaimAaveRewardTokenToTreasury(uint256 amount);
 
   ////////////////////////////////////
   /////////// MODIFIERS //////////////
@@ -113,13 +116,6 @@ contract YieldManagerMock is IYieldManager {
   }
 
   /**
-   * Adds the given yield to the token holdings.
-   */
-  function mockHoldingAdditionalRewardYield() public adminOnly {
-    tokenOtherRewardERC20.mint(address(this), TEN_TO_THE_18 * 2);
-  }
-
-  /**
    * Sets the yield percentage per second for the given token.
    */
   function setYieldRate(uint256 _yieldRate) public adminOnly {
@@ -143,15 +139,6 @@ contract YieldManagerMock is IYieldManager {
     // Transfer tokens back to LongShort contract.
     token.transfer(longShort, amount);
     totalHeld = totalHeld - amount;
-  }
-
-  function claimAaveRewardsToTreasury() external override treasuryOnly {
-    // Redeem other erc20 tokens.
-    // Transfer tokens back to Treasury contract.
-    // TODO: fix
-    mockHoldingAdditionalRewardYield();
-    uint256 amount = ERC20PresetMinterPauser(erc20Token).balanceOf(address(this));
-    ERC20PresetMinterPauser(erc20Token).transfer(treasury, amount);
   }
 
   function distributeYieldForTreasuryAndReturnMarketAllocation(

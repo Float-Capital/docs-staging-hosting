@@ -45,7 +45,7 @@ contract YieldManagerAave is IYieldManager {
     ║           EVENTS            ║
     ╚═════════════════════════════╝*/
 
-  event ClaimAaveRewardTokenToTreasury(address erc20Token, uint256 amount);
+  event ClaimAaveRewardTokenToTreasury(uint256 amount);
 
   /*╔═════════════════════════════╗
     ║          MODIFIERS          ║
@@ -151,19 +151,21 @@ contract YieldManagerAave is IYieldManager {
     @notice Allows for withdrawal of aave rewards to the treasury contract    
     @dev This is specifically implemented to allow withdrawal of aave reward wMatic tokens accrued    
   */
-  function claimAaveRewardsToTreasury() external virtual treasuryOnly {
+  function claimAaveRewardsToTreasury() external treasuryOnly {
     uint256 amount = IAaveIncentivesController(aaveIncentivesController).getUserUnclaimedRewards(
       address(this)
     );
 
+    address[] memory rewardsDepositedAssets = new address[](1);
+    rewardsDepositedAssets[0] = address(paymentToken);
+
     IAaveIncentivesController(aaveIncentivesController).claimRewards(
-      [paymentToken],
+      rewardsDepositedAssets,
       amount,
-      address(this),
       treasury
     );
 
-    emit ClaimAaveRewardTokenToTreasury(aaveRewardsToken, amount);
+    emit ClaimAaveRewardTokenToTreasury(amount);
   }
 
   /**    

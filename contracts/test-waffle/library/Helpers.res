@@ -297,6 +297,7 @@ let initializeLongShortUnit = () => {
         ~paymentToken=paymentToken.address,
         ~aToken=CONSTANTS.zeroAddress,
         ~lendingPool=randomAddress(),
+        ~aaveIncentivesController=randomAddress(),
         ~aaveReferralCode=0,
       ),
       OracleManagerMock.make(~admin=CONSTANTS.zeroAddress),
