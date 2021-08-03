@@ -27,7 +27,6 @@ let test =
           ~contracts,
           ~accounts,
         );
-      StakerSmocked.InternalMock.mock_mintAccumulatedFloatToReturn();
 
       let%AwaitThen _ =
         contracts^.staker
