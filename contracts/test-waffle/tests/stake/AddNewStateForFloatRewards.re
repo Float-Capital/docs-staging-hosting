@@ -21,10 +21,12 @@ let testUnit =
 
     let setup =
         (
-          ~takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted,
+          ~stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted,
           ~timeDelta,
         ) => {
-      StakerSmocked.InternalMock.mock_calculateTimeDeltaToReturn(timeDelta);
+      StakerSmocked.InternalMock.mock_calculateTimeDeltaFromLastAccumulativeIssancePerStakedSynthSnapshotToReturn(
+        timeDelta,
+      );
 
       contracts.contents.staker
       ->Staker.addNewStateForFloatRewards(
@@ -33,7 +35,7 @@ let testUnit =
           ~shortPrice,
           ~longValue,
           ~shortValue,
-          ~takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted,
+          ~stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted,
         );
     };
 
@@ -47,7 +49,7 @@ let testUnit =
               ~shortPrice,
               ~longValue,
               ~shortValue,
-              ~takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted=zeroBn,
+              ~stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted=zeroBn,
             );
 
         StakerSmocked.InternalMock.onlyLongShortModifierLogicCalls()
@@ -57,18 +59,18 @@ let testUnit =
     );
 
     describe("case timeDelta > 0", () => {
-      let takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted =
+      let stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted =
         Helpers.randomTokenAmount();
 
       before_once'(() =>
         setup(
           ~timeDelta=timeDeltaGreaterThanZero,
-          ~takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted,
+          ~stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted,
         )
       );
 
       it("calls calculateTimeDelta with correct arguments", () => {
-        StakerSmocked.InternalMock._calculateTimeDeltaCalls()
+        StakerSmocked.InternalMock._calculateTimeDeltaFromLastAccumulativeIssancePerStakedSynthSnapshotCalls()
         ->Chai.recordArrayDeepEqualFlat([|{marketIndex: marketIndex}|])
       });
 
@@ -81,11 +83,11 @@ let testUnit =
     });
 
     describe(
-      "case takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted > 0",
+      "case stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted > 0",
       () => {
         let batched_stakerNextTokenShiftIndex = Helpers.randomInteger();
         let latestRewardIndex = Helpers.randomInteger();
-        let takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted =
+        let stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted =
           Helpers.randomInteger();
         let addNewStateForFloatRewardsTxPromise =
           ref("Not set yet"->Obj.magic);
@@ -102,39 +104,41 @@ let testUnit =
           addNewStateForFloatRewardsTxPromise :=
             setup(
               ~timeDelta=timeDeltaGreaterThanZero,
-              ~takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted,
+              ~stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted,
             );
 
           addNewStateForFloatRewardsTxPromise.contents;
         });
 
         it(
-          "updates takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping to the 'takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted' value recieved from long short",
+          "updates takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping to the 'stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted' value recieved from long short",
           () => {
             let%Await takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping =
               contracts.contents.staker
-              ->Staker.takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping(
+              ->Staker.stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping(
                   batched_stakerNextTokenShiftIndex,
                 );
             Chai.bnEqual(
               takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping,
-              takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted,
+              stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted,
             );
           },
         );
 
         it(
-          "increments the takerTokenShiftIndex_to_stakerStateIndex_mapping", () => {
-          let%Await takerTokenShiftIndex_to_stakerStateIndex_mapping =
-            contracts.contents.staker
-            ->Staker.takerTokenShiftIndex_to_stakerStateIndex_mapping(
-                batched_stakerNextTokenShiftIndex,
-              );
-          Chai.bnEqual(
-            takerTokenShiftIndex_to_stakerStateIndex_mapping,
-            latestRewardIndex->add(oneBn),
-          );
-        });
+          "increments the stakerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping",
+          () => {
+            let%Await stakerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping =
+              contracts.contents.staker
+              ->Staker.stakerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping(
+                  batched_stakerNextTokenShiftIndex,
+                );
+            Chai.bnEqual(
+              stakerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping,
+              latestRewardIndex->add(oneBn),
+            );
+          },
+        );
 
         it("increments the batched_stakerNextTokenShiftIndex", () => {
           let%Await updatedNextTokenShiftIndex =
@@ -162,7 +166,7 @@ let testUnit =
         let%Await _ =
           setup(
             ~timeDelta=CONSTANTS.zeroBn,
-            ~takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted=zeroBn,
+            ~stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted=zeroBn,
           );
         StakerSmocked.InternalMock._setRewardObjectsCalls()
         ->Chai.recordArrayDeepEqualFlat([||]);

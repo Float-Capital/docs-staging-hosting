@@ -171,10 +171,10 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
         Helpers.randomInteger();
       let batched_stakerNextTokenShiftIndex =
         userNextPrice_stakedSyntheticTokenShiftIndex->add(oneBn);
-      let takerTokenShiftIndex_to_stakerStateIndex_mapping =
+      let stakerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping =
         usersLatestClaimedReward->add(Helpers.randomInteger());
       let newLatestRewardIndex =
-        takerTokenShiftIndex_to_stakerStateIndex_mapping->add(
+        stakerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping->add(
           Helpers.randomInteger(),
         );
       let amountOfStakeShifted = Helpers.randomTokenAmount();
@@ -216,7 +216,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
             ~userNextPrice_stakedSyntheticTokenShiftIndex,
             ~batched_stakerNextTokenShiftIndex,
             ~takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping,
-            ~takerTokenShiftIndex_to_stakerStateIndex_mapping,
+            ~stakerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping,
           );
         let%AwaitThen longShortSmocked = longShort->LongShortSmocked.make;
         let%AwaitThen _ =
@@ -274,7 +274,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
                 amountStakedLong: amountStakedBothSidesInitially,
                 amountStakedShort: amountStakedBothSidesInitially,
                 rewardIndexFrom: usersLatestClaimedReward,
-                rewardIndexTo: takerTokenShiftIndex_to_stakerStateIndex_mapping,
+                rewardIndexTo: stakerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping,
               },
               {
                 marketIndex,
@@ -282,7 +282,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
                   isShiftFromLong ? stakeDecreasedSide : stakeIncreasedSide,
                 amountStakedShort:
                   isShiftFromLong ? stakeIncreasedSide : stakeDecreasedSide,
-                rewardIndexFrom: takerTokenShiftIndex_to_stakerStateIndex_mapping,
+                rewardIndexFrom: stakerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping,
                 rewardIndexTo: newLatestRewardIndex,
               },
             |],
