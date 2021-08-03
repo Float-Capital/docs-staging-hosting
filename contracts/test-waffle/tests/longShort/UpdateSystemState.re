@@ -79,7 +79,7 @@ let testUnit =
           oldLongValueAfterYield,
           oldShortValueAfterYield,
         );
-        LongShortSmocked.InternalMock.mock_performOustandingBatchedSettlementsToReturn(
+        LongShortSmocked.InternalMock.mock_batchConfirmOutstandingPendingActionsToReturn(
           valueChangeLong,
           valueChangeShort,
         );
@@ -196,7 +196,7 @@ let testUnit =
           LongShortSmocked.InternalMock._getSyntheticTokenPriceCalls()
           ->Array.length;
         let numberOfOutstandingSettlementCalls =
-          LongShortSmocked.InternalMock._performOustandingBatchedSettlementsCalls()
+          LongShortSmocked.InternalMock._batchConfirmOutstandingPendingActionsCalls()
           ->Array.length;
 
         let numberOfTotalSupplyLongCalls =
@@ -380,7 +380,7 @@ let testUnit =
               ~fromStaker=false,
               ~stakerNextPrice_currentUpdateIndex=zeroBn,
             );
-          LongShortSmocked.InternalMock._performOustandingBatchedSettlementsCalls()
+          LongShortSmocked.InternalMock._batchConfirmOutstandingPendingActionsCalls()
           ->Chai.recordArrayDeepEqualFlat([|
               {
                 marketIndex,

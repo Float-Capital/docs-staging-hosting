@@ -760,7 +760,7 @@ contract LongShort is ILongShort, Initializable {
       (
         int256 long_changeInMarketValue_inPaymentToken,
         int256 short_changeInMarketValue_inPaymentToken
-      ) = _performOustandingBatchedSettlements(
+      ) = _batchConfirmOutstandingPendingActions(
         marketIndex,
         syntheticTokenPrice_inPaymentTokens_long,
         syntheticTokenPrice_inPaymentTokens_short
@@ -1196,14 +1196,14 @@ contract LongShort is ILongShort, Initializable {
     }
   }
 
-  // QUESTION: is the word "Settlements" confusing, since after this function the users are only
-  //           "confirmed" not "settled"
-
   /**
   @notice Performs all batched next price actions on an oracle price update.
-  @dev Mints or burns all synthetic tokens for this contract. 
-    Users are transferred their owed tokens when _executeOutstandingNexPriceSettlements is called for that user.
-    The maths here is safe from rounding errors since it always over estimates on the batch with division. 
+  @dev Mints or burns all synthetic tokens for this contract.
+
+    After this function is executed all user actions in that batch are confirmed and can be settled individually by
+      calling _executeOutstandingNexPriceSettlements for a given user.
+
+    The maths here is safe from rounding errors since it always over estimates on the batch with division.
       (as an example (5/3) + (5/3) = 2 but (5+5)/3 = 10/3 = 3, so the batched action would mint one more)
   @param marketIndex An int32 which uniquely identifies a market.
   @param syntheticTokenPrice_inPaymentTokens_long The long synthetic token price for this oracle price update.
@@ -1211,7 +1211,7 @@ contract LongShort is ILongShort, Initializable {
   @return long_changeInMarketValue_inPaymentToken The total value change for the long side after all batched actions are executed.
   @return short_changeInMarketValue_inPaymentToken The total value change for the short side after all batched actions are executed.
   */
-  function _performOustandingBatchedSettlements(
+  function _batchConfirmOutstandingPendingActions(
     uint32 marketIndex,
     uint256 syntheticTokenPrice_inPaymentTokens_long,
     uint256 syntheticTokenPrice_inPaymentTokens_short
