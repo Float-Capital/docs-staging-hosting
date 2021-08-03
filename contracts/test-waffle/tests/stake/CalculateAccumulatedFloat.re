@@ -216,7 +216,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
             ~userNextPrice_stakedSyntheticTokenShiftIndex,
             ~batched_stakerNextTokenShiftIndex,
             ~takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping,
-            ~takerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping,
+            ~stakerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping,
           );
         let%AwaitThen longShortSmocked = longShort->LongShortSmocked.make;
         let%AwaitThen _ =

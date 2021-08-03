@@ -96,5 +96,7 @@ module YieldManagerAaveHelpers = {
     "erc20Mock": ERC20Mock.t,
     "yieldManagerAave": YieldManagerAave.t,
     "paymentToken": ERC20MockSmocked.t,
+    "treasury": Ethers.Wallet.t,
+    "aaveIncentivesController": AaveIncentivesControllerMockSmocked.t,
   };
 };

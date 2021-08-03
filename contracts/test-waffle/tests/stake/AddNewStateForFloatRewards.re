@@ -115,7 +115,7 @@ let testUnit =
           () => {
             let%Await takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping =
               contracts.contents.staker
-              ->Staker.takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping(
+              ->Staker.stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping(
                   batched_stakerNextTokenShiftIndex,
                 );
             Chai.bnEqual(
@@ -130,7 +130,7 @@ let testUnit =
           () => {
             let%Await stakerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping =
               contracts.contents.staker
-              ->Staker.takerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping(
+              ->Staker.stakerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping(
                   batched_stakerNextTokenShiftIndex,
                 );
             Chai.bnEqual(

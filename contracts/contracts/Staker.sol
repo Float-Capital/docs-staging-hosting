@@ -60,14 +60,14 @@ contract Staker is IStaker, Initializable {
   /**
   @notice Used to link a token shift to a staker state
   @dev tokenShiftIndex => accumulativeFloatIssuanceSnapshotIndex
-    POSSIBLE OPTIMIZATION - could pack stakerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping and takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping into a struct of two uint128 for storage space optimization.
+    POSSIBLE OPTIMIZATION - could pack stakerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping and stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping into a struct of two uint128 for storage space optimization.
   */
   mapping(uint256 => uint256)
     public stakerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping;
   /// @notice Used to fetch the price from LongShort at that point in time
   /// @dev tokenShiftIndex => longShortMarketPriceSnapshotIndex
   mapping(uint256 => uint256)
-    public takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping;
+    public stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping;
   /// @dev marketIndex => usersAddress => stakerTokenShiftIndex
   mapping(uint32 => mapping(address => uint256))
     public userNextPrice_stakedSyntheticTokenShiftIndex;
@@ -584,7 +584,7 @@ contract Staker is IStaker, Initializable {
 
     // the `stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted` value will be 0 if there is no staker related action in an executed batch
     if (stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted > 0) {
-      takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping[
+      stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping[
         batched_stakerNextTokenShiftIndex[marketIndex]
       ] = stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted;
       stakerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping[
@@ -669,7 +669,7 @@ contract Staker is IStaker, Initializable {
           marketIndex,
           userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_long[marketIndex][user],
           true,
-          takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping[usersShiftIndex]
+          stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping[usersShiftIndex]
         );
 
         amountStakedLong -= userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_long[
@@ -683,7 +683,7 @@ contract Staker is IStaker, Initializable {
           marketIndex,
           userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_short[marketIndex][user],
           false,
-          takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping[usersShiftIndex]
+          stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping[usersShiftIndex]
         );
 
         // TODO: investigate how casting negative numbers works in solidity

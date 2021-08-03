@@ -75,7 +75,7 @@ contract StakerInternalStateSetters is Staker {
     uint256 _userNextPrice_stakedSyntheticTokenShiftIndex,
     uint256 _batched_stakerNextTokenShiftIndex,
     uint256 _takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping,
-    uint256 _takerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping
+    uint256 _stakerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping
   ) public {
     userNextPrice_stakedSyntheticTokenShiftIndex[marketIndex][
       user
@@ -87,12 +87,12 @@ contract StakerInternalStateSetters is Staker {
       user
     ] = shiftAmountShort;
     batched_stakerNextTokenShiftIndex[marketIndex] = _batched_stakerNextTokenShiftIndex;
-    takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping[
+    stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping[
       _userNextPrice_stakedSyntheticTokenShiftIndex
     ] = _takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping;
     stakerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping[
       _userNextPrice_stakedSyntheticTokenShiftIndex
-    ] = _takerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping;
+    ] = _stakerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping;
   }
 
   function setShiftTokensParams(

@@ -113,7 +113,6 @@ const createSynthetic = async (
   });
 
   const yieldManager = await YieldManager.new(
-    admin,
     longShort.address,
     treasury.address,
     fundToken.address,

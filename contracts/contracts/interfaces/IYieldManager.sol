@@ -4,8 +4,6 @@ pragma solidity 0.8.3;
 
 /// @notice Manages yield accumulation for the LongShort contract. Each market is deployed with its own yield manager to simplify the bookkeeping, as different markets may share a payment token and yield pool.
 abstract contract IYieldManager {
-  event WithdrawErc20TokenToTreasury(address erc20Token, uint256 amount);
-
   event YieldDistributed(uint256 unrealizedYield, uint256 treasuryYieldPercentE18);
 
   /// @dev This is purely saving some gas, but the subgraph will know how much is due for the treasury at all times - no need to include in event.
@@ -21,10 +19,6 @@ abstract contract IYieldManager {
   /// @notice Withdraws the given amount of tokens from this yield manager.
   /// @param amount Amount of payment token to withdraw
   function withdrawPaymentToken(uint256 amount) public virtual;
-
-  /// @notice Withdraw erc20 token other than the yield token to the treasury contract
-  /// @param erc20Token Erc20 token that is to be withdrawn
-  function withdrawErc20TokenToTreasury(address erc20Token) external virtual;
 
   /**    
     @notice Calculates and updates the yield allocation to the treasury and the market

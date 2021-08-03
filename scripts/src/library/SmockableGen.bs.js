@@ -12,6 +12,8 @@ var uppercaseFirstLetter = ((someString) => someString.charAt(0).toUpperCase() +
 
 function solASTTypeToRescriptType(typeDescrStr) {
   switch (typeDescrStr) {
+    case "address[]" :
+        return "array<Ethers.ethAddress>";
     case "bool" :
         return "bool";
     case "bytes32" :
