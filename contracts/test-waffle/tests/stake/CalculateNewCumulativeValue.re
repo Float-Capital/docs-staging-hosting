@@ -46,7 +46,7 @@ let test =
         shortFloatPerSecond,
       );
 
-      StakerSmocked.InternalMock.mock_calculateTimeDeltaFromLastAccumulativeIssancePerStakedSynthSnapshotToReturn(
+      StakerSmocked.InternalMock.mock_calculateTimeDeltaFromLastAccumulativeIssuancePerStakedSynthSnapshotToReturn(
         timeDelta,
       );
 
@@ -117,7 +117,7 @@ let test =
 
     it("calls calculateTimeDelta with correct arguments", () => {
       let call =
-        StakerSmocked.InternalMock._calculateTimeDeltaFromLastAccumulativeIssancePerStakedSynthSnapshotCalls()
+        StakerSmocked.InternalMock._calculateTimeDeltaFromLastAccumulativeIssuancePerStakedSynthSnapshotCalls()
         ->Array.getUnsafe(0);
       call->Chai.recordEqualFlat({marketIndex: marketIndex});
     });

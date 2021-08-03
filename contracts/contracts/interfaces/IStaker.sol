@@ -9,7 +9,7 @@ abstract contract IStaker {
     address shortTokenAddress,
     uint256 kInitialMultiplier,
     uint256 kPeriod,
-    uint256 unstakeFeeBasisPoints,
+    uint256 unstakeFee_e18,
     uint256 _balanceIncentive_curveExponent,
     int256 _balanceIncentiveCurve_equilibriumOffset
   ) external virtual;
