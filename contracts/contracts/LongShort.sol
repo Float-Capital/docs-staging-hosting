@@ -812,15 +812,21 @@ contract LongShort is ILongShort, Initializable {
     ╚════════════════════════════════╝*/
 
   /// @notice Transfers payment tokens for a market from msg.sender to this contract.
-  /// @dev Transferred to this contract to be deposited to the yield manager on batch execution of next price actions.
+  /// @dev Tokens are transferred directly to this contract to be deposited by the yield manager in the batch to earn yield.
   ///      Since we check the return value of the transferFrom method, all payment tokens we use must conform to the ERC20 standard.
   /// @param marketIndex An int32 which uniquely identifies a market.
   /// @param amount Amount of payment tokens in that token's lowest denominationto deposit.
-  function _pullPaymentTokensFromUserToLongShort(uint32 marketIndex, uint256 amount)
+  function _transferPaymentTokensFromUserToYieldManager(uint32 marketIndex, uint256 amount)
     internal
     virtual
   {
-    require(IERC20(paymentTokens[marketIndex]).transferFrom(msg.sender, address(this), amount));
+    require(
+      IERC20(paymentTokens[marketIndex]).transferFrom(
+        msg.sender,
+        yieldManagers[marketIndex],
+        amount
+      )
+    );
   }
 
   /// @notice Transfer payment tokens to the contract then lock them in yield manager.
@@ -831,7 +837,7 @@ contract LongShort is ILongShort, Initializable {
   /// @param marketIndex An int32 which uniquely identifies a market.
   /// @param amount Amount of payment tokens in that token's lowest denominationto deposit.
   function _lockFundsInMarket(uint32 marketIndex, uint256 amount) internal virtual {
-    _pullPaymentTokensFromUserToLongShort(marketIndex, amount);
+    _transferPaymentTokensFromUserToYieldManager(marketIndex, amount);
     IYieldManager(yieldManagers[marketIndex]).depositPaymentToken(amount);
   }
 
@@ -854,7 +860,7 @@ contract LongShort is ILongShort, Initializable {
     updateSystemStateMarket(marketIndex)
     executeOutstandingNextPriceSettlements(msg.sender, marketIndex)
   {
-    _pullPaymentTokensFromUserToLongShort(marketIndex, amount);
+    _transferPaymentTokensFromUserToYieldManager(marketIndex, amount);
 
     batched_amountPaymentToken_deposit[marketIndex][isLong] += amount;
     userNextPrice_paymentToken_depositAmount[marketIndex][isLong][msg.sender] += amount;

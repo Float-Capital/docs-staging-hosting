@@ -105,11 +105,18 @@ contract YieldManagerAave is IYieldManager {
    @param amount Amount of payment token to deposit
   */
   function depositPaymentToken(uint256 amount) external override longShortOnly {
-    // Transfer tokens to manager contract.
-    paymentToken.transferFrom(longShort, address(this), amount);
-
+    if (amountReservedInCaseOfInsufficientAaveLiquidity > amount) {
+      amountReservedInCaseOfInsufficientAaveLiquidity -= amount;
+    } else {
+      lendingPool.deposit(
+        address(paymentToken),
+        amount - amountReservedInCaseOfInsufficientAaveLiquidity,
+        address(this),
+        referralCode
+      );
+      amountReservedInCaseOfInsufficientAaveLiquidity = 0;
+    }
     // Deposit the desired amount of tokens into the aave pool
-    lendingPool.deposit(address(paymentToken), amount, address(this), referralCode);
   }
 
   /// @notice Allows the LongShort pay out a user from tokens already withdrawn from Aave

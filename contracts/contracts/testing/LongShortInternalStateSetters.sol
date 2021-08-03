@@ -271,8 +271,13 @@ contract LongShortInternalStateSetters is LongShort {
     yieldManagers[marketIndex] = yieldManager;
   }
 
-  function setDepositFundsGlobals(uint32 marketIndex, address paymentToken) external {
+  function setDepositFundsGlobals(
+    uint32 marketIndex,
+    address paymentToken,
+    address yieldManager
+  ) external {
     paymentTokens[marketIndex] = paymentToken;
+    yieldManagers[marketIndex] = yieldManager;
   }
 
   function setLockFundsInMarketGlobals(uint32 marketIndex, address yieldManager) external {
