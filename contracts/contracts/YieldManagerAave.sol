@@ -115,7 +115,7 @@ contract YieldManagerAave is IYieldManager {
   /// @notice Allows the LongShort pay out a user from tokens already withdrawn from Aave
   /// @param user User to recieve the payout
   /// @param amount Amount of payment token to pay to user
-  function payUserPaymentTokensFromYieldManager(address user, uint256 amount)
+  function transferPaymentTokensToUser(address user, uint256 amount)
     external
     override
     longShortOnly
@@ -126,6 +126,7 @@ contract YieldManagerAave is IYieldManager {
         return;
       }
     } catch {}
+
     amountReservedInCaseOfInsufficientAaveLiquidity -= amount;
 
     // If this reverts (ie aave unable to make payout), then the whole transaction will revent. User will have to wait until sufficient liquidity available.
@@ -139,7 +140,7 @@ contract YieldManagerAave is IYieldManager {
   function removePaymentTokenFromMarket(uint256 amount) external override longShortOnly {
     try lendingPool.withdraw(address(paymentToken), amount, address(this)) {} catch {
       // In theory we should only catch `VL_CURRENT_AVAILABLE_LIQUIDITY_NOT_ENOUGH` errors.
-      //    Other errors should revert the contract.
+      // Safe to revert on all errors, if aave completely blocks withdrawals the amountReservedInCaseOfInsufficientAaveLiquidity can grow until it is fixed without problems.
       amountReservedInCaseOfInsufficientAaveLiquidity += amount;
     }
   }

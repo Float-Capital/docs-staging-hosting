@@ -19,7 +19,7 @@ abstract contract IYieldManager {
   /// @notice Allows the LongShort pay out a user from tokens already withdrawn from Aave
   /// @param user User to recieve the payout
   /// @param amount Amount of payment token to pay to user
-  function payUserPaymentTokensFromYieldManager(address user, uint256 amount) external virtual;
+  function transferPaymentTokensToUser(address user, uint256 amount) external virtual;
 
   /// @notice Withdraws the given amount of tokens from this yield manager.
   /// @param amount Amount of payment token to withdraw

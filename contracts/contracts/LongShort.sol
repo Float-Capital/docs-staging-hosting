@@ -1065,6 +1065,11 @@ contract LongShort is ILongShort, Initializable {
         ]
       );
 
+      IYieldManager(yieldManagers[marketIndex]).transferPaymentTokensToUser(
+        user,
+        amountPaymentToken_toRedeem
+      );
+
       emit ExecuteNextPriceRedeemSettlementUser(
         user,
         marketIndex,
