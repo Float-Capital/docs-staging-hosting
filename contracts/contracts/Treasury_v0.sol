@@ -34,5 +34,5 @@ contract Treasury_v0 is Initializable {
   }
 
   /** To be upgraded in future allowing governance of treasury 
-    and function to buy and burn FLOAT off open market using DEX */
+    and its funds */
 }

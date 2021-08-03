@@ -33,6 +33,6 @@ contract FloatCapital_v0 is Initializable {
     admin = _admin;
   }
 
-  /** Small percentage of float token to accrue here for project
+  /** A percentage of float token to accrue here for project
      development */
 }
