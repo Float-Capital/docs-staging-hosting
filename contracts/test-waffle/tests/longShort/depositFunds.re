@@ -19,8 +19,8 @@ let testUnit =
         let%Await _ =
           contracts.contents.longShort
           ->LongShortSmocked.InternalMock.setupFunctionForUnitTesting(
-          ~functionName="_depositFunds",
-        );
+              ~functionName="_depositFunds",
+            );
 
         let%AwaitThen smockedPaymentToken =
           ERC20MockSmocked.make(paymentToken);
@@ -57,56 +57,6 @@ let testUnit =
             recipient: contracts.contents.longShort.address,
             amount,
           },
-        |]);
-      });
-    });
-
-    describe("_lockFundsInMarket", () => {
-      let yieldManagerRef = ref("Not Set Yet"->Obj.magic);
-
-      before_each(() => {
-        let%Await _ =
-          contracts.contents.longShort
-          ->LongShortSmocked.InternalMock.setupFunctionForUnitTesting(
-              ~functionName="_lockFundsInMarket",
-            );
-
-        let {longShort, markets} = contracts.contents;
-        let {yieldManager} = markets->Array.getUnsafe(0);
-
-        let%Await smockedYieldManager =
-          YieldManagerMockSmocked.make(yieldManager);
-
-        yieldManagerRef := smockedYieldManager;
-
-        let _ =
-          smockedYieldManager->YieldManagerMockSmocked.mockDepositPaymentTokenToReturn;
-        let%Await _ =
-          longShort->LongShort.Exposed.setLockFundsInMarketGlobals(
-            ~marketIndex,
-            ~yieldManager=smockedYieldManager.address,
-          );
-
-        contracts.contents.longShort
-        ->LongShort.Exposed._lockFundsInMarketExposed(~marketIndex, ~amount);
-      });
-
-      it("calls _depositFunds with correct arguments", () => {
-        let depositFundsCalls =
-          LongShortSmocked.InternalMock._depositFundsCalls();
-
-        depositFundsCalls->Chai.recordArrayDeepEqualFlat([|
-          {marketIndex, amount},
-        |]);
-      });
-
-      it("calls YieldManager.depositPaymentToken with correct arguments", () => {
-        let depositPaymentTokenCalls =
-          yieldManagerRef.contents
-          ->YieldManagerMockSmocked.depositPaymentTokenCalls;
-
-        depositPaymentTokenCalls->Chai.recordArrayDeepEqualFlat([|
-          {amount: amount},
         |]);
       });
     });
