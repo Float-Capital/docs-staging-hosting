@@ -102,11 +102,11 @@ let test =
         accumulativeFloatPerSyntheticToken_short: shortAccum,
       });
     });
-    it("emits AccumulativeIssuancePerStakedSynthSnapshotEvent", () => {
+    it("emits AccumulativeIssuancePerStakedSynthSnapshotCreated event", () => {
       Chai.callEmitEvents(
         ~call=promiseRef^,
         ~contract=contracts^.staker->Obj.magic,
-        ~eventName="AccumulativeIssuancePerStakedSynthSnapshot",
+        ~eventName="AccumulativeIssuancePerStakedSynthSnapshotCreated",
       )
       ->Chai.withArgs4(marketIndex, mutatedIndex, longAccum, shortAccum)
     });
