@@ -7,7 +7,7 @@ let testUnit =
       ~contracts: ref(Helpers.coreContracts),
       ~accounts: ref(array(Ethers.Wallet.t)),
     ) => {
-  describe_only("initializeMarket", () => {
+  describe("initializeMarket", () => {
     let stakerSmockedRef = ref(StakerSmocked.uninitializedValue);
     let longShortRef: ref(LongShort.t) = ref(""->Obj.magic);
 
