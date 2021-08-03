@@ -1,30 +1,21 @@
 // SPDX-License-Identifier: BUSL-1.1
 
 pragma solidity 0.8.3;
-/* The bellow code can make this token non-upgradable. This can be decided closer to launch6
-import "@openzeppelin/contracts/token/ERC20/presets/ERC20PresetMinterPauser.sol";
 
-contract FloatToken is ERC20PresetMinterPauser {
-    constructor(
-        string memory name,
-        string memory symbol,
-        address stakerAddress
-    ) ERC20PresetMinterPauser(name, symbol) {
-*/
 import "@openzeppelin/contracts-upgradeable/token/ERC20/presets/ERC20PresetMinterPauserUpgradeable.sol";
 
 import "./interfaces/IFloatToken.sol";
 
-/// @title FloatToken
-/// @notice TODO
-/// @dev
+/** @title FloatToken
+   @notice The Float Token is the governance token for the Float Capital protocol
+ */
 contract FloatToken is IFloatToken, ERC20PresetMinterPauserUpgradeable {
-  /// @notice TODO
-  /// @dev TODO
-  /// @param name TODO
-  /// @param symbol TODO
-  /// @param stakerAddress TODO
-  function initialize3(
+  /**@notice Initialize the Float Token with relevant roles  
+    @param name The name of the Float governance token
+   @param symbol The ticker representing the token
+   @param stakerAddress The staker contract that controls minting of the token
+   */
+  function initialize(
     string calldata name,
     string calldata symbol,
     address stakerAddress
@@ -44,10 +35,13 @@ contract FloatToken is IFloatToken, ERC20PresetMinterPauserUpgradeable {
     ║    FUNCTIONS INHERITED BY ERC20PresetMinterPauserUpgradeable      ║
     ╚═══════════════════════════════════════════════════════════════════╝*/
 
-  /// @notice TODO
-  /// @dev TODO
-  /// @param to TODO
-  /// @param amount TODO
+  /** 
+  @notice Mints an amount of Float tokens for an address.
+  @dev Can only be called by addresses with a MINTER_ROLE. 
+        This should correspond to the Staker contract.
+  @param to The address for which to mint the tokens for.
+  @param amount Amount of synthetic tokens to mint in wei.
+  */
   function mint(address to, uint256 amount)
     public
     override(IFloatToken, ERC20PresetMinterPauserUpgradeable)
