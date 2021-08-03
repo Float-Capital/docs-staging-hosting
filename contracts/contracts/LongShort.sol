@@ -442,7 +442,7 @@ contract LongShort is ILongShort, Initializable {
   /**
   @notice Calculate the amount of target side synthetic tokens that are worth the same
           amount of payment tokens as X many synthetic tokens on origin side.
-          The resulting equation comes from simplifying this function 
+          The resulting equation comes from simplifying this function
 
             _getAmountSyntheticToken(
               _getAmountPaymentToken(
@@ -659,6 +659,8 @@ contract LongShort is ILongShort, Initializable {
     // $50 * 10% = $5 gained for short side and conversely $5 lost for long side.
     int256 underbalancedSideValue = int256(_getMin(longValue, shortValue));
 
+    // See this equation in latex: https://gateway.pinata.cloud/ipfs/QmPeJ3SZdn1GfxqCD4GDYyWTJGPMSHkjPJaxrzk2qTTPSE
+    // Interact with this equation: https://www.desmos.com/calculator/t8gr6j5vsq
     int256 valueChange = ((newAssetPrice - oldAssetPrice) * underbalancedSideValue) / oldAssetPrice;
 
     if (valueChange > 0) {
@@ -1184,9 +1186,9 @@ contract LongShort is ILongShort, Initializable {
 
   /**
   @notice Performs all batched next price actions on an oracle price update.
-  @dev Mints or burns all synthetic tokens for this contract. 
+  @dev Mints or burns all synthetic tokens for this contract.
     Users are transferred their owed tokens when _executeOutstandingNexPriceSettlements is called for that user.
-    The maths here is safe from rounding errors since it always over estimates on the batch with division. 
+    The maths here is safe from rounding errors since it always over estimates on the batch with division.
       (as an example (5/3) + (5/3) = 2 but (5+5)/3 = 10/3 = 3, so the batched action would mint one more)
   @param marketIndex An int32 which uniquely identifies a market.
   @param syntheticTokenPriceLong The long synthetic token price for this oracle price update.
