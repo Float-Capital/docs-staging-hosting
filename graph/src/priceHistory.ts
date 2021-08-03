@@ -1,5 +1,5 @@
 import {
-  SyntheticTokenCreated,
+  SyntheticMarketCreated,
   OracleUpdated,
 } from "../generated-price-history/LongShort/LongShort";
 import { OracleManager } from "../generated-price-history/templates/OracleManager/OracleManager";
@@ -123,8 +123,8 @@ function getLatestOraclePrice(oracleAddress: Address): BigInt {
   return latestPriceQuery.value;
 }
 
-export function handleSyntheticTokenCreated(
-  event: SyntheticTokenCreated
+export function handleSyntheticMarketCreated(
+  event: SyntheticMarketCreated
 ): void {
   let marketIndex = event.params.marketIndex;
   let timestamp = event.block.timestamp;

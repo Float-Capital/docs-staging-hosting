@@ -26,11 +26,11 @@ let test =
   ) =
     Helpers.Tuple.make7(Helpers.randomInteger);
 
-  describe("setRewardObjects", () => {
+  describe("setCurrentAccumulativeIssuancePerStakeStakedSynthSnapshot", () => {
     before_once'(() => {
       let%AwaitThen _ =
         deployAndSetupStakerToUnitTest(
-          ~functionName="setRewardObjects",
+          ~functionName="setCurrentAccumulativeIssuancePerStakeStakedSynthSnapshot",
           ~contracts,
           ~accounts,
         );
@@ -52,7 +52,7 @@ let test =
 
       promiseRef :=
         contracts^.staker
-        ->Staker.Exposed._setRewardObjectsExposed(
+        ->Staker.Exposed._setCurrentAccumulativeIssuancePerStakeStakedSynthSnapshotExposed(
             ~marketIndex,
             ~longPrice,
             ~shortPrice,
@@ -88,22 +88,25 @@ let test =
       latestRewardIndex->Chai.bnEqual(mutatedIndex);
     });
 
-    it("mutates syntheticRewardParams", () => {
+    it("mutates accumulativeFloatPerSyntheticTokenSnapshots", () => {
       let%Await rewardParams =
         contracts^.staker
-        ->Staker.syntheticRewardParams(marketIndex, mutatedIndex);
+        ->Staker.accumulativeFloatPerSyntheticTokenSnapshots(
+            marketIndex,
+            mutatedIndex,
+          );
 
       rewardParams->Chai.recordEqualFlat({
         timestamp: timestampRef^,
-        accumulativeFloatPerLongToken: longAccum,
-        accumulativeFloatPerShortToken: shortAccum,
+        accumulativeFloatPerSyntheticToken_long: longAccum,
+        accumulativeFloatPerSyntheticToken_short: shortAccum,
       });
     });
-    it("emits StateAddedEvent", () => {
+    it("emits AccumulativeIssuancePerStakedSynthSnapshotCreated event", () => {
       Chai.callEmitEvents(
         ~call=promiseRef^,
         ~contract=contracts^.staker->Obj.magic,
-        ~eventName="StateAdded",
+        ~eventName="AccumulativeIssuancePerStakedSynthSnapshotCreated",
       )
       ->Chai.withArgs4(marketIndex, mutatedIndex, longAccum, shortAccum)
     });

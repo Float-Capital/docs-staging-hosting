@@ -58,7 +58,7 @@ module.exports = async function (deployer, networkName, accounts) {
     deployer,
     initializer: false,
   });
-  await deployer.deploy(TokenFactory, admin, longShort.address, {
+  await deployer.deploy(TokenFactory, longShort.address, {
     from: admin,
   });
   let tokenFactory = await TokenFactory.deployed();

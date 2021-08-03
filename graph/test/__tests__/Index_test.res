@@ -68,10 +68,10 @@ describe("All Tests", ({beforeAll, testAsync}) => {
     })
   })
 
-  describe("SyntheticTokenCreated event", ({testAsync}) => {
+  describe("SyntheticMarketCreated event", ({testAsync}) => {
     testAsync("should occur more than ONCE (must test!)", ({expectTrue, callback}) => {
-      let _ = allStateChanges.contents->JsPromise.map(({allSyntheticTokenCreatedEvents}) => {
-        expectTrue(allSyntheticTokenCreatedEvents->Belt.Array.length >= 1)
+      let _ = allStateChanges.contents->JsPromise.map(({allSyntheticMarketCreatedEvents}) => {
+        expectTrue(allSyntheticMarketCreatedEvents->Belt.Array.length >= 1)
         callback()
       })
     })
@@ -82,8 +82,8 @@ describe("All Tests", ({beforeAll, testAsync}) => {
     }) => {
       let _ =
         allStateChanges.contents
-        ->JsPromise.then(({allSyntheticTokenCreatedEvents}) => {
-          allSyntheticTokenCreatedEvents
+        ->JsPromise.then(({allSyntheticMarketCreatedEvents}) => {
+          allSyntheticMarketCreatedEvents
           ->Array.map(({blockNumber, data: {marketIndex}}) => {
             Queries.getSyntheticMarketAtBlock(
               ~blockNumber=blockNumber - 1,
@@ -106,8 +106,8 @@ describe("All Tests", ({beforeAll, testAsync}) => {
     }) => {
       let _ =
         allStateChanges.contents
-        ->JsPromise.then(({allSyntheticTokenCreatedEvents}) => {
-          allSyntheticTokenCreatedEvents
+        ->JsPromise.then(({allSyntheticMarketCreatedEvents}) => {
+          allSyntheticMarketCreatedEvents
           ->Array.map(({
             blockNumber,
             timestamp,
@@ -224,8 +224,8 @@ describe("All Tests", ({beforeAll, testAsync}) => {
     }) => {
       let _ =
         allStateChanges.contents
-        ->JsPromise.then(({allSyntheticTokenCreatedEvents}) => {
-          allSyntheticTokenCreatedEvents
+        ->JsPromise.then(({allSyntheticMarketCreatedEvents}) => {
+          allSyntheticMarketCreatedEvents
           ->Array.map(({
             blockNumber,
             timestamp,

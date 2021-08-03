@@ -34,12 +34,12 @@ module LongShortHelpers = {
   };
   let getMarketBalance = (longShort, ~marketIndex) => {
     let%AwaitThen longValue =
-      longShort->LongShort.syntheticTokenPoolValue(
+      longShort->LongShort.marketSideValueInPaymentToken(
         marketIndex,
         true /*long*/,
       );
     let%Await shortValue =
-      longShort->LongShort.syntheticTokenPoolValue(
+      longShort->LongShort.marketSideValueInPaymentToken(
         marketIndex,
         false /*short*/,
       );
@@ -56,28 +56,36 @@ module LongShortHelpers = {
     let%AwaitThen totalSupply =
       synthContract->Obj.magic->SyntheticToken.totalSupply;
 
-    let%Await syntheticTokenPoolValue =
-      longShort->LongShort.syntheticTokenPoolValue(marketIndex, isLong);
+    let%Await marketSideValueInPaymentToken =
+      longShort->LongShort.marketSideValueInPaymentToken(marketIndex, isLong);
 
     let syntheticTokenPrice =
-      syntheticTokenPoolValue->mul(CONSTANTS.tenToThe18)->div(totalSupply);
+      marketSideValueInPaymentToken
+      ->mul(CONSTANTS.tenToThe18)
+      ->div(totalSupply);
 
     syntheticTokenPrice;
   };
-  let calcSyntheticTokenPrice = (~amountPaymentToken, ~amountSynthToken) => {
-    amountPaymentToken->mul(CONSTANTS.tenToThe18)->div(amountSynthToken);
+  let calcSyntheticTokenPrice = (~amountPaymentToken, ~amountSyntheticToken) => {
+    amountPaymentToken->mul(CONSTANTS.tenToThe18)->div(amountSyntheticToken);
   };
-  let calcAmountPaymentToken = (~amountSynthToken, ~price) => {
-    amountSynthToken->mul(price)->div(CONSTANTS.tenToThe18);
+  let calcAmountPaymentToken = (~amountSyntheticToken, ~price) => {
+    amountSyntheticToken->mul(price)->div(CONSTANTS.tenToThe18);
   };
-  let calcAmountSynthToken = (~amountPaymentToken, ~price) => {
+  let calcAmountSyntheticToken = (~amountPaymentToken, ~price) => {
     amountPaymentToken->mul(CONSTANTS.tenToThe18)->div(price);
+  };
+  let calcEquivalentAmountSyntheticTokensOnTargetSide =
+      (~amountSyntheticTokenOriginSide, ~priceOriginSide, ~priceTargetSide) => {
+    amountSyntheticTokenOriginSide
+    ->mul(priceOriginSide)
+    ->div(priceTargetSide);
   };
 };
 
 module SyntheticTokenHelpers = {
-  let getIsLong = synthToken => {
-    let%Await isLong = synthToken->SyntheticToken.isLong;
+  let getIsLong = syntheticToken => {
+    let%Await isLong = syntheticToken->SyntheticToken.isLong;
     isLong == true /*long*/;
   };
 };
@@ -88,5 +96,7 @@ module YieldManagerAaveHelpers = {
     "erc20Mock": ERC20Mock.t,
     "yieldManagerAave": YieldManagerAave.t,
     "paymentToken": ERC20MockSmocked.t,
+    "treasury": Ethers.Wallet.t,
+    "aaveIncentivesController": AaveIncentivesControllerMockSmocked.t,
   };
 };

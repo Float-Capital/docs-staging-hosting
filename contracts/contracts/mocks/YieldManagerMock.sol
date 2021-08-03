@@ -7,6 +7,7 @@ import "hardhat/console.sol";
 import "@openzeppelin/contracts/token/ERC20/presets/ERC20PresetMinterPauser.sol";
 
 import "../interfaces/IYieldManager.sol";
+import "../interfaces/aave/IAaveIncentivesController.sol";
 
 // TODO: it would be better to deprecate this mock and rather mock aave and use the
 //       `YieldManagerAave` to avoid duplicate code/logic that can easily go out of sync.
@@ -35,22 +36,14 @@ contract YieldManagerMock is IYieldManager {
   uint256 public yieldRate; // pcnt per sec
   uint256 public lastSettled; // secs after epoch
 
+  event ClaimAaveRewardTokenToTreasury(uint256 amount);
+
   ////////////////////////////////////
   /////////// MODIFIERS //////////////
   ////////////////////////////////////
 
-  modifier adminOnly() {
-    require(msg.sender == admin, "Not admin");
-    _;
-  }
-
   modifier longShortOnly() {
     require(msg.sender == longShort, "Not longShort");
-    _;
-  }
-
-  modifier treasuryOnly() {
-    require(msg.sender == treasury, "Not longShort");
     _;
   }
 
@@ -59,13 +52,11 @@ contract YieldManagerMock is IYieldManager {
   ////////////////////////////////////
 
   constructor(
-    address _admin,
     address _longShort,
     address _treasury,
     address _token
   ) {
     // Admin contracts.
-    admin = _admin;
     longShort = _longShort;
     treasury = _treasury;
 
@@ -95,7 +86,7 @@ contract YieldManagerMock is IYieldManager {
   /**
    * Adds the given yield percent to the token holdings.
    */
-  function settleWithYieldPercent(uint256 yieldPercent) public adminOnly {
+  function settleWithYieldPercent(uint256 yieldPercent) external {
     uint256 totalYield = (totalHeld * yieldPercent) / TEN_TO_THE_18;
 
     lastSettled = block.timestamp;
@@ -106,70 +97,63 @@ contract YieldManagerMock is IYieldManager {
   /**
    * Adds the given absolute yield to the token holdings.
    */
-  function settleWithYieldAbsolute(uint256 totalYield) public adminOnly {
+  function settleWithYieldAbsolute(uint256 totalYield) external {
     lastSettled = block.timestamp;
     totalHeld = totalHeld + totalYield;
     token.mint(address(this), totalYield);
   }
 
   /**
-   * Adds the given yield to the token holdings.
-   */
-  function mockHoldingAdditionalRewardYield() public adminOnly {
-    tokenOtherRewardERC20.mint(address(this), TEN_TO_THE_18 * 2);
-  }
-
-  /**
    * Sets the yield percentage per second for the given token.
    */
-  function setYieldRate(uint256 _yieldRate) public adminOnly {
+  function setYieldRate(uint256 _yieldRate) external {
     yieldRate = _yieldRate;
   }
 
-  function depositPaymentToken(uint256 amount) public override longShortOnly {
+  function depositPaymentToken(uint256 amount) external override longShortOnly {
     // Ensure token state is current.
     settle();
 
     // Transfer tokens to manager contract.
-    token.transferFrom(longShort, address(this), amount);
     totalHeld = totalHeld + amount;
   }
 
-  function withdrawPaymentToken(uint256 amount) public override longShortOnly {
+  /// @notice Allows the LongShort pay out a user from tokens already withdrawn from Aave
+  /// @param user User to recieve the payout
+  /// @param amount Amount of payment token to pay to user
+  function transferPaymentTokensToUser(address user, uint256 amount)
+    external
+    override
+    longShortOnly
+  {
+    // Transfer tokens back to LongShort contract.
+    token.transfer(user, amount);
+  }
+
+  function removePaymentTokenFromMarket(uint256 amount) external override longShortOnly {
     // Ensure token state is current.
     settle();
     require(amount <= totalHeld);
 
-    // Transfer tokens back to LongShort contract.
-    token.transfer(longShort, amount);
     totalHeld = totalHeld - amount;
   }
 
-  function withdrawErc20TokenToTreasury(address erc20Token) external override treasuryOnly {
-    // Redeem other erc20 tokens.
-    // Transfer tokens back to Treasury contract.
-    mockHoldingAdditionalRewardYield();
-    uint256 amount = ERC20PresetMinterPauser(erc20Token).balanceOf(address(this));
-    ERC20PresetMinterPauser(erc20Token).transfer(treasury, amount);
-  }
-
-  // TODO STENT need to change this and unit test it
-  function claimYieldAndGetMarketAmount(
+  function distributeYieldForTreasuryAndReturnMarketAllocation(
     uint256 totalValueRealizedForMarket,
-    uint256 treasuryPercentE18
-  ) public override longShortOnly returns (uint256) {
+    uint256 treasuryYieldPercentE18
+  ) external override longShortOnly returns (uint256) {
     uint256 unrealizedYield = totalHeld - totalValueRealizedForMarket - totalReservedForTreasury;
 
     if (unrealizedYield == 0) {
       return 0;
     }
 
-    uint256 amountForTreasury = (unrealizedYield * treasuryPercentE18) / TEN_TO_THE_18;
-    uint256 amountForMarketIncetives = unrealizedYield - amountForTreasury;
+    uint256 amountForTreasury = (unrealizedYield * treasuryYieldPercentE18) / TEN_TO_THE_18;
+    uint256 amountForMarketIncentives = unrealizedYield - amountForTreasury;
 
     totalReservedForTreasury += amountForTreasury;
 
-    return amountForMarketIncetives;
+    return amountForMarketIncentives;
   }
 
   // TODO STENT need to change this and unit test it

@@ -1,6 +1,6 @@
 import {
   LongShortV1,
-  SyntheticTokenCreated,
+  SyntheticMarketCreated,
   SystemStateUpdated,
   OracleUpdated,
   NextPriceDeposit,
@@ -269,8 +269,8 @@ export function handleSystemStateUpdated(event: SystemStateUpdated): void {
   );
 }
 
-export function handleSyntheticTokenCreated(
-  event: SyntheticTokenCreated
+export function handleSyntheticMarketCreated(
+  event: SyntheticMarketCreated
 ): void {
   let txHash = event.transaction.hash;
   let blockNumber = event.block.number;
@@ -333,7 +333,7 @@ export function handleSyntheticTokenCreated(
 
   let globalState = GlobalState.load(GLOBAL_STATE_ID);
   if (globalState == null) {
-    log.critical("Global state is null in `handleSyntheticTokenCreated`", []);
+    log.critical("Global state is null in `handleSyntheticMarketCreated`", []);
   }
   globalState.latestMarketIndex = globalState.latestMarketIndex.plus(
     BigInt.fromI32(1)
@@ -366,7 +366,7 @@ export function handleSyntheticTokenCreated(
 
   saveEventToStateChange(
     event,
-    "SyntheticTokenCreated",
+    "SyntheticMarketCreated",
     [
       marketIndex.toString(),
       longTokenAddress.toHex(),

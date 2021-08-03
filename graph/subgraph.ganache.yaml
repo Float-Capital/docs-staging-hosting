@@ -21,7 +21,7 @@ dataSources:
         - NextPriceDeposit
         - NextPriceRedeem
         - OracleUpdated
-        - SyntheticTokenCreated
+        - SyntheticMarketCreated
         - SystemStateUpdated
         - LongShortV1
       abis:
@@ -42,8 +42,8 @@ dataSources:
           handler: handleNextPriceRedeem
         - event: OracleUpdated(uint32,address,address)
           handler: handleOracleUpdated
-        - event: SyntheticTokenCreated(uint32,address,address,address,uint256,string,string,address,address)
-          handler: handleSyntheticTokenCreated
+        - event: SyntheticMarketCreated(uint32,address,address,address,uint256,string,string,address,address)
+          handler: handleSyntheticMarketCreated
         - event: SystemStateUpdated(uint32,uint256,int256,uint256,uint256,uint256,uint256)
           handler: handleSystemStateUpdated
         - event: LongShortV1(address,address,address,address)

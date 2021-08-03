@@ -31,7 +31,7 @@ const initialize = async (admin) => {
     from: admin,
   });
 
-  const tokenFactory = await TokenFactory.new(admin, longShort.address, {
+  const tokenFactory = await TokenFactory.new(longShort.address, {
     from: admin,
   });
 
@@ -113,7 +113,6 @@ const createSynthetic = async (
   });
 
   const yieldManager = await YieldManager.new(
-    admin,
     longShort.address,
     treasury.address,
     fundToken.address,
@@ -126,7 +125,7 @@ const createSynthetic = async (
   var mintRole = await fundToken.MINTER_ROLE.call();
   await fundToken.grantRole(mintRole, yieldManager.address);
 
-  await longShort.newSyntheticMarket(
+  await longShort.createNewSyntheticMarket(
     syntheticName,
     syntheticSymbol,
     fundToken.address,
@@ -148,6 +147,7 @@ const createSynthetic = async (
     "500000000000000000",
     "5",
     0,
+    1,
     { from: admin }
   );
 
@@ -243,12 +243,7 @@ const feeCalculation = (
     }
   }
   // If greater than minFeeThreshold
-  if (
-    amount
-      .add(longValue)
-      .add(shortValue)
-      .gte(minThreshold)
-  ) {
+  if (amount.add(longValue).add(shortValue).gte(minThreshold)) {
     const TEN_TO_THE_18 = "1" + "000000000000000000";
     let betaDiff = new BN(TEN_TO_THE_18).sub(thinBeta); // TODO: when previous beta != 1
 
@@ -296,10 +291,7 @@ const logGasPrices = async (
   console.log(`USD Price: $${ethPriceUsd}`);
   const ethCost =
     Number(
-      totalCostEth
-        .mul(new BN(ethPriceUsd))
-        .mul(new BN(100))
-        .div(ONE_ETH)
+      totalCostEth.mul(new BN(ethPriceUsd)).mul(new BN(100)).div(ONE_ETH)
     ) / 100;
   console.log(`Cost on ETH Mainnet: $${ethCost}`);
 
@@ -311,10 +303,7 @@ const logGasPrices = async (
   console.log(`MATIC Price: $${maticPriceUsd}`);
   const maticCost =
     Number(
-      totalCostMatic
-        .mul(new BN(maticPriceUsd))
-        .mul(new BN(100))
-        .div(ONE_ETH)
+      totalCostMatic.mul(new BN(maticPriceUsd)).mul(new BN(100)).div(ONE_ETH)
     ) / 100;
   console.log(`Cost on BSC: $${maticCost}`);
 };

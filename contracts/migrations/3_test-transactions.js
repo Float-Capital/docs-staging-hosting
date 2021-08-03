@@ -17,7 +17,9 @@ const OracleManagerEthKillerChainlinkTestnet = artifacts.require(
 const mumbaiDaiAddress = "0x001B3B4d0F3714Ca98ba10F6042DaEbF0B1B7b6F";
 
 const aavePoolAddressMumbai = "0x9198F13B08E299d85E096929fA9781A1E3d5d827";
-const mumabiADai = "0x639cB7b21ee2161DF9c882483C9D55c90c20Ca3e";
+const mumbaiADai = "0x639cB7b21ee2161DF9c882483C9D55c90c20Ca3e";
+const mumbaiAaveIncentivesController =
+  "0xd41aE58e803Edf4304334acCE4DC4Ec34a63C644";
 
 /* See docs:
     https://docs.chain.link/docs/matic-addresses/
@@ -67,18 +69,17 @@ const deployTestMarket = async (
   let fundTokenAddress;
   if (networkName == "mumbai") {
     yieldManager = await YieldManagerAave.new(
-      admin,
       longShortInstance.address,
       treasuryInstance.address,
       mumbaiDaiAddress,
-      mumabiADai,
+      mumbaiADai,
       aavePoolAddressMumbai,
+      mumbaiAaveIncentivesController,
       0
     );
     fundTokenAddress = mumbaiDaiAddress;
   } else {
     yieldManager = await YieldManagerMock.new(
-      admin,
       longShortInstance.address,
       treasuryInstance.address,
       paymentToken.address
@@ -90,7 +91,7 @@ const deployTestMarket = async (
     await paymentToken.grantRole(mintRole, yieldManager.address);
   }
 
-  await longShortInstance.newSyntheticMarket(
+  await longShortInstance.createNewSyntheticMarket(
     syntheticName,
     syntheticSymbol,
     fundTokenAddress,
@@ -118,7 +119,8 @@ const deployTestMarket = async (
     new BN("5000000000000000"), // 50 basis point unstake fee
     new BN("1000000000000000000"),
     5,
-    0
+    0,
+    1
   );
 };
 
@@ -178,8 +180,8 @@ const redeemShortNextPriceWithSystemUpdate = async (
 };
 
 const stakeSynth = async (amount, synth, user) => {
-  const usersSynthTokenBalance = new BN(await synth.balanceOf(user));
-  if (usersSynthTokenBalance.gt(new BN("0"))) {
+  const usersSyntheticTokenBalance = new BN(await synth.balanceOf(user));
+  if (usersSyntheticTokenBalance.gt(new BN("0"))) {
     await synth.stake(new BN(amount), { from: user });
   } else {
     console.log("user doesn't have any synth tokens");
@@ -318,7 +320,7 @@ module.exports = async function (deployer, network, accounts) {
     }
 
     console.log(`To verify market specific contracts run the following:
-    
+
     \`${verifyString} --network ${network}\``);
   }
 

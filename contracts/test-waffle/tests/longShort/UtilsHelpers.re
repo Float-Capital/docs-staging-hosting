@@ -73,33 +73,40 @@ let testUnit =
     describe("_getYieldSplit", () => {
       let marketIndex = 1;
 
-      let test = (~syntheticTokenPoolValueLong, ~syntheticTokenPoolValueShort) => {
+      let test =
+          (
+            ~marketSideValueInPaymentTokenLong,
+            ~marketSideValueInPaymentTokenShort,
+          ) => {
         let totalValueLockedInMarket =
-          syntheticTokenPoolValueLong->add(syntheticTokenPoolValueShort);
+          marketSideValueInPaymentTokenLong->add(
+            marketSideValueInPaymentTokenShort,
+          );
 
         let isLongSideUnderbalanced =
-          syntheticTokenPoolValueShort->bnGte(syntheticTokenPoolValueLong);
+          marketSideValueInPaymentTokenShort->bnGte(
+            marketSideValueInPaymentTokenLong,
+          );
 
         let imbalance =
           isLongSideUnderbalanced
-            ? syntheticTokenPoolValueShort->sub(syntheticTokenPoolValueLong)
-            : syntheticTokenPoolValueLong->sub(syntheticTokenPoolValueShort);
+            ? marketSideValueInPaymentTokenShort->sub(
+                marketSideValueInPaymentTokenLong,
+              )
+            : marketSideValueInPaymentTokenLong->sub(
+                marketSideValueInPaymentTokenShort,
+              );
 
-        let%AwaitThen marketTreasurySplitGradientE18 =
+        let%AwaitThen marketTreasurySplitGradient_e18 =
           contracts.contents.longShort
-          ->LongShort.marketTreasurySplitGradientsE18(marketIndex);
+          ->LongShort.marketTreasurySplitGradient_e18(marketIndex);
 
         let marketPercentCalculatedE18 =
           imbalance
-          ->mul(marketTreasurySplitGradientE18)
+          ->mul(marketTreasurySplitGradient_e18)
           ->div(totalValueLockedInMarket);
-
-        let%AwaitThen marketPercentE18 =
-          contracts.contents.longShort
-          ->LongShort.Exposed._getMinExposed(
-              ~a=marketPercentCalculatedE18,
-              ~b=CONSTANTS.tenToThe18,
-            );
+        let marketPercentE18 =
+          bnMin(marketPercentCalculatedE18, CONSTANTS.tenToThe18);
 
         let treasuryPercentE18 = CONSTANTS.tenToThe18->sub(marketPercentE18);
 
@@ -109,37 +116,48 @@ let testUnit =
           contracts.contents.longShort
           ->LongShort.Exposed._getYieldSplitExposed(
               ~marketIndex,
-              ~longValue=syntheticTokenPoolValueLong,
-              ~shortValue=syntheticTokenPoolValueShort,
+              ~longValue=marketSideValueInPaymentTokenLong,
+              ~shortValue=marketSideValueInPaymentTokenShort,
               ~totalValueLockedInMarket,
             );
         Chai.bnEqual(
           ~message=
             "expectedResult and result after `_getYieldSplit` not the same",
           expectedResult,
-          actualResult.treasuryPercentE18,
+          actualResult.treasuryYieldPercentE18,
         );
       };
 
       it("works as expected if longValue > shortValue", () => {
-        let syntheticTokenPoolValueShort = Helpers.randomTokenAmount();
-        let syntheticTokenPoolValueLong =
-          syntheticTokenPoolValueShort->add(Helpers.randomTokenAmount());
+        let marketSideValueInPaymentTokenShort = Helpers.randomTokenAmount();
+        let marketSideValueInPaymentTokenLong =
+          marketSideValueInPaymentTokenShort->add(
+            Helpers.randomTokenAmount(),
+          );
 
-        test(~syntheticTokenPoolValueLong, ~syntheticTokenPoolValueShort);
+        test(
+          ~marketSideValueInPaymentTokenLong,
+          ~marketSideValueInPaymentTokenShort,
+        );
       });
       it("works as expected if shortValue > longValue", () => {
-        let syntheticTokenPoolValueLong = Helpers.randomTokenAmount();
-        let syntheticTokenPoolValueShort =
-          syntheticTokenPoolValueLong->add(Helpers.randomTokenAmount());
+        let marketSideValueInPaymentTokenLong = Helpers.randomTokenAmount();
+        let marketSideValueInPaymentTokenShort =
+          marketSideValueInPaymentTokenLong->add(Helpers.randomTokenAmount());
 
-        test(~syntheticTokenPoolValueLong, ~syntheticTokenPoolValueShort);
+        test(
+          ~marketSideValueInPaymentTokenLong,
+          ~marketSideValueInPaymentTokenShort,
+        );
       });
       it("works as expected if shortValue == longValue", () => {
-        let syntheticTokenPoolValueLong = Helpers.randomTokenAmount();
-        let syntheticTokenPoolValueShort = syntheticTokenPoolValueLong;
+        let marketSideValueInPaymentTokenLong = Helpers.randomTokenAmount();
+        let marketSideValueInPaymentTokenShort = marketSideValueInPaymentTokenLong;
 
-        test(~syntheticTokenPoolValueLong, ~syntheticTokenPoolValueShort);
+        test(
+          ~marketSideValueInPaymentTokenLong,
+          ~marketSideValueInPaymentTokenShort,
+        );
       });
     });
   });

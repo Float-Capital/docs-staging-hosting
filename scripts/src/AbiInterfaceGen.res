@@ -28,9 +28,10 @@ let getRescriptType = typeString =>
   | #bytes4 => "bytes4"
   | #bytes32 => "bytes32"
   | #bool => "bool"
+  | #"address[]" => "array<Ethers.ethAddress>"
   | unknownType =>
     Js.log(`Please handle all types - ${unknownType->Obj.magic} isn't handled by this script.`)
-    "unkownType"
+    "unknownType"
   }
 type inputParamLayout = NamedTyped | NamedUntyped | UnnamedUntyped
 

@@ -168,6 +168,7 @@ describe("Float System", () => {
       CalculateAccumulatedFloatInRange.testUnit(~contracts, ~accounts);
       ClaimFloatCustom.testUnit(~contracts, ~accounts);
       AddNewStateForFloatRewards.testUnit(~contracts, ~accounts);
+      Withdraw.testUnit(~contracts, ~accounts);
     });
   });
 });

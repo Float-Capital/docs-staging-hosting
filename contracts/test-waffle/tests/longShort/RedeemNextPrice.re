@@ -7,8 +7,8 @@ let testIntegration =
       ~contracts: ref(Helpers.coreContracts),
       ~accounts: ref(array(Ethers.Wallet.t)),
     ) =>
-  describe("lazyRedeem", () => {
-    let runLazyRedeemTest = (~isLong) =>
+  describe("nextPriceRedeem", () => {
+    let runNextPriceRedeemTest = (~isLong) =>
       it(
         "should work as expected happy path for redeem "
         ++ (isLong ? "Long" : "Short"),
@@ -36,7 +36,10 @@ let testIntegration =
               ? LongShort.redeemLongNextPrice : LongShort.redeemShortNextPrice;
 
           let%AwaitThen _longValueBefore =
-            longShort->LongShort.syntheticTokenPoolValue(marketIndex, isLong);
+            longShort->LongShort.marketSideValueInPaymentToken(
+              marketIndex,
+              isLong,
+            );
 
           let%AwaitThen _ =
             paymentToken->ERC20Mock.mint(
@@ -71,7 +74,7 @@ let testIntegration =
           let%AwaitThen _ =
             longShortUserConnected->redeemNextPriceFunction(
               ~marketIndex,
-              ~tokensToRedeem=usersBalanceAvailableForRedeem,
+              ~tokens_redeem=usersBalanceAvailableForRedeem,
             );
           let%AwaitThen usersBalanceAfterNextPriceRedeem =
             testSynth->SyntheticToken.balanceOf(~account=testUser.address);
@@ -102,7 +105,7 @@ let testIntegration =
           let%AwaitThen latestUpdateIndex =
             longShort->LongShort.marketUpdateIndex(marketIndex);
           let%AwaitThen redemptionPriceWithFees =
-            longShort->LongShort.syntheticTokenPriceSnapshot(
+            longShort->LongShort.syntheticToken_priceSnapshot(
               marketIndex,
               isLong,
               latestUpdateIndex,
@@ -135,8 +138,8 @@ let testIntegration =
         },
       );
 
-    runLazyRedeemTest(~isLong=true);
-    runLazyRedeemTest(~isLong=false);
+    runNextPriceRedeemTest(~isLong=true);
+    runNextPriceRedeemTest(~isLong=false);
   });
 
 let testUnit =
@@ -146,7 +149,7 @@ let testUnit =
     ) => {
   describe("redeemNextPrice external functions", () => {
     let marketIndex = 1;
-    let tokensToRedeem = Helpers.randomTokenAmount();
+    let tokens_redeem = Helpers.randomTokenAmount();
 
     let setup = () => {
       contracts.contents.longShort->LongShortSmocked.InternalMock.setup;
@@ -164,13 +167,13 @@ let testUnit =
 
         let%Await _ =
           contracts.contents.longShort
-          ->LongShort.redeemLongNextPrice(~marketIndex, ~tokensToRedeem);
+          ->LongShort.redeemLongNextPrice(~marketIndex, ~tokens_redeem);
 
         let redeemNextPriceCalls =
           LongShortSmocked.InternalMock._redeemNextPriceCalls();
 
         redeemNextPriceCalls->Chai.recordArrayDeepEqualFlat([|
-          {marketIndex, tokensToRedeem, isLong: true},
+          {marketIndex, tokens_redeem, isLong: true},
         |]);
       })
     });
@@ -187,13 +190,13 @@ let testUnit =
 
         let%Await _ =
           contracts.contents.longShort
-          ->LongShort.redeemShortNextPrice(~marketIndex, ~tokensToRedeem);
+          ->LongShort.redeemShortNextPrice(~marketIndex, ~tokens_redeem);
 
         let redeemNextPriceCalls =
           LongShortSmocked.InternalMock._redeemNextPriceCalls();
 
         redeemNextPriceCalls->Chai.recordArrayDeepEqualFlat([|
-          {marketIndex, tokensToRedeem, isLong: false},
+          {marketIndex, tokens_redeem, isLong: false},
         |]);
       })
     });
@@ -203,13 +206,13 @@ let testUnit =
     let marketIndex = 1;
     let marketUpdateIndex = Helpers.randomInteger();
     let amount = Helpers.randomTokenAmount();
-    let smockedSynthToken = ref(SyntheticTokenSmocked.uninitializedValue);
+    let smockedSyntheticToken = ref(SyntheticTokenSmocked.uninitializedValue);
 
     let setup = (~isLong, ~testWallet: Ethers.walletType) => {
       let {longSynth} = contracts.contents.markets->Array.getUnsafe(0);
       let%AwaitThen longSynthSmocked = longSynth->SyntheticTokenSmocked.make;
       longSynthSmocked->SyntheticTokenSmocked.mockTransferFromToReturn(true);
-      smockedSynthToken := longSynthSmocked;
+      smockedSyntheticToken := longSynthSmocked;
 
       let%AwaitThen _ =
         contracts.contents.longShort->LongShortSmocked.InternalMock.setup;
@@ -235,7 +238,7 @@ let testUnit =
 
       longShort->LongShort.Exposed._redeemNextPriceExposed(
         ~marketIndex,
-        ~tokensToRedeem=amount,
+        ~tokens_redeem=amount,
         ~isLong,
       );
     };
@@ -279,7 +282,8 @@ let testUnit =
         let%Await _ = setup(~isLong, ~testWallet);
 
         let transferFromCalls =
-          smockedSynthToken.contents->SyntheticTokenSmocked.transferFromCalls;
+          smockedSyntheticToken.contents
+          ->SyntheticTokenSmocked.transferFromCalls;
 
         transferFromCalls->Chai.recordArrayDeepEqualFlat([|
           {
@@ -295,28 +299,31 @@ let testUnit =
 
         let%AwaitThen _ = setup(~isLong, ~testWallet);
 
-        let%AwaitThen updatedBatchedAmountOfSynthTokensToRedeem =
+        let%AwaitThen updatedbatched_amountSyntheticToken_redeem =
           contracts.contents.longShort
-          ->LongShort.batchedAmountOfSynthTokensToRedeem(marketIndex, isLong);
+          ->LongShort.batched_amountSyntheticToken_redeem(
+              marketIndex,
+              isLong,
+            );
 
         let%AwaitThen updatedUserNextPriceRedemptionAmount =
           contracts.contents.longShort
-          ->LongShort.userNextPriceRedemptionAmount(
+          ->LongShort.userNextPrice_syntheticToken_redeemAmount(
               marketIndex,
               isLong,
               testWallet.address,
             );
 
-        let%Await updatedUserCurrentNextPriceUpdateIndex =
+        let%Await updateduserNextPrice_currentUpdateIndex =
           contracts.contents.longShort
-          ->LongShort.userCurrentNextPriceUpdateIndex(
+          ->LongShort.userNextPrice_currentUpdateIndex(
               marketIndex,
               testWallet.address,
             );
 
         Chai.bnEqual(
-          ~message="batchedAmountOfSynthTokensToRedeem not updated correctly",
-          updatedBatchedAmountOfSynthTokensToRedeem,
+          ~message="batched_amountSyntheticToken_redeem not updated correctly",
+          updatedbatched_amountSyntheticToken_redeem,
           amount,
         );
 
@@ -327,8 +334,8 @@ let testUnit =
         );
 
         Chai.bnEqual(
-          ~message="userCurrentNextPriceUpdateIndex not updated correctly",
-          updatedUserCurrentNextPriceUpdateIndex,
+          ~message="userNextPrice_currentUpdateIndex not updated correctly",
+          updateduserNextPrice_currentUpdateIndex,
           marketUpdateIndex->add(oneBn),
         );
       });
