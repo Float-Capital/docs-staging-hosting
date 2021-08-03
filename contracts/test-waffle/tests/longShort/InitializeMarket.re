@@ -7,7 +7,7 @@ let testUnit =
       ~contracts: ref(Helpers.coreContracts),
       ~accounts: ref(array(Ethers.Wallet.t)),
     ) => {
-  describe("initializeMarket", () => {
+  describe_only("initializeMarket", () => {
     let stakerSmockedRef = ref(StakerSmocked.uninitializedValue);
     let longShortRef: ref(LongShort.t) = ref(""->Obj.magic);
 
@@ -50,7 +50,8 @@ let testUnit =
           ->LongShort.initializeMarket(
               ~marketIndex=1,
               ~kPeriod=Ethers.BigNumber.fromUnsafe("4"),
-              ~kInitialMultiplier=Ethers.BigNumber.fromUnsafe("6"),
+              ~kInitialMultiplier=
+                Ethers.BigNumber.fromUnsafe("60000000000000000"),
               ~unstakeFee_e18=Ethers.BigNumber.fromUnsafe("5000000000000000"), // 0.5% or 50 basis points
               ~initialMarketSeed=Ethers.BigNumber.fromUnsafe("7"),
               ~balanceIncentive_curveExponent=bnFromInt(5),
@@ -64,7 +65,8 @@ let testUnit =
         Chai.recordEqualFlatLabeled(
           ~expected=stakerCalls->Array.getExn(0),
           ~actual={
-            kInitialMultiplier: Ethers.BigNumber.fromUnsafe("6"),
+            kInitialMultiplier:
+              Ethers.BigNumber.fromUnsafe("60000000000000000"),
             marketIndex: 1,
             longToken: sampleAddress,
             shortToken: sampleAddress,
@@ -109,7 +111,8 @@ let testUnit =
             ->LongShort.initializeMarket(
                 ~marketIndex=1,
                 ~kPeriod=Ethers.BigNumber.fromUnsafe("4"),
-                ~kInitialMultiplier=Ethers.BigNumber.fromUnsafe("6"),
+                ~kInitialMultiplier=
+                  Ethers.BigNumber.fromUnsafe("60000000000000000"),
                 ~unstakeFee_e18=
                   Ethers.BigNumber.fromUnsafe("5000000000000000"), // 0.5% or 50 basis points
                 ~initialMarketSeed=Ethers.BigNumber.fromUnsafe("7"),
@@ -133,7 +136,8 @@ let testUnit =
             ->LongShort.initializeMarket(
                 ~marketIndex=2,
                 ~kPeriod=Ethers.BigNumber.fromUnsafe("4"),
-                ~kInitialMultiplier=Ethers.BigNumber.fromUnsafe("6"),
+                ~kInitialMultiplier=
+                  Ethers.BigNumber.fromUnsafe("60000000000000000"),
                 ~unstakeFee_e18=
                   Ethers.BigNumber.fromUnsafe("5000000000000000"), // 0.5% or 50 basis points
                 ~initialMarketSeed=Ethers.BigNumber.fromUnsafe("7"),
