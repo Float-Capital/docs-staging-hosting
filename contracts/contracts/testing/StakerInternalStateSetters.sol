@@ -250,11 +250,13 @@ contract StakerInternalStateSetters is Staker {
     address syntheticToken,
     address user,
     uint256 amountStaked,
-    uint256 fees
+    uint256 fees,
+    address treasury
   ) external {
     marketIndexOfToken[syntheticToken] = marketIndex;
     marketUnstakeFee_e18[marketIndex] = fees;
     userAmountStaked[syntheticToken][user] = amountStaked;
+    floatTreasury = treasury;
   }
 
   function setWithdrawGlobals(

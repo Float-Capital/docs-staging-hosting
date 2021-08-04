@@ -184,6 +184,7 @@ contract Staker is IStaker, Initializable {
   @param _admin Address of the admin role.
   @param _longShort Address of the LongShort contract, a deployed LongShort.sol
   @param _floatToken Address of the Float token earned by staking.
+  @param _floatTreasury Address of the treasury contract for managing fees.
   @param _floatCapital Address of the contract which earns a fixed percentage of Float.
   @param _floatPercentage Determines the float percentage that gets minted for Float Capital, base 1e18.
   */
@@ -658,6 +659,9 @@ contract Staker is IStaker, Initializable {
   ) external override onlyLongShort {
     // Only add a new accumulativeIssuancePerStakedSynthSnapshot if some time has passed.
 
+
+      bool timeDeltaSinceLastUpdateGreaterThanZero
+     = _calculateTimeDeltaFromLastAccumulativeIssuancePerStakedSynthSnapshot(marketIndex) > 0;
     // the `stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted` value will be 0 if there is no staker related action in an executed batch
     if (stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted > 0) {
       stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping[
@@ -665,14 +669,16 @@ contract Staker is IStaker, Initializable {
       ] = stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted;
       stakerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping[
         batched_stakerNextTokenShiftIndex[marketIndex]
-      ] = latestRewardIndex[marketIndex] + 1;
+      ] = timeDeltaSinceLastUpdateGreaterThanZero
+        ? latestRewardIndex[marketIndex] + 1
+        : latestRewardIndex[marketIndex];
       batched_stakerNextTokenShiftIndex[marketIndex] += 1;
 
       emit SyntheticTokensShifted();
     }
 
     // Time delta is fetched twice in below code, can pass through? Which is less gas?
-    if (_calculateTimeDeltaFromLastAccumulativeIssuancePerStakedSynthSnapshot(marketIndex) > 0) {
+    if (timeDeltaSinceLastUpdateGreaterThanZero) {
       _setCurrentAccumulativeIssuancePerStakeStakedSynthSnapshot(
         marketIndex,
         longPrice,
@@ -993,10 +999,24 @@ contract Staker is IStaker, Initializable {
     require(userAmountStaked[token][msg.sender] > 0, "nothing to withdraw");
     _mintAccumulatedFloat(marketIndex, msg.sender);
 
+    if (userNextPrice_stakedSyntheticTokenShiftIndex[marketIndex][msg.sender] > 0) {
+      // If they still have outstanding shifts after minting float, then check
+      // that they don't withdraw more than their shifts allow.
+      uint256 amountToShiftForThisToken = syntheticTokens[marketIndex][true] == token
+        ? userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_long[marketIndex][msg.sender]
+        : userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_short[marketIndex][msg.sender];
+
+      require(
+        userAmountStaked[token][msg.sender] >= amountToShiftForThisToken + amount,
+        "Outstanding next price stake shifts too great"
+      );
+    }
+
     userAmountStaked[token][msg.sender] = userAmountStaked[token][msg.sender] - amount;
 
     uint256 amountFees = (amount * marketUnstakeFee_e18[marketIndex]) / 1e18;
 
+    IERC20(token).transfer(floatTreasury, amountFees);
     IERC20(token).transfer(msg.sender, amount - amountFees);
 
     emit StakeWithdrawn(msg.sender, token, amount);

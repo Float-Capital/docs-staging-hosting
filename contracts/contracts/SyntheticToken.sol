@@ -82,9 +82,8 @@ contract SyntheticToken is ISyntheticToken {
 
   /** 
   @notice Overrides the default ERC20 transferFrom.
-  @dev To allow users to avoid approving LongShort.sol when redeeming tokens,
-        longShort has a virtual infinite allowance when transfering tokens
-        to itself.
+  @dev To allow users to avoid approving yield managers when redeeming tokens,
+       longShort has a virtual infinite allowance.
   @param sender User for which to transfer tokens.
   @param recipient Recipient of the transferred tokens.
   @param amount Amount of tokens to transfer in wei.
@@ -94,7 +93,7 @@ contract SyntheticToken is ISyntheticToken {
     address recipient,
     uint256 amount
   ) public override returns (bool) {
-    if (recipient == address(longShort) && msg.sender == address(longShort)) {
+    if (msg.sender == address(longShort)) {
       super._transfer(sender, recipient, amount);
       return true;
     } else {

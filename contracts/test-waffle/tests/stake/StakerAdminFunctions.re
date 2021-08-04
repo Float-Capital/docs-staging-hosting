@@ -8,8 +8,7 @@ let testUnit =
       ~contracts: ref(Helpers.coreContracts),
       ~accounts: ref(array(Ethers.Wallet.t)),
     ) => {
-
-  describe_only("Staker Admin Functions", () => {
+  describe("Staker Admin Functions", () => {
     let marketIndex = Helpers.randomJsInteger();
     let randomAddress1 = Helpers.randomAddress();
 
@@ -214,6 +213,7 @@ let testUnit =
                 ),
             ~reason="",
           );
+        ();
       });
 
       it("should update unstake fee correctly", () => {
@@ -264,6 +264,7 @@ let testUnit =
             );
         promiseRef := promise;
         let%Await _ = promise;
+        ();
       });
 
       it("should call the onlyAdmin Modifier", () => {
@@ -328,6 +329,7 @@ let testUnit =
                 ),
             ~reason="",
           );
+        ();
       });
 
       it("should update incentive exponent correctly", () => {
@@ -378,6 +380,7 @@ let testUnit =
             );
         promiseRef := promise;
         let%Await _ = promise;
+        ();
       });
 
       it("should call the onlyAdmin Modifier", () => {
@@ -446,6 +449,7 @@ let testUnit =
                 ),
             ~reason="",
           );
+        ();
       });
 
       it("should update incentive equilibrium offset correctly", () => {
