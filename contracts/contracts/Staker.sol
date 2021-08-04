@@ -264,7 +264,7 @@ contract Staker is IStaker, Initializable {
   @notice Changes the market launch incentive parameters for a market
   @param marketIndex Identifies the market.
   @param period The new period for which float token generation should be boosted.
-  @param multiplier The new multiplier on Float generation.
+  @param initialMultiplier The new multiplier on Float generation.
   */
   function changeMarketLaunchIncentiveParameters(
     uint32 marketIndex,
@@ -322,7 +322,7 @@ contract Staker is IStaker, Initializable {
   /**
   @notice Changes the balance incentive curve equilibrium offset for a market
   @param marketIndex Identifies the market.
-  @param _balanceIncentive_equilibriumOffset The new offset.
+  @param _balanceIncentiveCurve_equilibriumOffset The new offset.
   */
   function changeBalanceIncentiveEquilibriumOffset(
     uint32 marketIndex,
@@ -638,7 +638,7 @@ contract Staker is IStaker, Initializable {
   /**
   @notice Adds new accumulativeIssuancePerStakedSynthSnapshots for the given long/short tokens. Called by the
   ILongShort contract whenever there is a state change for a market.
-  @param stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted Mapping from this contracts shifts to LongShort.sols
+  @param stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted Mapping from this contract's shifts to LongShort.sols next price snapshots.
   @param shortValue The value locked in the short side of the market.
   @param longValue The value locked in the long side of the market.
   @param shortPrice The price of the short token as defined in LongShort.sol
@@ -882,7 +882,7 @@ contract Staker is IStaker, Initializable {
 
   /**
   @notice Mints outstanding float on behalf of another user.
-  @param marketIndex Identifiers for the markets for which to mint float.
+  @param marketIndexes Identifiers for the markets for which to mint float.
   @param user The address of the user.
    */
   function claimFloatCustomFor(uint32[] calldata marketIndexes, address user) external {
@@ -915,8 +915,9 @@ contract Staker is IStaker, Initializable {
 
   /**
   @dev Internal logic for staking.
+  @param token Address of the token for which to stake.
   @param amount Amount to stake.
-  @param from Address to stake for.
+  @param user Address to stake for.
   */
   function _stake(
     address token,
@@ -1018,7 +1019,7 @@ contract Staker is IStaker, Initializable {
   /**
   @notice Withdraw function. Allows users to unstake.
   @param amount Amount to withdraw.
-  @param token Synthetic token that was staked.
+  @param token Address of the token for which to withdraw.
   */
   function withdraw(address token, uint256 amount) external {
     // TODO: possibly make a 'updateSystemState' (and 'updateSystemStateMulti') modifiers?
@@ -1029,7 +1030,7 @@ contract Staker is IStaker, Initializable {
 
   /**
   @notice Allows users to withdraw their entire stake for a token.
-  @param amount Amount to withdraw.
+  @param token Address of the token for which to withdraw.
   */
   function withdrawAll(address token) external {
     ILongShort(longShort).updateSystemState(marketIndexOfToken[token]);
