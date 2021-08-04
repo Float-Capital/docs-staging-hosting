@@ -416,11 +416,11 @@ contract Staker is IStaker, Initializable {
   // TODO: rename 'k' into 'incentiveMultiplier' or something else more descriptive.
 
   /** 
-    @notice Returns the extent to which a markets float generation should be adjusted
-    based on the market's launch incentive parameters. Should start at multiplier
-    then linearly change to 1e18 over time.
-    @param marketIndex Identifies the marekt.
-    @return k The calculated modifier for float generation.
+  @notice Returns the extent to which a markets float generation should be adjusted
+  based on the market's launch incentive parameters. Should start at multiplier
+  then linearly change to 1e18 over time.
+  @param marketIndex Identifies the market.
+  @return k The calculated modifier for float generation.
   */
   function _getKValue(uint32 marketIndex) internal view virtual returns (uint256) {
     // Parameters controlling the float issuance multiplier.
@@ -922,7 +922,7 @@ contract Staker is IStaker, Initializable {
 
   /**
   @notice Allows users to shift their staked tokens from one side of the market to 
-          the other at the next price.
+  the other at the next price.
   @param amountSyntheticTokensToShift Amount of tokens to shift.
   @param marketIndex Identifier for the market.
   @param isShiftFromLong Whether the shift is from long to short or short to long.
