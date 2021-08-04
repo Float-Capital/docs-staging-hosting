@@ -348,15 +348,14 @@ contract Staker is IStaker, Initializable {
     internal
     view
     virtual
-    returns (uint256, uint256)
+    returns (uint256 period, uint256 multiplier)
   {
-    uint256 period = marketLaunchIncentive_period[marketIndex];
-    uint256 multiplier = marketLaunchIncentive_multipliers[marketIndex];
+    period = marketLaunchIncentive_period[marketIndex];
+    multiplier = marketLaunchIncentive_multipliers[marketIndex];
+
     if (multiplier < 1e18) {
       multiplier = 1e18; // multiplier of 1 by default
     }
-
-    return (period, multiplier);
   }
 
   // TODO: rename 'k' into 'incentiveMultiplier' or something else more descriptive.
@@ -383,12 +382,20 @@ contract Staker is IStaker, Initializable {
   }
 
   /*
-   * Computes the current 'r' value, i.e. the number of float tokens a user
-   * earns per second for every longshort token they've staked. The returned
-   * value has a fixed decimal scale of 1e42 (!!!) for numerical stability.
-   * The return values are float per second per synthetic token (hence the
-   * requirement to multiply by price)
-   *  -- here is the graph of the curve used: https://www.desmos.com/calculator/vg7jlmn4mn
+  @notice Computes the number of float tokens a user earns per second for
+  every long/short synthetic token they've staked. The returned value has
+  a fixed decimal scale of 1e42 (!!!) for numerical stability. The return
+  values are float per second per synthetic token (hence the requirement
+  to multiply by price)
+  @dev to see below math in latex form see TODO add link
+  to interact with the equations see https://www.desmos.com/calculator/optkaxyihr
+  @param marketIndex The market referred to.
+  @param longPrice Price of the synthetic long token in units of payment token
+  @param shortPrice Price of the synthetic short token in units of payment token
+  @param longValue Amount of payment token in the long side of the market
+  @param shortValue Amount of payment token in the short side of the market
+  @return longFloatPerSecond Float token per second per long synthetic token
+  @return shortFloatPerSecond Float token per second per short synthetic token
    */
   function _calculateFloatPerSecond(
     uint32 marketIndex,
@@ -397,9 +404,6 @@ contract Staker is IStaker, Initializable {
     uint256 longValue,
     uint256 shortValue
   ) internal view virtual returns (uint256 longFloatPerSecond, uint256 shortFloatPerSecond) {
-    // Markets cannot be or become empty (since they are seeded with non-withdrawable capital)
-    assert(longValue != 0 && shortValue != 0);
-
     // A float issuance multiplier that starts high and decreases linearly
     // over time to a value of 1. This incentivises users to stake early.
     uint256 k = _getKValue(marketIndex);
@@ -409,7 +413,7 @@ contract Staker is IStaker, Initializable {
     // we need to scale this number by the totalLocked so that the offset remains consistent accross market size
 
     int256 equilibriumOffsetMarketScaled = (balanceIncentiveCurve_equilibriumOffset[marketIndex] *
-      int256(totalLocked)) / 1e18;
+      int256(totalLocked)) / 2e18;
 
     // Float is scaled by the percentage of the total market value held in
     // the opposite position. This incentivises users to stake on the
