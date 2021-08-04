@@ -184,6 +184,7 @@ contract Staker is IStaker, Initializable {
   @param _admin Address of the admin role.
   @param _longShort Address of the LongShort contract, a deployed LongShort.sol
   @param _floatToken Address of the Float token earned by staking.
+  @param _floatTreasury Address of the treasury contract for managing fees.
   @param _floatCapital Address of the contract which earns a fixed percentage of Float.
   @param _floatPercentage Determines the float percentage that gets minted for Float Capital, base 1e18.
   */
@@ -988,11 +989,15 @@ contract Staker is IStaker, Initializable {
   /**
   @notice Internal logic for withdrawing stakes.
   @dev Mint user any outstanding float before withdrawing.
+  @param marketIndex Market index of token.
   @param amount Amount to withdraw.
   @param token Synthetic token that was staked.
   */
-  function _withdraw(address token, uint256 amount) internal virtual {
-    uint32 marketIndex = marketIndexOfToken[token];
+  function _withdraw(
+    uint32 marketIndex,
+    address token,
+    uint256 amount
+  ) internal virtual {
     require(userAmountStaked[token][msg.sender] > 0, "nothing to withdraw");
     _mintAccumulatedFloat(marketIndex, msg.sender);
 
@@ -1000,6 +1005,7 @@ contract Staker is IStaker, Initializable {
 
     uint256 amountFees = (amount * marketUnstakeFee_e18[marketIndex]) / 1e18;
 
+    IERC20(token).transfer(floatTreasury, amountFees);
     IERC20(token).transfer(msg.sender, amount - amountFees);
 
     emit StakeWithdrawn(msg.sender, token, amount);
@@ -1013,7 +1019,22 @@ contract Staker is IStaker, Initializable {
   function withdraw(address token, uint256 amount) external {
     ILongShort(longShort).updateSystemState(marketIndexOfToken[token]);
 
-    _withdraw(token, amount);
+    uint32 marketIndex = marketIndexOfToken[token];
+
+    _withdraw(marketIndex, token, amount);
+
+    if (userNextPrice_stakedSyntheticTokenShiftIndex[marketIndex][msg.sender] > 0) {
+      // If they still have outstanding shifts after minting float, then check
+      // that they don't withdraw more than their shifts allow.
+      uint256 amountToShiftForThisToken = syntheticTokens[marketIndex][true] == token
+        ? userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_long[marketIndex][msg.sender]
+        : userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_short[marketIndex][msg.sender];
+
+      require(
+        userAmountStaked[token][msg.sender] >= amountToShiftForThisToken,
+        "Outstanding next price stake shifts too great"
+      );
+    }
   }
 
   /**
@@ -1023,6 +1044,12 @@ contract Staker is IStaker, Initializable {
   function withdrawAll(address token) external {
     ILongShort(longShort).updateSystemState(marketIndexOfToken[token]);
 
-    _withdraw(token, userAmountStaked[token][msg.sender]);
+    uint32 marketIndex = marketIndexOfToken[token];
+
+    uint256 amountToShiftForThisToken = syntheticTokens[marketIndex][true] == token
+      ? userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_long[marketIndex][msg.sender]
+      : userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_short[marketIndex][msg.sender];
+
+    _withdraw(marketIndex, token, userAmountStaked[token][msg.sender] - amountToShiftForThisToken);
   }
 }

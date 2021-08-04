@@ -13,6 +13,7 @@ let testUnit =
 
     describe("_withdraw", () => {
       let userWallet: ref(Ethers.Wallet.t) = ref(None->Obj.magic);
+      let treasury = Helpers.randomAddress();
       let amountWithdrawn =
         amountStaked->div(Js.Math.random_int(1, 20)->bnFromInt);
       let fees = Helpers.randomRatio1e18();
@@ -30,6 +31,7 @@ let testUnit =
             ~user=userWallet.contents.address,
             ~amountStaked,
             ~fees,
+            ~treasury,
           );
         syntheticTokenSmocked->SyntheticTokenSmocked.mockTransferToReturn(
           true,
@@ -42,6 +44,7 @@ let testUnit =
           connectedStaker.contents
           ->Staker.Exposed._withdrawExposed(
               ~token=syntheticTokenSmocked.address,
+              ~marketIndex,
               ~amount=amountWithdrawn,
             );
       };
@@ -52,17 +55,16 @@ let testUnit =
           call.contents;
         });
         it("calls transfer on the synthetic token with correct args", () => {
+          let fees = amountWithdrawn->mul(fees)->div(tenToThe18);
           contracts.contents.syntheticTokenSmocked
           ->SyntheticTokenSmocked.transferCalls
           ->Chai.recordArrayDeepEqualFlat([|
+              {recipient: treasury, amount: fees},
               {
                 recipient: userWallet.contents.address,
-                amount:
-                  amountWithdrawn->sub(
-                    amountWithdrawn->mul(fees)->div(tenToThe18),
-                  ),
+                amount: amountWithdrawn->sub(fees),
               },
-            |])
+            |]);
         });
 
         it("calls _mintAccumulatedFloat with correct args", () => {
@@ -136,7 +138,9 @@ let testUnit =
       });
       it("calls _withdraw with correct args", () =>
         StakerSmocked.InternalMock._withdrawCalls()
-        ->Chai.recordArrayDeepEqualFlat([|{token, amount: amountWithdrawn}|])
+        ->Chai.recordArrayDeepEqualFlat([|
+            {marketIndex, token, amount: amountWithdrawn},
+          |])
       );
     });
 
@@ -170,7 +174,9 @@ let testUnit =
       });
       it("calls _withdraw with correct args", () =>
         StakerSmocked.InternalMock._withdrawCalls()
-        ->Chai.recordArrayDeepEqualFlat([|{token, amount: amountStaked}|])
+        ->Chai.recordArrayDeepEqualFlat([|
+            {marketIndex, token, amount: amountStaked},
+          |])
       );
     });
   });
