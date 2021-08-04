@@ -87,6 +87,7 @@ module.exports = async function (deployer, networkName, accounts) {
     admin,
     longShort.address,
     floatToken.address,
+    treasury.address,
     floatCapital.address,
     "250000000000000000", // 25%
     {
