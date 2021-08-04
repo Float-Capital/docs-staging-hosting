@@ -24,6 +24,7 @@ contract Staker is IStaker, Initializable {
   // Global state
   address public admin;
   address public floatCapital;
+  address public floatTreasury;
   uint256 public floatPercentage;
 
   address public longShort;
@@ -33,7 +34,7 @@ contract Staker is IStaker, Initializable {
   mapping(uint32 => uint256) public marketLaunchIncentive_period; // seconds
   mapping(uint32 => uint256) public marketLaunchIncentive_multipliers; // e18 scale
   mapping(uint32 => uint256) public marketUnstakeFee_e18;
-  mapping(uint32 => uint256) public balanceIncentive_curveExponent;
+  mapping(uint32 => uint256) public balanceIncentiveCurve_exponent;
   mapping(uint32 => int256) public balanceIncentiveCurve_equilibriumOffset;
 
   mapping(uint32 => mapping(bool => address)) public syntheticTokens;
@@ -81,7 +82,13 @@ contract Staker is IStaker, Initializable {
     ║           EVENTS           ║
     ╚════════════════════════════╝*/
 
-  event StakerV1(address floatToken, uint256 floatPercentage);
+  event StakerV1(
+    address admin,
+    address floatTreasury,
+    address floatCapital,
+    address floatToken,
+    uint256 floatPercentage
+  );
 
   event MarketAddedToStaker(
     uint32 marketIndex,
@@ -124,6 +131,8 @@ contract Staker is IStaker, Initializable {
   event FloatPercentageUpdated(uint256 floatPercentage);
 
   event SyntheticTokensShifted();
+
+  event ChangeAdmin(address newAdmin);
 
   /*╔═════════════════════════════╗
     ║          MODIFIERS          ║
@@ -169,46 +178,73 @@ contract Staker is IStaker, Initializable {
     ║       CONTRACT SET-UP       ║
     ╚═════════════════════════════╝*/
 
+  /**
+  @notice Initializes the contract.
+  @dev Calls OpenZeppelin's initializer modifier.
+  @param _admin Address of the admin role.
+  @param _longShort Address of the LongShort contract, a deployed LongShort.sol
+  @param _floatToken Address of the Float token earned by staking.
+  @param _floatCapital Address of the contract which earns a fixed percentage of Float.
+  @param _floatPercentage Determines the float percentage that gets minted for Float Capital, base 1e18.
+  */
   function initialize(
     address _admin,
     address _longShort,
     address _floatToken,
+    address _floatTreasury,
     address _floatCapital,
     uint256 _floatPercentage
   ) external virtual initializer {
     admin = _admin;
     floatCapital = _floatCapital;
+    floatTreasury = _floatTreasury;
     longShort = _longShort;
     floatToken = _floatToken;
 
     _changeFloatPercentage(_floatPercentage);
 
-    emit StakerV1(_floatToken, _floatPercentage);
+    emit StakerV1(_admin, _floatTreasury, _floatCapital, _floatToken, _floatPercentage);
   }
 
   /*╔═════════════════════════════╗
     ║       MULTI-SIG ADMIN       ║
     ╚═════════════════════════════╝*/
 
+  /** 
+  @notice Changes admin for the contract
+  @param _admin The address of the new admin.
+  */
   function changeAdmin(address _admin) external onlyAdmin {
     admin = _admin;
+    emit ChangeAdmin(_admin);
   }
 
+  /// @dev Logic for changeFloatPercentage
   function _changeFloatPercentage(uint256 newFloatPercentage) internal virtual {
-    require(newFloatPercentage <= 1e18 && newFloatPercentage > 0); // less than 100% and greater than 0%
+    require(newFloatPercentage <= 1e18 && newFloatPercentage > 0); // less than or equal to 100% and greater than 0%
     floatPercentage = newFloatPercentage;
   }
 
+  /**
+  @notice Changes percentage of float that is minted for float capital.
+  @param newFloatPercentage The new float percentage in base 1e18.
+  */
   function changeFloatPercentage(uint256 newFloatPercentage) external onlyAdmin {
     _changeFloatPercentage(newFloatPercentage);
     emit FloatPercentageUpdated(newFloatPercentage);
   }
 
+  /// @dev Logic for changeUnstakeFee
   function _changeUnstakeFee(uint32 marketIndex, uint256 newMarketUnstakeFee_e18) internal virtual {
     require(newMarketUnstakeFee_e18 <= 5e16); // Explicitely stating 5% fee as the max fee possible.
     marketUnstakeFee_e18[marketIndex] = newMarketUnstakeFee_e18;
   }
 
+  /**
+  @notice Changes unstake fee for a market
+  @param marketIndex Identifies the market.
+  @param newMarketUnstakeFee_e18 The new unstake fee.
+  */
   function changeUnstakeFee(uint32 marketIndex, uint256 newMarketUnstakeFee_e18)
     external
     onlyAdmin
@@ -217,6 +253,7 @@ contract Staker is IStaker, Initializable {
     emit StakeWithdrawalFeeUpdated(marketIndex, newMarketUnstakeFee_e18);
   }
 
+  /// @dev Logic for changeMarketLaunchIncentiveParameters
   function _changeMarketLaunchIncentiveParameters(
     uint32 marketIndex,
     uint256 period,
@@ -228,6 +265,12 @@ contract Staker is IStaker, Initializable {
     marketLaunchIncentive_multipliers[marketIndex] = initialMultiplier;
   }
 
+  /**
+  @notice Changes the market launch incentive parameters for a market
+  @param marketIndex Identifies the market.
+  @param period The new period for which float token generation should be boosted.
+  @param initialMultiplier The new multiplier on Float generation.
+  */
   function changeMarketLaunchIncentiveParameters(
     uint32 marketIndex,
     uint256 period,
@@ -238,28 +281,35 @@ contract Staker is IStaker, Initializable {
     emit MarketLaunchIncentiveParametersChanges(marketIndex, period, initialMultiplier);
   }
 
+  /// @dev Logic for changeBalanceIncentiveExponent
   function _changeBalanceIncentiveExponent(
     uint32 marketIndex,
-    uint256 _balanceIncentive_curveExponent
+    uint256 _balanceIncentiveCurve_exponent
   ) internal virtual {
     require(
       // The exponent has to be less than 5 in these versions of the contracts.
-      _balanceIncentive_curveExponent > 0 && _balanceIncentive_curveExponent < 6,
-      "balanceIncentive_curveExponent out of bounds"
+      _balanceIncentiveCurve_exponent > 0 && _balanceIncentiveCurve_exponent < 6,
+      "balanceIncentiveCurve_exponent out of bounds"
     );
 
-    balanceIncentive_curveExponent[marketIndex] = _balanceIncentive_curveExponent;
+    balanceIncentiveCurve_exponent[marketIndex] = _balanceIncentiveCurve_exponent;
   }
 
+  /** 
+  @notice Changes the balance incentive exponent for a market
+  @param marketIndex Identifies the market.
+  @param _balanceIncentiveCurve_exponent The new exponent for the curve.
+  */
   function changeBalanceIncentiveExponent(
     uint32 marketIndex,
-    uint256 _balanceIncentive_curveExponent
+    uint256 _balanceIncentiveCurve_exponent
   ) external onlyAdmin {
-    _changeBalanceIncentiveExponent(marketIndex, _balanceIncentive_curveExponent);
+    _changeBalanceIncentiveExponent(marketIndex, _balanceIncentiveCurve_exponent);
 
-    emit BalanceIncentiveExponentUpdated(marketIndex, _balanceIncentive_curveExponent);
+    emit BalanceIncentiveExponentUpdated(marketIndex, _balanceIncentiveCurve_exponent);
   }
 
+  /// @dev Logic for changeBalanceIncentiveEquilibriumOffset
   function _changeBalanceIncentiveEquilibriumOffset(
     uint32 marketIndex,
     int256 _balanceIncentiveCurve_equilibriumOffset
@@ -274,6 +324,11 @@ contract Staker is IStaker, Initializable {
     balanceIncentiveCurve_equilibriumOffset[marketIndex] = _balanceIncentiveCurve_equilibriumOffset;
   }
 
+  /**
+  @notice Changes the balance incentive curve equilibrium offset for a market
+  @param marketIndex Identifies the market.
+  @param _balanceIncentiveCurve_equilibriumOffset The new offset.
+  */
   function changeBalanceIncentiveEquilibriumOffset(
     uint32 marketIndex,
     int256 _balanceIncentiveCurve_equilibriumOffset
@@ -290,6 +345,17 @@ contract Staker is IStaker, Initializable {
     ║        STAKING SETUP        ║
     ╚═════════════════════════════╝*/
 
+  /**
+  @notice Sets this contract to track staking for a market in LongShort.sol
+  @param marketIndex Identifies the market.
+  @param longToken Address of the long token for the market.
+  @param shortToken Address of the short token for the market.
+  @param kInitialMultiplier Initial boost on float generation for the market.
+  @param kPeriod Period which the boost should last.
+  @param unstakeFee_e18 Percentage of tokens that are levied on unstaking in base 1e18.
+  @param _balanceIncentiveCurve_exponent Exponent for balance curve (see _calculateFloatPerSecond)
+  @param _balanceIncentiveCurve_equilibriumOffset Offset for balance curve (see _calculateFloatPerSecond)
+  */
   function addNewStakingFund(
     uint32 marketIndex,
     address longToken,
@@ -297,7 +363,7 @@ contract Staker is IStaker, Initializable {
     uint256 kInitialMultiplier,
     uint256 kPeriod,
     uint256 unstakeFee_e18,
-    uint256 _balanceIncentive_curveExponent,
+    uint256 _balanceIncentiveCurve_exponent,
     int256 _balanceIncentiveCurve_equilibriumOffset
   ) external override onlyLongShort {
     marketIndexOfToken[longToken] = marketIndex;
@@ -312,7 +378,7 @@ contract Staker is IStaker, Initializable {
     syntheticTokens[marketIndex][true] = longToken;
     syntheticTokens[marketIndex][false] = shortToken;
 
-    _changeBalanceIncentiveExponent(marketIndex, _balanceIncentive_curveExponent);
+    _changeBalanceIncentiveExponent(marketIndex, _balanceIncentiveCurve_exponent);
     _changeBalanceIncentiveEquilibriumOffset(marketIndex, _balanceIncentiveCurve_equilibriumOffset);
     _changeMarketLaunchIncentiveParameters(marketIndex, kPeriod, kInitialMultiplier);
 
@@ -326,7 +392,7 @@ contract Staker is IStaker, Initializable {
       unstakeFee_e18,
       kPeriod,
       kInitialMultiplier,
-      _balanceIncentive_curveExponent,
+      _balanceIncentiveCurve_exponent,
       _balanceIncentiveCurve_equilibriumOffset
     );
 
@@ -359,6 +425,13 @@ contract Staker is IStaker, Initializable {
     return (period, multiplier);
   }
 
+  /** 
+  @notice Returns the extent to which a markets float generation should be adjusted
+  based on the market's launch incentive parameters. Should start at multiplier
+  then linearly change to 1e18 over time.
+  @param marketIndex Identifies the market.
+  @return k The calculated modifier for float generation.
+  */
   function _getKValue(uint32 marketIndex) internal view virtual returns (uint256) {
     // Parameters controlling the float issuance multiplier.
     (uint256 kPeriod, uint256 kInitialMultiplier) = _getMarketLaunchIncentiveParameters(
@@ -421,10 +494,10 @@ contract Staker is IStaker, Initializable {
       }
 
       uint256 numerator = (uint256(int256(shortValue) - equilibriumOffsetMarketScaled) >>
-        (safeExponentBitShifting - 1))**balanceIncentive_curveExponent[marketIndex];
+        (safeExponentBitShifting - 1))**balanceIncentiveCurve_exponent[marketIndex];
 
       uint256 denominator = ((totalLocked >> safeExponentBitShifting) **
-        balanceIncentive_curveExponent[marketIndex]);
+        balanceIncentiveCurve_exponent[marketIndex]);
 
       // NOTE: `x * 5e17` == `(x * 10e18) / 2`
       uint256 longRewardUnscaled = (numerator * 5e17) / denominator;
@@ -442,10 +515,10 @@ contract Staker is IStaker, Initializable {
       }
 
       uint256 numerator = (uint256(int256(longValue) + equilibriumOffsetMarketScaled) >>
-        (safeExponentBitShifting - 1))**balanceIncentive_curveExponent[marketIndex];
+        (safeExponentBitShifting - 1))**balanceIncentiveCurve_exponent[marketIndex];
 
       uint256 denominator = ((totalLocked >> safeExponentBitShifting) **
-        balanceIncentive_curveExponent[marketIndex]);
+        balanceIncentiveCurve_exponent[marketIndex]);
 
       // NOTE: `x * 5e17` == `(x * 10e18) / 2`
       uint256 shortRewardUnscaled = (numerator * 5e17) / denominator;
@@ -568,7 +641,7 @@ contract Staker is IStaker, Initializable {
   /**
   @notice Adds new accumulativeIssuancePerStakedSynthSnapshots for the given long/short tokens. Called by the
   ILongShort contract whenever there is a state change for a market.
-  @param stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted Mapping from this contracts shifts to LongShort.sols
+  @param stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted Mapping from this contract's shifts to LongShort.sols next price snapshots.
   @param shortValue The value locked in the short side of the market.
   @param longValue The value locked in the long side of the market.
   @param shortPrice The price of the short token as defined in LongShort.sol
@@ -641,6 +714,12 @@ contract Staker is IStaker, Initializable {
     }
   }
 
+  /** 
+  @notice Calculates float owed to the user since the user last minted float for a market.
+  @param marketIndex Identifier for the market which the user staked in.
+  @param user The address of the user.
+  @return floatReward The amount of float owed.
+   */
   function _calculateAccumulatedFloat(uint32 marketIndex, address user)
     internal
     virtual
@@ -723,11 +802,22 @@ contract Staker is IStaker, Initializable {
     }
   }
 
+  /**
+  @notice Mints float for a user.
+  @dev Mints a fixed percentage for Float capital.
+  @param user The address of the user.
+  @param floatToMint The amount of float to mint.
+   */
   function _mintFloat(address user, uint256 floatToMint) internal virtual {
     IFloatToken(floatToken).mint(user, floatToMint);
     IFloatToken(floatToken).mint(floatCapital, (floatToMint * floatPercentage) / 1e18);
   }
 
+  /**
+  @notice Mints float owed to a user for a market since they last minted.
+  @param marketIndex An identifier for the market.
+  @param user The address of the user.
+   */
   function _mintAccumulatedFloat(uint32 marketIndex, address user) internal virtual {
     uint256 floatToMint = _calculateAccumulatedFloat(marketIndex, user);
 
@@ -740,6 +830,11 @@ contract Staker is IStaker, Initializable {
     }
   }
 
+  /**
+  @notice Mints float owed to a user for multiple markets, since they last minted for those markets.
+  @param marketIndexes Identifiers for the markets.
+  @param user The address of the user.
+   */
   function _mintAccumulatedFloatMulti(uint32[] calldata marketIndexes, address user)
     internal
     virtual
@@ -762,11 +857,20 @@ contract Staker is IStaker, Initializable {
     }
   }
 
+  /**
+  @notice Mints outstanding float for msg.sender.
+  @param marketIndexes Identifiers for the markets for which to mint float.
+   */
   function claimFloatCustom(uint32[] calldata marketIndexes) external {
     ILongShort(longShort).updateSystemStateMulti(marketIndexes);
     _mintAccumulatedFloatMulti(marketIndexes, msg.sender);
   }
 
+  /**
+  @notice Mints outstanding float on behalf of another user.
+  @param marketIndexes Identifiers for the markets for which to mint float.
+  @param user The address of the user.
+   */
   function claimFloatCustomFor(uint32[] calldata marketIndexes, address user) external {
     // Unbounded loop - users are responsible for paying their own gas costs on these and it doesn't effect the rest of the system.
     // No need to impose limit.
@@ -781,7 +885,7 @@ contract Staker is IStaker, Initializable {
   /**
   @notice A user with synthetic tokens stakes by calling stake on the token
   contract which calls this function. We need to first update the
-  State of the system before staking to correctly calculate user rewards.
+  state of the LongShort contract for this market before staking to correctly calculate user rewards.
   @param amount Amount to stake.
   @param from Address to stake for.
   */
@@ -795,6 +899,12 @@ contract Staker is IStaker, Initializable {
     _stake((msg.sender), amount, from);
   }
 
+  /**
+  @dev Internal logic for staking.
+  @param token Address of the token for which to stake.
+  @param amount Amount to stake.
+  @param user Address to stake for.
+  */
   function _stake(
     address token,
     uint256 amount,
@@ -817,7 +927,13 @@ contract Staker is IStaker, Initializable {
     emit StakeAdded(user, address(token), amount, userIndexOfLastClaimedReward[marketIndex][user]);
   }
 
-  // Token shifting
+  /**
+  @notice Allows users to shift their staked tokens from one side of the market to 
+  the other at the next price.
+  @param amountSyntheticTokensToShift Amount of tokens to shift.
+  @param marketIndex Identifier for the market.
+  @param isShiftFromLong Whether the shift is from long to short or short to long.
+  */
   function shiftTokens(
     uint256 amountSyntheticTokensToShift,
     uint32 marketIndex,
@@ -867,8 +983,8 @@ contract Staker is IStaker, Initializable {
     ╚════════════════════════════╝*/
 
   /**
-  @notice Withdraw function.
-  @dev Mints user any outstanding float before
+  @notice Internal logic for withdrawing stakes.
+  @dev Mint user any outstanding float before withdrawing.
   @param amount Amount to withdraw.
   @param token Synthetic token that was staked.
   */
@@ -886,12 +1002,21 @@ contract Staker is IStaker, Initializable {
     emit StakeWithdrawn(msg.sender, token, amount);
   }
 
+  /**
+  @notice Withdraw function. Allows users to unstake.
+  @param amount Amount to withdraw.
+  @param token Address of the token for which to withdraw.
+  */
   function withdraw(address token, uint256 amount) external {
     ILongShort(longShort).updateSystemState(marketIndexOfToken[token]);
 
     _withdraw(token, amount);
   }
 
+  /**
+  @notice Allows users to withdraw their entire stake for a token.
+  @param token Address of the token for which to withdraw.
+  */
   function withdrawAll(address token) external {
     ILongShort(longShort).updateSystemState(marketIndexOfToken[token]);
 

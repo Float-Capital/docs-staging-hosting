@@ -6,8 +6,9 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/presets/ERC20PresetMinte
 
 import "./interfaces/IFloatToken.sol";
 
-/** @title FloatToken
-   @notice The Float Token is the governance token for the Float Capital protocol
+/**
+ @title FloatToken
+ @notice The Float Token is the governance token for the Float Capital protocol
  */
 contract FloatToken is IFloatToken, ERC20PresetMinterPauserUpgradeable {
   /**
@@ -49,5 +50,23 @@ contract FloatToken is IFloatToken, ERC20PresetMinterPauserUpgradeable {
     override(IFloatToken, ERC20PresetMinterPauserUpgradeable)
   {
     ERC20PresetMinterPauserUpgradeable.mint(to, amount);
+  }
+
+  /**
+   @notice modify token functionality so that a pausing this token doesn't affect minting
+   @dev Pause functionality in the open zeppelin ERC20PresetMinterPauserUpgradeable comes from the below function.
+    We override it to exclude anyone with the minter role (ie the Staker contract)
+   @param from address tokens are being sent from
+   @param to address tokens are being sent to
+   @param amount amount of tokens being sent
+   */
+  function _beforeTokenTransfer(
+    address from,
+    address to,
+    uint256 amount
+  ) internal virtual override {
+    if (!hasRole(MINTER_ROLE, _msgSender())) {
+      super._beforeTokenTransfer(from, to, amount);
+    }
   }
 }

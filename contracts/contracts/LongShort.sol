@@ -318,8 +318,8 @@ contract LongShort is ILongShort, Initializable {
     virtual
   {
     require(
-      // You require at least 10^17 of the underlying payment token to seed the market.
-      initialMarketSeedForEachMarketSide > 0.1 ether,
+      // You require at least 1e18 (1 payment token with 18 decimal places) of the underlying payment token to seed the market.
+      initialMarketSeedForEachMarketSide >= 1e18,
       "Insufficient market seed"
     );
 
@@ -348,7 +348,7 @@ contract LongShort is ILongShort, Initializable {
   /// @param kInitialMultiplier Linearly decreasing multiplier for Float token issuance for the market when staking synths.
   /// @param kPeriod Time which kInitialMultiplier will last
   /// @param unstakeFee_e18 Base 1e18 percentage fee levied when unstaking for the market.
-  /// @param balanceIncentive_curveExponent Sets the degree to which Float token issuance differs
+  /// @param balanceIncentiveCurve_exponent Sets the degree to which Float token issuance differs
   /// for market sides in unbalanced markets. See Staker.sol
   /// @param balanceIncentiveCurve_equilibriumOffset An offset to account for naturally imbalanced markets
   /// when Float token issuance should differ for market sides. See Staker.sol
@@ -359,7 +359,7 @@ contract LongShort is ILongShort, Initializable {
     uint256 kPeriod,
     uint256 unstakeFee_e18,
     uint256 initialMarketSeedForEachMarketSide,
-    uint256 balanceIncentive_curveExponent,
+    uint256 balanceIncentiveCurve_exponent,
     int256 balanceIncentiveCurve_equilibriumOffset,
     uint256 _marketTreasurySplitGradient_e18
   ) external adminOnly {
@@ -381,7 +381,7 @@ contract LongShort is ILongShort, Initializable {
       kInitialMultiplier,
       kPeriod,
       unstakeFee_e18,
-      balanceIncentive_curveExponent,
+      balanceIncentiveCurve_exponent,
       balanceIncentiveCurve_equilibriumOffset
     );
 

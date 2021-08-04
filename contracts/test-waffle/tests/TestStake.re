@@ -148,6 +148,7 @@ describe("Float System", () => {
       ClaimFloat.test(~contracts, ~accounts);
       StakeFromUser.test(~contracts, ~accounts);
       Stake.test(~contracts, ~accounts);
+      StakerAdminFunctions.testUnit(~contracts, ~accounts);
     });
   });
   describe("Smocked", () => {
