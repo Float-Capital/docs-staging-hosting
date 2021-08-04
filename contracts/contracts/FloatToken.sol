@@ -10,8 +10,10 @@ import "./interfaces/IFloatToken.sol";
    @notice The Float Token is the governance token for the Float Capital protocol
  */
 contract FloatToken is IFloatToken, ERC20PresetMinterPauserUpgradeable {
-  /**@notice Initialize the Float Token with relevant roles  
-    @param name The name of the Float governance token
+  /**
+   @notice Initialize the Float Token with relevant
+   @dev This function is called `initializeFloatToken` to differentiate it from `initialize(string,string)` in the parent contract which should NOT be called to initialize this contract. 
+   @param name The name of the Float governance token
    @param symbol The ticker representing the token
    @param stakerAddress The staker contract that controls minting of the token
    */
