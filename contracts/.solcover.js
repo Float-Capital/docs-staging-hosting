@@ -16,7 +16,6 @@ if (isWaffleTest) {
       "FloatToken.sol",
       "SyntheticToken.sol",
       "TokenFactory.sol",
-      "FloatCapital_v0.sol",
       "Treasury_v0.sol",
     ]
   } else if (isIntegrationTests) {
