@@ -348,7 +348,7 @@ contract LongShort is ILongShort, Initializable {
   /// @param kInitialMultiplier Linearly decreasing multiplier for Float token issuance for the market when staking synths.
   /// @param kPeriod Time which kInitialMultiplier will last
   /// @param unstakeFee_e18 Base 1e18 percentage fee levied when unstaking for the market.
-  /// @param balanceIncentive_curveExponent Sets the degree to which Float token issuance differs
+  /// @param balanceIncentiveCurve_exponent Sets the degree to which Float token issuance differs
   /// for market sides in unbalanced markets. See Staker.sol
   /// @param balanceIncentiveCurve_equilibriumOffset An offset to account for naturally imbalanced markets
   /// when Float token issuance should differ for market sides. See Staker.sol
@@ -359,7 +359,7 @@ contract LongShort is ILongShort, Initializable {
     uint256 kPeriod,
     uint256 unstakeFee_e18,
     uint256 initialMarketSeedForEachMarketSide,
-    uint256 balanceIncentive_curveExponent,
+    uint256 balanceIncentiveCurve_exponent,
     int256 balanceIncentiveCurve_equilibriumOffset,
     uint256 _marketTreasurySplitGradient_e18
   ) external adminOnly {
@@ -381,7 +381,7 @@ contract LongShort is ILongShort, Initializable {
       kInitialMultiplier,
       kPeriod,
       unstakeFee_e18,
-      balanceIncentive_curveExponent,
+      balanceIncentiveCurve_exponent,
       balanceIncentiveCurve_equilibriumOffset
     );
 
@@ -547,9 +547,9 @@ contract LongShort is ILongShort, Initializable {
         );
       }
 
-
-        uint256 amountSyntheticTokensToBeShiftedAwayFromOriginSide
-       = userNextPrice_syntheticToken_toShiftAwayFrom_marketSide[marketIndex][!isLong][user];
+      uint256 amountSyntheticTokensToBeShiftedAwayFromOriginSide = userNextPrice_syntheticToken_toShiftAwayFrom_marketSide[
+          marketIndex
+        ][!isLong][user];
 
       if (amountSyntheticTokensToBeShiftedAwayFromOriginSide > 0) {
         uint256 syntheticTokenPriceOnOriginSide = syntheticToken_priceSnapshot[marketIndex][
@@ -646,10 +646,10 @@ contract LongShort is ILongShort, Initializable {
     );
 
     uint256 marketAmount = IYieldManager(yieldManagers[marketIndex])
-    .distributeYieldForTreasuryAndReturnMarketAllocation(
-      totalValueLockedInMarket,
-      treasuryYieldPercent_e18
-    );
+      .distributeYieldForTreasuryAndReturnMarketAllocation(
+        totalValueLockedInMarket,
+        treasuryYieldPercent_e18
+      );
 
     if (marketAmount > 0) {
       if (isLongSideUnderbalanced) {
@@ -772,10 +772,10 @@ contract LongShort is ILongShort, Initializable {
         int256 long_changeInMarketValue_inPaymentToken,
         int256 short_changeInMarketValue_inPaymentToken
       ) = _batchConfirmOutstandingPendingActions(
-        marketIndex,
-        syntheticTokenPrice_inPaymentTokens_long,
-        syntheticTokenPrice_inPaymentTokens_short
-      );
+          marketIndex,
+          syntheticTokenPrice_inPaymentTokens_long,
+          syntheticTokenPrice_inPaymentTokens_short
+        );
 
       newLongPoolValue = uint256(
         int256(newLongPoolValue) + long_changeInMarketValue_inPaymentToken
@@ -1088,9 +1088,9 @@ contract LongShort is ILongShort, Initializable {
     address user,
     bool isShiftFromLong
   ) internal virtual {
-
-      uint256 syntheticToken_toShiftAwayFrom_marketSide
-     = userNextPrice_syntheticToken_toShiftAwayFrom_marketSide[marketIndex][isShiftFromLong][user];
+    uint256 syntheticToken_toShiftAwayFrom_marketSide = userNextPrice_syntheticToken_toShiftAwayFrom_marketSide[
+        marketIndex
+      ][isShiftFromLong][user];
     if (syntheticToken_toShiftAwayFrom_marketSide > 0) {
       uint256 syntheticToken_toShiftTowardsTargetSide = getAmountSyntheticTokenToMintOnTargetSide(
         marketIndex,
