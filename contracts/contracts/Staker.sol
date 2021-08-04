@@ -169,6 +169,15 @@ contract Staker is IStaker, Initializable {
     ║       CONTRACT SET-UP       ║
     ╚═════════════════════════════╝*/
 
+  /**
+  @notice Initializes the contract.
+  @dev Calls OpenZeppelin's initializer modifier.
+  @param _admin Address of the admin role.
+  @param _longShort Address of the LongShort contract, a deployed LongShort.sol
+  @param _floatToken Address of the Float token earned by staking.
+  @param _floatCapital Address of the contract which earns a fixed percentage of Float.
+  @param _floatPercentage Determines the float percentage that gets minted for Float Capital, base 1e18.
+  */
   function initialize(
     address _admin,
     address _longShort,
@@ -815,7 +824,7 @@ contract Staker is IStaker, Initializable {
   }
 
   /**
-  @notice Mints float owed to a user for a market. since they last minted for a market.
+  @notice Mints float owed to a user for a market, since they last minted for a market.
   @param marketIndexes Identifiers for the markets.
   @param user The address of the user.
    */
@@ -912,7 +921,8 @@ contract Staker is IStaker, Initializable {
   }
 
   /**
-  @notice Allows users to shift their staked tokens from one side of the market to the other at the next price.
+  @notice Allows users to shift their staked tokens from one side of the market to 
+          the other at the next price.
   @param amountSyntheticTokensToShift Amount of tokens to shift.
   @param marketIndex Identifier for the market.
   @param isShiftFromLong Whether the shift is from long to short or short to long.
