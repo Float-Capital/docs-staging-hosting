@@ -44,6 +44,7 @@ let testUnit =
           connectedStaker.contents
           ->Staker.Exposed._withdrawExposed(
               ~token=syntheticTokenSmocked.address,
+              ~marketIndex,
               ~amount=amountWithdrawn,
             );
       };
@@ -137,7 +138,9 @@ let testUnit =
       });
       it("calls _withdraw with correct args", () =>
         StakerSmocked.InternalMock._withdrawCalls()
-        ->Chai.recordArrayDeepEqualFlat([|{token, amount: amountWithdrawn}|])
+        ->Chai.recordArrayDeepEqualFlat([|
+            {marketIndex, token, amount: amountWithdrawn},
+          |])
       );
     });
 
@@ -171,7 +174,9 @@ let testUnit =
       });
       it("calls _withdraw with correct args", () =>
         StakerSmocked.InternalMock._withdrawCalls()
-        ->Chai.recordArrayDeepEqualFlat([|{token, amount: amountStaked}|])
+        ->Chai.recordArrayDeepEqualFlat([|
+            {marketIndex, token, amount: amountStaked},
+          |])
       );
     });
   });

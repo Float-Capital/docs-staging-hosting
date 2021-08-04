@@ -988,11 +988,15 @@ contract Staker is IStaker, Initializable {
   /**
   @notice Internal logic for withdrawing stakes.
   @dev Mint user any outstanding float before withdrawing.
+  @param marketIndex Market index of token.
   @param amount Amount to withdraw.
   @param token Synthetic token that was staked.
   */
-  function _withdraw(address token, uint256 amount) internal virtual {
-    uint32 marketIndex = marketIndexOfToken[token];
+  function _withdraw(
+    uint32 marketIndex,
+    address token,
+    uint256 amount
+  ) internal virtual {
     require(userAmountStaked[token][msg.sender] > 0, "nothing to withdraw");
     _mintAccumulatedFloat(marketIndex, msg.sender);
 
@@ -1014,7 +1018,9 @@ contract Staker is IStaker, Initializable {
   function withdraw(address token, uint256 amount) external {
     ILongShort(longShort).updateSystemState(marketIndexOfToken[token]);
 
-    _withdraw(token, amount);
+    uint32 marketIndex = marketIndexOfToken[token];
+
+    _withdraw(marketIndex, token, amount);
 
     if (userNextPrice_stakedSyntheticTokenShiftIndex[marketIndex][msg.sender] > 0) {
       // If they still have outstanding shifts after minting float, then check
@@ -1037,10 +1043,12 @@ contract Staker is IStaker, Initializable {
   function withdrawAll(address token) external {
     ILongShort(longShort).updateSystemState(marketIndexOfToken[token]);
 
+    uint32 marketIndex = marketIndexOfToken[token];
+
     uint256 amountToShiftForThisToken = syntheticTokens[marketIndex][true] == token
       ? userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_long[marketIndex][msg.sender]
       : userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_short[marketIndex][msg.sender];
 
-    _withdraw(token, userAmountStaked[token][msg.sender] - amountToShiftForThisToken);
+    _withdraw(marketIndex, token, userAmountStaked[token][msg.sender] - amountToShiftForThisToken);
   }
 }

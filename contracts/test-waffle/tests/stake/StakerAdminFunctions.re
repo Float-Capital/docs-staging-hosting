@@ -8,7 +8,7 @@ let testUnit =
       ~contracts: ref(Helpers.coreContracts),
       ~accounts: ref(array(Ethers.Wallet.t)),
     ) => {
-  describe_only("Staker Admin Functions", () => {
+  describe("Staker Admin Functions", () => {
     let marketIndex = Helpers.randomJsInteger();
     let randomAddress1 = Helpers.randomAddress();
 
