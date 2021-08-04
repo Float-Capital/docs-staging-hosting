@@ -824,7 +824,7 @@ contract Staker is IStaker, Initializable {
   }
 
   /**
-  @notice Mints float owed to a user for a market, since they last minted for a market.
+  @notice Mints float owed to a user for multiple markets, since they last minted for those markets.
   @param marketIndexes Identifiers for the markets.
   @param user The address of the user.
    */
