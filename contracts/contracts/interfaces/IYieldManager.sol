@@ -4,7 +4,7 @@ pragma solidity 0.8.3;
 
 /// @notice Manages yield accumulation for the LongShort contract. Each market is deployed with its own yield manager to simplify the bookkeeping, as different markets may share a payment token and yield pool.
 abstract contract IYieldManager {
-  event YieldDistributed(uint256 unrealizedYield, uint256 treasuryYieldPercentE18);
+  event YieldDistributed(uint256 unrealizedYield, uint256 treasuryYieldPercent_e18);
 
   /// @dev This is purely saving some gas, but the subgraph will know how much is due for the treasury at all times - no need to include in event.
   event WithdrawTreasuryFunds();
@@ -29,15 +29,14 @@ abstract contract IYieldManager {
     @notice Calculates and updates the yield allocation to the treasury and the market
     @dev treasuryPercent = 1 - marketPercent
     @param totalValueRealizedForMarket total value of long and short side of the market
-    @param treasuryYieldPercentE18 Percentage of yield in base 1e18 that is allocated to the treasury
+    @param treasuryYieldPercent_e18 Percentage of yield in base 1e18 that is allocated to the treasury
     @return amountForMarketIncentives The market allocation of the yield
   */
   function distributeYieldForTreasuryAndReturnMarketAllocation(
     uint256 totalValueRealizedForMarket,
-    uint256 treasuryYieldPercentE18
+    uint256 treasuryYieldPercent_e18
   ) external virtual returns (uint256 amountForMarketIncentives);
 
   /// @notice Withdraw treasury allocated accrued yield from the lending pool to the treasury contract
-  /// @dev This will fail if not enough liquidity is avaiable in the yield provider liquidity pool
   function withdrawTreasuryFunds() external virtual;
 }

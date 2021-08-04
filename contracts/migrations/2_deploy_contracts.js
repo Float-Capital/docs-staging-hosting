@@ -73,15 +73,21 @@ module.exports = async function (deployer, networkName, accounts) {
     }
   );
 
-  await floatToken.initialize3("Float token", "FLOAT TOKEN", staker.address, {
-    from: admin,
-  });
+  await floatToken.initializeFloatToken(
+    "Float token",
+    "FLOAT TOKEN",
+    staker.address,
+    {
+      from: admin,
+    }
+  );
 
   // Initialize here as there are circular contract dependencies.
   await staker.initialize(
     admin,
     longShort.address,
     floatToken.address,
+    treasury.address,
     floatCapital.address,
     "250000000000000000", // 25%
     {
