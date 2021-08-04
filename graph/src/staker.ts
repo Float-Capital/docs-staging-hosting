@@ -1,6 +1,6 @@
 import {
   StakerV1,
-  StateAdded,
+  AccumulativeIssuancePerStakedSynthSnapshotCreated,
   StakeAdded,
   StakeWithdrawn,
   FloatMinted,
@@ -18,7 +18,7 @@ import {
   SyntheticMarket,
   CurrentStake,
   Stake,
-  StakeState,
+  AccumulativeFloatIssuanceSnapshot,
 } from "../generated/schema";
 import { log, DataSourceContext } from "@graphprotocol/graph-ts";
 import {
@@ -27,10 +27,10 @@ import {
 } from "./utils/txEventHelpers";
 import {
   getOrCreateUser,
-  getOrCreateStakerState,
+  getOrCreateAccumulativeFloatIssuanceSnapshot,
 } from "./utils/globalStateManager";
 
-import { ZERO, ONE, GLOBAL_STATE_ID } from "./CONSTANTS";
+import { ZERO, ONE, GLOBAL_STATE_ID, TEN_TO_THE_18 } from "./CONSTANTS";
 
 export function handleStakerV1(event: StakerV1): void {
   let floatAddress = event.params.floatToken;
@@ -73,58 +73,85 @@ export function handleStakeWithdrawalFeeUpdated(
 
 export function handleMarketAddedToStaker(event: MarketAddedToStaker): void {
   let marketIndex = event.params.marketIndex;
-  let exitFeeBasisPoints = event.params.exitFeeBasisPoints;
+  let exitFee_e18 = event.params.exitFee_e18;
+  let balanceIncentiveEquilibriumOffset =
+    event.params.balanceIncentiveEquilibriumOffset;
+  let balanceIncentiveExponent = event.params.balanceIncentiveExponent;
+  let multiplier = event.params.multiplier;
+  let period = event.params.period;
 
   saveEventToStateChange(
     event,
     "MarketAddedToStaker",
-    bigIntArrayToStringArray([marketIndex, exitFeeBasisPoints]),
-    ["marketIndex", "exitFee_e18"],
-    ["uint32", "uint256"],
+    bigIntArrayToStringArray([
+      marketIndex,
+      exitFee_e18,
+      balanceIncentiveExponent,
+      multiplier,
+      period,
+      balanceIncentiveEquilibriumOffset,
+    ]),
+    [
+      "marketIndex",
+      "exitFee_e18",
+      "balanceIncentiveExponent",
+      "multiplier",
+      "period",
+      "balanceIncentiveEquilibriumOffset",
+    ],
+    ["uint32", "uint256", "uint256", "uint256", "uint256", "int256"],
     [],
     []
   );
 }
 
-export function handleStateAdded(event: StateAdded): void {
+export function handleAccumulativeIssuancePerStakedSynthSnapshotCreated(
+  event: AccumulativeIssuancePerStakedSynthSnapshotCreated
+): void {
   let txHash = event.transaction.hash;
   let blockNumber = event.block.number;
   let timestamp = event.block.timestamp;
 
   let marketIndex = event.params.marketIndex;
   let marketIndexId = marketIndex.toString();
-  let stateIndex = event.params.stateIndex;
+  let accumulativeFloatIssuanceSnapshotIndex =
+    event.params.accumulativeFloatIssuanceSnapshotIndex;
   let accumulativeLong = event.params.accumulativeLong;
   let accumulativeShort = event.params.accumulativeShort;
 
   let syntheticMarket = SyntheticMarket.load(marketIndexId);
   if (syntheticMarket == null) {
     log.critical(
-      "`handleStateAdded` called without SyntheticMarket with id #{} being created.",
+      "`handleAccumulativeIssuancePerStakedSynthSnapshotCreated` called without SyntheticMarket with id #{} being created.",
       [marketIndexId]
     );
   }
 
-  let state = getOrCreateStakerState(
+  let state = getOrCreateAccumulativeFloatIssuanceSnapshot(
     syntheticMarket as SyntheticMarket,
-    stateIndex,
+    accumulativeFloatIssuanceSnapshotIndex,
     event
   );
   state.blockNumber = blockNumber;
   state.creationTxHash = txHash;
-  state.stateIndex = stateIndex;
+  state.index = accumulativeFloatIssuanceSnapshotIndex;
   state.timestamp = timestamp;
   state.accumulativeFloatPerTokenLong = accumulativeLong;
   state.accumulativeFloatPerTokenShort = accumulativeShort;
 
-  if (!stateIndex.equals(ZERO)) {
-    let prevState = StakeState.load(
-      marketIndexId + "-" + stateIndex.minus(ONE).toString()
+  if (!accumulativeFloatIssuanceSnapshotIndex.equals(ZERO)) {
+    let prevState = AccumulativeFloatIssuanceSnapshot.load(
+      marketIndexId +
+        "-" +
+        accumulativeFloatIssuanceSnapshotIndex.minus(ONE).toString()
     );
     if (prevState == null) {
       log.critical(
         "There is no previous state for market #{} at with index {}",
-        [marketIndexId, stateIndex.minus(ONE).toString()]
+        [
+          marketIndexId,
+          accumulativeFloatIssuanceSnapshotIndex.minus(ONE).toString(),
+        ]
       );
     }
     let timeElapsedSinceLastStateChange = state.timestamp.minus(
@@ -162,14 +189,19 @@ export function handleStateAdded(event: StateAdded): void {
 
   saveEventToStateChange(
     event,
-    "StateAdded",
+    "AccumulativeIssuancePerStakedSynthSnapshotCreated",
+    bigIntArrayToStringArray([
+      marketIndex,
+      accumulativeFloatIssuanceSnapshotIndex,
+      accumulativeLong,
+      accumulativeShort,
+    ]),
     [
-      marketIndexId,
-      stateIndex.toString(),
-      accumulativeLong.toString(),
-      accumulativeShort.toString(),
+      "marketIndex",
+      "accumulativeFloatIssuanceSnapshotIndex",
+      "accumulativeLong",
+      "accumulativeShort",
     ],
-    ["marketIndex", "stateIndex", "accumulativeLong", "accumulativeShort"],
     ["uint32", "uint256", "uint256", "uint256"],
     [],
     []
@@ -232,8 +264,8 @@ export function handleStakeAdded(event: StakeAdded): void {
     );
   }
 
-  // NOTE: This will create a new (empyt) StakerState if the user is not staking immediately
-  let state = getOrCreateStakerState(
+  // NOTE: This will create a new (empyt) AccumulativeFloatIssuanceSnapshot if the user is not staking immediately
+  let state = getOrCreateAccumulativeFloatIssuanceSnapshot(
     syntheticMarket as SyntheticMarket,
     lastMintIndex,
     event
@@ -358,13 +390,19 @@ export function handleFloatMinted(event: FloatMinted): void {
   let userAddressString = userAddress.toHex();
   let marketIndex = event.params.marketIndex;
   let marketIndexId = marketIndex.toString();
-  let amountLong = event.params.amountLong;
-  let amountShort = event.params.amountShort;
+  // TODO: Need to calculate these values correctly.
+  let amountLong = TEN_TO_THE_18;
+  let amountShort = TEN_TO_THE_18;
   let totalAmount = amountLong.plus(amountShort);
   let amountFloatMinted = event.params.amountFloatMinted;
 
+  // TODO - get this value from SyntheticMarket.latestAccumulativeFloatIssuanceSnapshot.index
+  let lastMintIndex = ONE;
+
   // TODO: This will brake here as the FloatMintedEvent has changed
-  let state = StakeState.load(marketIndexId + "-" + lastMintIndex.toString());
+  let state = AccumulativeFloatIssuanceSnapshot.load(
+    marketIndexId + "-" + lastMintIndex.toString()
+  );
   if (state == null) {
     log.critical("state not defined yet in `handleFloatMinted`, tx hash {}", [
       event.transaction.hash.toHex(),

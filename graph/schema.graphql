@@ -215,7 +215,7 @@ type SyntheticMarket @entity {
   symbol: String!
   marketIndex: BigInt!
   oracleAddress: Bytes!
-  latestStakerState: StakeState!
+  latestAccumulativeFloatIssuanceSnapshot: AccumulativeFloatIssuanceSnapshot!
   previousOracleAddresses: [Bytes!]!
   syntheticLong: SyntheticToken!
   syntheticShort: SyntheticToken!
@@ -268,7 +268,7 @@ type CurrentStake @entity {
   syntheticToken: SyntheticToken!
   syntheticMarket: SyntheticMarket!
   currentStake: Stake!
-  lastMintState: StakeState!
+  lastMintState: AccumulativeFloatIssuanceSnapshot!
 }
 
 type Stake @entity {
@@ -282,11 +282,11 @@ type Stake @entity {
   withdrawn: Boolean!
 }
 
-type StakeState @entity {
+type AccumulativeFloatIssuanceSnapshot @entity {
   id: ID! # token address - state indexed
+  index: BigInt! #
   blockNumber: BigInt!
   creationTxHash: Bytes!
-  stateIndex: BigInt! #
   longToken: SyntheticToken!
   shortToken: SyntheticToken!
   timestamp: BigInt!

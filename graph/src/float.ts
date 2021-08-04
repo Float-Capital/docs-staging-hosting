@@ -30,13 +30,13 @@ import {
 } from "./utils/txEventHelpers";
 import {
   getOrCreateLatestSystemState,
-  getOrCreateStakerState,
+  getOrCreateAccumulativeFloatIssuanceSnapshot,
   createSyntheticTokenLong,
   createSyntheticTokenShort,
   createInitialSystemState,
   updateOrCreatePaymentToken,
   getOrCreateGlobalState,
-  getStakerStateId,
+  getAccumulativeFloatIssuanceSnapshotId,
   getUser,
   getSyntheticMarket,
   getSyntheticTokenById,
@@ -340,7 +340,10 @@ export function handleSyntheticMarketCreated(
   );
 
   // Make sure the latest staker state has the correct ID even though the instance hasn't been created yet.
-  syntheticMarket.latestStakerState = getStakerStateId(marketIndexString, ZERO);
+  syntheticMarket.latestAccumulativeFloatIssuanceSnapshot = getAccumulativeFloatIssuanceSnapshotId(
+    marketIndexString,
+    ZERO
+  );
 
   longToken.syntheticMarket = syntheticMarket.id;
   longToken.latestPrice = initialState.latestTokenPriceLong.id;
@@ -352,13 +355,13 @@ export function handleSyntheticMarketCreated(
 
   syntheticMarket.save();
   // This function uses the synthetic market internally, so can only be created once the synthetic market has been created.
-  let initalLatestStakerState = getOrCreateStakerState(
+  let initalLatestAccumulativeFloatIssuanceSnapshot = getOrCreateAccumulativeFloatIssuanceSnapshot(
     syntheticMarket,
     ZERO,
     event
   );
   paymentTokenEntity.save();
-  initalLatestStakerState.save();
+  initalLatestAccumulativeFloatIssuanceSnapshot.save();
   longToken.save();
   shortToken.save();
   initialState.systemState.save();
