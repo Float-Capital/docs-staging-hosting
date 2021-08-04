@@ -318,8 +318,8 @@ contract LongShort is ILongShort, Initializable {
     virtual
   {
     require(
-      // You require at least 10^17 of the underlying payment token to seed the market.
-      initialMarketSeedForEachMarketSide > 0.1 ether,
+      // You require at least 1e18 (1 payment token with 18 decimal places) of the underlying payment token to seed the market.
+      initialMarketSeedForEachMarketSide >= 1e18,
       "Insufficient market seed"
     );
 
