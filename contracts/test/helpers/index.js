@@ -103,8 +103,8 @@ const createSynthetic = async (
     from: admin,
   });
 
-  await fundToken.mint(admin, "1000000000000000000", { from: admin });
-  await fundToken.approve(longShort.address, "1000000000000000000", {
+  await fundToken.mint(admin, "10000000000000000000", { from: admin });
+  await fundToken.approve(longShort.address, "10000000000000000000", {
     from: admin,
   });
 
