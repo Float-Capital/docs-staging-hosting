@@ -24,6 +24,7 @@ contract Staker is IStaker, Initializable {
   // Global state
   address public admin;
   address public floatCapital;
+  address public floatTreasury;
   uint256 public floatPercentage;
 
   address public longShort;
@@ -81,7 +82,13 @@ contract Staker is IStaker, Initializable {
     ║           EVENTS           ║
     ╚════════════════════════════╝*/
 
-  event StakerV1(address floatToken, uint256 floatPercentage);
+  event StakerV1(
+    address admin,
+    address floatTreasury,
+    address floatCapital,
+    address floatToken,
+    uint256 floatPercentage
+  );
 
   event MarketAddedToStaker(
     uint32 marketIndex,
@@ -124,6 +131,8 @@ contract Staker is IStaker, Initializable {
   event FloatPercentageUpdated(uint256 floatPercentage);
 
   event SyntheticTokensShifted();
+
+  event ChangeAdmin(address newAdmin);
 
   /*╔═════════════════════════════╗
     ║          MODIFIERS          ║
@@ -173,17 +182,19 @@ contract Staker is IStaker, Initializable {
     address _admin,
     address _longShort,
     address _floatToken,
+    address _floatTreasury,
     address _floatCapital,
     uint256 _floatPercentage
   ) external virtual initializer {
     admin = _admin;
     floatCapital = _floatCapital;
+    floatTreasury = _floatTreasury;
     longShort = _longShort;
     floatToken = _floatToken;
 
     _changeFloatPercentage(_floatPercentage);
 
-    emit StakerV1(_floatToken, _floatPercentage);
+    emit StakerV1(_admin, _floatTreasury, _floatCapital, _floatToken, _floatPercentage);
   }
 
   /*╔═════════════════════════════╗
@@ -192,6 +203,7 @@ contract Staker is IStaker, Initializable {
 
   function changeAdmin(address _admin) external onlyAdmin {
     admin = _admin;
+    emit ChangeAdmin(_admin);
   }
 
   function _changeFloatPercentage(uint256 newFloatPercentage) internal virtual {
