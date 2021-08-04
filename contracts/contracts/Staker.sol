@@ -371,9 +371,9 @@ contract Staker is IStaker, Initializable {
 
     accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][0].timestamp = block.timestamp;
     accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][0]
-      .accumulativeFloatPerSyntheticToken_long = 0;
+    .accumulativeFloatPerSyntheticToken_long = 0;
     accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][0]
-      .accumulativeFloatPerSyntheticToken_short = 0;
+    .accumulativeFloatPerSyntheticToken_short = 0;
 
     syntheticTokens[marketIndex][true] = longToken;
     syntheticTokens[marketIndex][false] = shortToken;
@@ -414,15 +414,14 @@ contract Staker is IStaker, Initializable {
     internal
     view
     virtual
-    returns (uint256, uint256)
+    returns (uint256 period, uint256 multiplier)
   {
-    uint256 period = marketLaunchIncentive_period[marketIndex];
-    uint256 multiplier = marketLaunchIncentive_multipliers[marketIndex];
+    period = marketLaunchIncentive_period[marketIndex];
+    multiplier = marketLaunchIncentive_multipliers[marketIndex];
+
     if (multiplier < 1e18) {
       multiplier = 1e18; // multiplier of 1 by default
     }
-
-    return (period, multiplier);
   }
 
   /** 
@@ -443,7 +442,7 @@ contract Staker is IStaker, Initializable {
     assert(kInitialMultiplier >= 1e18);
 
     uint256 initialTimestamp = accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][0]
-      .timestamp;
+    .timestamp;
 
     if (block.timestamp - initialTimestamp <= kPeriod) {
       return
@@ -455,12 +454,20 @@ contract Staker is IStaker, Initializable {
   }
 
   /*
-   * Computes the current 'r' value, i.e. the number of float tokens a user
-   * earns per second for every longshort token they've staked. The returned
-   * value has a fixed decimal scale of 1e42 (!!!) for numerical stability.
-   * The return values are float per second per synthetic token (hence the
-   * requirement to multiply by price)
-   *  -- here is the graph of the curve used: https://www.desmos.com/calculator/vg7jlmn4mn
+  @notice Computes the number of float tokens a user earns per second for
+  every long/short synthetic token they've staked. The returned value has
+  a fixed decimal scale of 1e42 (!!!) for numerical stability. The return
+  values are float per second per synthetic token (hence the requirement
+  to multiply by price)
+  @dev to see below math in latex form see TODO add link
+  to interact with the equations see https://www.desmos.com/calculator/optkaxyihr
+  @param marketIndex The market referred to.
+  @param longPrice Price of the synthetic long token in units of payment token
+  @param shortPrice Price of the synthetic short token in units of payment token
+  @param longValue Amount of payment token in the long side of the market
+  @param shortValue Amount of payment token in the short side of the market
+  @return longFloatPerSecond Float token per second per long synthetic token
+  @return shortFloatPerSecond Float token per second per short synthetic token
    */
   function _calculateFloatPerSecond(
     uint32 marketIndex,
@@ -469,9 +476,6 @@ contract Staker is IStaker, Initializable {
     uint256 longValue,
     uint256 shortValue
   ) internal view virtual returns (uint256 longFloatPerSecond, uint256 shortFloatPerSecond) {
-    // Markets cannot be or become empty (since they are seeded with non-withdrawable capital)
-    assert(longValue != 0 && shortValue != 0);
-
     // A float issuance multiplier that starts high and decreases linearly
     // over time to a value of 1. This incentivises users to stake early.
     uint256 k = _getKValue(marketIndex);
@@ -481,7 +485,10 @@ contract Staker is IStaker, Initializable {
     // we need to scale this number by the totalLocked so that the offset remains consistent accross market size
 
     int256 equilibriumOffsetMarketScaled = (balanceIncentiveCurve_equilibriumOffset[marketIndex] *
-      int256(totalLocked)) / 1e18;
+      int256(totalLocked)) / 2e18;
+
+    uint256 denominator = ((totalLocked >> safeExponentBitShifting) **
+      balanceIncentiveCurve_exponent[marketIndex]);
 
     // Float is scaled by the percentage of the total market value held in
     // the opposite position. This incentivises users to stake on the
@@ -495,9 +502,6 @@ contract Staker is IStaker, Initializable {
 
       uint256 numerator = (uint256(int256(shortValue) - equilibriumOffsetMarketScaled) >>
         (safeExponentBitShifting - 1))**balanceIncentiveCurve_exponent[marketIndex];
-
-      uint256 denominator = ((totalLocked >> safeExponentBitShifting) **
-        balanceIncentiveCurve_exponent[marketIndex]);
 
       // NOTE: `x * 5e17` == `(x * 10e18) / 2`
       uint256 longRewardUnscaled = (numerator * 5e17) / denominator;
@@ -516,9 +520,6 @@ contract Staker is IStaker, Initializable {
 
       uint256 numerator = (uint256(int256(longValue) + equilibriumOffsetMarketScaled) >>
         (safeExponentBitShifting - 1))**balanceIncentiveCurve_exponent[marketIndex];
-
-      uint256 denominator = ((totalLocked >> safeExponentBitShifting) **
-        balanceIncentiveCurve_exponent[marketIndex]);
 
       // NOTE: `x * 5e17` == `(x * 10e18) / 2`
       uint256 shortRewardUnscaled = (numerator * 5e17) / denominator;
@@ -545,7 +546,7 @@ contract Staker is IStaker, Initializable {
     return
       block.timestamp -
       accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][latestRewardIndex[marketIndex]]
-        .timestamp;
+      .timestamp;
   }
 
   /**
@@ -584,9 +585,9 @@ contract Staker is IStaker, Initializable {
     // Compute new cumulative 'r' value total.
     return (
       accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][latestRewardIndex[marketIndex]]
-        .accumulativeFloatPerSyntheticToken_long + (timeDelta * longFloatPerSecond),
+      .accumulativeFloatPerSyntheticToken_long + (timeDelta * longFloatPerSecond),
       accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][latestRewardIndex[marketIndex]]
-        .accumulativeFloatPerSyntheticToken_short + (timeDelta * shortFloatPerSecond)
+      .accumulativeFloatPerSyntheticToken_short + (timeDelta * shortFloatPerSecond)
     );
   }
 
@@ -609,20 +610,20 @@ contract Staker is IStaker, Initializable {
       uint256 newLongAccumulativeValue,
       uint256 newShortAccumulativeValue
     ) = _calculateNewCumulativeIssuancePerStakedSynth(
-        marketIndex,
-        longPrice,
-        shortPrice,
-        longValue,
-        shortValue
-      );
+      marketIndex,
+      longPrice,
+      shortPrice,
+      longValue,
+      shortValue
+    );
 
     uint256 newIndex = latestRewardIndex[marketIndex] + 1;
 
     // Set cumulative 'r' value on new accumulativeIssuancePerStakedSynthSnapshot.
     accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][newIndex]
-      .accumulativeFloatPerSyntheticToken_long = newLongAccumulativeValue;
+    .accumulativeFloatPerSyntheticToken_long = newLongAccumulativeValue;
     accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][newIndex]
-      .accumulativeFloatPerSyntheticToken_short = newShortAccumulativeValue;
+    .accumulativeFloatPerSyntheticToken_short = newShortAccumulativeValue;
 
     // Set timestamp on new accumulativeIssuancePerStakedSynthSnapshot.
     accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][newIndex].timestamp = block.timestamp;
@@ -698,18 +699,20 @@ contract Staker is IStaker, Initializable {
     if (amountStakedLong > 0) {
       uint256 accumDeltaLong = accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][
         rewardIndexTo
-      ].accumulativeFloatPerSyntheticToken_long -
+      ]
+      .accumulativeFloatPerSyntheticToken_long -
         accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][rewardIndexFrom]
-          .accumulativeFloatPerSyntheticToken_long;
+        .accumulativeFloatPerSyntheticToken_long;
       floatReward += (accumDeltaLong * amountStakedLong) / FLOAT_ISSUANCE_FIXED_DECIMAL;
     }
 
     if (amountStakedShort > 0) {
       uint256 accumDeltaShort = accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][
         rewardIndexTo
-      ].accumulativeFloatPerSyntheticToken_short -
+      ]
+      .accumulativeFloatPerSyntheticToken_short -
         accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][rewardIndexFrom]
-          .accumulativeFloatPerSyntheticToken_short;
+        .accumulativeFloatPerSyntheticToken_short;
       floatReward += (accumDeltaShort * amountStakedShort) / FLOAT_ISSUANCE_FIXED_DECIMAL;
     }
   }
