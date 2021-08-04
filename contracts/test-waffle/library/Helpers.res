@@ -68,7 +68,7 @@ let randomAddress = () => Ethers.Wallet.createRandom().address
 
 let createSyntheticMarket = (
   ~admin,
-  ~initialMarketSeedForEachMarketSide=bnFromString("500000000000000000"),
+  ~initialMarketSeedForEachMarketSide=CONSTANTS.tenToThe18,
   ~paymentToken: ERC20Mock.t,
   ~treasury,
   ~marketName,

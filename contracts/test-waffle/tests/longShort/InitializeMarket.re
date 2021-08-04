@@ -53,8 +53,7 @@ let testUnit =
               ~kInitialMultiplier=
                 Ethers.BigNumber.fromUnsafe("60000000000000000"),
               ~unstakeFee_e18=Ethers.BigNumber.fromUnsafe("5000000000000000"), // 0.5% or 50 basis points
-              ~initialMarketSeedForEachMarketSide=
-                Ethers.BigNumber.fromUnsafe("7"),
+              ~initialMarketSeedForEachMarketSide=CONSTANTS.tenToThe18,
               ~balanceIncentive_curveExponent=bnFromInt(5),
               ~balanceIncentiveCurve_equilibriumOffset=bnFromInt(0),
               ~marketTreasurySplitGradient_e18=bnFromInt(1),
@@ -84,16 +83,10 @@ let testUnit =
         Chai.recordEqualFlatLabeled(
           ~actual={
             marketIndex: 1,
-            initialMarketSeedForEachMarketSide:
-              Ethers.BigNumber.fromUnsafe("7"),
+            initialMarketSeedForEachMarketSide: CONSTANTS.tenToThe18,
           },
           ~expected=seedMarketInitiallyCalls->Array.getExn(0),
         );
-
-        // No arguments
-        //let adminOnlyCalls = LongShortSmocked.InternalMock.adminOnlyCalls();
-
-        // Chai.intEqual(1, adminOnlyCalls->Array.length);
 
         let%Await isMarket = (longShortRef^)->LongShort.marketExists(1);
 

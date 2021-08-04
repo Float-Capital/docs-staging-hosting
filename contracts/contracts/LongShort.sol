@@ -322,8 +322,8 @@ contract LongShort is ILongShort, Initializable {
     virtual
   {
     require(
-      // You require at least 10^17 of the underlying payment token to seed the market.
-      initialMarketSeedForEachMarketSide > 0.1 ether,
+      // You require at least 1e18 (1 payment token with 18 decimal places) of the underlying payment token to seed the market.
+      initialMarketSeedForEachMarketSide >= 1e18,
       "Insufficient market seed"
     );
 
@@ -551,9 +551,9 @@ contract LongShort is ILongShort, Initializable {
         );
       }
 
-
-        uint256 amountSyntheticTokensToBeShiftedAwayFromOriginSide
-       = userNextPrice_syntheticToken_toShiftAwayFrom_marketSide[marketIndex][!isLong][user];
+      uint256 amountSyntheticTokensToBeShiftedAwayFromOriginSide = userNextPrice_syntheticToken_toShiftAwayFrom_marketSide[
+          marketIndex
+        ][!isLong][user];
 
       if (amountSyntheticTokensToBeShiftedAwayFromOriginSide > 0) {
         uint256 syntheticTokenPriceOnOriginSide = syntheticToken_priceSnapshot[marketIndex][
@@ -646,10 +646,10 @@ contract LongShort is ILongShort, Initializable {
     );
 
     uint256 marketAmount = IYieldManager(yieldManagers[marketIndex])
-    .distributeYieldForTreasuryAndReturnMarketAllocation(
-      totalValueLockedInMarket,
-      treasuryYieldPercentE18
-    );
+      .distributeYieldForTreasuryAndReturnMarketAllocation(
+        totalValueLockedInMarket,
+        treasuryYieldPercentE18
+      );
 
     if (marketAmount > 0) {
       if (isLongSideUnderbalanced) {
@@ -772,10 +772,10 @@ contract LongShort is ILongShort, Initializable {
         int256 long_changeInMarketValue_inPaymentToken,
         int256 short_changeInMarketValue_inPaymentToken
       ) = _batchConfirmOutstandingPendingActions(
-        marketIndex,
-        syntheticTokenPrice_inPaymentTokens_long,
-        syntheticTokenPrice_inPaymentTokens_short
-      );
+          marketIndex,
+          syntheticTokenPrice_inPaymentTokens_long,
+          syntheticTokenPrice_inPaymentTokens_short
+        );
 
       newLongPoolValue = uint256(
         int256(newLongPoolValue) + long_changeInMarketValue_inPaymentToken
@@ -1088,9 +1088,9 @@ contract LongShort is ILongShort, Initializable {
     address user,
     bool isShiftFromLong
   ) internal virtual {
-
-      uint256 syntheticToken_toShiftAwayFrom_marketSide
-     = userNextPrice_syntheticToken_toShiftAwayFrom_marketSide[marketIndex][isShiftFromLong][user];
+    uint256 syntheticToken_toShiftAwayFrom_marketSide = userNextPrice_syntheticToken_toShiftAwayFrom_marketSide[
+        marketIndex
+      ][isShiftFromLong][user];
     if (syntheticToken_toShiftAwayFrom_marketSide > 0) {
       uint256 syntheticToken_toShiftTowardsTargetSide = getAmountSyntheticTokenToMintOnTargetSide(
         marketIndex,
