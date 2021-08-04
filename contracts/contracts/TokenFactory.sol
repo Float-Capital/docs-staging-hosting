@@ -52,7 +52,7 @@ contract TokenFactory is ITokenFactory {
   /// @param staker address of the staker contract
   /// @param marketIndex market index this synthetic token belongs to
   /// @param isLong boolean denoting if the synthetic token is long or short
-  /// @return syntheticToken - adress of the created synthetic token
+  /// @return syntheticToken - address of the created synthetic token
   function createSyntheticToken(
     string calldata syntheticName,
     string calldata syntheticSymbol,

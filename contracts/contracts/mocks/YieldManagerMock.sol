@@ -2,8 +2,6 @@
 
 pragma solidity 0.8.3;
 
-import "hardhat/console.sol";
-
 import "@openzeppelin/contracts/token/ERC20/presets/ERC20PresetMinterPauser.sol";
 
 import "../interfaces/IYieldManager.sol";
@@ -140,7 +138,7 @@ contract YieldManagerMock is IYieldManager {
 
   function distributeYieldForTreasuryAndReturnMarketAllocation(
     uint256 totalValueRealizedForMarket,
-    uint256 treasuryYieldPercentE18
+    uint256 treasuryYieldPercent_e18
   ) external override longShortOnly returns (uint256) {
     uint256 unrealizedYield = totalHeld - totalValueRealizedForMarket - totalReservedForTreasury;
 
@@ -148,7 +146,7 @@ contract YieldManagerMock is IYieldManager {
       return 0;
     }
 
-    uint256 amountForTreasury = (unrealizedYield * treasuryYieldPercentE18) / TEN_TO_THE_18;
+    uint256 amountForTreasury = (unrealizedYield * treasuryYieldPercent_e18) / TEN_TO_THE_18;
     uint256 amountForMarketIncentives = unrealizedYield - amountForTreasury;
 
     totalReservedForTreasury += amountForTreasury;
