@@ -7,9 +7,6 @@ import "@openzeppelin/contracts/token/ERC20/presets/ERC20PresetMinterPauser.sol"
 import "../interfaces/IYieldManager.sol";
 import "../interfaces/aave/IAaveIncentivesController.sol";
 
-// TODO: it would be better to deprecate this mock and rather mock aave and use the
-//       `YieldManagerAave` to avoid duplicate code/logic that can easily go out of sync.
-
 /*
  * YieldManagerMock is an implementation of a yield manager that supports
  * configurable, deterministic token yields for testing. Note that the mock
@@ -154,6 +151,5 @@ contract YieldManagerMock is IYieldManager {
     return amountForMarketIncentives;
   }
 
-  // TODO STENT need to change this and unit test it
   function withdrawTreasuryFunds() external override longShortOnly {}
 }

@@ -10,7 +10,7 @@ abstract contract IStaker {
     uint256 kInitialMultiplier,
     uint256 kPeriod,
     uint256 unstakeFee_e18,
-    uint256 _balanceIncentive_curveExponent,
+    uint256 _balanceIncentiveCurve_exponent,
     int256 _balanceIncentiveCurve_equilibriumOffset
   ) external virtual;
 

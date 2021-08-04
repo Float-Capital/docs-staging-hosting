@@ -27,15 +27,18 @@ contract LongShort is ILongShort, Initializable {
     ║          VARIABLES          ║
     ╚═════════════════════════════╝*/
 
-  // Fixed-precision constants
+  /* ══════ Fixed-precision constants ══════ */
   /// @notice this is the address that permanently locked initial liquidity for markets is held by.
   /// These tokens will never move so market can never have zero liquidity on a side.
   /// @dev f10a7 spells float in hex - for fun - important part is that the private key for this address in not known.
   address public constant PERMANENT_INITIAL_LIQUIDITY_HOLDER =
     0xf10A7_F10A7_f10A7_F10a7_F10A7_f10a7_F10A7_f10a7;
+
+  /// @dev an empty allocation of storage for use in future upgrades - inspiration from OZ:
+  ///      https://github.com/OpenZeppelin/openzeppelin-contracts-upgradeable/blob/10f0f1a95b1b0fd5520351886bae7a03490f1056/contracts/token/ERC20/ERC20Upgradeable.sol#L361
   uint256[45] private __constantsGap;
 
-  // Global state
+  /* ══════ Global state ══════ */
   address public admin;
   address public treasury;
   uint32 public latestMarket;
@@ -44,7 +47,7 @@ contract LongShort is ILongShort, Initializable {
   address public tokenFactory;
   uint256[45] private __globalStateGap;
 
-  // Market specific
+  /* ══════ Market specific ══════ */
   mapping(uint32 => bool) public marketExists;
   mapping(uint32 => uint256) public assetPrice;
   mapping(uint32 => uint256) public marketUpdateIndex;
@@ -53,7 +56,7 @@ contract LongShort is ILongShort, Initializable {
   mapping(uint32 => address) public oracleManagers;
   mapping(uint32 => uint256) public marketTreasurySplitGradient_e18;
 
-  // Market + position (long/short) specific
+  /* ══════ Market + position (long/short) specific ══════ */
   mapping(uint32 => mapping(bool => address)) public syntheticTokens;
   mapping(uint32 => mapping(bool => uint256)) public marketSideValueInPaymentToken;
 
@@ -66,7 +69,7 @@ contract LongShort is ILongShort, Initializable {
   mapping(uint32 => mapping(bool => uint256))
     public batched_amountSyntheticToken_toShiftAwayFrom_marketSide;
 
-  // User specific
+  /* ══════ User specific ══════ */
   mapping(uint32 => mapping(address => uint256)) public userNextPrice_currentUpdateIndex;
 
   mapping(uint32 => mapping(bool => mapping(address => uint256)))
@@ -211,9 +214,9 @@ contract LongShort is ILongShort, Initializable {
     emit LongShortV1(_admin, _treasury, _tokenFactory, _staker);
   }
 
-  /*╔═════════════════════════════╗
-    ║       MULTI-SIG ADMIN       ║
-    ╚═════════════════════════════╝*/
+  /*╔═══════════════════╗
+    ║       ADMIN       ║
+    ╚═══════════════════╝*/
 
   /// @notice Changes the admin address for this contract.
   /// @dev Can only be called by the current admin.
@@ -241,7 +244,7 @@ contract LongShort is ILongShort, Initializable {
     emit OracleUpdated(marketIndex, previousOracleManager, _newOracleManager);
   }
 
-  /// @notice
+  /// @notice changes the gradient of the line for determining the yield split between market and treasury.
   function changeMarketTreasurySplitGradient(
     uint32 marketIndex,
     uint256 _marketTreasurySplitGradient_e18
@@ -318,8 +321,8 @@ contract LongShort is ILongShort, Initializable {
     virtual
   {
     require(
-      // You require at least 10^17 of the underlying payment token to seed the market.
-      initialMarketSeedForEachMarketSide > 0.1 ether,
+      // You require at least 1e18 (1 payment token with 18 decimal places) of the underlying payment token to seed the market.
+      initialMarketSeedForEachMarketSide >= 1e18,
       "Insufficient market seed"
     );
 
@@ -348,7 +351,7 @@ contract LongShort is ILongShort, Initializable {
   /// @param kInitialMultiplier Linearly decreasing multiplier for Float token issuance for the market when staking synths.
   /// @param kPeriod Time which kInitialMultiplier will last
   /// @param unstakeFee_e18 Base 1e18 percentage fee levied when unstaking for the market.
-  /// @param balanceIncentive_curveExponent Sets the degree to which Float token issuance differs
+  /// @param balanceIncentiveCurve_exponent Sets the degree to which Float token issuance differs
   /// for market sides in unbalanced markets. See Staker.sol
   /// @param balanceIncentiveCurve_equilibriumOffset An offset to account for naturally imbalanced markets
   /// when Float token issuance should differ for market sides. See Staker.sol
@@ -359,7 +362,7 @@ contract LongShort is ILongShort, Initializable {
     uint256 kPeriod,
     uint256 unstakeFee_e18,
     uint256 initialMarketSeedForEachMarketSide,
-    uint256 balanceIncentive_curveExponent,
+    uint256 balanceIncentiveCurve_exponent,
     int256 balanceIncentiveCurve_equilibriumOffset,
     uint256 _marketTreasurySplitGradient_e18
   ) external adminOnly {
@@ -381,7 +384,7 @@ contract LongShort is ILongShort, Initializable {
       kInitialMultiplier,
       kPeriod,
       unstakeFee_e18,
-      balanceIncentive_curveExponent,
+      balanceIncentiveCurve_exponent,
       balanceIncentiveCurve_equilibriumOffset
     );
 
@@ -573,7 +576,7 @@ contract LongShort is ILongShort, Initializable {
    for a market should be allocated to treasury.
    @dev For gas considerations also returns whether the long side is imbalanced.
    @dev For gas considerations totalValueLockedInMarket is passed as a parameter as the function
-  calling this function has pre calculated the value
+   calling this function has pre calculated the value
    @param longValue The current total payment token value of the long side of the market.
    @param shortValue The current total payment token value of the short side of the market.
    @param totalValueLockedInMarket Total payment token value of both sides of the market.

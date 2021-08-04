@@ -13,12 +13,10 @@ if (isWaffleTest) {
   } else if (isUnitTests) {
     coverageReportOutputDirectory = "coverage-unit"
     extraFilesToIgnore = [
-      "FloatCapital_v0.sol",
       "FloatToken.sol",
       "SyntheticToken.sol",
       "TokenFactory.sol",
       "Treasury_v0.sol",
-      "YieldManagerAave.sol",
     ]
   } else if (isIntegrationTests) {
     coverageReportOutputDirectory = "coverage-integration"
@@ -30,6 +28,8 @@ if (isWaffleTest) {
 module.exports = {
   skipFiles: [
     "Migrations.sol",
+    "FloatCapital_v0.sol",
+    "Treasury_v0.sol",
 
     "interfaces/IBandOracle.sol",
     "interfaces/IFloatToken.sol",
@@ -50,6 +50,7 @@ module.exports = {
     "mocks/YieldManagerMock.sol",
     "mocks/AggregatorV3Mock.sol",
     "mocks/ERC20Mock.sol",
+    "mocks/LendingPoolAaveMock.sol",
 
     "oracles/OracleManagerBand.sol",
     "oracles/OracleManagerChainlink.sol",
@@ -59,8 +60,8 @@ module.exports = {
     "oracles/OracleManagerEthVsBtc.sol",
     "oracles/OracleManagerFlippening_V0.sol",
 
-    "testing/LongShortInternalsExposed.sol",
-    "testing/StakerInternalsExposed.sol",
+    "testing/StakerInternalStateSetters.sol",
+    "testing/LongShortInternalStateSetters.sol",
 
     "testing/generated/LongShortForInternalMocking.sol",
     "testing/generated/StakerForInternalMocking.sol",
