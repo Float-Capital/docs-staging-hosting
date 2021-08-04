@@ -8,6 +8,7 @@ let testUnit =
       ~contracts: ref(Helpers.coreContracts),
       ~accounts: ref(array(Ethers.Wallet.t)),
     ) => {
+
   describe_only("Staker Admin Functions", () => {
     let marketIndex = Helpers.randomJsInteger();
     let randomAddress1 = Helpers.randomAddress();
@@ -83,6 +84,7 @@ let testUnit =
           ->Staker.Exposed.changeFloatPercentage(
               ~newFloatPercentage=newFloatPerc,
             );
+
         txPromiseRef.contents;
       });
 
@@ -212,7 +214,6 @@ let testUnit =
                 ),
             ~reason="",
           );
-        ();
       });
 
       it("should update unstake fee correctly", () => {
@@ -232,6 +233,240 @@ let testUnit =
           contracts.contents.staker->Staker.Exposed.marketUnstakeFee_e18(1);
 
         Chai.bnEqual(feeAfterCall, newFeePercentageRandom);
+      });
+    });
+
+    describe("changeBalanceIncentiveExponent", () => {
+      let marketIndex = 23;
+      let startingTestExponent = bnFromInt(1);
+      let updatedExponent = bnFromInt(2);
+
+      let promiseRef: ref(JsPromise.t(ContractHelpers.transaction)) =
+        ref(()->JsPromise.resolve->Obj.magic);
+
+      before_once'(() => {
+        let%Await _ =
+          deployAndSetupStakerToUnitTest(
+            ~functionName="changeBalanceIncentiveExponent",
+            ~contracts,
+            ~accounts,
+          );
+
+        StakerSmocked.InternalMock.mock_changeBalanceIncentiveExponentToReturn();
+        let stakerAddress = accounts.contents->Array.getUnsafe(5);
+
+        let promise =
+          contracts.contents.staker
+          ->ContractHelpers.connect(~address=stakerAddress)
+          ->Staker.changeBalanceIncentiveExponent(
+              ~marketIndex,
+              ~balanceIncentive_curveExponent=startingTestExponent,
+            );
+        promiseRef := promise;
+        let%Await _ = promise;
+      });
+
+      it("should call the onlyAdmin Modifier", () => {
+        let%Await _ =
+          contracts.contents.staker
+          ->Staker.changeBalanceIncentiveExponent(
+              ~marketIndex,
+              ~balanceIncentive_curveExponent=updatedExponent,
+            );
+        StakerSmocked.InternalMock.onlyAdminModifierLogicCalls()
+        ->Array.length
+        ->Chai.intEqual(1);
+      });
+
+      it(
+        "should call _changeBalanceIncentiveExponent with correct arguments",
+        () => {
+        StakerSmocked.InternalMock._changeBalanceIncentiveExponentCalls()
+        ->Array.getUnsafe(0)
+        ->Chai.recordEqualFlat({
+            marketIndex,
+            balanceIncentive_curveExponent: updatedExponent,
+          })
+      });
+
+      it(
+        "should emit BalanceIncentiveExponentUpdated with correct arguments",
+        () => {
+        Chai.callEmitEvents(
+          ~call=promiseRef^,
+          ~contract=contracts.contents.staker->Obj.magic,
+          ~eventName="BalanceIncentiveExponentUpdated",
+        )
+        ->Chai.withArgs2(marketIndex, startingTestExponent)
+      });
+
+      it("should only allow (0 < new exponent < 6 percent)", () => {
+        let adminWallet = accounts.contents->Array.getUnsafe(0);
+        let newExponentOutOfBoundsHighSide = bnFromInt(6);
+        let newExponentOutOfBoundsLowSide = bnFromInt(0);
+
+        let%Await _ =
+          Chai.expectRevert(
+            ~transaction=
+              contracts.contents.staker
+              ->ContractHelpers.connect(~address=adminWallet)
+              ->Staker.Exposed._changeBalanceIncentiveExponentExposed(
+                  ~marketIndex,
+                  ~balanceIncentive_curveExponent=newExponentOutOfBoundsHighSide,
+                ),
+            ~reason="",
+          );
+
+        let%Await _ =
+          Chai.expectRevert(
+            ~transaction=
+              contracts.contents.staker
+              ->ContractHelpers.connect(~address=adminWallet)
+              ->Staker.Exposed._changeBalanceIncentiveExponentExposed(
+                  ~marketIndex,
+                  ~balanceIncentive_curveExponent=newExponentOutOfBoundsLowSide,
+                ),
+            ~reason="",
+          );
+      });
+
+      it("should update incentive exponent correctly", () => {
+        let adminWallet = accounts.contents->Array.getUnsafe(0);
+        let newExponent = bnFromInt(4);
+
+        let%Await _ =
+          contracts.contents.staker
+          ->ContractHelpers.connect(~address=adminWallet)
+          ->Staker.Exposed._changeBalanceIncentiveExponentExposed(
+              ~marketIndex,
+              ~balanceIncentive_curveExponent=newExponent,
+            );
+
+        let%Await exponentAfterCall =
+          contracts.contents.staker
+          ->Staker.Exposed.balanceIncentive_curveExponent(marketIndex);
+
+        Chai.bnEqual(exponentAfterCall, newExponent);
+      });
+    });
+
+    describe("changeBalanceIncentiveEquilibriumOffset", () => {
+      let marketIndex = 15;
+      let startingEquilibriumOffset = Helpers.randomInteger();
+      let updatedEquilibriumOffset = Helpers.randomInteger();
+
+      let promiseRef: ref(JsPromise.t(ContractHelpers.transaction)) =
+        ref(()->JsPromise.resolve->Obj.magic);
+
+      before_once'(() => {
+        let%Await _ =
+          deployAndSetupStakerToUnitTest(
+            ~functionName="changeBalanceIncentiveEquilibriumOffset",
+            ~contracts,
+            ~accounts,
+          );
+
+        StakerSmocked.InternalMock.mock_changeBalanceIncentiveEquilibriumOffsetToReturn();
+        let stakerAddress = accounts.contents->Array.getUnsafe(5);
+
+        let promise =
+          contracts.contents.staker
+          ->ContractHelpers.connect(~address=stakerAddress)
+          ->Staker.changeBalanceIncentiveEquilibriumOffset(
+              ~marketIndex,
+              ~balanceIncentiveCurve_equilibriumOffset=startingEquilibriumOffset,
+            );
+        promiseRef := promise;
+        let%Await _ = promise;
+      });
+
+      it("should call the onlyAdmin Modifier", () => {
+        let%Await _ =
+          contracts.contents.staker
+          ->Staker.changeBalanceIncentiveEquilibriumOffset(
+              ~marketIndex,
+              ~balanceIncentiveCurve_equilibriumOffset=updatedEquilibriumOffset,
+            );
+        StakerSmocked.InternalMock.onlyAdminModifierLogicCalls()
+        ->Array.length
+        ->Chai.intEqual(1);
+      });
+
+      it(
+        "should call _changeBalanceIncentiveEquilibriumOffset with correct arguments",
+        () => {
+        StakerSmocked.InternalMock._changeBalanceIncentiveEquilibriumOffsetCalls()
+        ->Array.getUnsafe(0)
+        ->Chai.recordEqualFlat({
+            marketIndex,
+            balanceIncentiveCurve_equilibriumOffset: updatedEquilibriumOffset,
+          })
+      });
+
+      it(
+        "should emit BalanceIncentiveEquilibriumOffsetUpdated with correct arguments",
+        () => {
+        Chai.callEmitEvents(
+          ~call=promiseRef^,
+          ~contract=contracts.contents.staker->Obj.magic,
+          ~eventName="BalanceIncentiveEquilibriumOffsetUpdated",
+        )
+        ->Chai.withArgs2(marketIndex, startingEquilibriumOffset)
+      });
+
+      it("should ensure (-9e17 < new equilibrium offset < 9e17)", () => {
+        let adminWallet = accounts.contents->Array.getUnsafe(0);
+        let newOffsetOutOfBoundsHighSide =
+          bnFromString("900000000000000000")
+          ->add(Helpers.randomTokenAmount());
+        let newOffsetOutOfBoundsLowSide =
+          bnFromString("-900000000000000000")
+          ->sub(Helpers.randomTokenAmount());
+
+        let%Await _ =
+          Chai.expectRevert(
+            ~transaction=
+              contracts.contents.staker
+              ->ContractHelpers.connect(~address=adminWallet)
+              ->Staker.Exposed._changeBalanceIncentiveEquilibriumOffsetExposed(
+                  ~marketIndex,
+                  ~balanceIncentiveCurve_equilibriumOffset=newOffsetOutOfBoundsHighSide,
+                ),
+            ~reason="",
+          );
+
+        let%Await _ =
+          Chai.expectRevert(
+            ~transaction=
+              contracts.contents.staker
+              ->ContractHelpers.connect(~address=adminWallet)
+              ->Staker.Exposed._changeBalanceIncentiveEquilibriumOffsetExposed(
+                  ~marketIndex,
+                  ~balanceIncentiveCurve_equilibriumOffset=newOffsetOutOfBoundsLowSide,
+                ),
+            ~reason="",
+          );
+      });
+
+      it("should update incentive equilibrium offset correctly", () => {
+        let adminWallet = accounts.contents->Array.getUnsafe(0);
+        let updatedEquilibriumOffset2 = Helpers.randomInteger();
+
+        let%Await _ =
+          contracts.contents.staker
+          ->ContractHelpers.connect(~address=adminWallet)
+          ->Staker.Exposed._changeBalanceIncentiveEquilibriumOffsetExposed(
+              ~marketIndex,
+              ~balanceIncentiveCurve_equilibriumOffset=updatedEquilibriumOffset2,
+            );
+
+        let%Await exponentAfterCall =
+          contracts.contents.staker
+          ->Staker.Exposed.balanceIncentiveCurve_equilibriumOffset(
+              marketIndex,
+            );
+
+        Chai.bnEqual(exponentAfterCall, updatedEquilibriumOffset2);
       });
     });
   });
