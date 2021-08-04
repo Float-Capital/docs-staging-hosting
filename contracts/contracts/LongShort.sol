@@ -297,9 +297,6 @@ contract LongShort is ILongShort, Initializable {
     oracleManagers[latestMarket] = _oracleManager;
     assetPrice[latestMarket] = uint256(IOracleManager(oracleManagers[latestMarket]).updatePrice());
 
-    // Approve tokens for aave lending pool maximally.
-    IERC20(paymentTokens[latestMarket]).approve(_yieldManager, type(uint256).max);
-
     emit SyntheticMarketCreated(
       latestMarket,
       syntheticTokens[latestMarket][true],
