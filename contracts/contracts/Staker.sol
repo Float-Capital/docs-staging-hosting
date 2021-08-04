@@ -14,14 +14,14 @@ contract Staker is IStaker, Initializable {
     ║          VARIABLES          ║
     ╚═════════════════════════════╝*/
 
-  // Fixed-precision constants
+  /* ══════ Fixed-precision constants ══════ */
   uint256 public constant FLOAT_ISSUANCE_FIXED_DECIMAL = 1e42;
   // 2^52 ~= 4.5e15
   // With an exponent of 5, the largest total liquidity possible in a market (to avoid integer overflow on exponentiation) is ~10^31 or 10 Trillion (10^13)
   // NOTE: this also means if the total market value is less than 2^52 there will be a division by zero error
   uint256 public constant safeExponentBitShifting = 52;
 
-  // Global state
+  /* ══════ Global state ══════ */
   address public admin;
   address public floatCapital;
   address public floatTreasury;
@@ -30,7 +30,7 @@ contract Staker is IStaker, Initializable {
   address public longShort;
   address public floatToken;
 
-  // Market specific
+  /* ══════ Market specific ══════ */
   mapping(uint32 => uint256) public marketLaunchIncentive_period; // seconds
   mapping(uint32 => uint256) public marketLaunchIncentive_multipliers; // e18 scale
   mapping(uint32 => uint256) public marketUnstakeFee_e18;
@@ -41,7 +41,7 @@ contract Staker is IStaker, Initializable {
 
   mapping(address => uint32) public marketIndexOfToken;
 
-  // Reward specific
+  /* ══════ Reward specific ══════ */
   mapping(uint32 => uint256) public latestRewardIndex;
   mapping(uint32 => mapping(uint256 => AccumulativeIssuancePerStakedSynthSnapshot))
     public accumulativeFloatPerSyntheticTokenSnapshots;
@@ -51,11 +51,11 @@ contract Staker is IStaker, Initializable {
     uint256 accumulativeFloatPerSyntheticToken_short;
   }
 
-  // User specific
+  /* ══════ User specific ══════ */
   mapping(uint32 => mapping(address => uint256)) public userIndexOfLastClaimedReward;
   mapping(address => mapping(address => uint256)) public userAmountStaked;
 
-  // Token shift management
+  /* ══════ Token shift management specific ══════ */
   mapping(uint32 => uint256) public batched_stakerNextTokenShiftIndex;
   /**
   @notice Used to link a token shift to a staker state
@@ -206,9 +206,9 @@ contract Staker is IStaker, Initializable {
     emit StakerV1(_admin, _floatTreasury, _floatCapital, _floatToken, _floatPercentage);
   }
 
-  /*╔═════════════════════════════╗
-    ║       MULTI-SIG ADMIN       ║
-    ╚═════════════════════════════╝*/
+  /*╔═══════════════════╗
+    ║       ADMIN       ║
+    ╚═══════════════════╝*/
 
   /** 
   @notice Changes admin for the contract
