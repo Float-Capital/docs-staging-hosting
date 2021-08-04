@@ -68,11 +68,11 @@ module.exports = {
           items: [
             {
               label: "Discord",
-              href: "#",
+              href: "https://discord.gg/dqDwgrVYcU",
             },
             {
               label: "Twitter",
-              href: "#",
+              href: "https://twitter.com/float_capital",
             },
           ],
         },

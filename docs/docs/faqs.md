@@ -23,9 +23,15 @@ As an example, normally to get exposure to an asset, say Gold, you would need to
 
 ### What synthetic assets does Float Capital currently support?
 
-Our first synthetic asset is an 'index' known as the ethereum killers (ETHKillers). The EthKillers is the first synthetic market offered by Float Capital. This Market is an average of the prices of the tokens of the three protocols seen as alternatives to ethereum, namely TRON, XRP and EOS. The EthKillers market allows users to gain long or short exposure to an equally weighted basket containing TRON, XRP and EOS.
+Our testnet deployment currently supports 3 synthetic assets. This may change for Polygon launch.
 
-The next synthetic market we plan to release is an asset tracking bitcoin vs ethereum dominance. We plan to release many more awesome synthetics. Join our [Discord](https://discord.gg/qesr2KZAhn) and give us your suggestions on which markets to release next.
+One of our synthetic asset is an 'index' known as the ethereum killers (ETHKillers). This Market is an average of the prices of the tokens of the three protocols seen as alternatives to ethereum, namely TRON, XRP and EOS. The EthKillers market allows users to gain long or short exposure to an equally weighted basket containing TRON, XRP and EOS.
+
+Another synthetic market we have on the testnet is an asset tracking bitcoin vs ethereum dominance.
+
+The third testnet market listed is synthetic Doge coin.
+
+Join our [Discord](https://discord.gg/qesr2KZAhn) and give us your suggestions on which markets to release next.
 
 ### What are 'long' and 'short' tokens?
 
