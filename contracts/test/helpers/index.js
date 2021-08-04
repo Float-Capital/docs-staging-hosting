@@ -144,7 +144,7 @@ const createSynthetic = async (
     kInitialMultiplier,
     kPeriod,
     "5000000000000000", //50 basis points unstake fee
-    "500000000000000000",
+    "1000000000000000000",
     "5",
     0,
     1,
