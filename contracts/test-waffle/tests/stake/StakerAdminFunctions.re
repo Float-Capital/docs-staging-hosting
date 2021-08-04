@@ -8,7 +8,6 @@ let testUnit =
       ~contracts: ref(Helpers.coreContracts),
       ~accounts: ref(array(Ethers.Wallet.t)),
     ) => {
-
   describe_only("Staker Admin Functions", () => {
     let marketIndex = Helpers.randomJsInteger();
     let randomAddress1 = Helpers.randomAddress();
@@ -214,6 +213,7 @@ let testUnit =
                 ),
             ~reason="",
           );
+        ();
       });
 
       it("should update unstake fee correctly", () => {
@@ -241,7 +241,7 @@ let testUnit =
       let startingTestExponent = bnFromInt(1);
       let updatedExponent = bnFromInt(2);
 
-      let promiseRef: ref(JsPromise.t(ContractHelpers.transaction)) =
+      let txPromiseRef: ref(JsPromise.t(ContractHelpers.transaction)) =
         ref(()->JsPromise.resolve->Obj.magic);
 
       before_once'(() => {
@@ -255,15 +255,14 @@ let testUnit =
         StakerSmocked.InternalMock.mock_changeBalanceIncentiveExponentToReturn();
         let stakerAddress = accounts.contents->Array.getUnsafe(5);
 
-        let promise =
+        txPromiseRef :=
           contracts.contents.staker
           ->ContractHelpers.connect(~address=stakerAddress)
           ->Staker.changeBalanceIncentiveExponent(
               ~marketIndex,
-              ~balanceIncentive_curveExponent=startingTestExponent,
+              ~balanceIncentiveCurve_exponent=startingTestExponent,
             );
-        promiseRef := promise;
-        let%Await _ = promise;
+        txPromiseRef.contents;
       });
 
       it("should call the onlyAdmin Modifier", () => {
@@ -271,7 +270,7 @@ let testUnit =
           contracts.contents.staker
           ->Staker.changeBalanceIncentiveExponent(
               ~marketIndex,
-              ~balanceIncentive_curveExponent=updatedExponent,
+              ~balanceIncentiveCurve_exponent=updatedExponent,
             );
         StakerSmocked.InternalMock.onlyAdminModifierLogicCalls()
         ->Array.length
@@ -285,7 +284,7 @@ let testUnit =
         ->Array.getUnsafe(0)
         ->Chai.recordEqualFlat({
             marketIndex,
-            balanceIncentive_curveExponent: updatedExponent,
+            balanceIncentiveCurve_exponent: updatedExponent,
           })
       });
 
@@ -293,7 +292,7 @@ let testUnit =
         "should emit BalanceIncentiveExponentUpdated with correct arguments",
         () => {
         Chai.callEmitEvents(
-          ~call=promiseRef^,
+          ~call=txPromiseRef^,
           ~contract=contracts.contents.staker->Obj.magic,
           ~eventName="BalanceIncentiveExponentUpdated",
         )
@@ -312,22 +311,21 @@ let testUnit =
               ->ContractHelpers.connect(~address=adminWallet)
               ->Staker.Exposed._changeBalanceIncentiveExponentExposed(
                   ~marketIndex,
-                  ~balanceIncentive_curveExponent=newExponentOutOfBoundsHighSide,
+                  ~balanceIncentiveCurve_exponent=newExponentOutOfBoundsHighSide,
                 ),
             ~reason="",
           );
 
-        let%Await _ =
-          Chai.expectRevert(
-            ~transaction=
-              contracts.contents.staker
-              ->ContractHelpers.connect(~address=adminWallet)
-              ->Staker.Exposed._changeBalanceIncentiveExponentExposed(
-                  ~marketIndex,
-                  ~balanceIncentive_curveExponent=newExponentOutOfBoundsLowSide,
-                ),
-            ~reason="",
-          );
+        Chai.expectRevert(
+          ~transaction=
+            contracts.contents.staker
+            ->ContractHelpers.connect(~address=adminWallet)
+            ->Staker.Exposed._changeBalanceIncentiveExponentExposed(
+                ~marketIndex,
+                ~balanceIncentiveCurve_exponent=newExponentOutOfBoundsLowSide,
+              ),
+          ~reason="",
+        );
       });
 
       it("should update incentive exponent correctly", () => {
@@ -339,12 +337,12 @@ let testUnit =
           ->ContractHelpers.connect(~address=adminWallet)
           ->Staker.Exposed._changeBalanceIncentiveExponentExposed(
               ~marketIndex,
-              ~balanceIncentive_curveExponent=newExponent,
+              ~balanceIncentiveCurve_exponent=newExponent,
             );
 
         let%Await exponentAfterCall =
           contracts.contents.staker
-          ->Staker.Exposed.balanceIncentive_curveExponent(marketIndex);
+          ->Staker.Exposed.balanceIncentiveCurve_exponent(marketIndex);
 
         Chai.bnEqual(exponentAfterCall, newExponent);
       });
@@ -355,7 +353,7 @@ let testUnit =
       let startingEquilibriumOffset = Helpers.randomInteger();
       let updatedEquilibriumOffset = Helpers.randomInteger();
 
-      let promiseRef: ref(JsPromise.t(ContractHelpers.transaction)) =
+      let txPromiseRef: ref(JsPromise.t(ContractHelpers.transaction)) =
         ref(()->JsPromise.resolve->Obj.magic);
 
       before_once'(() => {
@@ -369,15 +367,14 @@ let testUnit =
         StakerSmocked.InternalMock.mock_changeBalanceIncentiveEquilibriumOffsetToReturn();
         let stakerAddress = accounts.contents->Array.getUnsafe(5);
 
-        let promise =
+        txPromiseRef :=
           contracts.contents.staker
           ->ContractHelpers.connect(~address=stakerAddress)
           ->Staker.changeBalanceIncentiveEquilibriumOffset(
               ~marketIndex,
               ~balanceIncentiveCurve_equilibriumOffset=startingEquilibriumOffset,
             );
-        promiseRef := promise;
-        let%Await _ = promise;
+        txPromiseRef.contents;
       });
 
       it("should call the onlyAdmin Modifier", () => {
@@ -407,7 +404,7 @@ let testUnit =
         "should emit BalanceIncentiveEquilibriumOffsetUpdated with correct arguments",
         () => {
         Chai.callEmitEvents(
-          ~call=promiseRef^,
+          ~call=txPromiseRef^,
           ~contract=contracts.contents.staker->Obj.magic,
           ~eventName="BalanceIncentiveEquilibriumOffsetUpdated",
         )
@@ -446,6 +443,7 @@ let testUnit =
                 ),
             ~reason="",
           );
+        ();
       });
 
       it("should update incentive equilibrium offset correctly", () => {
