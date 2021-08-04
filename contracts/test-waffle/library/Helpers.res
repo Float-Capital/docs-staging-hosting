@@ -68,7 +68,7 @@ let randomAddress = () => Ethers.Wallet.createRandom().address
 
 let createSyntheticMarket = (
   ~admin,
-  ~initialMarketSeedForEachMarketSide=bnFromString("500000000000000000"),
+  ~initialMarketSeedForEachMarketSide=CONSTANTS.tenToThe18,
   ~paymentToken: ERC20Mock.t,
   ~treasury,
   ~marketName,
@@ -109,7 +109,7 @@ let createSyntheticMarket = (
         ~kPeriod=Ethers.BigNumber.fromInt(0),
         ~unstakeFee_e18=Ethers.BigNumber.fromInt(50),
         ~initialMarketSeedForEachMarketSide,
-        ~balanceIncentive_curveExponent=bnFromInt(5),
+        ~balanceIncentiveCurve_exponent=bnFromInt(5),
         ~balanceIncentiveCurve_equilibriumOffset=bnFromInt(0),
         ~marketTreasurySplitGradient_e18=bnFromInt(1),
       )
@@ -171,7 +171,7 @@ let initialize = (~admin: Ethers.Wallet.t, ~exposeInternals: bool) => {
   )) => {
     TokenFactory.make(~longShort=longShort.address)->JsPromise.then(tokenFactory => {
       JsPromise.all4((
-        floatToken->FloatToken.initialize3(
+        floatToken->FloatToken.initializeFloatToken(
           ~name="Float token",
           ~symbol="FLOAT TOKEN",
           ~stakerAddress=staker.address,
@@ -188,6 +188,8 @@ let initialize = (~admin: Ethers.Wallet.t, ~exposeInternals: bool) => {
           ~longShort=longShort.address,
           ~floatToken=floatToken.address,
           ~floatCapital=floatCapital.address,
+          // NOTE: for now using the floatCapital address as the float treasury
+          ~floatTreasury=floatCapital.address,
           ~floatPercentage=bnFromString("250000000000000000"),
         ),
       ))

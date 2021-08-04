@@ -2,15 +2,10 @@
 
 pragma solidity 0.8.3;
 
-import "hardhat/console.sol";
-
 import "@openzeppelin/contracts/token/ERC20/presets/ERC20PresetMinterPauser.sol";
 
 import "../interfaces/IYieldManager.sol";
 import "../interfaces/aave/IAaveIncentivesController.sol";
-
-// TODO: it would be better to deprecate this mock and rather mock aave and use the
-//       `YieldManagerAave` to avoid duplicate code/logic that can easily go out of sync.
 
 /*
  * YieldManagerMock is an implementation of a yield manager that supports
@@ -140,7 +135,7 @@ contract YieldManagerMock is IYieldManager {
 
   function distributeYieldForTreasuryAndReturnMarketAllocation(
     uint256 totalValueRealizedForMarket,
-    uint256 treasuryYieldPercentE18
+    uint256 treasuryYieldPercent_e18
   ) external override longShortOnly returns (uint256) {
     uint256 unrealizedYield = totalHeld - totalValueRealizedForMarket - totalReservedForTreasury;
 
@@ -148,7 +143,7 @@ contract YieldManagerMock is IYieldManager {
       return 0;
     }
 
-    uint256 amountForTreasury = (unrealizedYield * treasuryYieldPercentE18) / TEN_TO_THE_18;
+    uint256 amountForTreasury = (unrealizedYield * treasuryYieldPercent_e18) / TEN_TO_THE_18;
     uint256 amountForMarketIncentives = unrealizedYield - amountForTreasury;
 
     totalReservedForTreasury += amountForTreasury;
@@ -156,6 +151,5 @@ contract YieldManagerMock is IYieldManager {
     return amountForMarketIncentives;
   }
 
-  // TODO STENT need to change this and unit test it
   function withdrawTreasuryFunds() external override longShortOnly {}
 }

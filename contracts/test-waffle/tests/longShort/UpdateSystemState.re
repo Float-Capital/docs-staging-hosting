@@ -280,6 +280,8 @@ let testUnit =
                 longValue: oldLongValue,
                 shortValue: oldShortValue,
                 stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted: stakerNextPrice_currentUpdateIndex,
+                forceAccumulativeIssuancePerStakeStakedSynthSnapshotEvenIfExistingWithSameTimestamp:
+                  true,
               },
             |]);
         },
@@ -317,6 +319,8 @@ let testUnit =
                 longValue: oldLongValue,
                 shortValue: oldShortValue,
                 stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted: zeroBn,
+                forceAccumulativeIssuancePerStakeStakedSynthSnapshotEvenIfExistingWithSameTimestamp:
+                  false,
               },
             |]);
 
@@ -351,6 +355,8 @@ let testUnit =
                   longValue: oldLongValue,
                   shortValue: oldShortValue,
                   stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted: zeroBn,
+                  forceAccumulativeIssuancePerStakeStakedSynthSnapshotEvenIfExistingWithSameTimestamp:
+                    true,
                 },
               |]);
           },

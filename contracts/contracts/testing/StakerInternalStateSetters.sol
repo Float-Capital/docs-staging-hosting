@@ -250,11 +250,13 @@ contract StakerInternalStateSetters is Staker {
     address syntheticToken,
     address user,
     uint256 amountStaked,
-    uint256 fees
+    uint256 fees,
+    address treasury
   ) external {
     marketIndexOfToken[syntheticToken] = marketIndex;
-    marketUnstakeFeeBasis_points[marketIndex] = fees;
+    marketUnstakeFee_e18[marketIndex] = fees;
     userAmountStaked[syntheticToken][user] = amountStaked;
+    floatTreasury = treasury;
   }
 
   function setWithdrawGlobals(
@@ -276,6 +278,12 @@ contract StakerInternalStateSetters is Staker {
     marketIndexOfToken[token] = marketIndex;
     longShort = _longShort;
     userAmountStaked[token][user] = amountStaked;
+  }
+
+  function setEquilibriumOffset(uint32 marketIndex, int256 _balanceIncentiveCurve_equilibriumOffset)
+    external
+  {
+    balanceIncentiveCurve_equilibriumOffset[marketIndex] = _balanceIncentiveCurve_equilibriumOffset;
   }
 
   ///////////////////////////////////////////////////////

@@ -10,7 +10,7 @@ abstract contract IStaker {
     uint256 kInitialMultiplier,
     uint256 kPeriod,
     uint256 unstakeFee_e18,
-    uint256 _balanceIncentive_curveExponent,
+    uint256 _balanceIncentiveCurve_exponent,
     int256 _balanceIncentiveCurve_equilibriumOffset
   ) external virtual;
 
@@ -20,7 +20,8 @@ abstract contract IStaker {
     uint256 shortTokenPrice,
     uint256 longValue,
     uint256 shortValue,
-    uint256 stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted
+    uint256 stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted,
+    bool forceAccumulativeIssuancePerStakeStakedSynthSnapshotEvenIfExistingWithSameTimestamp
   ) external virtual;
 
   function stakeFromUser(address from, uint256 amount) public virtual;
