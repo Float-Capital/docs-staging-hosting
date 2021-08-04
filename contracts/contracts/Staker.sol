@@ -2,7 +2,6 @@
 
 pragma solidity 0.8.3;
 
-import "hardhat/console.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/presets/ERC20PresetMinterPauserUpgradeable.sol";
 
 import "./interfaces/IFloatToken.sol";
@@ -33,7 +32,7 @@ contract Staker is IStaker, Initializable {
   // Market specific
   mapping(uint32 => uint256) public marketLaunchIncentive_period; // seconds
   mapping(uint32 => uint256) public marketLaunchIncentive_multipliers; // e18 scale
-  mapping(uint32 => uint256) public marketUnstakeFeeBasis_points;
+  mapping(uint32 => uint256) public marketUnstakeFee_e18;
   mapping(uint32 => uint256) public balanceIncentive_curveExponent;
   mapping(uint32 => int256) public balanceIncentiveCurve_equilibriumOffset;
 
@@ -86,7 +85,7 @@ contract Staker is IStaker, Initializable {
 
   event MarketAddedToStaker(
     uint32 marketIndex,
-    uint256 exitFeeBasisPoints,
+    uint256 exitFee_e18,
     uint256 period,
     uint256 multiplier,
     uint256 balanceIncentiveExponent,
@@ -104,17 +103,8 @@ contract Staker is IStaker, Initializable {
 
   event StakeWithdrawn(address user, address token, uint256 amount);
 
-  // TODO: remove `FloatMinted` and replace it with `FloatMintedNew`
-  event FloatMinted(
-    address user,
-    uint32 marketIndex,
-    uint256 amountLong,
-    uint256 amountShort,
-    uint256 lastMintIndex
-  );
-
   // Note: the `amountFloatMinted` isn't strictly needed by the graph, but it is good to add it to validate calculations are accurate.
-  event FloatMintedNew(address user, uint32 marketIndex, uint256 amountFloatMinted);
+  event FloatMinted(address user, uint32 marketIndex, uint256 amountFloatMinted);
 
   event MarketLaunchIncentiveParametersChanges(
     uint32 marketIndex,
@@ -215,8 +205,8 @@ contract Staker is IStaker, Initializable {
   }
 
   function _changeUnstakeFee(uint32 marketIndex, uint256 newMarketUnstakeFee_e18) internal virtual {
-    require(newMarketUnstakeFee_e18 <= 5e16); // 5% fee is the max fee possible.
-    marketUnstakeFeeBasis_points[marketIndex] = newMarketUnstakeFee_e18;
+    require(newMarketUnstakeFee_e18 <= 5e16); // Explicitely stating 5% fee as the max fee possible.
+    marketUnstakeFee_e18[marketIndex] = newMarketUnstakeFee_e18;
   }
 
   function changeUnstakeFee(uint32 marketIndex, uint256 newMarketUnstakeFee_e18)
@@ -328,7 +318,7 @@ contract Staker is IStaker, Initializable {
 
     _changeUnstakeFee(marketIndex, unstakeFee_e18);
 
-    // Rather start this at 1 to prevent confusion.
+    // Set this value to one initially - 0 is a null value and thus potentially bug prone.
     batched_stakerNextTokenShiftIndex[marketIndex] = 1;
 
     emit MarketAddedToStaker(
@@ -544,7 +534,7 @@ contract Staker is IStaker, Initializable {
     uint256 shortValue
   ) internal virtual {
     (
-      uint256 newLongAccumaltiveValue,
+      uint256 newLongAccumulativeValue,
       uint256 newShortAccumulativeValue
     ) = _calculateNewCumulativeIssuancePerStakedSynth(
       marketIndex,
@@ -558,7 +548,7 @@ contract Staker is IStaker, Initializable {
 
     // Set cumulative 'r' value on new accumulativeIssuancePerStakedSynthSnapshot.
     accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][newIndex]
-    .accumulativeFloatPerSyntheticToken_long = newLongAccumaltiveValue;
+    .accumulativeFloatPerSyntheticToken_long = newLongAccumulativeValue;
     accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][newIndex]
     .accumulativeFloatPerSyntheticToken_short = newShortAccumulativeValue;
 
@@ -571,7 +561,7 @@ contract Staker is IStaker, Initializable {
     emit AccumulativeIssuancePerStakedSynthSnapshotCreated(
       marketIndex,
       newIndex,
-      newLongAccumaltiveValue,
+      newLongAccumulativeValue,
       newShortAccumulativeValue
     );
   }
@@ -750,15 +740,7 @@ contract Staker is IStaker, Initializable {
       userIndexOfLastClaimedReward[marketIndex][user] = latestRewardIndex[marketIndex];
 
       _mintFloat(user, floatToMint);
-      // TODO: remove `FloatMinted` and replace it with `FloatMintedNew`
-      emit FloatMinted(
-        user,
-        marketIndex,
-        floatToMint,
-        0, /*Setting this to zero has no effect on the graph, just here so the graph doesn't break in the mean time*/
-        latestRewardIndex[marketIndex]
-      );
-      emit FloatMintedNew(user, marketIndex, floatToMint);
+      emit FloatMinted(user, marketIndex, floatToMint);
     }
   }
 
@@ -776,15 +758,7 @@ contract Staker is IStaker, Initializable {
 
         floatTotal += floatToMint;
 
-        // TODO: remove `FloatMinted` and replace it with `FloatMintedNew`
-        emit FloatMinted(
-          user,
-          marketIndexes[i],
-          floatToMint,
-          0, /*Setting this to zero has no effect on the graph, just here so the graph doesn't break in the mean time*/
-          latestRewardIndex[marketIndexes[i]]
-        );
-        emit FloatMintedNew(user, marketIndexes[i], floatToMint);
+        emit FloatMinted(user, marketIndexes[i], floatToMint);
       }
     }
     if (floatTotal > 0) {
@@ -909,8 +883,7 @@ contract Staker is IStaker, Initializable {
 
     userAmountStaked[token][msg.sender] = userAmountStaked[token][msg.sender] - amount;
 
-    // TODO STENT what happens with the fees that are left in this contract?
-    uint256 amountFees = (amount * marketUnstakeFeeBasis_points[marketIndex]) / 1e18;
+    uint256 amountFees = (amount * marketUnstakeFee_e18[marketIndex]) / 1e18;
 
     IERC20(token).transfer(msg.sender, amount - amountFees);
 

@@ -11,7 +11,7 @@ let testUnit =
   describeUnit("_claimAndDistributeYieldThenRebalanceMarket", () => {
     let marketIndex = Helpers.randomJsInteger();
     let oldAssetPrice = Helpers.randomTokenAmount();
-    let treasuryYieldPercentE18 = Helpers.randomRatio1e18();
+    let treasuryYieldPercent_e18 = Helpers.randomRatio1e18();
 
     let marketAmountFromYieldManager = Helpers.randomTokenAmount();
 
@@ -77,7 +77,7 @@ let testUnit =
 
         LongShortSmocked.InternalMock.mock_getYieldSplitToReturn(
           isLongSideUnderbalanced,
-          treasuryYieldPercentE18,
+          treasuryYieldPercent_e18,
         );
 
         contracts.contents.yieldManagerSmocked
@@ -116,7 +116,7 @@ let testUnit =
           ->Chai.recordArrayDeepEqualFlat([|
               {
                 totalValueRealizedForMarket: totalValueLockedInMarket,
-                treasuryYieldPercentE18,
+                treasuryYieldPercent_e18,
               },
             |])
         });

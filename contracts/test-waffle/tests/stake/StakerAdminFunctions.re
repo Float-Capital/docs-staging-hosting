@@ -232,8 +232,7 @@ let testUnit =
             );
 
         let%Await feeAfterCall =
-          contracts.contents.staker
-          ->Staker.Exposed.marketUnstakeFeeBasis_points(1);
+          contracts.contents.staker->Staker.Exposed.marketUnstakeFee_e18(1);
 
         Chai.bnEqual(feeAfterCall, newFeePercentageRandom);
       });
