@@ -68,7 +68,7 @@ let test =
           ~contracts,
           ~accounts,
         );
-      let%Await balanceIncentiveCurve_exponentFetched =
+      let%AwaitThen balanceIncentiveCurve_exponentFetched =
         contracts^.staker->Staker.balanceIncentiveCurve_exponent(marketIndex);
       balanceIncentiveCurve_exponent := balanceIncentiveCurve_exponentFetched;
 
