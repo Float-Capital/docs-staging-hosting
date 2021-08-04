@@ -110,8 +110,7 @@ let testUnit =
                   Ethers.BigNumber.fromUnsafe("60000000000000000"),
                 ~unstakeFee_e18=
                   Ethers.BigNumber.fromUnsafe("5000000000000000"), // 0.5% or 50 basis points
-                ~initialMarketSeedForEachMarketSide=
-                  Ethers.BigNumber.fromUnsafe("7"),
+                ~initialMarketSeedForEachMarketSide=CONSTANTS.tenToThe18,
                 ~balanceIncentive_curveExponent=bnFromInt(5),
                 ~balanceIncentiveCurve_equilibriumOffset=bnFromInt(0),
                 ~marketTreasurySplitGradient_e18=bnFromInt(1),
@@ -136,8 +135,7 @@ let testUnit =
                   Ethers.BigNumber.fromUnsafe("60000000000000000"),
                 ~unstakeFee_e18=
                   Ethers.BigNumber.fromUnsafe("5000000000000000"), // 0.5% or 50 basis points
-                ~initialMarketSeedForEachMarketSide=
-                  Ethers.BigNumber.fromUnsafe("7"),
+                ~initialMarketSeedForEachMarketSide=CONSTANTS.tenToThe18,
                 ~balanceIncentive_curveExponent=bnFromInt(5),
                 ~balanceIncentiveCurve_equilibriumOffset=bnFromInt(0),
                 ~marketTreasurySplitGradient_e18=bnFromInt(1),
@@ -165,7 +163,7 @@ let testIntegration =
               ~kInitialMultiplier=CONSTANTS.oneBn,
               ~kPeriod=CONSTANTS.oneBn,
               ~unstakeFee_e18=Ethers.BigNumber.fromUnsafe("5000000000000000"), // 0.5% or 50 basis points
-              ~initialMarketSeedForEachMarketSide=CONSTANTS.oneBn,
+              ~initialMarketSeedForEachMarketSide=CONSTANTS.tenToThe18,
               ~balanceIncentive_curveExponent=bnFromInt(5),
               ~balanceIncentiveCurve_equilibriumOffset=bnFromInt(0),
               ~marketTreasurySplitGradient_e18=bnFromInt(1),
@@ -187,7 +185,7 @@ let testIntegration =
             ~kInitialMultiplier=CONSTANTS.oneBn,
             ~kPeriod=CONSTANTS.oneBn,
             ~unstakeFee_e18=Ethers.BigNumber.fromUnsafe("5000000000000000"), // 0.5% or 50 basis points
-            ~initialMarketSeedForEachMarketSide=CONSTANTS.oneBn,
+            ~initialMarketSeedForEachMarketSide=CONSTANTS.tenToThe18,
             ~balanceIncentive_curveExponent=bnFromInt(5),
             ~balanceIncentiveCurve_equilibriumOffset=bnFromInt(0),
             ~marketTreasurySplitGradient_e18=bnFromInt(1),
