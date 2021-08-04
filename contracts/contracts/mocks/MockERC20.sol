@@ -2,8 +2,6 @@
 
 pragma solidity 0.8.3;
 
-import "hardhat/console.sol";
-
 contract MockERC20 {
   address public steward;
 

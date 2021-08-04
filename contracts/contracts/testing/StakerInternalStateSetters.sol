@@ -253,7 +253,7 @@ contract StakerInternalStateSetters is Staker {
     uint256 fees
   ) external {
     marketIndexOfToken[syntheticToken] = marketIndex;
-    marketUnstakeFeeBasis_points[marketIndex] = fees;
+    marketUnstakeFee_e18[marketIndex] = fees;
     userAmountStaked[syntheticToken][user] = amountStaked;
   }
 

@@ -2,8 +2,6 @@
 
 pragma solidity 0.8.3;
 
-import "hardhat/console.sol";
-
 import "@openzeppelin/contracts/token/ERC20/presets/ERC20PresetMinterPauser.sol";
 
 import "../interfaces/IYieldManager.sol";
@@ -86,7 +84,7 @@ contract YieldManagerMock is IYieldManager {
   /**
    * Adds the given yield percent to the token holdings.
    */
-  function settleWithYieldPercent(uint256 yieldPercent) public {
+  function settleWithYieldPercent(uint256 yieldPercent) external {
     uint256 totalYield = (totalHeld * yieldPercent) / TEN_TO_THE_18;
 
     lastSettled = block.timestamp;
@@ -97,7 +95,7 @@ contract YieldManagerMock is IYieldManager {
   /**
    * Adds the given absolute yield to the token holdings.
    */
-  function settleWithYieldAbsolute(uint256 totalYield) public {
+  function settleWithYieldAbsolute(uint256 totalYield) external {
     lastSettled = block.timestamp;
     totalHeld = totalHeld + totalYield;
     token.mint(address(this), totalYield);
@@ -106,40 +104,49 @@ contract YieldManagerMock is IYieldManager {
   /**
    * Sets the yield percentage per second for the given token.
    */
-  function setYieldRate(uint256 _yieldRate) public {
+  function setYieldRate(uint256 _yieldRate) external {
     yieldRate = _yieldRate;
   }
 
-  function depositPaymentToken(uint256 amount) public override longShortOnly {
+  function depositPaymentToken(uint256 amount) external override longShortOnly {
     // Ensure token state is current.
     settle();
 
     // Transfer tokens to manager contract.
-    token.transferFrom(longShort, address(this), amount);
     totalHeld = totalHeld + amount;
   }
 
-  function withdrawPaymentToken(uint256 amount) public override longShortOnly {
+  /// @notice Allows the LongShort pay out a user from tokens already withdrawn from Aave
+  /// @param user User to recieve the payout
+  /// @param amount Amount of payment token to pay to user
+  function transferPaymentTokensToUser(address user, uint256 amount)
+    external
+    override
+    longShortOnly
+  {
+    // Transfer tokens back to LongShort contract.
+    token.transfer(user, amount);
+  }
+
+  function removePaymentTokenFromMarket(uint256 amount) external override longShortOnly {
     // Ensure token state is current.
     settle();
     require(amount <= totalHeld);
 
-    // Transfer tokens back to LongShort contract.
-    token.transfer(longShort, amount);
     totalHeld = totalHeld - amount;
   }
 
   function distributeYieldForTreasuryAndReturnMarketAllocation(
     uint256 totalValueRealizedForMarket,
-    uint256 treasuryYieldPercentE18
-  ) public override longShortOnly returns (uint256) {
+    uint256 treasuryYieldPercent_e18
+  ) external override longShortOnly returns (uint256) {
     uint256 unrealizedYield = totalHeld - totalValueRealizedForMarket - totalReservedForTreasury;
 
     if (unrealizedYield == 0) {
       return 0;
     }
 
-    uint256 amountForTreasury = (unrealizedYield * treasuryYieldPercentE18) / TEN_TO_THE_18;
+    uint256 amountForTreasury = (unrealizedYield * treasuryYieldPercent_e18) / TEN_TO_THE_18;
     uint256 amountForMarketIncentives = unrealizedYield - amountForTreasury;
 
     totalReservedForTreasury += amountForTreasury;

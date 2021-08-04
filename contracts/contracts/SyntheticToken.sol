@@ -2,7 +2,6 @@
 
 pragma solidity 0.8.3;
 
-import "hardhat/console.sol";
 import "./interfaces/IStaker.sol";
 import "./interfaces/ILongShort.sol";
 import "./interfaces/ISyntheticToken.sol";

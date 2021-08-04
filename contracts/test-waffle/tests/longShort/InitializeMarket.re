@@ -50,9 +50,11 @@ let testUnit =
           ->LongShort.initializeMarket(
               ~marketIndex=1,
               ~kPeriod=Ethers.BigNumber.fromUnsafe("4"),
-              ~kInitialMultiplier=Ethers.BigNumber.fromUnsafe("6"),
+              ~kInitialMultiplier=
+                Ethers.BigNumber.fromUnsafe("60000000000000000"),
               ~unstakeFee_e18=Ethers.BigNumber.fromUnsafe("5000000000000000"), // 0.5% or 50 basis points
-              ~initialMarketSeed=Ethers.BigNumber.fromUnsafe("7"),
+              ~initialMarketSeedForEachMarketSide=
+                Ethers.BigNumber.fromUnsafe("7"),
               ~balanceIncentive_curveExponent=bnFromInt(5),
               ~balanceIncentiveCurve_equilibriumOffset=bnFromInt(0),
               ~marketTreasurySplitGradient_e18=bnFromInt(1),
@@ -64,7 +66,8 @@ let testUnit =
         Chai.recordEqualFlatLabeled(
           ~expected=stakerCalls->Array.getExn(0),
           ~actual={
-            kInitialMultiplier: Ethers.BigNumber.fromUnsafe("6"),
+            kInitialMultiplier:
+              Ethers.BigNumber.fromUnsafe("60000000000000000"),
             marketIndex: 1,
             longToken: sampleAddress,
             shortToken: sampleAddress,
@@ -81,7 +84,8 @@ let testUnit =
         Chai.recordEqualFlatLabeled(
           ~actual={
             marketIndex: 1,
-            initialMarketSeed: Ethers.BigNumber.fromUnsafe("7"),
+            initialMarketSeedForEachMarketSide:
+              Ethers.BigNumber.fromUnsafe("7"),
           },
           ~expected=seedMarketInitiallyCalls->Array.getExn(0),
         );
@@ -109,10 +113,12 @@ let testUnit =
             ->LongShort.initializeMarket(
                 ~marketIndex=1,
                 ~kPeriod=Ethers.BigNumber.fromUnsafe("4"),
-                ~kInitialMultiplier=Ethers.BigNumber.fromUnsafe("6"),
+                ~kInitialMultiplier=
+                  Ethers.BigNumber.fromUnsafe("60000000000000000"),
                 ~unstakeFee_e18=
                   Ethers.BigNumber.fromUnsafe("5000000000000000"), // 0.5% or 50 basis points
-                ~initialMarketSeed=Ethers.BigNumber.fromUnsafe("7"),
+                ~initialMarketSeedForEachMarketSide=
+                  Ethers.BigNumber.fromUnsafe("7"),
                 ~balanceIncentive_curveExponent=bnFromInt(5),
                 ~balanceIncentiveCurve_equilibriumOffset=bnFromInt(0),
                 ~marketTreasurySplitGradient_e18=bnFromInt(1),
@@ -133,10 +139,12 @@ let testUnit =
             ->LongShort.initializeMarket(
                 ~marketIndex=2,
                 ~kPeriod=Ethers.BigNumber.fromUnsafe("4"),
-                ~kInitialMultiplier=Ethers.BigNumber.fromUnsafe("6"),
+                ~kInitialMultiplier=
+                  Ethers.BigNumber.fromUnsafe("60000000000000000"),
                 ~unstakeFee_e18=
                   Ethers.BigNumber.fromUnsafe("5000000000000000"), // 0.5% or 50 basis points
-                ~initialMarketSeed=Ethers.BigNumber.fromUnsafe("7"),
+                ~initialMarketSeedForEachMarketSide=
+                  Ethers.BigNumber.fromUnsafe("7"),
                 ~balanceIncentive_curveExponent=bnFromInt(5),
                 ~balanceIncentiveCurve_equilibriumOffset=bnFromInt(0),
                 ~marketTreasurySplitGradient_e18=bnFromInt(1),
@@ -164,7 +172,7 @@ let testIntegration =
               ~kInitialMultiplier=CONSTANTS.oneBn,
               ~kPeriod=CONSTANTS.oneBn,
               ~unstakeFee_e18=Ethers.BigNumber.fromUnsafe("5000000000000000"), // 0.5% or 50 basis points
-              ~initialMarketSeed=CONSTANTS.oneBn,
+              ~initialMarketSeedForEachMarketSide=CONSTANTS.oneBn,
               ~balanceIncentive_curveExponent=bnFromInt(5),
               ~balanceIncentiveCurve_equilibriumOffset=bnFromInt(0),
               ~marketTreasurySplitGradient_e18=bnFromInt(1),
@@ -186,7 +194,7 @@ let testIntegration =
             ~kInitialMultiplier=CONSTANTS.oneBn,
             ~kPeriod=CONSTANTS.oneBn,
             ~unstakeFee_e18=Ethers.BigNumber.fromUnsafe("5000000000000000"), // 0.5% or 50 basis points
-            ~initialMarketSeed=CONSTANTS.oneBn,
+            ~initialMarketSeedForEachMarketSide=CONSTANTS.oneBn,
             ~balanceIncentive_curveExponent=bnFromInt(5),
             ~balanceIncentiveCurve_equilibriumOffset=bnFromInt(0),
             ~marketTreasurySplitGradient_e18=bnFromInt(1),
@@ -219,7 +227,7 @@ let testIntegration =
             ~kInitialMultiplier=CONSTANTS.tenToThe18,
             ~kPeriod=CONSTANTS.oneBn,
             ~unstakeFee_e18=Ethers.BigNumber.fromUnsafe("5000000000000000"), // 0.5% or 50 basis points
-            ~initialMarketSeed=CONSTANTS.oneBn,
+            ~initialMarketSeedForEachMarketSide=CONSTANTS.oneBn,
             ~balanceIncentive_curveExponent=bnFromInt(5),
             ~balanceIncentiveCurve_equilibriumOffset=bnFromInt(0),
             ~marketTreasurySplitGradient_e18=bnFromInt(1),
