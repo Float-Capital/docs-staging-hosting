@@ -890,7 +890,7 @@ contract Staker is IStaker, Initializable {
   /**
   @notice A user with synthetic tokens stakes by calling stake on the token
   contract which calls this function. We need to first update the
-  state of the system before staking to correctly calculate user rewards.
+  state of the LongShort contract for this market before staking to correctly calculate user rewards.
   @param amount Amount to stake.
   @param from Address to stake for.
   */
