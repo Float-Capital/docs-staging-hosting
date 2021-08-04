@@ -659,9 +659,6 @@ contract Staker is IStaker, Initializable {
   ) external override onlyLongShort {
     // Only add a new accumulativeIssuancePerStakedSynthSnapshot if some time has passed.
 
-
-      bool timeDeltaSinceLastUpdateGreaterThanZero
-     = _calculateTimeDeltaFromLastAccumulativeIssuancePerStakedSynthSnapshot(marketIndex) > 0;
     // the `stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted` value will be 0 if there is no staker related action in an executed batch
     if (stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted > 0) {
       stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping[
@@ -669,16 +666,14 @@ contract Staker is IStaker, Initializable {
       ] = stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted;
       stakerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping[
         batched_stakerNextTokenShiftIndex[marketIndex]
-      ] = timeDeltaSinceLastUpdateGreaterThanZero
-        ? latestRewardIndex[marketIndex] + 1
-        : latestRewardIndex[marketIndex];
+      ] = latestRewardIndex[marketIndex] + 1;
       batched_stakerNextTokenShiftIndex[marketIndex] += 1;
 
       emit SyntheticTokensShifted();
     }
 
     // Time delta is fetched twice in below code, can pass through? Which is less gas?
-    if (timeDeltaSinceLastUpdateGreaterThanZero) {
+    if (_calculateTimeDeltaFromLastAccumulativeIssuancePerStakedSynthSnapshot(marketIndex) > 0) {
       _setCurrentAccumulativeIssuancePerStakeStakedSynthSnapshot(
         marketIndex,
         longPrice,
