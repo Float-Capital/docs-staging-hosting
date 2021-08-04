@@ -76,13 +76,13 @@ contract SyntheticToken is ISyntheticToken {
   /// @param account The account for which to burn tokens for.
   /// @param amount The amount of tokens to burn in wei.
   function _burn(address account, uint256 amount) internal override {
-    require(msg.sender == address(longShort), "Only LongShort contract");
+    require(msg.sender == longShort, "Only LongShort contract");
     super._burn(account, amount);
   }
 
   /** 
   @notice Overrides the default ERC20 transferFrom.
-  @dev To allow users to avoid approving yield managers when redeeming tokens,
+  @dev To allow users to avoid approving LongShort when redeeming tokens,
        longShort has a virtual infinite allowance.
   @param sender User for which to transfer tokens.
   @param recipient Recipient of the transferred tokens.
@@ -93,7 +93,7 @@ contract SyntheticToken is ISyntheticToken {
     address recipient,
     uint256 amount
   ) public override returns (bool) {
-    if (msg.sender == address(longShort)) {
+    if (recipient == longShort && msg.sender == longShort) {
       super._transfer(sender, recipient, amount);
       return true;
     } else {
@@ -113,7 +113,7 @@ contract SyntheticToken is ISyntheticToken {
     address,
     uint256
   ) internal override {
-    if (sender != address(longShort)) {
+    if (sender != longShort) {
       ILongShort(longShort).executeOutstandingNextPriceSettlementsUser(sender, marketIndex);
     }
   }
