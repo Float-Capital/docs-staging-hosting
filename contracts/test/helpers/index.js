@@ -31,7 +31,7 @@ const initialize = async (admin) => {
     from: admin,
   });
 
-  const tokenFactory = await TokenFactory.new(admin, longShort.address, {
+  const tokenFactory = await TokenFactory.new(longShort.address, {
     from: admin,
   });
 
@@ -50,9 +50,14 @@ const initialize = async (admin) => {
   const floatToken = await FloatToken.new({
     from: admin,
   });
-  await floatToken.initialize3("Float token", "FLOAT TOKEN", staker.address, {
-    from: admin,
-  });
+  await floatToken.initializeFloatToken(
+    "Float token",
+    "FLOAT TOKEN",
+    staker.address,
+    {
+      from: admin,
+    }
+  );
 
   await treasury.initialize(admin, {
     from: admin,
@@ -72,6 +77,8 @@ const initialize = async (admin) => {
     admin,
     longShort.address,
     floatToken.address,
+    /// Using the float capital address for the 
+    floatCapital.address,
     floatCapital.address,
     "250000000000000000", // 25%
     {
@@ -103,8 +110,8 @@ const createSynthetic = async (
     from: admin,
   });
 
-  await fundToken.mint(admin, "1000000000000000000", { from: admin });
-  await fundToken.approve(longShort.address, "1000000000000000000", {
+  await fundToken.mint(admin, "10000000000000000000", { from: admin });
+  await fundToken.approve(longShort.address, "10000000000000000000", {
     from: admin,
   });
 
@@ -113,7 +120,6 @@ const createSynthetic = async (
   });
 
   const yieldManager = await YieldManager.new(
-    admin,
     longShort.address,
     treasury.address,
     fundToken.address,
@@ -145,7 +151,7 @@ const createSynthetic = async (
     kInitialMultiplier,
     kPeriod,
     "5000000000000000", //50 basis points unstake fee
-    "500000000000000000",
+    "1000000000000000000",
     "5",
     0,
     1,

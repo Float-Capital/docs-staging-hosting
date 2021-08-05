@@ -68,7 +68,7 @@ let randomAddress = () => Ethers.Wallet.createRandom().address
 
 let createSyntheticMarket = (
   ~admin,
-  ~initialMarketSeed=bnFromString("500000000000000000"),
+  ~initialMarketSeedForEachMarketSide=CONSTANTS.tenToThe18,
   ~paymentToken: ERC20Mock.t,
   ~treasury,
   ~marketName,
@@ -77,18 +77,13 @@ let createSyntheticMarket = (
 ) => {
   JsPromise.all3((
     OracleManagerMock.make(~admin),
-    YieldManagerMock.make(
-      ~admin,
-      ~longShort=longShort.address,
-      ~token=paymentToken.address,
-      ~treasury,
-    ),
+    YieldManagerMock.make(~longShort=longShort.address, ~token=paymentToken.address, ~treasury),
     paymentToken
-    ->ERC20Mock.mint(~_to=admin, ~amount=initialMarketSeed->mul(bnFromInt(100)))
+    ->ERC20Mock.mint(~_to=admin, ~amount=initialMarketSeedForEachMarketSide->mul(bnFromInt(100)))
     ->JsPromise.then(_ =>
       paymentToken->ERC20Mock.approve(
         ~spender=longShort.address,
-        ~amount=initialMarketSeed->mul(bnFromInt(100)),
+        ~amount=initialMarketSeedForEachMarketSide->mul(bnFromInt(100)),
       )
     ),
   ))->JsPromise.then(((oracleManager, yieldManager, _)) => {
@@ -112,11 +107,11 @@ let createSyntheticMarket = (
         ~marketIndex,
         ~kInitialMultiplier=Ethers.BigNumber.fromUnsafe("1000000000000000000"),
         ~kPeriod=Ethers.BigNumber.fromInt(0),
-        ~unstakeFeeE18=Ethers.BigNumber.fromInt(50),
-        ~initialMarketSeed,
-        ~balanceIncentiveCurveExponent=bnFromInt(5),
-        ~balanceIncentiveCurveEquilibriumOffset=bnFromInt(0),
-        ~marketTreasurySplitGradientE18=bnFromInt(1),
+        ~unstakeFee_e18=Ethers.BigNumber.fromInt(50),
+        ~initialMarketSeedForEachMarketSide,
+        ~balanceIncentiveCurve_exponent=bnFromInt(5),
+        ~balanceIncentiveCurve_equilibriumOffset=bnFromInt(0),
+        ~marketTreasurySplitGradient_e18=bnFromInt(1),
       )
     })
   })
@@ -174,12 +169,9 @@ let initialize = (~admin: Ethers.Wallet.t, ~exposeInternals: bool) => {
     longShort,
     (payToken1, payToken2),
   )) => {
-    TokenFactory.make(
-      ~admin=admin.address,
-      ~longShort=longShort.address,
-    )->JsPromise.then(tokenFactory => {
+    TokenFactory.make(~longShort=longShort.address)->JsPromise.then(tokenFactory => {
       JsPromise.all4((
-        floatToken->FloatToken.initialize3(
+        floatToken->FloatToken.initializeFloatToken(
           ~name="Float token",
           ~symbol="FLOAT TOKEN",
           ~stakerAddress=staker.address,
@@ -196,6 +188,8 @@ let initialize = (~admin: Ethers.Wallet.t, ~exposeInternals: bool) => {
           ~longShort=longShort.address,
           ~floatToken=floatToken.address,
           ~floatCapital=floatCapital.address,
+          // NOTE: for now using the floatCapital address as the float treasury
+          ~floatTreasury=floatCapital.address,
           ~floatPercentage=bnFromString("250000000000000000"),
         ),
       ))
@@ -245,7 +239,7 @@ let initializeStakerUnit = () => {
     LongShort.make(),
     FloatToken.make(),
     SyntheticToken.make(
-      ~name="baseTestSynthToken",
+      ~name="baseTestSyntheticToken",
       ~symbol="BTST",
       ~longShort=CONSTANTS.zeroAddress,
       ~staker=CONSTANTS.zeroAddress,
@@ -292,19 +286,19 @@ let initializeLongShortUnit = () => {
       LongShort.Exposed.make(),
       Staker.make(),
       FloatToken.make(),
-      TokenFactory.make(~admin=CONSTANTS.zeroAddress, ~longShort=CONSTANTS.zeroAddress),
+      TokenFactory.make(~longShort=CONSTANTS.zeroAddress),
       YieldManagerAave.make(
-        ~admin=CONSTANTS.zeroAddress,
         ~longShort=CONSTANTS.zeroAddress,
         ~treasury=CONSTANTS.zeroAddress,
         ~paymentToken=paymentToken.address,
         ~aToken=CONSTANTS.zeroAddress,
         ~lendingPool=randomAddress(),
-        ~aaveReferalCode=0,
+        ~aaveIncentivesController=randomAddress(),
+        ~aaveReferralCode=0,
       ),
       OracleManagerMock.make(~admin=CONSTANTS.zeroAddress),
       SyntheticToken.make(
-        ~name="baseTestSynthToken",
+        ~name="baseTestSyntheticToken",
         ~symbol="BTST",
         ~longShort=CONSTANTS.zeroAddress,
         ~staker=CONSTANTS.zeroAddress,

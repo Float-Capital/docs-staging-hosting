@@ -27,7 +27,7 @@ let testIntegration =
         markets->Array.getUnsafe(0);
 
       let%AwaitThen _longValueBefore =
-        longShort->LongShort.syntheticTokenPoolValue(
+        longShort->LongShort.marketSideValueInPaymentToken(
           marketIndex,
           true /*long*/,
         );
@@ -245,7 +245,7 @@ let testUnit =
         let%Await _ = setup(~isLong, ~testWallet);
 
         let depositFundsCalls =
-          LongShortSmocked.InternalMock._depositFundsCalls();
+          LongShortSmocked.InternalMock._transferPaymentTokensFromUserToYieldManagerCalls();
 
         depositFundsCalls->Chai.recordArrayDeepEqualFlat([|
           {marketIndex, amount},
@@ -257,32 +257,28 @@ let testUnit =
 
         let%AwaitThen _ = setup(~isLong, ~testWallet);
 
-        let%AwaitThen updatedBatchedAmountOfTokensToDeposit =
+        let%AwaitThen updatedBatchedAmountOfTokens_deposit =
           contracts.contents.longShort
-          ->LongShort.batchedAmountOfPaymentTokenToDeposit(
-              marketIndex,
-              isLong,
-            );
+          ->LongShort.batched_amountPaymentToken_deposit(marketIndex, isLong);
 
         let%AwaitThen updatedUserNextPriceDepositAmount =
           contracts.contents.longShort
-          ->LongShort.userNextPriceDepositAmount(
+          ->LongShort.userNextPrice_paymentToken_depositAmount(
               marketIndex,
               isLong,
               testWallet.address,
             );
 
-        let%Await updatedUserCurrentNextPriceUpdateIndex =
+        let%Await updateduserNextPrice_currentUpdateIndex =
           contracts.contents.longShort
-          ->LongShort.userCurrentNextPriceUpdateIndex(
+          ->LongShort.userNextPrice_currentUpdateIndex(
               marketIndex,
               testWallet.address,
             );
 
         Chai.bnEqual(
-          ~message=
-            "batchedAmountOfPaymentTokenToDeposit not updated correctly",
-          updatedBatchedAmountOfTokensToDeposit,
+          ~message="batched_amountPaymentToken_deposit not updated correctly",
+          updatedBatchedAmountOfTokens_deposit,
           amount,
         );
 
@@ -293,8 +289,8 @@ let testUnit =
         );
 
         Chai.bnEqual(
-          ~message="userCurrentNextPriceUpdateIndex not updated correctly",
-          updatedUserCurrentNextPriceUpdateIndex,
+          ~message="userNextPrice_currentUpdateIndex not updated correctly",
+          updateduserNextPrice_currentUpdateIndex,
           marketUpdateIndex->add(oneBn),
         );
       });

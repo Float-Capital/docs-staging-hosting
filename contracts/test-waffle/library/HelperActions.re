@@ -46,11 +46,12 @@ let mintAndStakeDirect =
       ~user: Ethers.Wallet.t,
       ~longShort: LongShort.t,
       ~oracleManagerMock: OracleManagerMock.t,
-      ~synthToken: SyntheticToken.t,
+      ~syntheticToken: SyntheticToken.t,
     ) => {
-  let%AwaitThen isLong = synthToken->Contract.SyntheticTokenHelpers.getIsLong;
+  let%AwaitThen isLong =
+    syntheticToken->Contract.SyntheticTokenHelpers.getIsLong;
   let%AwaitThen balanceBeforeMinting =
-    synthToken->SyntheticToken.balanceOf(~account=user.address);
+    syntheticToken->SyntheticToken.balanceOf(~account=user.address);
   let%AwaitThen _mintDirect =
     mintDirect(
       ~marketIndex,
@@ -62,11 +63,11 @@ let mintAndStakeDirect =
       ~isLong,
     );
   let%AwaitThen availableToStakeAfter =
-    synthToken->SyntheticToken.balanceOf(~account=user.address);
+    syntheticToken->SyntheticToken.balanceOf(~account=user.address);
   let amountToStake = availableToStakeAfter->sub(balanceBeforeMinting);
-  let synthTokenConnected =
-    synthToken->ContractHelpers.connect(~address=user);
-  synthTokenConnected->SyntheticToken.stake(~amount=amountToStake);
+  let syntheticTokenConnected =
+    syntheticToken->ContractHelpers.connect(~address=user);
+  syntheticTokenConnected->SyntheticToken.stake(~amount=amountToStake);
 };
 
 type randomStakeInfo = {
@@ -109,7 +110,7 @@ let stakeRandomlyInMarkets =
         let%Await newSynthsUserHasStakedIn =
           switch (Helpers.randomMintLongShort()) {
           | Long(amount) =>
-            let%AwaitThen _ = mintStake(~synthToken=longSynth, ~amount);
+            let%AwaitThen _ = mintStake(~syntheticToken=longSynth, ~amount);
             let%Await longTokenPrice =
               longShort->LongShortHelpers.getSyntheticTokenPrice(
                 ~marketIndex,
@@ -127,7 +128,7 @@ let stakeRandomlyInMarkets =
               },
             |]);
           | Short(amount) =>
-            let%AwaitThen _ = mintStake(~synthToken=shortSynth, ~amount);
+            let%AwaitThen _ = mintStake(~syntheticToken=shortSynth, ~amount);
             let%Await shortTokenPrice =
               longShort->LongShortHelpers.getSyntheticTokenPrice(
                 ~marketIndex,
@@ -145,7 +146,7 @@ let stakeRandomlyInMarkets =
             |]);
           | Both(longAmount, shortAmount) =>
             let%AwaitThen _ =
-              mintStake(~synthToken=longSynth, ~amount=longAmount);
+              mintStake(~syntheticToken=longSynth, ~amount=longAmount);
             let%AwaitThen longTokenPrice =
               longShort->LongShortHelpers.getSyntheticTokenPrice(
                 ~marketIndex,
@@ -168,7 +169,7 @@ let stakeRandomlyInMarkets =
             } =
               longShort->LongShortHelpers.getMarketBalance(~marketIndex);
             let%AwaitThen _ =
-              mintStake(~synthToken=shortSynth, ~amount=shortAmount);
+              mintStake(~syntheticToken=shortSynth, ~amount=shortAmount);
             let%Await shortTokenPrice =
               longShort->LongShortHelpers.getSyntheticTokenPrice(
                 ~marketIndex,
@@ -216,10 +217,13 @@ let stakeRandomlyInBothSidesOfMarket =
           ~oracleManagerMock=oracleManager,
         );
       let%AwaitThen _ =
-        mintStake(~synthToken=longSynth, ~amount=Helpers.randomTokenAmount());
+        mintStake(
+          ~syntheticToken=longSynth,
+          ~amount=Helpers.randomTokenAmount(),
+        );
       let%Await _ =
         mintStake(
-          ~synthToken=shortSynth,
+          ~syntheticToken=shortSynth,
           ~amount=Helpers.randomTokenAmount(),
         );
       ();

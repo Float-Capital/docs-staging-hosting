@@ -3,39 +3,30 @@
 pragma solidity 0.8.3;
 
 import "./SyntheticToken.sol";
-import "./interfaces/ILongShort.sol";
 import "./interfaces/ITokenFactory.sol";
 
 /// @title TokenFactory
-/// @notice TODO
-/// @dev
+/// @notice contract is used to reliably mint the synthetic tokens used by the float protocol.
 contract TokenFactory is ITokenFactory {
   /*╔═══════════════════════════╗
     ║           STATE           ║
     ╚═══════════════════════════╝*/
-  /// @notice TODO
-  address public admin;
-  /// @notice TODO
+
+  /// @notice address of long short contract
   address public longShort;
 
-  /// @notice TODO
+  /// @notice admin role hash for the synthetic token
   bytes32 public constant DEFAULT_ADMIN_ROLE = keccak256("DEFAULT_ADMIN_ROLE");
-  /// @notice TODO
+  /// @notice minter role hash for the synthetic token
   bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
-  /// @notice TODO
+  /// @notice pauser role hash for the synthetic token
   bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
 
   /*╔═══════════════════════════╗
     ║         MODIFIERS         ║
     ╚═══════════════════════════╝*/
 
-  /// @dev
-  modifier adminOnly() {
-    require(msg.sender == admin);
-    _;
-  }
-
-  /// @dev
+  /// @dev only allow longShort contract to call this function
   modifier onlyLongShort() {
     require(msg.sender == address(longShort));
     _;
@@ -45,31 +36,9 @@ contract TokenFactory is ITokenFactory {
     ║           SET-UP           ║
     ╚════════════════════════════╝*/
 
-  /// @notice TODO
-  /// @dev TODO
-  /// @param _admin TODO
-  /// @param _longShort TODO
-
-  constructor(address _admin, address _longShort) {
-    admin = _admin;
-    longShort = _longShort;
-  }
-
-  /*╔════════════════════════════════╗
-    ║    MULTISIG ADMIN FUNCTIONS    ║
-    ╚════════════════════════════════╝*/
-
-  /// @notice TODO
-  /// @dev TODO
-  /// @param _admin TODO
-  function changeAdmin(address _admin) external adminOnly {
-    admin = _admin;
-  }
-
-  /// @notice TODO
-  /// @dev TODO
-  /// @param _longShort TODO
-  function changeFloatAddress(address _longShort) external adminOnly {
+  /// @notice sets the address of the longShort contract on initialization
+  /// @param _longShort address of the longShort contract
+  constructor(address _longShort) {
     longShort = _longShort;
   }
 
@@ -77,70 +46,32 @@ contract TokenFactory is ITokenFactory {
     ║       TOKEN CREATION       ║
     ╚════════════════════════════╝*/
 
-  /// @notice TODO
-  /// @dev TODO
-  /// @param tokenContract TODO
-  function setupPermissions(address tokenContract) internal {
+  /// @notice creates and sets up a new synthetic token
+  /// @param syntheticName name of the synthetic token
+  /// @param syntheticSymbol ticker symbol of the synthetic token
+  /// @param staker address of the staker contract
+  /// @param marketIndex market index this synthetic token belongs to
+  /// @param isLong boolean denoting if the synthetic token is long or short
+  /// @return syntheticToken - address of the created synthetic token
+  function createSyntheticToken(
+    string calldata syntheticName,
+    string calldata syntheticSymbol,
+    address staker,
+    uint32 marketIndex,
+    bool isLong
+  ) external override onlyLongShort returns (address syntheticToken) {
+    syntheticToken = address(
+      new SyntheticToken(syntheticName, syntheticSymbol, longShort, staker, marketIndex, isLong)
+    );
+
     // Give minter roles
-    SyntheticToken(tokenContract).grantRole(DEFAULT_ADMIN_ROLE, longShort);
-    SyntheticToken(tokenContract).grantRole(MINTER_ROLE, longShort);
-    SyntheticToken(tokenContract).grantRole(PAUSER_ROLE, longShort);
+    SyntheticToken(syntheticToken).grantRole(DEFAULT_ADMIN_ROLE, longShort);
+    SyntheticToken(syntheticToken).grantRole(MINTER_ROLE, longShort);
+    SyntheticToken(syntheticToken).grantRole(PAUSER_ROLE, longShort);
 
     // Revoke roles
-    SyntheticToken(tokenContract).revokeRole(DEFAULT_ADMIN_ROLE, address(this));
-    SyntheticToken(tokenContract).revokeRole(MINTER_ROLE, address(this));
-    SyntheticToken(tokenContract).revokeRole(PAUSER_ROLE, address(this));
-  }
-
-  /// @notice TODO
-  /// @dev TODO
-  /// @param syntheticName TODO
-  /// @param syntheticSymbol TODO
-  /// @param staker TODO
-  /// @param marketIndex TODO
-  function createTokenLong(
-    string calldata syntheticName,
-    string calldata syntheticSymbol,
-    address staker,
-    uint32 marketIndex
-  ) external override onlyLongShort returns (address syntheticToken) {
-    syntheticToken = address(
-      new SyntheticToken(
-        string(abi.encodePacked("FLOAT UP", syntheticName)),
-        string(abi.encodePacked("fu", syntheticSymbol)),
-        longShort,
-        staker,
-        marketIndex,
-        true /*long*/
-      )
-    );
-
-    setupPermissions(syntheticToken);
-  }
-
-  /// @notice TODO
-  /// @dev TODO
-  /// @param syntheticName TODO
-  /// @param syntheticSymbol TODO
-  /// @param staker TODO
-  /// @param marketIndex TODO
-  function createTokenShort(
-    string calldata syntheticName,
-    string calldata syntheticSymbol,
-    address staker,
-    uint32 marketIndex
-  ) external override onlyLongShort returns (address syntheticToken) {
-    syntheticToken = address(
-      new SyntheticToken(
-        string(abi.encodePacked("FLOAT DOWN ", syntheticName)),
-        string(abi.encodePacked("fd", syntheticSymbol)),
-        longShort,
-        staker,
-        marketIndex,
-        false /*short*/
-      )
-    );
-
-    setupPermissions(syntheticToken);
+    SyntheticToken(syntheticToken).revokeRole(DEFAULT_ADMIN_ROLE, address(this));
+    SyntheticToken(syntheticToken).revokeRole(MINTER_ROLE, address(this));
+    SyntheticToken(syntheticToken).revokeRole(PAUSER_ROLE, address(this));
   }
 }

@@ -9,18 +9,19 @@ abstract contract IStaker {
     address shortTokenAddress,
     uint256 kInitialMultiplier,
     uint256 kPeriod,
-    uint256 unstakeFeeBasisPoints,
-    uint256 _balanceIncentiveCurveExponent,
-    int256 _balanceIncentiveCurveEquilibriumOffset
+    uint256 unstakeFee_e18,
+    uint256 _balanceIncentiveCurve_exponent,
+    int256 _balanceIncentiveCurve_equilibriumOffset
   ) external virtual;
 
-  function addNewStateForFloatRewards(
+  function pushUpdatedMarketPricesToUpdateFloatIssuanceCalculations(
     uint32 marketIndex,
     uint256 longTokenPrice,
     uint256 shortTokenPrice,
     uint256 longValue,
     uint256 shortValue,
-    uint256 longShortMarketPriceSnapshotIndexIfShiftExecuted
+    uint256 stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted,
+    bool forceAccumulativeIssuancePerStakeStakedSynthSnapshotEvenIfExistingWithSameTimestamp
   ) external virtual;
 
   function stakeFromUser(address from, uint256 amount) public virtual;

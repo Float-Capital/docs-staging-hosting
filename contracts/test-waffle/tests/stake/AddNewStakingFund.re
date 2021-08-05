@@ -15,7 +15,7 @@ let test =
     let sampleMockAddress = Helpers.randomAddress();
     let kInitialMultiplier = Helpers.randomInteger();
     let kPeriod = Helpers.randomInteger();
-    let unstakeFeeBasisPoints = Helpers.randomInteger();
+    let unstakeFee_e18 = Helpers.randomInteger();
 
     let timestampRef = ref(0);
 
@@ -55,9 +55,9 @@ let test =
             ~shortToken=sampleShortAddress,
             ~kInitialMultiplier,
             ~kPeriod,
-            ~unstakeFeeBasisPoints,
-            ~balanceIncentiveCurveExponent=bnFromInt(5),
-            ~balanceIncentiveCurveEquilibriumOffset=bnFromInt(0),
+            ~unstakeFee_e18,
+            ~balanceIncentiveCurve_exponent=bnFromInt(5),
+            ~balanceIncentiveCurve_equilibriumOffset=bnFromInt(0),
           );
       promiseRef := promise;
       let%Await _ = promise;
@@ -87,18 +87,22 @@ let test =
       ->Array.getUnsafe(0)
       ->Chai.recordEqualFlat({
           marketIndex,
-          newMarketUnstakeFeeBasisPoints: unstakeFeeBasisPoints,
+          newMarketUnstakeFee_e18: unstakeFee_e18,
         })
     });
 
-    it("mutates syntheticRewardParams", () => {
+    it("mutates accumulativeFloatPerSyntheticTokenSnapshots", () => {
       let%Await params =
-        contracts^.staker->Staker.syntheticRewardParams(1, CONSTANTS.zeroBn);
+        contracts^.staker
+        ->Staker.accumulativeFloatPerSyntheticTokenSnapshots(
+            1,
+            CONSTANTS.zeroBn,
+          );
 
       params->Chai.recordEqualFlat({
         timestamp: Ethers.BigNumber.fromInt(timestampRef^ + 1), // one second per block in hardhat
-        accumulativeFloatPerLongToken: CONSTANTS.zeroBn,
-        accumulativeFloatPerShortToken: CONSTANTS.zeroBn,
+        accumulativeFloatPerSyntheticToken_long: CONSTANTS.zeroBn,
+        accumulativeFloatPerSyntheticToken_short: CONSTANTS.zeroBn,
       });
     });
 
@@ -122,11 +126,11 @@ let test =
       Chai.intEqual(marketIndex, shortMarketIndex);
     });
 
-    it("emits StateAddedEvent", () => {
+    it("emits AccumulativeIssuancePerStakedSynthSnapshotCreated event", () => {
       Chai.callEmitEvents(
         ~call=promiseRef^,
         ~contract=contracts^.staker->Obj.magic,
-        ~eventName="StateAdded",
+        ~eventName="AccumulativeIssuancePerStakedSynthSnapshotCreated",
       )
       ->Chai.withArgs4(
           marketIndex,

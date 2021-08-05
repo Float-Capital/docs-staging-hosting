@@ -79,7 +79,7 @@ export function handleMarketAddedToStaker(event: MarketAddedToStaker): void {
     event,
     "MarketAddedToStaker",
     bigIntArrayToStringArray([marketIndex, exitFeeBasisPoints]),
-    ["marketIndex", "exitFeeBasisPoints"],
+    ["marketIndex", "exitFee_e18"],
     ["uint32", "uint256"],
     [],
     []
@@ -361,8 +361,9 @@ export function handleFloatMinted(event: FloatMinted): void {
   let amountLong = event.params.amountLong;
   let amountShort = event.params.amountShort;
   let totalAmount = amountLong.plus(amountShort);
-  let lastMintIndex = event.params.lastMintIndex;
+  let amountFloatMinted = event.params.amountFloatMinted;
 
+  // TODO: This will brake here as the FloatMintedEvent has changed
   let state = StakeState.load(marketIndexId + "-" + lastMintIndex.toString());
   if (state == null) {
     log.critical("state not defined yet in `handleFloatMinted`, tx hash {}", [
@@ -432,15 +433,9 @@ export function handleFloatMinted(event: FloatMinted): void {
   saveEventToStateChange(
     event,
     "FloatMinted",
-    [
-      userAddressString,
-      marketIndexId,
-      amountLong.toString(),
-      amountShort.toString(),
-      lastMintIndex.toString(),
-    ],
-    ["user", "marketIndex", "amountLong", "amountShort", "lastMintIndex"],
-    ["address", "uint32", "uint256", "uint256", "uint256"],
+    [userAddressString, marketIndexId, amountFloatMinted.toString()],
+    ["user", "marketIndex", "amountFloatMinted"],
+    ["address", "uint32", "uint256"],
     [userAddress],
     changedStakesArray
   );

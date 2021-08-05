@@ -87,9 +87,9 @@ let test =
         changeMarketLaunchIncentiveParametersCall.contents;
       });
 
-      it("mutates marketLaunchIncentivePeriod", () => {
+      it("mutates marketLaunchIncentive_period", () => {
         let%Await setPeriod =
-          contracts^.staker->Staker.marketLaunchIncentivePeriod(marketIndex);
+          contracts^.staker->Staker.marketLaunchIncentive_period(marketIndex);
 
         period->Chai.bnEqual(setPeriod);
       });
@@ -97,7 +97,7 @@ let test =
       it("mutates marketLaunchIncentiveMultiplier", () => {
         let%Await setMultiplier =
           contracts^.staker
-          ->Staker.marketLaunchIncentiveMultipliers(marketIndex);
+          ->Staker.marketLaunchIncentive_multipliers(marketIndex);
 
         initialMultiplierFine->Chai.bnEqual(setMultiplier);
       });

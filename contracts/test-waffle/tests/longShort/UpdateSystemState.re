@@ -49,7 +49,7 @@ let testUnit =
 
       let newAssetPrice = oldAssetPrice->add(oneBn);
 
-      let latestUpdateIndexForMarket = twoBn;
+      let latestUpdateIndexForMarket = Helpers.randomInteger();
 
       let staker: ref(StakerSmocked.t) = ref(None->Obj.magic);
       let oracle: ref(OracleManagerMockSmocked.t) = ref(None->Obj.magic);
@@ -65,6 +65,7 @@ let testUnit =
             ~oldLongPrice,
             ~oldShortPrice,
             ~fromStaker,
+            ~stakerNextPrice_currentUpdateIndex,
           ) => {
         let%AwaitThen _ =
           contracts.contents.longShort->LongShortSmocked.InternalMock.setup;
@@ -78,7 +79,7 @@ let testUnit =
           oldLongValueAfterYield,
           oldShortValueAfterYield,
         );
-        LongShortSmocked.InternalMock.mock_performOustandingBatchedSettlementsToReturn(
+        LongShortSmocked.InternalMock.mock_batchConfirmOutstandingPendingActionsToReturn(
           valueChangeLong,
           valueChangeShort,
         );
@@ -95,7 +96,7 @@ let testUnit =
           );
 
         let _ =
-          stakerSmocked->StakerSmocked.mockAddNewStateForFloatRewardsToReturn;
+          stakerSmocked->StakerSmocked.mockPushUpdatedMarketPricesToUpdateFloatIssuanceCalculationsToReturn;
         let%AwaitThen oracleSmocked =
           contracts.contents.markets->Array.getExn(1).oracleManager
           ->OracleManagerMockSmocked.make;
@@ -138,7 +139,7 @@ let testUnit =
         let%AwaitThen predictedLongPrice =
           longShort->LongShort.Exposed._getSyntheticTokenPriceExposed(
             ~amountPaymentTokenBackingSynth=oldLongValueAfterYield,
-            ~amountSynthToken=longSynthSupply,
+            ~amountSyntheticToken=longSynthSupply,
           );
 
         potentialNewLongPrice := predictedLongPrice;
@@ -146,7 +147,7 @@ let testUnit =
         let%AwaitThen predictedShortPrice =
           longShort->LongShort.Exposed._getSyntheticTokenPriceExposed(
             ~amountPaymentTokenBackingSynth=oldShortValueAfterYield,
-            ~amountSynthToken=shortSynthSupply,
+            ~amountSyntheticToken=shortSynthSupply,
           );
 
         potentialNewShortPrice := predictedShortPrice;
@@ -155,8 +156,8 @@ let testUnit =
           longShort->LongShort.Exposed.set_updateSystemStateInternalGlobals(
             ~marketIndex,
             ~latestUpdateIndexForMarket,
-            ~syntheticTokenPriceLong=oldLongPrice,
-            ~syntheticTokenPriceShort=oldShortPrice,
+            ~syntheticTokenPrice_inPaymentTokens_long=oldLongPrice,
+            ~syntheticTokenPrice_inPaymentTokens_short=oldShortPrice,
             ~assetPrice=oldAssetPrice,
             ~oracleManager=oracleSmocked.address,
             ~staker=stakerSmocked.address,
@@ -164,6 +165,7 @@ let testUnit =
             ~shortValue=oldShortValue,
             ~synthLong=longSynthSmocked.address,
             ~synthShort=shortSynthSmocked.address,
+            ~stakerNextPrice_currentUpdateIndex,
           );
 
         longShort->LongShort.Exposed._updateSystemStateInternalExposed(
@@ -182,7 +184,7 @@ let testUnit =
         if (checkNoStakerCalls) {
           let numberOfStakerCalls =
             staker.contents
-            ->StakerSmocked.addNewStateForFloatRewardsCalls
+            ->StakerSmocked.pushUpdatedMarketPricesToUpdateFloatIssuanceCalculationsCalls
             ->Array.length;
           Chai.intEqual(numberOfStakerCalls, 0);
         };
@@ -194,7 +196,7 @@ let testUnit =
           LongShortSmocked.InternalMock._getSyntheticTokenPriceCalls()
           ->Array.length;
         let numberOfOutstandingSettlementCalls =
-          LongShortSmocked.InternalMock._performOustandingBatchedSettlementsCalls()
+          LongShortSmocked.InternalMock._batchConfirmOutstandingPendingActionsCalls()
           ->Array.length;
 
         let numberOfTotalSupplyLongCalls =
@@ -212,7 +214,7 @@ let testUnit =
 
         let%AwaitThen newLongPrice =
           contracts.contents.longShort
-          ->LongShort.syntheticTokenPriceSnapshot(
+          ->LongShort.syntheticToken_priceSnapshot(
               marketIndex,
               true,
               updateIndex,
@@ -220,7 +222,7 @@ let testUnit =
 
         let%AwaitThen newShortPrice =
           contracts.contents.longShort
-          ->LongShort.syntheticTokenPriceSnapshot(
+          ->LongShort.syntheticToken_priceSnapshot(
               marketIndex,
               false,
               updateIndex,
@@ -244,7 +246,11 @@ let testUnit =
       };
 
       it("calls for the latest price from the oracle", () => {
-        let%Await _ = setupWithoutPriceChange(~fromStaker=true);
+        let%Await _ =
+          setupWithoutPriceChange(
+            ~fromStaker=true,
+            ~stakerNextPrice_currentUpdateIndex=zeroBn,
+          );
         oracle.contents
         ->OracleManagerMockSmocked.updatePriceCalls
         ->Array.length
@@ -252,21 +258,22 @@ let testUnit =
       });
 
       it(
-        "it shouldn't modify state or call other functions IF the `msg.sender` isn't the staker AND the price didn't change",
+        "calls pushUpdatedMarketPricesToUpdateFloatIssuanceCalculations on the staker if the staker has pending nextPrice shifts",
         () => {
-          let%AwaitThen _ = setupWithoutPriceChange(~fromStaker=false);
-
-          assertNoUpdateStateOrNonOracleCalls(~checkNoStakerCalls=true);
-        },
-      );
-
-      it(
-        "it should call the addNewStateForFloatRewards on the staker function if the `msg.sender` is the staker (with NO price change) but not update any state or call other functions in the LongShort contract",
-        () => {
-          let%AwaitThen _ = setupWithoutPriceChange(~fromStaker=true);
+          let stakerNextPrice_currentUpdateIndex =
+            latestUpdateIndexForMarket->add(oneBn);
+          let%Await _ =
+            setup(
+              ~oldAssetPrice,
+              ~newAssetPrice,
+              ~oldLongPrice,
+              ~oldShortPrice,
+              ~fromStaker=true,
+              ~stakerNextPrice_currentUpdateIndex,
+            );
 
           staker.contents
-          ->StakerSmocked.addNewStateForFloatRewardsCalls
+          ->StakerSmocked.pushUpdatedMarketPricesToUpdateFloatIssuanceCalculationsCalls
           ->Chai.recordArrayDeepEqualFlat([|
               {
                 marketIndex,
@@ -274,7 +281,48 @@ let testUnit =
                 shortPrice: oldShortPrice,
                 longValue: oldLongValue,
                 shortValue: oldShortValue,
-                longShortMarketPriceSnapshotIndexIfShiftExecuted: zeroBn,
+                stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted: stakerNextPrice_currentUpdateIndex,
+                forceAccumulativeIssuancePerStakeStakedSynthSnapshotEvenIfExistingWithSameTimestamp:
+                  true,
+              },
+            |]);
+        },
+      );
+
+      it(
+        "it shouldn't modify state or call other functions IF the `msg.sender` isn't the staker AND the price didn't change",
+        () => {
+          let%AwaitThen _ =
+            setupWithoutPriceChange(
+              ~fromStaker=false,
+              ~stakerNextPrice_currentUpdateIndex=zeroBn,
+            );
+
+          assertNoUpdateStateOrNonOracleCalls(~checkNoStakerCalls=true);
+        },
+      );
+
+      it(
+        "it should call the pushUpdatedMarketPricesToUpdateFloatIssuanceCalculations on the staker function if the `msg.sender` is the staker (with NO price change) but not update any state or call other functions in the LongShort contract",
+        () => {
+          let%AwaitThen _ =
+            setupWithoutPriceChange(
+              ~fromStaker=true,
+              ~stakerNextPrice_currentUpdateIndex=zeroBn,
+            );
+
+          staker.contents
+          ->StakerSmocked.pushUpdatedMarketPricesToUpdateFloatIssuanceCalculationsCalls
+          ->Chai.recordArrayDeepEqualFlat([|
+              {
+                marketIndex,
+                longPrice: oldLongPrice,
+                shortPrice: oldShortPrice,
+                longValue: oldLongValue,
+                shortValue: oldShortValue,
+                stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted: zeroBn,
+                forceAccumulativeIssuancePerStakeStakedSynthSnapshotEvenIfExistingWithSameTimestamp:
+                  false,
               },
             |]);
 
@@ -292,11 +340,15 @@ let testUnit =
           );
 
         it(
-          "it should call the addNewStateForFloatRewards on the staker function if the `msg.sender` is the staker (WITH a price change)",
+          "it should call the pushUpdatedMarketPricesToUpdateFloatIssuanceCalculations on the staker function if the `msg.sender` is the staker (WITH a price change)",
           () => {
-            let%Await _ = setupWithPriceChange(~fromStaker=true);
+            let%Await _ =
+              setupWithPriceChange(
+                ~fromStaker=true,
+                ~stakerNextPrice_currentUpdateIndex=zeroBn,
+              );
             staker.contents
-            ->StakerSmocked.addNewStateForFloatRewardsCalls
+            ->StakerSmocked.pushUpdatedMarketPricesToUpdateFloatIssuanceCalculationsCalls
             ->Chai.recordArrayDeepEqualFlat([|
                 {
                   marketIndex,
@@ -304,7 +356,9 @@ let testUnit =
                   shortPrice: oldShortPrice,
                   longValue: oldLongValue,
                   shortValue: oldShortValue,
-                  longShortMarketPriceSnapshotIndexIfShiftExecuted: zeroBn,
+                  stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted: zeroBn,
+                  forceAccumulativeIssuancePerStakeStakedSynthSnapshotEvenIfExistingWithSameTimestamp:
+                    true,
                 },
               |]);
           },
@@ -313,7 +367,11 @@ let testUnit =
         it(
           "it should call `_claimAndDistributeYieldThenRebalanceMarket` with correct arguments",
           () => {
-            let%Await _ = setupWithPriceChange(~fromStaker=false);
+            let%Await _ =
+              setupWithPriceChange(
+                ~fromStaker=false,
+                ~stakerNextPrice_currentUpdateIndex=zeroBn,
+              );
             LongShortSmocked.InternalMock._claimAndDistributeYieldThenRebalanceMarketCalls()
             ->Chai.recordArrayDeepEqualFlat([|
                 {marketIndex, oldAssetPrice, newAssetPrice},
@@ -323,19 +381,29 @@ let testUnit =
         it(
           "it should call `_performOustandingSettlements` with correct arguments",
           () => {
-          let%Await _ = setupWithPriceChange(~fromStaker=false);
-          LongShortSmocked.InternalMock._performOustandingBatchedSettlementsCalls()
+          let%Await _ =
+            setupWithPriceChange(
+              ~fromStaker=false,
+              ~stakerNextPrice_currentUpdateIndex=zeroBn,
+            );
+          LongShortSmocked.InternalMock._batchConfirmOutstandingPendingActionsCalls()
           ->Chai.recordArrayDeepEqualFlat([|
               {
                 marketIndex,
-                syntheticTokenPriceLong: potentialNewLongPrice.contents,
-                syntheticTokenPriceShort: potentialNewShortPrice.contents,
+                syntheticTokenPrice_inPaymentTokens_long:
+                  potentialNewLongPrice.contents,
+                syntheticTokenPrice_inPaymentTokens_short:
+                  potentialNewShortPrice.contents,
               },
             |]);
         });
 
         it("should call `totalSupply` on the long and short synth tokens", () => {
-          let%Await _ = setupWithPriceChange(~fromStaker=false);
+          let%Await _ =
+            setupWithPriceChange(
+              ~fromStaker=false,
+              ~stakerNextPrice_currentUpdateIndex=zeroBn,
+            );
           longSynth.contents
           ->SyntheticTokenSmocked.totalSupplyCalls
           ->Array.length
@@ -348,13 +416,17 @@ let testUnit =
         });
 
         it(
-          "should mutate syntheticTokenPriceSnapshots for long and short correctly",
+          "should mutate syntheticToken_priceSnapshots for long and short correctly",
           () => {
-          let%Await _ = setupWithPriceChange(~fromStaker=false);
+          let%Await _ =
+            setupWithPriceChange(
+              ~fromStaker=false,
+              ~stakerNextPrice_currentUpdateIndex=zeroBn,
+            );
           let newUpdateIndex = latestUpdateIndexForMarket->add(oneBn);
           let%AwaitThen newLongPrice =
             contracts.contents.longShort
-            ->LongShort.syntheticTokenPriceSnapshot(
+            ->LongShort.syntheticToken_priceSnapshot(
                 marketIndex,
                 true,
                 newUpdateIndex,
@@ -362,7 +434,7 @@ let testUnit =
 
           let%Await newShortPrice =
             contracts.contents.longShort
-            ->LongShort.syntheticTokenPriceSnapshot(
+            ->LongShort.syntheticToken_priceSnapshot(
                 marketIndex,
                 false,
                 newUpdateIndex,
@@ -373,16 +445,20 @@ let testUnit =
         });
 
         it(
-          "should mutate syntheticTokenPoolValues for long and short correctly",
+          "should mutate marketSideValueInPaymentTokens for long and short correctly",
           () => {
-          let%AwaitThen _ = setupWithPriceChange(~fromStaker=false);
+          let%AwaitThen _ =
+            setupWithPriceChange(
+              ~fromStaker=false,
+              ~stakerNextPrice_currentUpdateIndex=zeroBn,
+            );
           let%AwaitThen newLongValue =
             contracts.contents.longShort
-            ->LongShort.syntheticTokenPoolValue(marketIndex, true);
+            ->LongShort.marketSideValueInPaymentToken(marketIndex, true);
 
           let%Await newShortValue =
             contracts.contents.longShort
-            ->LongShort.syntheticTokenPoolValue(marketIndex, false);
+            ->LongShort.marketSideValueInPaymentToken(marketIndex, false);
 
           newLongValue->Chai.bnEqual(
             oldLongValueAfterYield->add(valueChangeLong),
@@ -393,14 +469,22 @@ let testUnit =
         });
 
         it("it should update the (underlying) asset price correctly", () => {
-          let%AwaitThen _ = setupWithPriceChange(~fromStaker=false);
+          let%AwaitThen _ =
+            setupWithPriceChange(
+              ~fromStaker=false,
+              ~stakerNextPrice_currentUpdateIndex=zeroBn,
+            );
           let%Await assetPrice =
             contracts.contents.longShort->LongShort.assetPrice(marketIndex);
           Chai.bnEqual(assetPrice, newAssetPrice);
         });
 
         it("it should increment the marketUpdateIndex by 1", () => {
-          let%AwaitThen _ = setupWithPriceChange(~fromStaker=false);
+          let%AwaitThen _ =
+            setupWithPriceChange(
+              ~fromStaker=false,
+              ~stakerNextPrice_currentUpdateIndex=zeroBn,
+            );
           let%Await updateIndex =
             contracts.contents.longShort
             ->LongShort.marketUpdateIndex(marketIndex);
@@ -411,7 +495,11 @@ let testUnit =
           "it should emit the SystemStateUpdated event with the correct arguments",
           () => {
           Chai.callEmitEvents(
-            ~call=setupWithPriceChange(~fromStaker=false),
+            ~call=
+              setupWithPriceChange(
+                ~fromStaker=false,
+                ~stakerNextPrice_currentUpdateIndex=zeroBn,
+              ),
             ~eventName="SystemStateUpdated",
             ~contract=contracts.contents.longShort->Obj.magic,
           )
@@ -520,7 +608,7 @@ let testIntegration =
           let amountOfYieldToAward = bnFromString("3216543216543216542");
 
           let%Await amountToMintToGuaranteeImbalance =
-            longShort->LongShort.syntheticTokenPoolValue(
+            longShort->LongShort.marketSideValueInPaymentToken(
               marketIndex,
               !longIsOverBalanced,
             );
@@ -538,9 +626,15 @@ let testIntegration =
 
           // get total balance pools etc before (and amount for treasury)
           let%Await longTokenPoolValueBefore =
-            longShort->LongShort.syntheticTokenPoolValue(marketIndex, true);
+            longShort->LongShort.marketSideValueInPaymentToken(
+              marketIndex,
+              true,
+            );
           let%Await shortTokenPoolValueBefore =
-            longShort->LongShort.syntheticTokenPoolValue(marketIndex, false);
+            longShort->LongShort.marketSideValueInPaymentToken(
+              marketIndex,
+              false,
+            );
 
           let%Await totalDueForTreasuryBefore =
             yieldManager->YieldManagerMock.totalReservedForTreasury;
@@ -568,9 +662,15 @@ let testIntegration =
 
           // get total balance pools after and amount for treasury
           let%Await longTokenPoolValueAfter =
-            longShort->LongShort.syntheticTokenPoolValue(marketIndex, true);
+            longShort->LongShort.marketSideValueInPaymentToken(
+              marketIndex,
+              true,
+            );
           let%Await shortTokenPoolValueAfter =
-            longShort->LongShort.syntheticTokenPoolValue(marketIndex, false);
+            longShort->LongShort.marketSideValueInPaymentToken(
+              marketIndex,
+              false,
+            );
           let%Await totalDueForTreasuryAfter =
             yieldManager->YieldManagerMock.totalReservedForTreasury;
           let totalValueRelatedToMarketAfter =
