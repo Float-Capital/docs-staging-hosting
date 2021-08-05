@@ -184,7 +184,7 @@ let getMockToReturnInternal: functionDef => string = fn => {
 
   if fn.returnValues->Array.length > 0 {
     `
-  @send @scope(("smocked", "${fn.name}", "will", "return"))
+  @send @scope(("smocked", "${fn.name}Mock", "will", "return"))
   external ${fn.name}MockReturnRaw: (t, ${fn.returnValues->basicReturn}) => unit = "with"
 
   let mock${fn.name->uppercaseFirstLetter}ToReturn: ${fn.returnValues->rescriptReturnAnnotation(
@@ -201,10 +201,10 @@ let getMockToReturnInternal: functionDef => string = fn => {
 
 let getMockToRevertInternal: functionDef => string = fn => {
   `
-  @send @scope(("smocked", "${fn.name}", "will", "revert"))
+  @send @scope(("smocked", "${fn.name}Mock", "will", "revert"))
   external ${fn.name}MockRevertRaw: (t, ~errorString: string) => unit = "with"
 
-  @send @scope(("smocked", "${fn.name}", "will"))
+  @send @scope(("smocked", "${fn.name}Mock", "will"))
   external ${fn.name}MockRevertNoReasonRaw: t => unit = "revert"
 
   let mock${fn.name->uppercaseFirstLetter}ToRevert = (~errorString) => {

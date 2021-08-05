@@ -158,14 +158,14 @@ function rescriptReturnAnnotation(params, context) {
 function getMockToReturnInternal(fn) {
   var params = getRescriptParamsForReturn(fn.returnValues);
   if (fn.returnValues.length !== 0) {
-    return "\n  @send @scope((\"smocked\", \"" + fn.name + "\", \"will\", \"return\"))\n  external " + fn.name + "MockReturnRaw: (t, " + basicReturn(fn.returnValues) + ") => unit = \"with\"\n\n  let mock" + uppercaseFirstLetter(fn.name) + "ToReturn: " + rescriptReturnAnnotation(fn.returnValues, /* Internal */1) + " = (" + params + ") => {\n    checkForExceptions(~functionName=\"" + fn.name + "\")\n    let _ = internalRef.contents->Option.map(smockedContract => smockedContract->" + fn.name + "MockReturnRaw(" + params + "))\n  }\n  ";
+    return "\n  @send @scope((\"smocked\", \"" + fn.name + "Mock\", \"will\", \"return\"))\n  external " + fn.name + "MockReturnRaw: (t, " + basicReturn(fn.returnValues) + ") => unit = \"with\"\n\n  let mock" + uppercaseFirstLetter(fn.name) + "ToReturn: " + rescriptReturnAnnotation(fn.returnValues, /* Internal */1) + " = (" + params + ") => {\n    checkForExceptions(~functionName=\"" + fn.name + "\")\n    let _ = internalRef.contents->Option.map(smockedContract => smockedContract->" + fn.name + "MockReturnRaw(" + params + "))\n  }\n  ";
   } else {
     return "";
   }
 }
 
 function getMockToRevertInternal(fn) {
-  return "\n  @send @scope((\"smocked\", \"" + fn.name + "\", \"will\", \"revert\"))\n  external " + fn.name + "MockRevertRaw: (t, ~errorString: string) => unit = \"with\"\n\n  @send @scope((\"smocked\", \"" + fn.name + "\", \"will\"))\n  external " + fn.name + "MockRevertNoReasonRaw: t => unit = \"revert\"\n\n  let mock" + uppercaseFirstLetter(fn.name) + "ToRevert = (~errorString) => {\n    checkForExceptions(~functionName=\"" + fn.name + "\")\n    let _ = internalRef.contents->Option.map(" + fn.name + "MockRevertRaw(~errorString))\n  }\n  let mock" + uppercaseFirstLetter(fn.name) + "ToRevertNoReason = () => {\n    checkForExceptions(~functionName=\"" + fn.name + "\")\n    let _ = internalRef.contents->Option.map(" + fn.name + "MockRevertNoReasonRaw)\n  }\n  ";
+  return "\n  @send @scope((\"smocked\", \"" + fn.name + "Mock\", \"will\", \"revert\"))\n  external " + fn.name + "MockRevertRaw: (t, ~errorString: string) => unit = \"with\"\n\n  @send @scope((\"smocked\", \"" + fn.name + "Mock\", \"will\"))\n  external " + fn.name + "MockRevertNoReasonRaw: t => unit = \"revert\"\n\n  let mock" + uppercaseFirstLetter(fn.name) + "ToRevert = (~errorString) => {\n    checkForExceptions(~functionName=\"" + fn.name + "\")\n    let _ = internalRef.contents->Option.map(" + fn.name + "MockRevertRaw(~errorString))\n  }\n  let mock" + uppercaseFirstLetter(fn.name) + "ToRevertNoReason = () => {\n    checkForExceptions(~functionName=\"" + fn.name + "\")\n    let _ = internalRef.contents->Option.map(" + fn.name + "MockRevertNoReasonRaw)\n  }\n  ";
 }
 
 function getMockToReturnExternal(fn) {
