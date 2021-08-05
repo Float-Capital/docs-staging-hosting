@@ -218,6 +218,22 @@ export function getOrCreateAccumulativeFloatIssuanceSnapshot(
   return state as AccumulativeFloatIssuanceSnapshot;
 }
 
+export function getLatestAccumulativeFloatIssuanceSnapshot(
+  syntheticMarket: SyntheticMarket
+): AccumulativeFloatIssuanceSnapshot {
+  let latestAccumulativeFloatIssuanceSnapshot = AccumulativeFloatIssuanceSnapshot.load(
+    syntheticMarket.latestAccumulativeFloatIssuanceSnapshot
+  );
+  if (latestAccumulativeFloatIssuanceSnapshot == null) {
+    log.critical(
+      "Error AccumulativeFloatIssuanceSnapshot is undefined with id {}. It should be defined since it is marked as the latest snapshot in the market",
+      []
+    );
+  }
+
+  return latestAccumulativeFloatIssuanceSnapshot as AccumulativeFloatIssuanceSnapshot;
+}
+
 export function getOrCreateGlobalState(): GlobalState {
   let globalState = GlobalState.load(GLOBAL_STATE_ID);
   if (globalState == null) {

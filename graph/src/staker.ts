@@ -28,6 +28,7 @@ import {
 import {
   getOrCreateUser,
   getOrCreateAccumulativeFloatIssuanceSnapshot,
+  getLatestAccumulativeFloatIssuanceSnapshot,
 } from "./utils/globalStateManager";
 
 import { ZERO, ONE, GLOBAL_STATE_ID, TEN_TO_THE_18 } from "./CONSTANTS";
@@ -393,21 +394,10 @@ export function handleFloatMinted(event: FloatMinted): void {
   // TODO: Need to calculate these values correctly.
   let amountLong = TEN_TO_THE_18;
   let amountShort = TEN_TO_THE_18;
-  let totalAmount = amountLong.plus(amountShort);
+  let expectedTotalAmount = amountLong.plus(amountShort);
   let amountFloatMinted = event.params.amountFloatMinted;
+  /// TODO: assert that `amountFloatMinted` == `expectedTotalAmount (will fail until amountLong and amountShort calculations are fixed of course!!!)
 
-  // TODO - get this value from SyntheticMarket.latestAccumulativeFloatIssuanceSnapshot.index
-  let lastMintIndex = ONE;
-
-  // TODO: This will brake here as the FloatMintedEvent has changed
-  let state = AccumulativeFloatIssuanceSnapshot.load(
-    marketIndexId + "-" + lastMintIndex.toString()
-  );
-  if (state == null) {
-    log.critical("state not defined yet in `handleFloatMinted`, tx hash {}", [
-      event.transaction.hash.toHex(),
-    ]);
-  }
   let syntheticMarket = SyntheticMarket.load(marketIndexId);
   if (syntheticMarket == null) {
     log.critical(
@@ -416,11 +406,15 @@ export function handleFloatMinted(event: FloatMinted): void {
     );
   }
 
+  let latestAccumulativeFloatIssuanceSnapshot = getLatestAccumulativeFloatIssuanceSnapshot(
+    syntheticMarket as SyntheticMarket
+  );
+
   let user = getOrCreateUser(userAddress, event);
   syntheticMarket.totalFloatMinted = syntheticMarket.totalFloatMinted.plus(
-    totalAmount
+    amountFloatMinted
   );
-  user.totalMintedFloat = user.totalMintedFloat.plus(totalAmount);
+  user.totalMintedFloat = user.totalMintedFloat.plus(amountFloatMinted);
 
   let changedStakesArray: Array<string> = [];
   if (amountLong.gt(ZERO)) {
@@ -437,7 +431,7 @@ export function handleFloatMinted(event: FloatMinted): void {
         currentStakeLong.id,
       ]);
     }
-    currentStakeLong.lastMintState = state.id;
+    currentStakeLong.lastMintState = latestAccumulativeFloatIssuanceSnapshot.id;
     currentStakeLong.save();
     syntheticLong.save();
     changedStakesArray = changedStakesArray.concat([currentStakeLong.id]);
@@ -456,14 +450,17 @@ export function handleFloatMinted(event: FloatMinted): void {
         currentStakeShort.id,
       ]);
     }
-    currentStakeShort.lastMintState = state.id;
+    currentStakeShort.lastMintState =
+      latestAccumulativeFloatIssuanceSnapshot.id;
     currentStakeShort.save();
     syntheticShort.save();
     changedStakesArray = changedStakesArray.concat([currentStakeShort.id]);
   }
 
   let globalState = GlobalState.load(GLOBAL_STATE_ID);
-  globalState.totalFloatMinted = globalState.totalFloatMinted.plus(totalAmount);
+  globalState.totalFloatMinted = globalState.totalFloatMinted.plus(
+    amountFloatMinted
+  );
 
   user.save();
   globalState.save();
