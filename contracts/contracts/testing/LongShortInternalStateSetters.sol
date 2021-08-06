@@ -122,7 +122,7 @@ contract LongShortInternalStateSetters is LongShort {
     userNextPrice_syntheticToken_toShiftAwayFrom_marketSide[marketIndex][isLong][user] = 0; // reset other side for good measure
   }
 
-  function setPerformOustandingBatchedSettlementsGlobals(
+  function setPerformOutstandingBatchedSettlementsGlobals(
     uint32 marketIndex,
     uint256 batched_amountPaymentToken_depositLong,
     uint256 batched_amountPaymentToken_depositShort,

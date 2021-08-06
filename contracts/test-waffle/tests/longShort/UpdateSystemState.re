@@ -373,7 +373,7 @@ let testUnit =
           },
         );
         it(
-          "it should call `_performOustandingSettlements` with correct arguments",
+          "it should call `_performOutstandingSettlements` with correct arguments",
           () => {
           let%Await _ =
             setupWithPriceChange(
