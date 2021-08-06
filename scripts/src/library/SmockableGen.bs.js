@@ -158,7 +158,7 @@ function rescriptReturnAnnotation(params, context) {
 function getMockToReturnInternal(fn) {
   var params = getRescriptParamsForReturn(fn.returnValues);
   if (fn.returnValues.length !== 0) {
-    return "\n  @send @scope((\"smocked\", \"" + fn.name + "Mock\", \"will\", \"return\"))\n  external " + fn.name + "MockReturnRaw: (t, " + basicReturn(fn.returnValues) + ") => unit = \"with\"\n\n  let mock" + uppercaseFirstLetter(fn.name) + "ToReturn: " + rescriptReturnAnnotation(fn.returnValues, /* Internal */1) + " = (" + params + ") => {\n    checkForExceptions(~functionName=\"" + fn.name + "\")\n    let _ = internalRef.contents->Option.map(smockedContract => smockedContract->" + fn.name + "MockReturnRaw(" + params + "))\n  }\n  ";
+    return "\n  @send @scope((\"smocked\", \"" + fn.name + "Mock\", \"will\", \"return\"))\n  external " + fn.name + "MockReturnRaw: (t, (" + basicReturn(fn.returnValues) + ")) => unit = \"with\"\n\n  let mock" + uppercaseFirstLetter(fn.name) + "ToReturn: " + rescriptReturnAnnotation(fn.returnValues, /* Internal */1) + " = (" + params + ") => {\n    checkForExceptions(~functionName=\"" + fn.name + "\")\n    let _ = internalRef.contents->Option.map(smockedContract => smockedContract->" + fn.name + "MockReturnRaw((" + params + ")))\n  }\n  ";
   } else {
     return "";
   }
@@ -170,7 +170,7 @@ function getMockToRevertInternal(fn) {
 
 function getMockToReturnExternal(fn) {
   if (fn.returnValues.length !== 0) {
-    return " \n      @send @scope((\"smocked\", \"" + fn.name + "\", \"will\", \"return\"))\n      external mock" + uppercaseFirstLetter(fn.name) + "ToReturn: (t, " + basicReturn(fn.returnValues) + ") => unit = \"with\"\n    ";
+    return " \n      @send @scope((\"smocked\", \"" + fn.name + "\", \"will\", \"return\"))\n      external mock" + uppercaseFirstLetter(fn.name) + "ToReturn: (t, (" + basicReturn(fn.returnValues) + ")) => unit = \"with\"\n    ";
   } else {
     return "";
   }

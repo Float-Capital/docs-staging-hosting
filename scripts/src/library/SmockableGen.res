@@ -185,13 +185,13 @@ let getMockToReturnInternal: functionDef => string = fn => {
   if fn.returnValues->Array.length > 0 {
     `
   @send @scope(("smocked", "${fn.name}Mock", "will", "return"))
-  external ${fn.name}MockReturnRaw: (t, ${fn.returnValues->basicReturn}) => unit = "with"
+  external ${fn.name}MockReturnRaw: (t, (${fn.returnValues->basicReturn})) => unit = "with"
 
   let mock${fn.name->uppercaseFirstLetter}ToReturn: ${fn.returnValues->rescriptReturnAnnotation(
         ~context=Internal,
       )} = (${params}) => {
     checkForExceptions(~functionName="${fn.name}")
-    let _ = internalRef.contents->Option.map(smockedContract => smockedContract->${fn.name}MockReturnRaw(${params}))
+    let _ = internalRef.contents->Option.map(smockedContract => smockedContract->${fn.name}MockReturnRaw((${params})))
   }
   `
   } else {
@@ -222,7 +222,7 @@ let getMockToReturnExternal: functionDef => string = fn => {
   if fn.returnValues->Array.length > 0 {
     ` 
       @send @scope(("smocked", "${fn.name}", "will", "return"))
-      external mock${fn.name->uppercaseFirstLetter}ToReturn: (t, ${fn.returnValues->basicReturn}) => unit = "with"
+      external mock${fn.name->uppercaseFirstLetter}ToReturn: (t, (${fn.returnValues->basicReturn})) => unit = "with"
     `
   } else {
     ""
