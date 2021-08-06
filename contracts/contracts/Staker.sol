@@ -942,11 +942,20 @@ contract Staker is IStaker, Initializable {
     bool isShiftFromLong
   ) external virtual {
     address token = syntheticTokens[marketIndex][isShiftFromLong];
+    if (isShiftFromLong) {
+      uint256 amountAlreadyQueuedForShifting = userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_long[
+          marketIndex
+        ][msg.sender];
+    } else {
+      uint256 amountAlreadyQueuedForShifting = userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_short[
+          marketIndex
+        ][msg.sender];
+    }
     require(
-      userAmountStaked[token][msg.sender] >= amountSyntheticTokensToShift,
+      userAmountStaked[token][msg.sender] >=
+        amountSyntheticTokensToShift + amountAlreadyQueuedForShifting,
       "Not enough tokens to shift"
     );
-
     // If the user has outstanding token shift that have already been confirmed in the LongShort
     // contract, execute them first.
     if (
