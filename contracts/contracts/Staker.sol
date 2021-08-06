@@ -966,8 +966,6 @@ contract Staker is IStaker, Initializable {
       _mintAccumulatedFloat(marketIndex, msg.sender);
     }
 
-    userAmountStaked[token][msg.sender] -= amountSyntheticTokensToShift;
-
     if (isShiftFromLong) {
       ILongShort(longShort).shiftPositionFromLongNextPrice(
         marketIndex,
