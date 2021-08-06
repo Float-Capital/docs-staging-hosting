@@ -252,7 +252,6 @@ let testUnit =
             ~accounts,
           );
 
-        StakerSmocked.InternalMock.mock_changeBalanceIncentiveExponentToReturn();
         let stakerAddress = accounts.contents->Array.getUnsafe(5);
 
         txPromiseRef :=
@@ -364,7 +363,6 @@ let testUnit =
             ~accounts,
           );
 
-        StakerSmocked.InternalMock.mock_changeBalanceIncentiveEquilibriumOffsetToReturn();
         let stakerAddress = accounts.contents->Array.getUnsafe(5);
 
         txPromiseRef :=

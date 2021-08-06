@@ -66,11 +66,11 @@ let nodeToTypedIdentifier: 'a => Globals.typedIdentifier = node => {
   storageLocationString: node["storageLocation"],
 }
 
-let functionsVirtual = nodeStatements => {
+let functionVirtualOrPure = nodeStatements => {
   nodeStatements
   ->Array.keep(x => x["nodeType"] == #FunctionDefinition && !(x["name"] == "")) // ignore constructors
   ->Array.keep(x => {
-    x["virtual"]
+    x["virtual"] || x["pure"]
   })
   ->Array.map(x => {
     let r: Globals.functionType = {
@@ -221,8 +221,6 @@ filesToMockInternally->Array.forEach(filePath => {
   )
   let sol = ref(("../contracts/contracts/" ++ filePath)->Node.Fs.readFileAsUtf8Sync)
 
-  sol := sol.contents->replaceByRe(%re("/\s+pure\s+/g"), " view ")
-
   let lineCommentsMatch =
     sol.contents
     ->match_(lineCommentsRe)
@@ -243,7 +241,11 @@ filesToMockInternally->Array.forEach(filePath => {
 
   let mockLogger = ref("")
 
-  let allFunctions = functionsVirtual(contractDefinition["nodes"])->Array.map(((x, original)) => {
+  // TODO: modify this code so that it also generates exposed interfaces for interal pure fonctions that aren't virtual.
+  let allFunctions = functionVirtualOrPure(contractDefinition["nodes"])->Array.map(((
+    x,
+    original,
+  )) => {
     let isPure = original["stateMutability"] == "pure"
     let isExternal = original["visibility"] == "external"
 
@@ -408,7 +410,7 @@ filesToMockInternally->Array.forEach(filePath => {
     fileNameWithoutExtension,
     existingModuleDef ++
     "\n\n" ++
-    functionsVirtual(contractDefinition["nodes"])
+    functionVirtualOrPure(contractDefinition["nodes"])
     ->Array.map(((x, _)) => x)
     ->SmockableGen.internalModule(~contractName=fileNameWithoutExtension),
   )
