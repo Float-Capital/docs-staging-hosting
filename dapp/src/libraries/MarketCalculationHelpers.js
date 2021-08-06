@@ -7,6 +7,7 @@ var Globals = require("./Globals.js");
 var Caml_obj = require("rescript/lib/js/caml_obj.js");
 var CONSTANTS = require("../CONSTANTS.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
+var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var Belt_HashMapString = require("rescript/lib/js/belt_HashMapString.js");
 
 function calculateBeta(totalValueLocked, totalLockedLong, totalLockedShort, isLong) {
@@ -42,7 +43,7 @@ function xoredAssignment(condition, a, b) {
 
 function calcLongAndShortDollarFloatPerSecondUnscaled(longVal, shortVal, equibOffset, initialTimestamp, currentTimestamp, kperiod, kmultiplier, balanceIncentiveExponent) {
   var totalLocked = longVal.add(shortVal);
-  var equibOffsetScaled = equibOffset.mul(totalLocked).div(CONSTANTS.tenToThe18);
+  var equibOffsetScaled = equibOffset.mul(totalLocked).div(CONSTANTS.tenToThe18).div(CONSTANTS.twoBN);
   var shortValAfterOffset = shortVal.sub(equibOffsetScaled);
   var longIsSideWithMoreValAfterOffset = shortValAfterOffset.lt(longVal);
   var sideWithLessValAfterEquibOffset = longIsSideWithMoreValAfterOffset ? shortValAfterOffset : longVal.add(equibOffsetScaled);
@@ -144,6 +145,24 @@ function calculateLendingProviderAPYForSideMapped(apy, longVal, shortVal, tokenT
   }
 }
 
+function mapStakeApy(apyDict, key) {
+  if (typeof apyDict === "number") {
+    return /* Loading */0;
+  } else if (apyDict.TAG === /* Loaded */0) {
+    return {
+            TAG: 0,
+            _0: Belt_Option.getExn(Belt_HashMapString.get(apyDict._0, key)),
+            [Symbol.for("name")]: "Loaded"
+          };
+  } else {
+    return {
+            TAG: 1,
+            _0: apyDict._0,
+            [Symbol.for("name")]: "Error"
+          };
+  }
+}
+
 exports.calculateBeta = calculateBeta;
 exports.kCalc = kCalc;
 exports.xoredAssignment = xoredAssignment;
@@ -153,4 +172,5 @@ exports.calculateFloatMintedOverPeriod = calculateFloatMintedOverPeriod;
 exports.calculateStakeAPYS = calculateStakeAPYS;
 exports.calculateLendingProviderAPYForSide = calculateLendingProviderAPYForSide;
 exports.calculateLendingProviderAPYForSideMapped = calculateLendingProviderAPYForSideMapped;
+exports.mapStakeApy = mapStakeApy;
 /* Ethers Not a pure module */

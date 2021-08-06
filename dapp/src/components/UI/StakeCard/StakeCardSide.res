@@ -1,5 +1,7 @@
 open APYProvider
 
+let {ifElement} = module(Masonry)
+
 let isHotAPY = apy => apy > CONSTANTS.hotAPYThreshold
 
 let apyToStr = apy => (apy *. 100.)->Js.Float.toFixedWithPrecision(~digits=2)
@@ -15,13 +17,6 @@ let apyComponent = (~heading, ~suffix, ~apy) => {
   </div>
 }
 
-let ifElement = (condition, element) =>
-  if condition {
-    element
-  } else {
-    React.null
-  }
-
 @react.component
 let make = (~orderPostion, ~orderPostionMobile, ~isLong, ~apy, ~floatApy, ~stakeApy) => {
   <div
@@ -29,9 +24,9 @@ let make = (~orderPostion, ~orderPostionMobile, ~isLong, ~apy, ~floatApy, ~stake
     <div className="flex flex-col items-center justify-center pt-0">
       <h3 className="text-xs mt-2">
         <span className="font-bold"> {isLong ? "LONG"->React.string : "SHORT"->React.string} </span>
-        {" FLOAT rewards"->React.string}
+        {" FLOAT Multiplier"->React.string}
       </h3>
-      <p className="text-2xl md:text-3xl tracking-widest font-alphbeta"> {floatApy->mapVal} </p>
+      <p className="text-2xl md:text-4xl tracking-widest font-alphbeta"> {floatApy->mapVal} </p>
     </div>
     <div className="flex items-center justify-center pt-0 text-gray-600">
       {switch (apy, stakeApy) {

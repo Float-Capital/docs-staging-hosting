@@ -3,6 +3,7 @@
 
 var React = require("react");
 var Loader = require("../Base/Loader.js");
+var Masonry = require("../Masonry.js");
 var Tooltip = require("../Base/Tooltip.js");
 var CONSTANTS = require("../../../CONSTANTS.js");
 
@@ -32,14 +33,6 @@ function apyComponent(heading, suffix, apy) {
                 }, apyToStr(apy) + "%"));
 }
 
-function ifElement(condition, element) {
-  if (condition) {
-    return element;
-  } else {
-    return null;
-  }
-}
-
 function StakeCardSide(Props) {
   var orderPostion = Props.orderPostion;
   var orderPostionMobile = Props.orderPostionMobile;
@@ -59,16 +52,13 @@ function StakeCardSide(Props) {
       var stakeApy$1 = stakeApy._0;
       var apyGreaterThanZero = apyVal >= 0.01;
       var stakeApyGreaterThanZero = stakeApy$1 >= 0.01;
-      var element = apyComponent("SYNTH", null, apyVal);
-      var element$1 = React.createElement("span", {
-            className: "mx-2"
-          }, "+");
-      var element$2 = apyComponent("STAKE", React.createElement("span", {
-                className: "ml-1"
-              }, React.createElement(Tooltip.make, {
-                    tip: "Expected yield from FLOAT buybacks"
-                  })), stakeApy$1);
-      tmp = React.createElement(React.Fragment, undefined, apyGreaterThanZero ? element : null, apyGreaterThanZero && stakeApyGreaterThanZero ? element$1 : null, stakeApyGreaterThanZero ? element$2 : null);
+      tmp = React.createElement(React.Fragment, undefined, Masonry.ifElement(apyGreaterThanZero, apyComponent("SYNTH", null, apyVal)), Masonry.ifElement(apyGreaterThanZero && stakeApyGreaterThanZero, React.createElement("span", {
+                    className: "mx-2"
+                  }, "+")), Masonry.ifElement(stakeApyGreaterThanZero, apyComponent("STAKE", React.createElement("span", {
+                        className: "ml-1"
+                      }, React.createElement(Tooltip.make, {
+                            tip: "Expected yield from FLOAT buybacks"
+                          })), stakeApy$1)));
     }
   }
   if (exit === 1) {
@@ -82,19 +72,21 @@ function StakeCardSide(Props) {
                       className: "text-xs mt-2"
                     }, React.createElement("span", {
                           className: "font-bold"
-                        }, isLong ? "LONG" : "SHORT"), " FLOAT rewards"), React.createElement("p", {
-                      className: "text-2xl md:text-3xl tracking-widest font-alphbeta"
+                        }, isLong ? "LONG" : "SHORT"), " FLOAT Multiplier"), React.createElement("p", {
+                      className: "text-2xl md:text-4xl tracking-widest font-alphbeta"
                     }, mapVal(floatApy))), React.createElement("div", {
                   className: "flex items-center justify-center pt-0 text-gray-600"
                 }, tmp));
 }
 
+var ifElement = Masonry.ifElement;
+
 var make = StakeCardSide;
 
+exports.ifElement = ifElement;
 exports.isHotAPY = isHotAPY;
 exports.apyToStr = apyToStr;
 exports.mapVal = mapVal;
 exports.apyComponent = apyComponent;
-exports.ifElement = ifElement;
 exports.make = make;
 /* react Not a pure module */

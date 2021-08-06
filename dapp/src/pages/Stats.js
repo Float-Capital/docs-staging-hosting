@@ -22,6 +22,7 @@ var FromUnixTime = require("date-fns/fromUnixTime").default;
 var FormatDistanceToNow = require("date-fns/formatDistanceToNow").default;
 
 function Stats$TrendingStakes(Props) {
+  var $$global = Props.global;
   var marketDetailsQuery = Curry.app(Queries.MarketDetails.use, [
         undefined,
         undefined,
@@ -39,6 +40,7 @@ function Stats$TrendingStakes(Props) {
         undefined
       ]);
   var apy = APYProvider.useAPY(undefined);
+  var bnApy = APYProvider.useBnApy(undefined);
   var match = marketDetailsQuery.data;
   if (marketDetailsQuery.loading) {
     return React.createElement("div", {
@@ -51,26 +53,24 @@ function Stats$TrendingStakes(Props) {
   if (match === undefined) {
     return "You might think this is impossible, but depending on the situation it might not be!";
   }
-  if (typeof apy === "number") {
-    return React.createElement(Loader.Mini.make, {});
+  if (typeof apy !== "number" && apy.TAG === /* Loaded */0 && typeof bnApy !== "number" && bnApy.TAG === /* Loaded */0) {
+    var trendingStakes = StatsCalcs.trendingStakes(match.syntheticMarkets, apy._0, $$global, bnApy._0);
+    return Belt_Array.map(trendingStakes, (function (param) {
+                  var isLong = param.isLong;
+                  var marketName = param.marketName;
+                  return React.createElement(StatsStakeCard.make, {
+                              marketName: marketName,
+                              isLong: isLong,
+                              yield: param.apy,
+                              rewards: param.floatApy,
+                              stakeYield: param.stakeApy,
+                              key: marketName + (
+                                isLong ? "-long" : "-short"
+                              )
+                            });
+                }));
   }
-  if (apy.TAG !== /* Loaded */0) {
-    return React.createElement(Loader.Mini.make, {});
-  }
-  var trendingStakes = StatsCalcs.trendingStakes(match.syntheticMarkets, apy._0);
-  return Belt_Array.map(trendingStakes, (function (param) {
-                var isLong = param.isLong;
-                var marketName = param.marketName;
-                return React.createElement(StatsStakeCard.make, {
-                            marketName: marketName,
-                            isLong: isLong,
-                            yield: param.apy,
-                            rewards: param.floatApy,
-                            key: marketName + (
-                              isLong ? "-long" : "-short"
-                            )
-                          });
-              }));
+  return React.createElement(Loader.Mini.make, {});
 }
 
 var TrendingStakes = {
@@ -155,7 +155,7 @@ function floatTokenCard(totalFloatMinted) {
                 }));
 }
 
-function stakingCard(totalValueStaked) {
+function stakingCard(totalValueStaked, $$global) {
   return React.createElement(Masonry.Card.make, {
               children: null
             }, React.createElement(Masonry.Header.make, {
@@ -170,7 +170,9 @@ function stakingCard(totalValueStaked) {
                   className: "text-left mt-4 pl-4 text-sm font-bold"
                 }, "Trending"), React.createElement("div", {
                   className: "pt-2 pb-5"
-                }, React.createElement(Stats$TrendingStakes, {})));
+                }, React.createElement(Stats$TrendingStakes, {
+                      global: $$global
+                    })));
 }
 
 function Stats(Props) {
@@ -219,13 +221,13 @@ function Stats(Props) {
     if (match$1.length !== 1) {
       tmp = "Query returned wrong number of results";
     } else {
-      var match$2 = match$1[0];
-      var match$3 = marketDetailsQuery.data;
-      if (match$3 !== undefined) {
-        var syntheticMarkets = match$3.syntheticMarkets;
-        var match$4 = StatsCalcs.getTotalValueLockedAndTotalStaked(syntheticMarkets);
-        var totalValueStaked = match$4.totalValueStaked;
-        var totalValueLocked = match$4.totalValueLocked;
+      var $$global = match$1[0];
+      var match$2 = marketDetailsQuery.data;
+      if (match$2 !== undefined) {
+        var syntheticMarkets = match$2.syntheticMarkets;
+        var match$3 = StatsCalcs.getTotalValueLockedAndTotalStaked(syntheticMarkets);
+        var totalValueStaked = match$3.totalValueStaked;
+        var totalValueLocked = match$3.totalValueLocked;
         var totalSynthValue = StatsCalcs.getTotalSynthValue(totalValueLocked, totalValueStaked);
         var numberOfSynths = String((syntheticMarkets.length << 1));
         tmp = React.createElement("div", {
@@ -233,11 +235,11 @@ function Stats(Props) {
             }, totalValueCard(totalValueLocked), React.createElement(Masonry.Container.make, {
                   children: null
                 }, React.createElement(Masonry.Divider.make, {
-                      children: floatProtocolCard(match$2.timestampLaunched, match$2.totalTxs, match$2.totalUsers, match$2.totalGasUsed, match$2.txHash, numberOfSynths)
+                      children: floatProtocolCard($$global.timestampLaunched, $$global.totalTxs, $$global.totalUsers, $$global.totalGasUsed, $$global.txHash, numberOfSynths)
                     }), React.createElement(Masonry.Divider.make, {
                       children: null
-                    }, syntheticAssetsCard(totalSynthValue), floatTokenCard(match$2.totalFloatMinted)), React.createElement(Masonry.Divider.make, {
-                      children: stakingCard(totalValueStaked)
+                    }, syntheticAssetsCard(totalSynthValue), floatTokenCard($$global.totalFloatMinted)), React.createElement(Masonry.Divider.make, {
+                      children: stakingCard(totalValueStaked, $$global)
                     })));
       } else {
         tmp = "Query returned wrong number of results";
@@ -247,7 +249,7 @@ function Stats(Props) {
     tmp = marketDetailsQuery.data !== undefined ? "Query returned wrong number of results" : "Error getting data";
   }
   return React.createElement("div", {
-              className: "w-screen flex flex-col overflow-x-hidden"
+              className: "flex flex-col overflow-x-hidden"
             }, tmp);
 }
 

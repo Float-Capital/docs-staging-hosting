@@ -10,9 +10,11 @@ type stakeApyType = {
   isLong: bool,
   apy: float,
   floatApy: float,
+  stakeApy: float,
 }
 
-let trendingStakes = (~syntheticMarkets: array<Queries.SyntheticMarketInfo.t>, ~apy) => {
+let trendingStakes = (~syntheticMarkets: array<Queries.SyntheticMarketInfo.t>, ~apy, ~global, ~bnApy) => {
+  let stakeApys = MarketCalculationHelpers.calculateStakeAPYS(~syntheticMarkets, ~global, ~apy=bnApy)
   syntheticMarkets
   ->Array.reduce([], (
     previous,
@@ -20,6 +22,8 @@ let trendingStakes = (~syntheticMarkets: array<Queries.SyntheticMarketInfo.t>, ~
       name: marketName,
       timestampCreated,
       latestSystemState: {timestamp: currentTimestamp, totalLockedLong, totalLockedShort},
+      syntheticLong: {id: longId},
+      syntheticShort: {id: shortId}
     },
   ) => {
     let longApy = MarketCalculationHelpers.calculateLendingProviderAPYForSide(
@@ -65,17 +69,19 @@ let trendingStakes = (~syntheticMarkets: array<Queries.SyntheticMarketInfo.t>, ~
         isLong: true,
         apy: longApy,
         floatApy: longFloatApy->Ethers.Utils.formatEther->Js.Float.fromString,
+        stakeApy: stakeApys->HashMap.String.get(longId)->Option.getExn
       },
       {
         marketName: marketName,
         isLong: false,
         apy: shortApy,
         floatApy: shortFloatApy->Ethers.Utils.formatEther->Js.Float.fromString,
+        stakeApy: stakeApys->HashMap.String.get(shortId)->Option.getExn
       },
     ])
   })
-  ->SortArray.stableSortBy((token1, token2) =>
-    switch (token1.apy +. token1.floatApy, token2.apy +. token2.floatApy) {
+  ->SortArray.stableSortBy((token1, token2) => 
+    switch (token1.apy +. token1.floatApy +. token1.stakeApy, token2.apy +. token2.floatApy +. token2.stakeApy) {
     | (a, b) if a < b => 1
     | (a, b) if b > a => -1
     | _ => 0

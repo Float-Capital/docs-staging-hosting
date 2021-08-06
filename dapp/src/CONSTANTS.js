@@ -11,7 +11,7 @@ var zeroBN = Ethers.BigNumber.from(0);
 
 var twoBN = Ethers.BigNumber.from(2);
 
-var eightBN = Ethers.BigNumber.from(8);
+var fiveBN = Ethers.BigNumber.from(5);
 
 var tenToThe5 = Ethers.BigNumber.from("100000");
 
@@ -52,7 +52,7 @@ var kperiodHardcode = Ethers.BigNumber.from("1664000");
 
 var kmultiplierHardcode = Ethers.BigNumber.from("5000000000000000000");
 
-var floatTokenDollarWorthHardcode = tenToThe18.div(eightBN);
+var floatCapitalHardCode = tenToThe18.div(fiveBN);
 
 var oneYearInSecondsMulTenToThe18 = Ethers.BigNumber.from(31536000).mul(tenToThe18);
 
@@ -78,6 +78,8 @@ var oneYearInSeconds = 31536000;
 
 var hotAPYThreshold = 0.15;
 
+var multiplierHotAPYThreshold = 1.0;
+
 var equilibriumOffsetHardcode = zeroBN;
 
 var balanceIncentiveExponentHardcode = twoBN;
@@ -93,7 +95,7 @@ exports.zeroAddressStr = zeroAddressStr;
 exports.zeroAddress = zeroAddress;
 exports.zeroBN = zeroBN;
 exports.twoBN = twoBN;
-exports.eightBN = eightBN;
+exports.fiveBN = fiveBN;
 exports.tenToThe5 = tenToThe5;
 exports.tenToThe6 = tenToThe6;
 exports.tenToThe9 = tenToThe9;
@@ -119,12 +121,13 @@ exports.PriceGraphLabels = PriceGraphLabels;
 exports.threeMonthsInSeconds = threeMonthsInSeconds;
 exports.oneYearInSeconds = oneYearInSeconds;
 exports.hotAPYThreshold = hotAPYThreshold;
+exports.multiplierHotAPYThreshold = multiplierHotAPYThreshold;
 exports.kperiodHardcode = kperiodHardcode;
 exports.kmultiplierHardcode = kmultiplierHardcode;
 exports.equilibriumOffsetHardcode = equilibriumOffsetHardcode;
 exports.balanceIncentiveExponentHardcode = balanceIncentiveExponentHardcode;
-exports.floatTokenDollarWorthHardcode = floatTokenDollarWorthHardcode;
 exports.yieldGradientHardcode = yieldGradientHardcode;
+exports.floatCapitalHardCode = floatCapitalHardCode;
 exports.oneYearInSecondsMulTenToThe18 = oneYearInSecondsMulTenToThe18;
 exports.daiDisplayToken = daiDisplayToken;
 /* zeroAddress Not a pure module */

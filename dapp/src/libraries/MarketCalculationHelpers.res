@@ -58,7 +58,8 @@ let calcLongAndShortDollarFloatPerSecondUnscaled = (
   open Ethers.BigNumber
 
   let totalLocked = longVal->add(shortVal)
-  let equibOffsetScaled = equibOffset->mul(totalLocked)->div(CONSTANTS.tenToThe18)
+  let equibOffsetScaled =
+    equibOffset->mul(totalLocked)->div(CONSTANTS.tenToThe18)->div(CONSTANTS.twoBN)
 
   let shortValAfterOffset = shortVal->sub(equibOffsetScaled)
 
@@ -290,3 +291,11 @@ let calculateLendingProviderAPYForSideMapped = (apy, longVal, shortVal, tokenTyp
     )
   | a => a
   }
+
+let mapStakeApy = (apyDict, key) => {
+  switch apyDict {
+  | APYProvider.Loaded(a) => APYProvider.Loaded(a->HashMap.String.get(key)->Option.getExn)
+  | Loading => Loading
+  | Error(e) => Error(e)
+  }
+}

@@ -1,3 +1,5 @@
+let {mapStakeApy} = module(MarketCalculationHelpers)
+
 @react.component
 let make = (
   ~syntheticMarket as {
@@ -9,6 +11,12 @@ let make = (
       totalLockedLong,
       totalLockedShort,
     },
+    syntheticLong: {
+      id: longId
+    },
+    syntheticShort: {
+      id: shortId
+    }
   }: Queries.SyntheticMarketInfo.t,
 ) => {
   let longBeta = MarketCalculationHelpers.calculateBeta(
@@ -39,6 +47,8 @@ let make = (
     totalLockedShort->Ethers.Utils.formatEther->Js.Float.fromString,
     "short",
   )
+
+  let stakeApys = DataHooks.useStakingAPYs()
 
   let longFloatApy = MarketCalculationHelpers.calculateFloatAPY(
     totalLockedLong,
@@ -73,6 +83,7 @@ let make = (
         marketName={marketName}
         isLong={true}
         apy={longApy}
+        stakeApy={stakeApys->mapStakeApy(longId)}
         floatApy={longFloatApy->Ethers.Utils.formatEther->Js.Float.fromString}
         beta={longBeta}
       />
@@ -80,41 +91,16 @@ let make = (
         <div className="flex justify-center w-full mb-2">
           <h1 className="font-bold text-xl font-alphbeta"> {marketName->React.string} </h1>
         </div>
-        <div className="flex flex-row items-center justify-between w-full mb-4">
-          <div>
-            <div>
-              <h2 className="text-xxxs mt-1">
-                <span className="font-bold "> {`📈 Long`->React.string} </span>
-                <br />
-                {"liquidity"->React.string}
-              </h2>
-            </div>
-            <div className="text-xs font-alphbeta tracking-wider py-1 text-gray-600">
-              {`$${totalLockedLong->Misc.NumberFormat.formatEther}`->React.string}
-            </div>
-          </div>
+        <div className="flex flex-row items-center justify-center w-full mb-4">
           <div>
             <div>
               <h2 className="text-xs mt-1 text-center">
                 <span className="font-bold pr-1"> {`TOTAL`->React.string} </span>
-                <br />
                 {"Liquidity"->React.string}
               </h2>
             </div>
             <div className="text-2xl font-alphbeta tracking-wider ">
               {`$${totalValueLocked->Misc.NumberFormat.formatEther}`->React.string}
-            </div>
-          </div>
-          <div className="text-right">
-            <div>
-              <h2 className="text-xxxs mt-1">
-                <span className="font-bold"> {`Short 📉`->React.string} </span>
-                <br />
-                {`liquidity`->React.string}
-              </h2>
-            </div>
-            <div className="text-xs font-alphbeta tracking-wider py-1 text-gray-600">
-              {`$${totalLockedShort->Misc.NumberFormat.formatEther}`->React.string}
             </div>
           </div>
         </div>
@@ -124,6 +110,31 @@ let make = (
           | false => React.null
           }}
         </div>
+        <div className="flex flex-row items-center justify-between w-full">
+          <div>
+            <div>
+              <h2 className="text-xs mt-1">
+                <span className="font-bold mr-1"> {`📈 Long`->React.string} </span>
+                {"Liquidity"->React.string}
+              </h2>
+            </div>
+            <div className="text-md font-alphbeta tracking-wider py-1 text-gray-600">
+              {`$${totalLockedLong->Misc.NumberFormat.formatEther}`->React.string}
+            </div>
+          </div>
+          <div className="text-right">
+            <div>
+              <h2 className="text-xs mt-1">
+                <span className="font-bold mr-1"> {`Short`->React.string} </span>
+                {`Liquidity 📉`->React.string}
+              </h2>
+            </div>
+            <div className="text-md font-alphbeta tracking-wider py-1 text-gray-600">
+              {`$${totalLockedShort->Misc.NumberFormat.formatEther}`->React.string}
+            </div>
+          </div>
+        </div>
+
       </div>
       <MarketStakeCardSide
         orderPostionMobile={3}
@@ -131,6 +142,7 @@ let make = (
         marketName={marketName}
         isLong={false}
         apy={shortApy}
+        stakeApy={stakeApys->mapStakeApy(shortId)}
         floatApy={shortFloatApy->Ethers.Utils.formatEther->Js.Float.fromString}
         beta={shortBeta}
       />

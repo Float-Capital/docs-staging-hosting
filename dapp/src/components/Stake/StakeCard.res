@@ -8,13 +8,7 @@ type handleStakeButtonPress =
   | Form(string)
   | Redirect({marketIndex: string, actionOption: string})
 
-let mapStakeApy = (apyDict, key) => {
-  switch apyDict {
-  | APYProvider.Loaded(a) => APYProvider.Loaded(a->HashMap.String.get(key)->Option.getExn)
-  | Loading => Loading
-  | Error(e) => Error(e)
-  }
-}
+let {mapStakeApy} = module(MarketCalculationHelpers)
 
 @react.component
 let make = (

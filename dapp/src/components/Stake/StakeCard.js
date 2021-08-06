@@ -9,32 +9,12 @@ var CONSTANTS = require("../../CONSTANTS.js");
 var MarketBar = require("../UI/MarketCard/MarketBar.js");
 var Link = require("next/link").default;
 var APYProvider = require("../../libraries/APYProvider.js");
-var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var Router = require("next/router");
 var StakeCardSide = require("../UI/StakeCard/StakeCardSide.js");
-var Belt_HashMapString = require("rescript/lib/js/belt_HashMapString.js");
 var MarketCalculationHelpers = require("../../libraries/MarketCalculationHelpers.js");
 
 function calculateDollarValue(tokenPrice, amountStaked) {
   return tokenPrice.mul(amountStaked).div(CONSTANTS.tenToThe18);
-}
-
-function mapStakeApy(apyDict, key) {
-  if (typeof apyDict === "number") {
-    return /* Loading */0;
-  } else if (apyDict.TAG === /* Loaded */0) {
-    return {
-            TAG: 0,
-            _0: Belt_Option.getExn(Belt_HashMapString.get(apyDict._0, key)),
-            [Symbol.for("name")]: "Loaded"
-          };
-  } else {
-    return {
-            TAG: 1,
-            _0: apyDict._0,
-            [Symbol.for("name")]: "Error"
-          };
-  }
 }
 
 function StakeCard(Props) {
@@ -109,7 +89,7 @@ function StakeCard(Props) {
                             isLong: true,
                             apy: longApy,
                             floatApy: Number(Ethers.Utils.formatEther(longFloatApy)),
-                            stakeApy: mapStakeApy(_stakeApys, match$2.id)
+                            stakeApy: MarketCalculationHelpers.mapStakeApy(_stakeApys, match$2.id)
                           }), React.createElement("div", {
                             className: "w-full md:w-1/2 flex items-center flex-col order-1 md:order-2"
                           }, React.createElement("div", {
@@ -142,12 +122,14 @@ function StakeCard(Props) {
                             isLong: false,
                             apy: shortApy,
                             floatApy: Number(Ethers.Utils.formatEther(shortFloatApy)),
-                            stakeApy: mapStakeApy(_stakeApys, match$1.id)
+                            stakeApy: MarketCalculationHelpers.mapStakeApy(_stakeApys, match$1.id)
                           }), React.createElement("div", {
                             className: "block md:hidden pt-5 order-4 w-full"
                           }, stakeButtons(undefined))))
             });
 }
+
+var mapStakeApy = MarketCalculationHelpers.mapStakeApy;
 
 var make = StakeCard;
 

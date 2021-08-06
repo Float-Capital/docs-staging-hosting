@@ -20,6 +20,7 @@ function StatsStakeCard(Props) {
   var isLong = Props.isLong;
   var $$yield = Props.yield;
   var rewards = Props.rewards;
+  var stakeYield = Props.stakeYield;
   return React.createElement(Link, {
               href: "/app/stake",
               children: React.createElement("div", {
@@ -29,10 +30,18 @@ function StatsStakeCard(Props) {
                       }, marketName, React.createElement("br", {
                             className: "mt-1"
                           }), isLong ? "Long↗️" : "Short↘️"), React.createElement("div", {
-                        className: "text-center w-full my-2 text-sm"
-                      }, "Yield: " + mapVal($$yield), React.createElement("br", {
-                            className: "mt-1"
-                          }), "Float rewards: " + mapVal(rewards)))
+                        className: "flex-1 my-2 text-sm flex flex-col items-center"
+                      }, React.createElement("div", undefined, React.createElement("div", undefined, React.createElement("span", {
+                                    className: "text-xs font-bold mr-2"
+                                  }, "Float rewards:"), mapVal(rewards)), React.createElement("div", {
+                                className: "mt-2"
+                              }, React.createElement("span", {
+                                    className: "text-xs font-bold mr-2"
+                                  }, "Synthetic Yield:"), mapVal($$yield)), React.createElement("div", {
+                                className: "mt-2"
+                              }, React.createElement("span", {
+                                    className: "text-xs font-bold mr-2"
+                                  }, "Stake Yield:"), mapVal(stakeYield)))))
             });
 }
 
