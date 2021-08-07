@@ -1,3 +1,5 @@
+export { runTests } from "../tests/longShort.test";
+
 import {
   LongShortV1,
   SyntheticMarketCreated,
@@ -9,7 +11,7 @@ import {
   ExecuteNextPriceSettlementsUser,
   ExecuteNextPriceRedeemSettlementUser,
   ExecuteNextPriceMintSettlementUser,
-} from "../generated/LongShort/LongShort";
+} from "../../generated/LongShort/LongShort";
 import {
   SyntheticMarket,
   GlobalState,
@@ -22,12 +24,12 @@ import {
   Price,
   LatestUnderlyingPrice,
   UnderlyingPrice,
-} from "../generated/schema";
+} from "../../generated/schema";
 import { BigInt, log, Bytes, Address } from "@graphprotocol/graph-ts";
 import {
   bigIntArrayToStringArray,
   saveEventToStateChange,
-} from "./utils/txEventHelpers";
+} from "../utils/txEventHelpers";
 import {
   getOrCreateLatestSystemState,
   getOrCreateAccumulativeFloatIssuanceSnapshot,
@@ -41,13 +43,13 @@ import {
   getSyntheticMarket,
   getSyntheticTokenById,
   getSyntheticTokenByMarketIdAndTokenType,
-} from "./utils/globalStateManager";
+} from "../utils/globalStateManager";
 import {
   createNewTokenDataSource,
   increaseUserMints,
   updateBalanceTransfer,
   updateUserBalance,
-} from "./utils/helperFunctions";
+} from "../utils/helperFunctions";
 import { decreaseOrCreateUserApprovals } from "./tokenTransfers";
 import {
   ZERO,
@@ -60,7 +62,7 @@ import {
   ACTION_MINT,
   ACTION_REDEEM,
   TEN_TO_THE_18,
-} from "./CONSTANTS";
+} from "../CONSTANTS";
 import {
   createOrUpdateUserNextPriceAction,
   createUserNextPriceActionComponent,
@@ -69,7 +71,7 @@ import {
   getUserNextPriceActionById,
   getUsersCurrentNextPriceAction,
   doesBatchExist,
-} from "./utils/nextPrice";
+} from "../utils/nextPrice";
 
 export function handleLongShortV1(event: LongShortV1): void {
   // event LongShortV1(address admin, address tokenFactory, address staker);

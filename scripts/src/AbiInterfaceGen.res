@@ -95,7 +95,7 @@ let moduleDictionary: Js.Dict.t<(Js.Dict.t<string>, string)> = Js.Dict.empty()
 let _ = files->Array.map(abiFileName => {
   let abiFileContents = `../contracts/abis/${abiFileName}`->Node.Fs.readFileAsUtf8Sync
 
-  let abiFileObject = abiFileContents->Js.Json.parseExn->Obj.magic // us some useful polymorphic magic 🙌
+  let abiFileObject = abiFileContents->Js.Json.parseExn->Obj.magic // use some useful polymorphic magic 🙌
 
   let moduleContents = Js.Dict.empty()
   let moduleConstructor = ref(
