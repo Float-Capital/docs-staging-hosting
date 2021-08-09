@@ -167,16 +167,11 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
       let amountToShift = Helpers.randomTokenAmount();
       let userNextPrice_stakedSyntheticTokenShiftIndex =
         Helpers.randomInteger();
-      let takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping =
-        Helpers.randomInteger();
-      let batched_stakerNextTokenShiftIndex =
+      let latestRewardIndex =
         userNextPrice_stakedSyntheticTokenShiftIndex->add(oneBn);
-      let stakerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping =
-        usersLatestClaimedReward->add(Helpers.randomInteger());
       let newLatestRewardIndex =
-        stakerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping->add(
-          Helpers.randomInteger(),
-        );
+        latestRewardIndex->add(Helpers.randomInteger());
+
       let amountOfStakeShifted = Helpers.randomTokenAmount();
       let amountStakedBothSidesInitially =
         amountToShift->add(amountOfStakeShifted);
@@ -214,9 +209,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
             ~shiftAmountLong=isShiftFromLong ? amountToShift : zeroBn,
             ~shiftAmountShort=isShiftFromLong ? zeroBn : amountToShift,
             ~userNextPrice_stakedSyntheticTokenShiftIndex,
-            ~batched_stakerNextTokenShiftIndex,
-            ~takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping,
-            ~stakerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping,
+            ~latestRewardIndex,
           );
         let%AwaitThen longShortSmocked = longShort->LongShortSmocked.make;
         let%AwaitThen _ =
@@ -274,7 +267,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
                 amountStakedLong: amountStakedBothSidesInitially,
                 amountStakedShort: amountStakedBothSidesInitially,
                 rewardIndexFrom: usersLatestClaimedReward,
-                rewardIndexTo: stakerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping,
+                rewardIndexTo: userNextPrice_stakedSyntheticTokenShiftIndex,
               },
               {
                 marketIndex,
@@ -282,8 +275,8 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
                   isShiftFromLong ? stakeDecreasedSide : stakeIncreasedSide,
                 amountStakedShort:
                   isShiftFromLong ? stakeIncreasedSide : stakeDecreasedSide,
-                rewardIndexFrom: stakerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping,
-                rewardIndexTo: newLatestRewardIndex,
+                rewardIndexFrom: userNextPrice_stakedSyntheticTokenShiftIndex,
+                rewardIndexTo: latestRewardIndex,
               },
             |],
           );
@@ -304,7 +297,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
                   marketIndex,
                   amountSyntheticToken_redeemOnOriginSide: amountToShift,
                   isShiftFromLong,
-                  priceSnapshotIndex: takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping,
+                  priceSnapshotIndex: userNextPrice_stakedSyntheticTokenShiftIndex,
                 },
               |],
             );
