@@ -1283,6 +1283,7 @@ contract LongShort is ILongShort, Initializable {
     amountForCurrentAction_workingVariable = batched_amountSyntheticToken_toShiftAwayFrom_marketSide[
       marketIndex
     ][true];
+
     if (amountForCurrentAction_workingVariable > 0) {
       int256 paymentTokenValueChangeForShiftToShort = int256(
         _getAmountPaymentToken(
@@ -1330,7 +1331,7 @@ contract LongShort is ILongShort, Initializable {
         )
       );
 
-      batched_amountSyntheticToken_toShiftAwayFrom_marketSide[marketIndex][true] = 0;
+      batched_amountSyntheticToken_toShiftAwayFrom_marketSide[marketIndex][false] = 0;
     }
 
     // Handle batched redeems LONG
