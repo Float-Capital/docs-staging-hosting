@@ -141,7 +141,7 @@ let testUnit =
           |])
       );
 
-      it_only("should not allow shifts > userAmountStaked", () => {
+      it("should not allow shifts > userAmountStaked", () => {
         let adminWallet = accounts.contents->Array.getUnsafe(0); 
 
         let%Await _ =
