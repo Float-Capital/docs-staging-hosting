@@ -73,7 +73,6 @@ function ethereumValueConverterFromSolidityType(typeString) {
 
 Belt_Array.forEach(Object.keys(abisMapping), (function (key) {
         var abiFile = abisMapping[key];
-        console.log(abiFile);
         var abi = JSON.parse(Fs.readFileSync(abiFile, "utf8"));
         var events = Belt_Array.keep(abi, (function (item) {
                 return item.type === "event";
@@ -94,17 +93,17 @@ Belt_Array.forEach(Object.keys(abisMapping), (function (key) {
                 var eventParamAddersCode = Belt_Array.joinWith(Belt_Array.map(eventParams, (function (eventParam) {
                             var eventParamName = eventParam.name;
                             var eventParamType = eventParam.type;
-                            return "\n          let " + eventParamName + "Param = new ethereum.EventParam();\n\n  " + eventParamName + "Param.name = \"" + eventParamName + "\";\n  " + eventParamName + "Param.value = " + ethereumValueConverterFromSolidityType(eventParamType) + "(" + eventParamName + ");\n  \n  new" + eventName + "Event.parameters.push(" + eventParamName + "Param);";
+                            return "\n  let " + eventParamName + "Param = new ethereum.EventParam();\n  " + eventParamName + "Param.name = \"" + eventParamName + "\";\n  " + eventParamName + "Param.value = " + ethereumValueConverterFromSolidityType(eventParamType) + "(" + eventParamName + ");\n  new" + eventName + "Event.parameters.push(" + eventParamName + "Param);";
                           })), "\n", (function (a) {
                         return a;
                       }));
-                var createEventFunction = "\nexport function create" + eventName + "Event(" + eventParamArgumentString + "): " + eventName + " {\n  let new" + eventName + "Event = new " + eventName + "();\n  new" + eventName + "Event.parameters = new Array<ethereum.EventParam>();\n\n  " + eventParamAddersCode + "\n\n  return new" + eventName + "Event;\n}";
+                var createEventFunction = "\nexport function create" + eventName + "Event(" + eventParamArgumentString + "): " + eventName + " {\n  let new" + eventName + "Event = new " + eventName + "();\n\n  new" + eventName + "Event.parameters = new Array<ethereum.EventParam>();\n" + eventParamAddersCode + "\n\n  return new" + eventName + "Event;\n}";
                 return [
-                        param[0] + "\n" + eventName + ",",
+                        "  " + param[0] + " \n  " + eventName + ",",
                         param[1] + "\n" + createEventFunction
                       ];
               }));
-        var helperFileContents = topLevelImports + ("\n  import {" + match[0] + "} from \"../../../generated/" + key + "/" + key + "\";\n") + match[1];
+        var helperFileContents = topLevelImports + ("\nimport {" + match[0] + "\n} from \"../../../generated/" + key + "/" + key + "\";") + match[1];
         Fs.writeFileSync("./src/tests/generated/" + key + "Helpers.ts", helperFileContents, "utf8");
         
       }));

@@ -78,3 +78,6 @@ typings/
 /abis-copy
 
 matchstick
+
+src/**/generated/*
+src/**/generate/.keep

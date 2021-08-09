@@ -67,7 +67,7 @@ abisMapping
 ->Js.Dict.keys
 ->Array.forEach(key => {
   let abiFile = abisMapping->Js.Dict.unsafeGet(key)
-  Js.log(abiFile)
+
   let abi = Node_fs.readFileAsUtf8Sync(abiFile)->Js.Json.parseExn->Obj.magic // use some useful polymorphic magic 🙌
 
   let events = abi->Array.keep(item => item["type"] == "event")
@@ -96,32 +96,34 @@ abisMapping
         let eventParamType = eventParam["type"]
 
         `
-          let ${eventParamName}Param = new ethereum.EventParam();
-
+  let ${eventParamName}Param = new ethereum.EventParam();
   ${eventParamName}Param.name = "${eventParamName}";
   ${eventParamName}Param.value = ${eventParamType->ethereumValueConverterFromSolidityType}(${eventParamName});
-  
   new${eventName}Event.parameters.push(${eventParamName}Param);`
       })
       ->Array.joinWith("\n", a => a)
     let createEventFunction = `
 export function create${eventName}Event(${eventParamArgumentString}): ${eventName} {
   let new${eventName}Event = new ${eventName}();
-  new${eventName}Event.parameters = new Array<ethereum.EventParam>();
 
-  ${eventParamAddersCode}
+  new${eventName}Event.parameters = new Array<ethereum.EventParam>();
+${eventParamAddersCode}
 
   return new${eventName}Event;
 }`
 
-    (eventImportsList ++ "\n" ++ eventName ++ ",", functions ++ "\n" ++ createEventFunction)
+    (
+      `  ${eventImportsList} 
+  ${eventName},`,
+      functions ++ "\n" ++ createEventFunction,
+    )
   })
 
   let helperFileContents =
     topLevelImports ++
     `
-  import {${eventImportsList}} from "../../../generated/${key}/${key}";
-` ++
+import {${eventImportsList}
+} from "../../../generated/${key}/${key}";` ++
     eventCreationFunctions
 
   Node_fs.writeFileAsUtf8Sync(`./src/tests/generated/${key}Helpers.ts`, helperFileContents)
