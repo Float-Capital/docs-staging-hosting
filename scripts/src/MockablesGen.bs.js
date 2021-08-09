@@ -89,7 +89,7 @@ function nodeToTypedIdentifier(node) {
         };
 }
 
-function functionsVirtual(nodeStatements) {
+function functionVirtualOrPure(nodeStatements) {
   return Belt_Array.map(Belt_Array.keep(Belt_Array.keep(nodeStatements, (function (x) {
                         if (x.nodeType === "FunctionDefinition") {
                           return x.name !== "";
@@ -97,7 +97,11 @@ function functionsVirtual(nodeStatements) {
                           return false;
                         }
                       })), (function (x) {
-                    return x.virtual;
+                    if (x.virtual) {
+                      return true;
+                    } else {
+                      return x.pure;
+                    }
                   })), (function (x) {
                 var r_name = x.name;
                 var r_parameters = Belt_Array.map(x.parameters.parameters, nodeToTypedIdentifier);
@@ -273,7 +277,6 @@ Belt_Array.forEach(filesToMockInternally, (function (filePath) {
         var sol = {
           contents: Fs.readFileSync("../contracts/contracts/" + filePath, "utf8")
         };
-        sol.contents = sol.contents.replace(/\s+pure\s+/g, " view ");
         var lineCommentsMatch = Belt_Option.map(Caml_option.null_to_opt(sol.contents.match(lineCommentsRe)), (function (i) {
                 return Belt_Array.keep(i, (function (x) {
                               return !Globals.contains(x, "SPDX-License-Identifier");
@@ -294,7 +297,7 @@ Belt_Array.forEach(filesToMockInternally, (function (filePath) {
         var mockLogger = {
           contents: ""
         };
-        var allFunctions = Belt_Array.map(functionsVirtual(contractDefinition.nodes), (function (param) {
+        var allFunctions = Belt_Array.map(functionVirtualOrPure(contractDefinition.nodes), (function (param) {
                 var original = param[1];
                 var x = param[0];
                 var isPure = original.stateMutability === "pure";
@@ -381,7 +384,7 @@ Belt_Array.forEach(filesToMockInternally, (function (filePath) {
         var existingModuleDef = Belt_Array.some(abisToMockExternally, (function (x) {
                 return x === fileNameWithoutExtension;
               })) ? Belt_Option.getExn(Belt_HashMapString.get(bindingsDict, fileNameWithoutExtension)) : "";
-        return Belt_HashMapString.set(bindingsDict, fileNameWithoutExtension, existingModuleDef + "\n\n" + SmockableGen.internalModule(Belt_Array.map(functionsVirtual(contractDefinition.nodes), (function (param) {
+        return Belt_HashMapString.set(bindingsDict, fileNameWithoutExtension, existingModuleDef + "\n\n" + SmockableGen.internalModule(Belt_Array.map(functionVirtualOrPure(contractDefinition.nodes), (function (param) {
                               return param[0];
                             })), fileNameWithoutExtension));
       }));
@@ -407,7 +410,7 @@ exports.abisToMockExternally = abisToMockExternally;
 exports.convertASTTypeToSolTypeSimple = convertASTTypeToSolTypeSimple;
 exports.convertASTTypeToSolType = convertASTTypeToSolType;
 exports.nodeToTypedIdentifier = nodeToTypedIdentifier;
-exports.functionsVirtual = functionsVirtual;
+exports.functionVirtualOrPure = functionVirtualOrPure;
 exports.modifiers = modifiers;
 exports.lineCommentsRe = lineCommentsRe;
 exports.blockCommentsRe = blockCommentsRe;

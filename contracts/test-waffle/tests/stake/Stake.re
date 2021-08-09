@@ -27,8 +27,6 @@ let test =
           ~contracts,
           ~accounts,
         );
-      StakerSmocked.InternalMock.mock_mintAccumulatedFloatAndExecuteOutstandingShiftsToReturn();
-
       let%AwaitThen _ =
         contracts^.staker
         ->Staker.Exposed.set_stakeParams(

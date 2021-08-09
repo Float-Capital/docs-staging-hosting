@@ -68,8 +68,6 @@ let test =
 
       iterativeMockCalculateAccumulatedFloatToReturn(floatRewardsForMarkets);
 
-      StakerSmocked.InternalMock.mock_mintFloatToReturn();
-
       let%Await _ =
         marketIndices->Array.reduceWithIndex(
           ()->JsPromise.resolve,

@@ -36,8 +36,6 @@ let testUnit =
         syntheticTokenSmocked->SyntheticTokenSmocked.mockTransferToReturn(
           true,
         );
-        StakerSmocked.InternalMock.mock_mintAccumulatedFloatAndExecuteOutstandingShiftsToReturn();
-
         connectedStaker :=
           staker->ContractHelpers.connect(~address=userWallet.contents);
         call :=
@@ -67,7 +65,9 @@ let testUnit =
             |]);
         });
 
-        it("calls _mintAccumulatedFloatAndExecuteOutstandingShifts with correct args", () => {
+        it(
+          "calls _mintAccumulatedFloatAndExecuteOutstandingShifts with correct args",
+          () => {
           StakerSmocked.InternalMock._mintAccumulatedFloatAndExecuteOutstandingShiftsCalls()
           ->Chai.recordArrayDeepEqualFlat([|
               {user: userWallet.contents.address, marketIndex},
@@ -124,9 +124,6 @@ let testUnit =
               ~token,
             );
 
-        contracts.contents.longShortSmocked
-        ->LongShortSmocked.mockUpdateSystemStateToReturn;
-
         contracts.contents.staker
         ->Staker.withdraw(~token, ~amount=amountWithdrawn);
       });
@@ -158,9 +155,6 @@ let testUnit =
               ~user=userWallet.contents.address,
               ~amountStaked,
             );
-
-        contracts.contents.longShortSmocked
-        ->LongShortSmocked.mockUpdateSystemStateToReturn;
 
         contracts.contents.staker
         ->ContractHelpers.connect(~address=userWallet.contents)
