@@ -115,8 +115,6 @@ contract Staker is IStaker, Initializable {
 
   event FloatPercentageUpdated(uint256 floatPercentage);
 
-  event SyntheticTokensShifted();
-
   event ChangeAdmin(address newAdmin);
 
   /*╔═════════════════════════════╗
@@ -892,6 +890,7 @@ contract Staker is IStaker, Initializable {
 
     userAmountStaked[token][user] = userAmountStaked[token][user] + amount;
 
+    // NOTE: Users retroactively earn a little bit of FLT because they start earning from the previous update index.
     userIndexOfLastClaimedReward[marketIndex][user] = latestRewardIndex[marketIndex];
 
     emit StakeAdded(user, address(token), amount, userIndexOfLastClaimedReward[marketIndex][user]);

@@ -80,13 +80,6 @@ let testUnit =
       before_once'(() =>
         setup(~timeDelta=timeDeltaGreaterThanZero, ~marketUpdateIndex)
       );
-
-      it("calls calculateTimeDelta with correct arguments", () => {
-        StakerSmocked.InternalMock._calculateTimeDeltaFromLastAccumulativeIssuancePerStakedSynthSnapshotCalls()
-        ->Chai.recordArrayDeepEqualFlat([|
-            {marketIndex, previousMarketUpdateIndex: marketUpdateIndex},
-          |])
-      });
     });
 
     describe("case marketUpdateIndex > 0", () => {
@@ -108,17 +101,6 @@ let testUnit =
 
         pushUpdatedMarketPricesToUpdateFloatIssuanceCalculationsTxPromise.
           contents;
-      });
-
-      it("emits the SyntheticTokensShifted event", () => {
-        Chai.callEmitEvents(
-          ~call=
-            pushUpdatedMarketPricesToUpdateFloatIssuanceCalculationsTxPromise.
-              contents,
-          ~contract=contracts.contents.staker->Obj.magic,
-          ~eventName="SyntheticTokensShifted",
-        )
-        ->Chai.withArgs0
       });
     });
 
