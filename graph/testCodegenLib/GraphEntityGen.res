@@ -8,7 +8,7 @@ let entityDefinitions = result["definitions"]
 
 let getDefaultValues = typeString =>
   switch typeString {
-  | "Bytes" => `Bytes.fromHexString("0x0")`
+  | "Bytes" => `Bytes.fromHexString("0x0") as Bytes`
   | "Address" => `Address.fromString("0x0000000000000000000000000000000000000000")`
   | "Int" => "0"
   | "String" => `""`
@@ -104,7 +104,7 @@ let functions =
 export function getOrInitialize${name}(entityId: string): GetOrCreateReturn<${name}> {
   let loaded${name} = ${name}.load(entityId);
 
-  let returnObject = new GetOrCreateReturn(loaded${name} as ${name}, false);
+  let returnObject = new GetOrCreateReturn<${name}>(loaded${name} as ${name}, false);
 
   if (loaded${name} == null) {${fieldDefaultSetters}
     loaded${name}.save();

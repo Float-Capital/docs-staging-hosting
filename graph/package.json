@@ -26,7 +26,7 @@
     "res:clean": "rescript clean",
     "test-codegen": "node ./test/util/Codegen.bs.js > ./test/stateChanges/Converters.res",
     "unit-test-codegen": "node ./testCodegenLib/EventGen.bs.js",
-    "entiy-helpers-codegen": "node ./testCodegenLib/GraphEntityGen.bs.js",
+    "entity-helpers-codegen": "node ./testCodegenLib/GraphEntityGen.bs.js",
     "integration-test": "jest test ./integrationTests"
   },
   "dependencies": {

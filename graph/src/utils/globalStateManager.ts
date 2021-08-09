@@ -136,48 +136,6 @@ export function createInitialSystemState(
     latestTokenPriceShort: shortCurrentTokenPrice,
   };
 }
-export function getOrCreateLatestSystemState(
-  marketIndex: BigInt,
-  txHash: Bytes,
-  event: ethereum.Event
-): SystemState {
-  let systemStateId = txHash.toHex();
-  let marketIndexId = marketIndex.toString();
-  let latestSystemState = SystemState.load(marketIndexId + "-" + systemStateId);
-  if (latestSystemState == null) {
-    let syntheticMarket = SyntheticMarket.load(marketIndexId);
-    if (syntheticMarket == null) {
-      log.critical(
-        "`getOrCreateLatestSystemState` called without SyntheticMarket with id #{} being created.",
-        [marketIndexId]
-      );
-    }
-    let prevSystemState = SystemState.load(syntheticMarket.latestSystemState);
-    if (prevSystemState == null) {
-      log.critical(
-        "SyntheticMarket with id #{} references a non-existant (null) `latestSystemState`.",
-        [marketIndexId]
-      );
-    }
-
-    latestSystemState = new SystemState(marketIndexId + "-" + systemStateId);
-    latestSystemState.timestamp = event.block.timestamp;
-    latestSystemState.txHash = event.transaction.hash;
-    latestSystemState.blockNumber = event.block.number;
-    latestSystemState.marketIndex = marketIndex;
-    latestSystemState.underlyingPrice = prevSystemState.underlyingPrice;
-    latestSystemState.longTokenPrice = prevSystemState.longTokenPrice;
-    latestSystemState.shortTokenPrice = prevSystemState.shortTokenPrice;
-    latestSystemState.totalLockedLong = prevSystemState.totalLockedLong;
-    latestSystemState.totalLockedShort = prevSystemState.totalLockedShort;
-    latestSystemState.totalValueLocked = prevSystemState.totalValueLocked;
-    latestSystemState.setBy = event.transaction.from;
-    latestSystemState.longToken = prevSystemState.longToken;
-    latestSystemState.shortToken = prevSystemState.shortToken;
-  }
-
-  return latestSystemState as SystemState;
-}
 
 export function getAccumulativeFloatIssuanceSnapshotId(
   marketIndexId: string,
@@ -293,17 +251,7 @@ export function getUser(address: Bytes): User {
 
   return user as User;
 }
-export function getSyntheticMarket(marketIndex: BigInt): SyntheticMarket {
-  let syntheticMarket = SyntheticMarket.load(marketIndex.toString());
-  if (syntheticMarket == null) {
-    log.critical(
-      "`getOrCreateLatestSystemState` called without SyntheticMarket with id #{} being created.",
-      [marketIndex.toString()]
-    );
-  }
 
-  return syntheticMarket as SyntheticMarket;
-}
 export function getSyntheticTokenById(
   syntheticTokenId: string
 ): SyntheticToken {
@@ -317,7 +265,7 @@ export function getSyntheticTokenById(
 
 export function getSyntheticTokenByMarketIdAndTokenType(
   marketIndex: BigInt,
-  isLong: bool
+  isLong: boolean
 ): SyntheticToken {
   let syntheticMarket = SyntheticMarket.load(marketIndex.toString());
   if (syntheticMarket == null) {

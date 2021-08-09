@@ -24,6 +24,7 @@ import {
   Price,
   LatestUnderlyingPrice,
   UnderlyingPrice,
+  SystemState,
 } from "../../generated/schema";
 import { BigInt, log, Bytes, Address } from "@graphprotocol/graph-ts";
 import {
@@ -31,7 +32,6 @@ import {
   saveEventToStateChange,
 } from "../utils/txEventHelpers";
 import {
-  getOrCreateLatestSystemState,
   getOrCreateAccumulativeFloatIssuanceSnapshot,
   createSyntheticTokenLong,
   createSyntheticTokenShort,
@@ -40,7 +40,6 @@ import {
   getOrCreateGlobalState,
   getAccumulativeFloatIssuanceSnapshotId,
   getUser,
-  getSyntheticMarket,
   getSyntheticTokenById,
   getSyntheticTokenByMarketIdAndTokenType,
 } from "../utils/globalStateManager";
@@ -72,6 +71,17 @@ import {
   getUsersCurrentNextPriceAction,
   doesBatchExist,
 } from "../utils/nextPrice";
+import {
+  generateSyntheticMarketId,
+  generateSystemStateId,
+} from "../utils/entityIdGenerator";
+import {
+  getOrInitializeGlobalState,
+  getOrInitializeSystemState,
+  getSystemState,
+  getSyntheticMarket,
+} from "../generated/EntityCreators";
+// import { getOrInitializeGlobalState }
 
 export function handleLongShortV1(event: LongShortV1): void {
   // event LongShortV1(address admin, address tokenFactory, address staker);
@@ -136,14 +146,35 @@ export function handleSystemStateUpdated(event: SystemStateUpdated): void {
   let txHash = event.transaction.hash;
   let timestamp = event.block.timestamp;
 
-  let systemState = getOrCreateLatestSystemState(marketIndex, txHash, event);
+  let syntheticMarket = getSyntheticMarket(marketIndexString);
+
+  let systemStateId = generateSystemStateId(marketIndex, txHash);
+  // TODO: this should always create a new SystemState.
+  let globalStateFetchAttempt = getOrInitializeSystemState(systemStateId);
+  let systemState = globalStateFetchAttempt.entity;
+  if (globalStateFetchAttempt.wasCreated) {
+    let prevSystemState = getSystemState(syntheticMarket.latestSystemState);
+
+    systemState.timestamp = event.block.timestamp;
+    systemState.txHash = event.transaction.hash;
+    systemState.blockNumber = event.block.number;
+    systemState.marketIndex = marketIndex;
+    systemState.underlyingPrice = prevSystemState.underlyingPrice;
+    systemState.longTokenPrice = prevSystemState.longTokenPrice;
+    systemState.shortTokenPrice = prevSystemState.shortTokenPrice;
+    systemState.totalLockedLong = prevSystemState.totalLockedLong;
+    systemState.totalLockedShort = prevSystemState.totalLockedShort;
+    systemState.totalValueLocked = prevSystemState.totalValueLocked;
+    systemState.setBy = event.transaction.from;
+    systemState.longToken = prevSystemState.longToken;
+    systemState.shortToken = prevSystemState.shortToken;
+  }
+
   systemState.totalValueLocked = totalValueLockedInMarket;
   systemState.totalLockedLong = longValue;
   systemState.totalLockedShort = shortValue;
 
   systemState.save();
-
-  let syntheticMarket = SyntheticMarket.load(marketIndexString);
 
   syntheticMarket.latestSystemState = systemState.id;
   syntheticMarket.save();
@@ -160,7 +191,7 @@ export function handleSystemStateUpdated(event: SystemStateUpdated): void {
   if (batchExists) {
     let executedTimestamp = event.block.timestamp;
 
-    let syntheticMarket = getSyntheticMarket(marketIndex);
+    let syntheticMarket = getSyntheticMarket(marketIndex.toString());
     let longTokenId = syntheticMarket.syntheticLong;
     let shortTokenId = syntheticMarket.syntheticShort;
 
@@ -435,7 +466,7 @@ export function handleNextPriceDeposit(event: NextPriceDeposit): void {
   let userAddress = event.params.user;
 
   let user = getUser(userAddress);
-  let syntheticMarket = getSyntheticMarket(marketIndex);
+  let syntheticMarket = getSyntheticMarket(marketIndex.toString());
 
   let userNextPriceActionComponent = createUserNextPriceActionComponent(
     user,
@@ -498,7 +529,7 @@ export function handleNextPriceRedeem(event: NextPriceRedeem): void {
   let userAddress = event.params.user;
 
   let user = getUser(userAddress);
-  let syntheticMarket = getSyntheticMarket(marketIndex);
+  let syntheticMarket = getSyntheticMarket(marketIndex.toString());
 
   let userNextPriceActionComponent = createUserNextPriceActionComponent(
     user,

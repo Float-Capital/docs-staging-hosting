@@ -22,7 +22,7 @@ function getDefaultValues(typeString) {
     case "Boolean" :
         return "false";
     case "Bytes" :
-        return "Bytes.fromHexString(\"0x0\")";
+        return "Bytes.fromHexString(\"0x0\") as Bytes";
     case "Int" :
         return "0";
     case "String" :
@@ -118,7 +118,7 @@ var functions = Belt_Array.joinWith(Belt_Array.map(Object.keys(entitiesMap), (fu
                       })), "\n", (function (a) {
                     return a;
                   }));
-            return "\nexport function getOrInitialize" + name + "(entityId: string): GetOrCreateReturn<" + name + "> {\n  let loaded" + name + " = " + name + ".load(entityId);\n\n  let returnObject = new GetOrCreateReturn(loaded" + name + " as " + name + ", false);\n\n  if (loaded" + name + " == null) {" + fieldDefaultSetters + "\n    loaded" + name + ".save();\n\n    returnObject.wasCreated = true;\n  }\n\n  return returnObject;\n}\nexport function get" + name + "(entityId: string): " + name + " {\n  let loaded" + name + " = " + name + ".load(entityId);\n\n  if (loaded" + name + " == null) {\n    log.critical(\"Unable to find entity of type " + name + " with id {}. If this entity hasn't been initialized use the 'getOrInitialize" + name + "' and handle the case that it needs to be initialized.\", [entityId])\n  }\n\n  return loaded" + name + " as " + name + ";\n}";
+            return "\nexport function getOrInitialize" + name + "(entityId: string): GetOrCreateReturn<" + name + "> {\n  let loaded" + name + " = " + name + ".load(entityId);\n\n  let returnObject = new GetOrCreateReturn<" + name + ">(loaded" + name + " as " + name + ", false);\n\n  if (loaded" + name + " == null) {" + fieldDefaultSetters + "\n    loaded" + name + ".save();\n\n    returnObject.wasCreated = true;\n  }\n\n  return returnObject;\n}\nexport function get" + name + "(entityId: string): " + name + " {\n  let loaded" + name + " = " + name + ".load(entityId);\n\n  if (loaded" + name + " == null) {\n    log.critical(\"Unable to find entity of type " + name + " with id {}. If this entity hasn't been initialized use the 'getOrInitialize" + name + "' and handle the case that it needs to be initialized.\", [entityId])\n  }\n\n  return loaded" + name + " as " + name + ";\n}";
           })), "\n", (function (a) {
         return a;
       }));
