@@ -32,13 +32,11 @@ import {
   saveEventToStateChange,
 } from "../utils/txEventHelpers";
 import {
-  getOrCreateAccumulativeFloatIssuanceSnapshot,
   createSyntheticTokenLong,
   createSyntheticTokenShort,
   createInitialSystemState,
   updateOrCreatePaymentToken,
   getOrCreateGlobalState,
-  getAccumulativeFloatIssuanceSnapshotId,
   getUser,
   getSyntheticTokenById,
   getSyntheticTokenByMarketIdAndTokenType,
@@ -73,6 +71,8 @@ import {
 } from "../utils/nextPrice";
 import {
   generateSyntheticMarketId,
+  generateAccumulativeFloatIssuanceSnapshotId,
+  getOrInitializeAccumulativeFloatIssuanceSnapshot,
   generateSystemStateId,
   getOrInitializeGlobalState,
   getOrInitializeSystemState,
@@ -369,11 +369,12 @@ export function handleSyntheticMarketCreated(
     BigInt.fromI32(1)
   );
 
-  // Make sure the latest staker state has the correct ID even though the instance hasn't been created yet.
-  syntheticMarket.latestAccumulativeFloatIssuanceSnapshot = getAccumulativeFloatIssuanceSnapshotId(
-    marketIndexString,
+  let accumulativeFloatIssuanceSnapshotId = generateAccumulativeFloatIssuanceSnapshotId(
+    marketIndex,
     ZERO
   );
+  // Make sure the latest staker state has the correct ID even though the instance hasn't been created yet.
+  syntheticMarket.latestAccumulativeFloatIssuanceSnapshot = accumulativeFloatIssuanceSnapshotId;
 
   longToken.syntheticMarket = syntheticMarket.id;
   longToken.latestPrice = initialState.latestTokenPriceLong.id;
@@ -385,11 +386,32 @@ export function handleSyntheticMarketCreated(
 
   syntheticMarket.save();
   // This function uses the synthetic market internally, so can only be created once the synthetic market has been created.
-  let initalLatestAccumulativeFloatIssuanceSnapshot = getOrCreateAccumulativeFloatIssuanceSnapshot(
-    syntheticMarket,
-    ZERO,
-    event
+
+  let accumulativeFloatIssunanceSnapshotRetrival = getOrInitializeAccumulativeFloatIssuanceSnapshot(
+    accumulativeFloatIssuanceSnapshotId
   );
+  if (!accumulativeFloatIssunanceSnapshotRetrival.wasCreated)
+    log.critical(
+      "There was an existing snapshot for a market that didn't exist yet",
+      []
+    );
+
+  let initalLatestAccumulativeFloatIssuanceSnapshot =
+    accumulativeFloatIssunanceSnapshotRetrival.entity;
+  initalLatestAccumulativeFloatIssuanceSnapshot.blockNumber =
+    event.block.number;
+  initalLatestAccumulativeFloatIssuanceSnapshot.creationTxHash =
+    event.transaction.hash;
+  initalLatestAccumulativeFloatIssuanceSnapshot.longToken =
+    syntheticMarket.syntheticLong;
+  initalLatestAccumulativeFloatIssuanceSnapshot.shortToken =
+    syntheticMarket.syntheticLong;
+  initalLatestAccumulativeFloatIssuanceSnapshot.timestamp =
+    event.block.timestamp;
+
+  // update latest staker state for market
+  syntheticMarket.latestAccumulativeFloatIssuanceSnapshot = accumulativeFloatIssuanceSnapshotId;
+
   paymentTokenEntity.save();
   initalLatestAccumulativeFloatIssuanceSnapshot.save();
   longToken.save();

@@ -8,3 +8,8 @@ entityIds:
       type: BigInt
     - name: txHash
       type: Bytes
+  AccumulativeFloatIssuanceSnapshot:
+    - name: marketIndex
+      type: BigInt
+    - name: stateIndex
+      type: BigInt
