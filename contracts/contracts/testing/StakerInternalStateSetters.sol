@@ -74,7 +74,7 @@ contract StakerInternalStateSetters is Staker {
     uint256 shiftAmountShort,
     uint256 _userNextPrice_stakedSyntheticTokenShiftIndex,
     uint256 _batched_stakerNextTokenShiftIndex,
-    uint256 _takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping,
+    uint256 _stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping,
     uint256 _stakerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping
   ) public {
     userNextPrice_stakedSyntheticTokenShiftIndex[marketIndex][
@@ -89,7 +89,7 @@ contract StakerInternalStateSetters is Staker {
     batched_stakerNextTokenShiftIndex[marketIndex] = _batched_stakerNextTokenShiftIndex;
     stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping[
       _userNextPrice_stakedSyntheticTokenShiftIndex
-    ] = _takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping;
+    ] = _stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping;
     stakerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping[
       _userNextPrice_stakedSyntheticTokenShiftIndex
     ] = _stakerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping;
@@ -273,11 +273,25 @@ contract StakerInternalStateSetters is Staker {
     address _longShort,
     address user,
     uint256 amountStaked,
-    address token
+    address token,
+    uint256 _userNextPrice_stakedSyntheticTokenShiftIndex,
+    address _syntheticTokens,
+    uint256 _userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_long,
+    uint256 _userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_short
   ) external {
     marketIndexOfToken[token] = marketIndex;
     longShort = _longShort;
     userAmountStaked[token][user] = amountStaked;
+    userNextPrice_stakedSyntheticTokenShiftIndex[marketIndex][
+      user
+    ] = _userNextPrice_stakedSyntheticTokenShiftIndex;
+    syntheticTokens[marketIndex][true] = _syntheticTokens;
+    userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_long[marketIndex][
+      user
+    ] = _userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_long;
+    userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_short[marketIndex][
+      user
+    ] = _userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_short;
   }
 
   function setEquilibriumOffset(uint32 marketIndex, int256 _balanceIncentiveCurve_equilibriumOffset)

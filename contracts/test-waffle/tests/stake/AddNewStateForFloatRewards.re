@@ -115,15 +115,15 @@ let testUnit =
         });
 
         it(
-          "updates takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping to the 'stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted' value recieved from long short",
+          "updates stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping to the 'stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted' value recieved from long short",
           () => {
-            let%Await takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping =
+            let%Await stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping =
               contracts.contents.staker
               ->Staker.stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping(
                   batched_stakerNextTokenShiftIndex,
                 );
             Chai.bnEqual(
-              takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping,
+              stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping,
               stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted,
             );
           },

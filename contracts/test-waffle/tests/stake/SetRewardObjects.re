@@ -30,7 +30,8 @@ let test =
     before_once'(() => {
       let%AwaitThen _ =
         deployAndSetupStakerToUnitTest(
-          ~functionName="setCurrentAccumulativeIssuancePerStakeStakedSynthSnapshot",
+          ~functionName=
+            "setCurrentAccumulativeIssuancePerStakeStakedSynthSnapshot",
           ~contracts,
           ~accounts,
         );
