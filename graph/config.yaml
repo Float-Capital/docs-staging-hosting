@@ -1,0 +1,10 @@
+# dash separated list of strings for the entity ID
+entityIds:
+  SyntheticMarket:
+    - name: marketIndex
+      type: BigInt
+  SystemState:
+    - name: marketIndex
+      type: BigInt
+    - name: txHash
+      type: Bytes

@@ -4,6 +4,10 @@
 
 let result = requireGqlFile("../schema.graphql")
 
+let repoConfigString = Node_fs.readFileAsUtf8Sync("./config.yaml")
+
+let repoConfig = Utils.loadYaml(repoConfigString)
+
 let entityDefinitions = result["definitions"]
 
 let getDefaultValues = typeString =>
@@ -15,6 +19,14 @@ let getDefaultValues = typeString =>
   | "BigInt" => "BigInt.fromI32(0)"
   | "Boolean" => "false"
   | unknownType => `"${unknownType} - Unknown type"`
+  }
+let toStringConverter = (paramName, paramType) =>
+  switch paramType {
+  | "Bytes" => `${paramName}.toHex()`
+  | "Address" => `${paramName}.toHex()`
+  | "BigInt" => `${paramName}.toString()`
+  | "String" => paramName
+  | unknownType => `"unhandled type in converter ${unknownType} - Please fix the converter"`
   }
 
 type enumItem
@@ -100,7 +112,28 @@ let functions =
       })
       ->Array.joinWith("\n", a => a)
 
+    let idGeneratorFunction =
+      repoConfig["entityIds"]
+      ->Js.Dict.get(name)
+      ->Option.map(idArgs => {
+        let argsDefinition = idArgs->Array.joinWith(",", arg => `${arg["name"]}: ${arg["type"]}`)
+        let idString =
+          "`" ++
+          idArgs->Array.joinWith("-", arg =>
+            "${" ++ toStringConverter(arg["name"], arg["type"]) ++ "}"
+          ) ++ "`"
+
+        `export function generate${name}Id(
+  ${argsDefinition}
+): string {
+  return ${idString}
+}
+`
+      })
+      ->Option.getWithDefault("")
+
     `
+${idGeneratorFunction}
 export function getOrInitialize${name}(entityId: string): GetOrCreateReturn<${name}> {
   let loaded${name} = ${name}.load(entityId);
 
@@ -159,4 +192,4 @@ export class GetOrCreateReturn<EntityType> {
 ${functions}
 `
 
-Node_fs.writeFileAsUtf8Sync(`./src/generated/EntityCreators.ts`, outputCode)
+Node_fs.writeFileAsUtf8Sync(`./src/generated/EntityHelpers.ts`, outputCode)

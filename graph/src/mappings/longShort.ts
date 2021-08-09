@@ -74,14 +74,11 @@ import {
 import {
   generateSyntheticMarketId,
   generateSystemStateId,
-} from "../utils/entityIdGenerator";
-import {
   getOrInitializeGlobalState,
   getOrInitializeSystemState,
   getSystemState,
   getSyntheticMarket,
-} from "../generated/EntityCreators";
-// import { getOrInitializeGlobalState }
+} from "../generated/EntityHelpers";
 
 export function handleLongShortV1(event: LongShortV1): void {
   // event LongShortV1(address admin, address tokenFactory, address staker);

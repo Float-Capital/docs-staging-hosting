@@ -3,6 +3,7 @@
 
 var Fs = require("fs");
 var Js_dict = require("rescript/lib/js/js_dict.js");
+var JsYaml = require("js-yaml");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var Belt_Option = require("rescript/lib/js/belt_Option.js");
 
@@ -10,6 +11,10 @@ require('graphql-import-node/register')
 ;
 
 var result = require("../schema.graphql");
+
+var repoConfigString = Fs.readFileSync("./config.yaml", "utf8");
+
+var repoConfig = JsYaml.load(repoConfigString);
 
 var entityDefinitions = result.definitions;
 
@@ -29,6 +34,20 @@ function getDefaultValues(typeString) {
         return "\"\"";
     default:
       return "\"" + typeString + " - Unknown type\"";
+  }
+}
+
+function toStringConverter(paramName, paramType) {
+  switch (paramType) {
+    case "BigInt" :
+        return paramName + ".toString()";
+    case "Address" :
+    case "Bytes" :
+        return paramName + ".toHex()";
+    case "String" :
+        return paramName;
+    default:
+      return "\"unhandled type in converter " + paramType + " - Please fix the converter\"";
   }
 }
 
@@ -118,7 +137,16 @@ var functions = Belt_Array.joinWith(Belt_Array.map(Object.keys(entitiesMap), (fu
                       })), "\n", (function (a) {
                     return a;
                   }));
-            return "\nexport function getOrInitialize" + name + "(entityId: string): GetOrCreateReturn<" + name + "> {\n  let loaded" + name + " = " + name + ".load(entityId);\n\n  let returnObject = new GetOrCreateReturn<" + name + ">(loaded" + name + " as " + name + ", false);\n\n  if (loaded" + name + " == null) {" + fieldDefaultSetters + "\n    loaded" + name + ".save();\n\n    returnObject.wasCreated = true;\n  }\n\n  return returnObject;\n}\nexport function get" + name + "(entityId: string): " + name + " {\n  let loaded" + name + " = " + name + ".load(entityId);\n\n  if (loaded" + name + " == null) {\n    log.critical(\"Unable to find entity of type " + name + " with id {}. If this entity hasn't been initialized use the 'getOrInitialize" + name + "' and handle the case that it needs to be initialized.\", [entityId])\n  }\n\n  return loaded" + name + " as " + name + ";\n}";
+            var idGeneratorFunction = Belt_Option.getWithDefault(Belt_Option.map(Js_dict.get(repoConfig.entityIds, name), (function (idArgs) {
+                        var argsDefinition = Belt_Array.joinWith(idArgs, ",", (function (arg) {
+                                return arg.name + ": " + arg.type;
+                              }));
+                        var idString = "`" + Belt_Array.joinWith(idArgs, "-", (function (arg) {
+                                return "${" + toStringConverter(arg.name, arg.type) + "}";
+                              })) + "`";
+                        return "export function generate" + name + "Id(\n  " + argsDefinition + "\n): string {\n  return " + idString + "\n}\n";
+                      })), "");
+            return "\n" + idGeneratorFunction + "\nexport function getOrInitialize" + name + "(entityId: string): GetOrCreateReturn<" + name + "> {\n  let loaded" + name + " = " + name + ".load(entityId);\n\n  let returnObject = new GetOrCreateReturn<" + name + ">(loaded" + name + " as " + name + ", false);\n\n  if (loaded" + name + " == null) {" + fieldDefaultSetters + "\n    loaded" + name + ".save();\n\n    returnObject.wasCreated = true;\n  }\n\n  return returnObject;\n}\nexport function get" + name + "(entityId: string): " + name + " {\n  let loaded" + name + " = " + name + ".load(entityId);\n\n  if (loaded" + name + " == null) {\n    log.critical(\"Unable to find entity of type " + name + " with id {}. If this entity hasn't been initialized use the 'getOrInitialize" + name + "' and handle the case that it needs to be initialized.\", [entityId])\n  }\n\n  return loaded" + name + " as " + name + ";\n}";
           })), "\n", (function (a) {
         return a;
       }));
@@ -137,11 +165,14 @@ var entityImports = Belt_Array.joinWith(Belt_Array.map(Belt_Array.keep(entityDef
 
 var outputCode = "import {\n" + entityImports + "\n} from \"../../generated/schema\";\nimport {\n  Address,\n  BigInt,\n  Bytes,\n  ethereum,\n  store,\n  Value,\n  log,\n} from \"@graphprotocol/graph-ts\";\n\nexport class GetOrCreateReturn<EntityType> {\n  entity: EntityType;\n  wasCreated: boolean;\n\n  constructor(entity: EntityType, wasCreated: boolean) {\n    this.entity = entity;\n    this.wasCreated = wasCreated;\n  }\n}\n" + functions + "\n";
 
-Fs.writeFileSync("./src/generated/EntityCreators.ts", outputCode, "utf8");
+Fs.writeFileSync("./src/generated/EntityHelpers.ts", outputCode, "utf8");
 
 exports.result = result;
+exports.repoConfigString = repoConfigString;
+exports.repoConfig = repoConfig;
 exports.entityDefinitions = entityDefinitions;
 exports.getDefaultValues = getDefaultValues;
+exports.toStringConverter = toStringConverter;
 exports.enumsMap = enumsMap;
 exports.interfacesMap = interfacesMap;
 exports.entitiesMap = entitiesMap;
