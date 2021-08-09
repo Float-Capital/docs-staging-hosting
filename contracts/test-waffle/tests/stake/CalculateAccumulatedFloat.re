@@ -167,7 +167,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
       let amountToShift = Helpers.randomTokenAmount();
       let userNextPrice_stakedSyntheticTokenShiftIndex =
         Helpers.randomInteger();
-      let takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping =
+      let stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping =
         Helpers.randomInteger();
       let batched_stakerNextTokenShiftIndex =
         userNextPrice_stakedSyntheticTokenShiftIndex->add(oneBn);
@@ -215,7 +215,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
             ~shiftAmountShort=isShiftFromLong ? zeroBn : amountToShift,
             ~userNextPrice_stakedSyntheticTokenShiftIndex,
             ~batched_stakerNextTokenShiftIndex,
-            ~takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping,
+            ~stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping,
             ~stakerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping,
           );
         let%AwaitThen longShortSmocked = longShort->LongShortSmocked.make;
@@ -304,7 +304,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
                   marketIndex,
                   amountSyntheticToken_redeemOnOriginSide: amountToShift,
                   isShiftFromLong,
-                  priceSnapshotIndex: takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping,
+                  priceSnapshotIndex: stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping,
                 },
               |],
             );

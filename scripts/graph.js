@@ -51,7 +51,7 @@ const preserveValues = (template, output) => {
       template = template.replace(p, templateVal);
       template = template.replace(p, templateVal);
       template = template.replace(p, templateVal);
-      // template = template.replaceAll(p, templateVal); // `replaceAll` only exists in javascript v15 or newer 
+      // template = template.replaceAll(p, templateVal); // `replaceAll` only exists in javascript v15 or newer
     }
   });
   return template;
