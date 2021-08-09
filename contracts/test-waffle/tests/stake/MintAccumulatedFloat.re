@@ -27,7 +27,7 @@ let test =
           ~accounts,
         );
 
-      StakerSmocked.InternalMock.mock_calculateAccumulatedFloatToReturn(
+      StakerSmocked.InternalMock.mock_calculateAccumulatedFloatAndExecuteOutstandingShiftsToReturn(
         floatToMintLong->add(floatToMintShort),
       );
 
@@ -42,7 +42,10 @@ let test =
 
       promiseRef :=
         contracts^.staker
-        ->Staker.Exposed._mintAccumulatedFloatExposed(~marketIndex, ~user);
+        ->Staker.Exposed._mintAccumulatedFloatAndExecuteOutstandingShiftsExposed(
+            ~marketIndex,
+            ~user,
+          );
 
       let%Await _ = promiseRef^;
       promiseRef^;
@@ -52,7 +55,7 @@ let test =
       before_once'(() => setup(~floatToMintLong, ~floatToMintShort));
 
       it("calls calculateAccumulatedFloat with correct arguments", () =>
-        StakerSmocked.InternalMock._calculateAccumulatedFloatCalls()
+        StakerSmocked.InternalMock._calculateAccumulatedFloatAndExecuteOutstandingShiftsCalls()
         ->Array.getExn(0)
         ->Chai.recordEqualFlat(
             {
@@ -101,7 +104,7 @@ let test =
       );
 
       it("calls calculateAccumulatedFloat with correct arguments", () =>
-        StakerSmocked.InternalMock._calculateAccumulatedFloatCalls()
+        StakerSmocked.InternalMock._calculateAccumulatedFloatAndExecuteOutstandingShiftsCalls()
         ->Array.getExn(0)
         ->Chai.recordEqualFlat(
             {

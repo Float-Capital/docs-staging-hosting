@@ -13,7 +13,7 @@ let makeIterator = anyArray => {
 };
 
 let smockedCalcAccumIterativeBinding = [%raw
-  {|(_r, arr) => _r.smocked._calculateAccumulatedFloatMock.will.return.with(makeIterator(arr))|}
+  {|(_r, arr) => _r.smocked._calculateAccumulatedFloatAndExecuteOutstandingShiftsMock.will.return.with(makeIterator(arr))|}
 ];
 
 // smocked allows functions to be passed as return vals,
@@ -32,7 +32,7 @@ let test =
       ~contracts: ref(Helpers.coreContracts),
       ~accounts: ref(array(Ethers.Wallet.t)),
     ) => {
-  describe("_mintAccumulatedFloatMulti", () => {
+  describe("_mintAccumulatedFloatAndExecuteOutstandingShiftsMulti", () => {
     let marketIndices = [|
       Helpers.randomJsInteger(),
       Helpers.randomJsInteger(),
@@ -58,7 +58,8 @@ let test =
         (~marketIndices, ~latestRewardIndices, ~floatRewardsForMarkets) => {
       let%Await _ =
         deployAndSetupStakerToUnitTest(
-          ~functionName="_mintAccumulatedFloatMulti",
+          ~functionName=
+            "_mintAccumulatedFloatAndExecuteOutstandingShiftsMulti",
           ~contracts,
           ~accounts,
         );
@@ -85,7 +86,7 @@ let test =
       promiseRef :=
         contracts^.staker
         ->ContractHelpers.connect(~address=userWalletRef^)
-        ->Staker.Exposed._mintAccumulatedFloatMultiExposed(
+        ->Staker.Exposed._mintAccumulatedFloatAndExecuteOutstandingShiftsMultiExposed(
             ~marketIndexes=marketIndices,
             ~user=userWalletRef.contents.address,
           );
@@ -109,7 +110,7 @@ let test =
 
       describe("case market has float to mint", () => {
         it("calls calculateAccumulatedFloat with correct arguments", () =>
-          StakerSmocked.InternalMock._calculateAccumulatedFloatCalls()
+          StakerSmocked.InternalMock._calculateAccumulatedFloatAndExecuteOutstandingShiftsCalls()
           ->Array.getExn(0)
           ->Chai.recordEqualFlat({
               marketIndex: marketIndices->Array.getUnsafe(0),

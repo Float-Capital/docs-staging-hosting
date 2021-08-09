@@ -59,7 +59,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
           ~newUserAmountStakedShort,
         );
       let%Await floatDue =
-        staker->Staker.Exposed._calculateAccumulatedFloatExposedCall(
+        staker->Staker.Exposed._calculateAccumulatedFloatAndExecuteOutstandingShiftsExposedCall(
           ~marketIndex,
           ~user,
         );
@@ -109,7 +109,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
             ~newUserAmountStakedShort,
           );
         let%Await floatDue =
-          staker->Staker.Exposed._calculateAccumulatedFloatExposedCall(
+          staker->Staker.Exposed._calculateAccumulatedFloatAndExecuteOutstandingShiftsExposedCall(
             ~marketIndex,
             ~user,
           );
@@ -148,7 +148,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
           ~newUserAmountStakedShort=Ethers.BigNumber.fromInt(0),
         );
       let%Await floatDue =
-        staker->Staker.Exposed._calculateAccumulatedFloatExposedCall(
+        staker->Staker.Exposed._calculateAccumulatedFloatAndExecuteOutstandingShiftsExposedCall(
           ~marketIndex,
           ~user,
         );
@@ -236,7 +236,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
               rewardAfterShiftInterval,
             |]);
 
-        staker->Staker.Exposed._calculateAccumulatedFloatExposedCall(
+        staker->Staker.Exposed._calculateAccumulatedFloatAndExecuteOutstandingShiftsExposedCall(
           ~marketIndex,
           ~user,
         );
@@ -324,19 +324,18 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
             // the setup function only simulates the call, it doesn't execute it, execute it here.
             let%Await _ =
               contracts.contents.staker
-              ->Staker.Exposed._calculateAccumulatedFloatExposed(
+              ->Staker.Exposed._calculateAccumulatedFloatAndExecuteOutstandingShiftsExposed(
                   ~marketIndex,
                   ~user,
                 );
 
-            let getAmountToShiftFromSideUser =
-              isShiftFromLong
-                ? Staker.userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_long
-                : Staker.userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_short;
-
             let%Await amountToShiftForSideAfter =
               contracts.contents.staker
-              ->getAmountToShiftFromSideUser(marketIndex, user);
+              ->Staker.userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom(
+                  marketIndex,
+                  isShiftFromLong,
+                  user,
+                );
 
             Chai.bnEqual(amountToShiftForSideAfter, zeroBn);
           },
@@ -357,7 +356,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
         // the setup function only simulates the call, it doesn't execute it, execute it here.
         let%Await _ =
           contracts.contents.staker
-          ->Staker.Exposed._calculateAccumulatedFloatExposed(
+          ->Staker.Exposed._calculateAccumulatedFloatAndExecuteOutstandingShiftsExposed(
               ~marketIndex,
               ~user,
             );

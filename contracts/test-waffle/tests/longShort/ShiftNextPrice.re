@@ -180,7 +180,7 @@ let testUnit =
             );
 
         let shiftPositionNextPriceCalls =
-          LongShortSmocked.InternalMock._shiftPositionNextPriceCalls();
+          LongShortSmocked.InternalMock.shiftPositionNextPriceCalls();
 
         shiftPositionNextPriceCalls->Chai.recordArrayDeepEqualFlat([|
           {marketIndex, amountSyntheticTokensToShift, isShiftFromLong: true},
@@ -206,7 +206,7 @@ let testUnit =
             );
 
         let shiftPositionNextPriceCalls =
-          LongShortSmocked.InternalMock._shiftPositionNextPriceCalls();
+          LongShortSmocked.InternalMock.shiftPositionNextPriceCalls();
 
         shiftPositionNextPriceCalls->Chai.recordArrayDeepEqualFlat([|
           {marketIndex, amountSyntheticTokensToShift, isShiftFromLong: false},
@@ -246,7 +246,7 @@ let testUnit =
 
       let longShort = longShort->ContractHelpers.connect(~address=testWallet);
 
-      longShort->LongShort.Exposed._shiftPositionNextPriceExposed(
+      longShort->LongShort.shiftPositionNextPrice(
         ~marketIndex,
         ~amountSyntheticTokensToShift=amount,
         ~isShiftFromLong,

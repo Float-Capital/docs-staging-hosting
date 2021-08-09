@@ -80,10 +80,10 @@ contract StakerInternalStateSetters is Staker {
     userNextPrice_stakedSyntheticTokenShiftIndex[marketIndex][
       user
     ] = _userNextPrice_stakedSyntheticTokenShiftIndex;
-    userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_long[marketIndex][
+    userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[marketIndex][true][
       user
     ] = shiftAmountLong;
-    userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_short[marketIndex][
+    userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[marketIndex][false][
       user
     ] = shiftAmountShort;
     batched_stakerNextTokenShiftIndex[marketIndex] = _batched_stakerNextTokenShiftIndex;
@@ -111,11 +111,11 @@ contract StakerInternalStateSetters is Staker {
     batched_stakerNextTokenShiftIndex[marketIndex] = _batched_stakerNextTokenShiftIndex;
 
     if (isShiftFromLong) {
-      userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_long[marketIndex][
+      userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[marketIndex][true][
         user
       ] = amountSyntheticTokensToShift;
     } else {
-      userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_short[marketIndex][
+      userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[marketIndex][false][
         user
       ] = amountSyntheticTokensToShift;
     }
