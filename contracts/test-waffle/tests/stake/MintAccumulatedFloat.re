@@ -31,8 +31,6 @@ let test =
         floatToMintLong->add(floatToMintShort),
       );
 
-      StakerSmocked.InternalMock.mock_mintFloatToReturn();
-
       let%AwaitThen _ =
         contracts^.staker
         ->Staker.Exposed.setMintAccumulatedFloatAndClaimFloatParams(

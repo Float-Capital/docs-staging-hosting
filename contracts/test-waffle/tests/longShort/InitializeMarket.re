@@ -17,7 +17,6 @@ let testUnit =
       let {longShort} = contracts^;
       longShortRef := longShort;
       let%Await smocked = StakerSmocked.make(contracts^.staker);
-      let _ = smocked->StakerSmocked.mockAddNewStakingFundToReturn;
       stakerSmockedRef := smocked;
       let%Await _ = (longShortRef^)->LongShortSmocked.InternalMock.setup;
       let%Await _ =
@@ -25,8 +24,6 @@ let testUnit =
         ->LongShortSmocked.InternalMock.setupFunctionForUnitTesting(
             ~functionName="initializeMarket",
           );
-
-      let _ = LongShortSmocked.InternalMock.mock_seedMarketInitiallyToReturn();
 
       (longShortRef^)
       ->LongShort.Exposed.setInitializeMarketParams(

@@ -95,8 +95,6 @@ let testUnit =
             stakerWallet.address,
           );
 
-        let _ =
-          stakerSmocked->StakerSmocked.mockPushUpdatedMarketPricesToUpdateFloatIssuanceCalculationsToReturn;
         let%AwaitThen oracleSmocked =
           contracts.contents.markets->Array.getExn(1).oracleManager
           ->OracleManagerMockSmocked.make;
@@ -513,12 +511,10 @@ let testUnit =
     let setupWithUpdateSystemStateInternalMocked = (~functionName) => {
       let%AwaitThen _ =
         contracts.contents.longShort->LongShortSmocked.InternalMock.setup;
-      let%Await _ =
-        contracts.contents.longShort
-        ->LongShortSmocked.InternalMock.setupFunctionForUnitTesting(
-            ~functionName,
-          );
-      LongShortSmocked.InternalMock.mock_updateSystemStateInternalToReturn();
+      contracts.contents.longShort
+      ->LongShortSmocked.InternalMock.setupFunctionForUnitTesting(
+          ~functionName,
+        );
     };
     describe("updateSystemStateMulti", () => {
       it(

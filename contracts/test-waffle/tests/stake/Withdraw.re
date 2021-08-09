@@ -36,7 +36,6 @@ let testUnit =
         syntheticTokenSmocked->SyntheticTokenSmocked.mockTransferToReturn(
           true,
         );
-        StakerSmocked.InternalMock.mock_mintAccumulatedFloatToReturn();
 
         connectedStaker :=
           staker->ContractHelpers.connect(~address=userWallet.contents);
@@ -124,9 +123,6 @@ let testUnit =
               ~token,
             );
 
-        contracts.contents.longShortSmocked
-        ->LongShortSmocked.mockUpdateSystemStateToReturn;
-
         contracts.contents.staker
         ->Staker.withdraw(~token, ~amount=amountWithdrawn);
       });
@@ -158,9 +154,6 @@ let testUnit =
               ~user=userWallet.contents.address,
               ~amountStaked,
             );
-
-        contracts.contents.longShortSmocked
-        ->LongShortSmocked.mockUpdateSystemStateToReturn;
 
         contracts.contents.staker
         ->ContractHelpers.connect(~address=userWallet.contents)
