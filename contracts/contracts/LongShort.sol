@@ -706,7 +706,7 @@ contract LongShort is ILongShort, Initializable {
 
     bool assetPriceHasChanged = oldAssetPrice != newAssetPrice;
 
-    if (assetPriceHasChanged || msg.sender == staker) {
+    if (assetPriceHasChanged) {
       uint256 syntheticTokenPrice_inPaymentTokens_long = syntheticToken_priceSnapshot[marketIndex][
         true
       ][marketUpdateIndex[marketIndex]];
@@ -715,36 +715,15 @@ contract LongShort is ILongShort, Initializable {
       ][marketUpdateIndex[marketIndex]];
       // if there is a price change and the 'staker' contract has pending updates, push the stakers price snapshot index to the staker
       // (so the staker can handle its internal accounting)
-      if (
-        userNextPrice_currentUpdateIndex[marketIndex][staker] ==
-        marketUpdateIndex[marketIndex] + 1 &&
-        assetPriceHasChanged
-      ) {
-        IStaker(staker).pushUpdatedMarketPricesToUpdateFloatIssuanceCalculations(
-          marketIndex,
-          syntheticTokenPrice_inPaymentTokens_long,
-          syntheticTokenPrice_inPaymentTokens_short,
-          marketSideValueInPaymentToken[marketIndex][true],
-          marketSideValueInPaymentToken[marketIndex][false],
-          // This variable could allow users to do any next price actions in the future (not just synthetic side shifts)
-          userNextPrice_currentUpdateIndex[marketIndex][staker]
-        );
-      } else {
-        IStaker(staker).pushUpdatedMarketPricesToUpdateFloatIssuanceCalculations(
-          marketIndex,
-          syntheticTokenPrice_inPaymentTokens_long,
-          syntheticTokenPrice_inPaymentTokens_short,
-          marketSideValueInPaymentToken[marketIndex][true],
-          marketSideValueInPaymentToken[marketIndex][false],
-          0
-        );
-      }
 
-      // function will return here if the staker called this simply for the
-      // purpose of adding a state point required in staker.sol for our rewards calculation
-      if (!assetPriceHasChanged) {
-        return;
-      }
+      IStaker(staker).pushUpdatedMarketPricesToUpdateFloatIssuanceCalculations(
+        marketIndex,
+        marketUpdateIndex[marketIndex],
+        syntheticTokenPrice_inPaymentTokens_long,
+        syntheticTokenPrice_inPaymentTokens_short,
+        marketSideValueInPaymentToken[marketIndex][true],
+        marketSideValueInPaymentToken[marketIndex][false]
+      );
 
       (
         uint256 newLongPoolValue,
@@ -949,13 +928,14 @@ contract LongShort is ILongShort, Initializable {
   /// @param marketIndex An int32 which uniquely identifies a market.
   /// @param amountSyntheticTokensToShift Amount in wei of synthetic tokens to shift from the one side to the other at the next oracle price update.
   /// @param isShiftFromLong Whether the token shift is from long to short (true), or short to long (false).
-  function _shiftPositionNextPrice(
+  function shiftPositionNextPrice(
     uint32 marketIndex,
     uint256 amountSyntheticTokensToShift,
     bool isShiftFromLong
   )
-    internal
+    public
     virtual
+    override
     updateSystemStateMarket(marketIndex)
     executeOutstandingNextPriceSettlements(msg.sender, marketIndex)
   {
@@ -992,7 +972,7 @@ contract LongShort is ILongShort, Initializable {
     external
     override
   {
-    _shiftPositionNextPrice(marketIndex, amountSyntheticTokensToShift, true);
+    shiftPositionNextPrice(marketIndex, amountSyntheticTokensToShift, true);
   }
 
   /// @notice Allows users to shift their position from short to long in a single transaction. To prevent front-running these shifts are executed on the next price update from the oracle.
@@ -1002,7 +982,7 @@ contract LongShort is ILongShort, Initializable {
     external
     override
   {
-    _shiftPositionNextPrice(marketIndex, amountSyntheticTokensToShift, false);
+    shiftPositionNextPrice(marketIndex, amountSyntheticTokensToShift, false);
   }
 
   /*╔════════════════════════════════╗

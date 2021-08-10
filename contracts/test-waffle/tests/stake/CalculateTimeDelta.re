@@ -30,6 +30,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) => {
         contracts^.staker
         ->Staker.Exposed._calculateTimeDeltaFromLastAccumulativeIssuancePerStakedSynthSnapshotExposed(
             ~marketIndex,
+            ~previousMarketUpdateIndex=latestMarketIndex,
           );
 
       delta->Chai.bnEqual(expectedDelta);

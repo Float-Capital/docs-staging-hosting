@@ -66,8 +66,10 @@ let testUnit =
             |]);
         });
 
-        it("calls _mintAccumulatedFloat with correct args", () => {
-          StakerSmocked.InternalMock._mintAccumulatedFloatCalls()
+        it(
+          "calls _mintAccumulatedFloatAndExecuteOutstandingShifts with correct args",
+          () => {
+          StakerSmocked.InternalMock._mintAccumulatedFloatAndExecuteOutstandingShiftsCalls()
           ->Chai.recordArrayDeepEqualFlat([|
               {user: userWallet.contents.address, marketIndex},
             |])

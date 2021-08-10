@@ -180,7 +180,7 @@ let testUnit =
             );
 
         let shiftPositionNextPriceCalls =
-          LongShortSmocked.InternalMock._shiftPositionNextPriceCalls();
+          LongShortSmocked.InternalMock.shiftPositionNextPriceCalls();
 
         shiftPositionNextPriceCalls->Chai.recordArrayDeepEqualFlat([|
           {marketIndex, amountSyntheticTokensToShift, isShiftFromLong: true},
@@ -206,7 +206,7 @@ let testUnit =
             );
 
         let shiftPositionNextPriceCalls =
-          LongShortSmocked.InternalMock._shiftPositionNextPriceCalls();
+          LongShortSmocked.InternalMock.shiftPositionNextPriceCalls();
 
         shiftPositionNextPriceCalls->Chai.recordArrayDeepEqualFlat([|
           {marketIndex, amountSyntheticTokensToShift, isShiftFromLong: false},
@@ -215,7 +215,7 @@ let testUnit =
     });
   });
 
-  describe("_shiftPositionNextPrice internal function", () => {
+  describe("shiftPositionNextPrice function", () => {
     let marketIndex = 1;
     let marketUpdateIndex = Helpers.randomInteger();
     let amount = Helpers.randomTokenAmount();
@@ -233,7 +233,7 @@ let testUnit =
 
       let%AwaitThen _ =
         longShort->LongShortSmocked.InternalMock.setupFunctionForUnitTesting(
-          ~functionName="_shiftPositionNextPrice",
+          ~functionName="shiftPositionNextPrice",
         );
 
       let%AwaitThen _ =
@@ -246,7 +246,7 @@ let testUnit =
 
       let longShort = longShort->ContractHelpers.connect(~address=testWallet);
 
-      longShort->LongShort.Exposed._shiftPositionNextPriceExposed(
+      longShort->LongShort.shiftPositionNextPrice(
         ~marketIndex,
         ~amountSyntheticTokensToShift=amount,
         ~isShiftFromLong,
@@ -262,7 +262,9 @@ let testUnit =
         let executeOutstandingNextPriceSettlementsCalls =
           LongShortSmocked.InternalMock._executeOutstandingNextPriceSettlementsCalls();
 
+        // TODO: fix bug in codegen that adds the modifiers to the generated code too (which means this gets called twice - even though it only gets called once!)
         executeOutstandingNextPriceSettlementsCalls->Chai.recordArrayDeepEqualFlat([|
+          {user: testWallet.address, marketIndex},
           {user: testWallet.address, marketIndex},
         |]);
       });
