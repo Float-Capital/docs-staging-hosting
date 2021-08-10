@@ -166,7 +166,7 @@ contract Staker is IStaker, Initializable {
   }
 
   function onlyLongShortModifierLogic() internal virtual {
-    require(msg.sender == address(longShort), "not long short");
+    require(msg.sender == address(longShort), "not LongShort");
   }
 
   modifier onlyLongShort() {
