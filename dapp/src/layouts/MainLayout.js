@@ -7,6 +7,7 @@ var Config = require("../config/Config.js");
 var ComingSoon = require("../components/ComingSoon.js");
 var Navigation = require("./Navigation.js");
 var RootProvider = require("../libraries/RootProvider.js");
+var BridgeToPolygon = require("../components/UI/BridgeToPolygon.js");
 
 function MainLayout(Props) {
   var children = Props.children;
@@ -21,7 +22,7 @@ function MainLayout(Props) {
                           className: "m-auto w-full pt-20 overflow-y-scroll"
                         }, chainId !== undefined && chainId !== Config.networkId ? React.createElement(React.Fragment, undefined, React.createElement("h2", undefined, "You are currently connected to the wrong network."), React.createElement("h4", {
                                     className: "text-lg"
-                                  }, "Please connect to " + Config.networkName + ".")) : children))), React.createElement(Lost.make, {}));
+                                  }, "Please connect to " + Config.networkName + ".")) : children))), React.createElement(BridgeToPolygon.make, {}), React.createElement(Lost.make, {}));
 }
 
 var make = MainLayout;
