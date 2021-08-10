@@ -42,7 +42,7 @@ contract Staker is IStaker, Initializable {
   mapping(address => uint32) public marketIndexOfToken;
 
   /* ══════ Reward specific ══════ */
-  mapping(uint32 => uint256) public latestRewardIndex; // This is synced to be the same as the
+  mapping(uint32 => uint256) public latestRewardIndex; // This is synced to be the same as LongShort
   mapping(uint32 => mapping(uint256 => AccumulativeIssuancePerStakedSynthSnapshot))
     public accumulativeFloatPerSyntheticTokenSnapshots;
   struct AccumulativeIssuancePerStakedSynthSnapshot {
