@@ -1,3 +1,4 @@
+// NOTE: this line has to be commented out for deployments, see: https://github.com/LimeChain/matchstick/issues/102
 export { runTests } from "../tests/longShort.test";
 
 import {
