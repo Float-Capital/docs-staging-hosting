@@ -25,6 +25,7 @@ import {
   Price,
   LatestUnderlyingPrice,
   UnderlyingPrice,
+  SystemState,
 } from "../../generated/schema";
 import { BigInt, log, Bytes, Address } from "@graphprotocol/graph-ts";
 import {
@@ -32,16 +33,12 @@ import {
   saveEventToStateChange,
 } from "../utils/txEventHelpers";
 import {
-  getOrCreateLatestSystemState,
-  getOrCreateAccumulativeFloatIssuanceSnapshot,
   createSyntheticTokenLong,
   createSyntheticTokenShort,
   createInitialSystemState,
   updateOrCreatePaymentToken,
   getOrCreateGlobalState,
-  getAccumulativeFloatIssuanceSnapshotId,
   getUser,
-  getSyntheticMarket,
   getSyntheticTokenById,
   getSyntheticTokenByMarketIdAndTokenType,
 } from "../utils/globalStateManager";
@@ -73,6 +70,16 @@ import {
   getUsersCurrentNextPriceAction,
   doesBatchExist,
 } from "../utils/nextPrice";
+import {
+  generateSyntheticMarketId,
+  generateAccumulativeFloatIssuanceSnapshotId,
+  getOrInitializeAccumulativeFloatIssuanceSnapshot,
+  generateSystemStateId,
+  getOrInitializeGlobalState,
+  getOrInitializeSystemState,
+  getSystemState,
+  getSyntheticMarket,
+} from "../generated/EntityHelpers";
 
 export function handleLongShortV1(event: LongShortV1): void {
   // event LongShortV1(address admin, address tokenFactory, address staker);
@@ -137,14 +144,35 @@ export function handleSystemStateUpdated(event: SystemStateUpdated): void {
   let txHash = event.transaction.hash;
   let timestamp = event.block.timestamp;
 
-  let systemState = getOrCreateLatestSystemState(marketIndex, txHash, event);
+  let syntheticMarket = getSyntheticMarket(marketIndexString);
+
+  let systemStateId = generateSystemStateId(marketIndex, txHash);
+  // TODO: this should always create a new SystemState.
+  let globalStateFetchAttempt = getOrInitializeSystemState(systemStateId);
+  let systemState = globalStateFetchAttempt.entity;
+  if (globalStateFetchAttempt.wasCreated) {
+    let prevSystemState = getSystemState(syntheticMarket.latestSystemState);
+
+    systemState.timestamp = event.block.timestamp;
+    systemState.txHash = event.transaction.hash;
+    systemState.blockNumber = event.block.number;
+    systemState.marketIndex = marketIndex;
+    systemState.underlyingPrice = prevSystemState.underlyingPrice;
+    systemState.longTokenPrice = prevSystemState.longTokenPrice;
+    systemState.shortTokenPrice = prevSystemState.shortTokenPrice;
+    systemState.totalLockedLong = prevSystemState.totalLockedLong;
+    systemState.totalLockedShort = prevSystemState.totalLockedShort;
+    systemState.totalValueLocked = prevSystemState.totalValueLocked;
+    systemState.setBy = event.transaction.from;
+    systemState.longToken = prevSystemState.longToken;
+    systemState.shortToken = prevSystemState.shortToken;
+  }
+
   systemState.totalValueLocked = totalValueLockedInMarket;
   systemState.totalLockedLong = longValue;
   systemState.totalLockedShort = shortValue;
 
   systemState.save();
-
-  let syntheticMarket = SyntheticMarket.load(marketIndexString);
 
   syntheticMarket.latestSystemState = systemState.id;
   syntheticMarket.save();
@@ -161,7 +189,7 @@ export function handleSystemStateUpdated(event: SystemStateUpdated): void {
   if (batchExists) {
     let executedTimestamp = event.block.timestamp;
 
-    let syntheticMarket = getSyntheticMarket(marketIndex);
+    let syntheticMarket = getSyntheticMarket(marketIndex.toString());
     let longTokenId = syntheticMarket.syntheticLong;
     let shortTokenId = syntheticMarket.syntheticShort;
 
@@ -342,11 +370,12 @@ export function handleSyntheticMarketCreated(
     BigInt.fromI32(1)
   );
 
-  // Make sure the latest staker state has the correct ID even though the instance hasn't been created yet.
-  syntheticMarket.latestAccumulativeFloatIssuanceSnapshot = getAccumulativeFloatIssuanceSnapshotId(
-    marketIndexString,
+  let accumulativeFloatIssuanceSnapshotId = generateAccumulativeFloatIssuanceSnapshotId(
+    marketIndex,
     ZERO
   );
+  // Make sure the latest staker state has the correct ID even though the instance hasn't been created yet.
+  syntheticMarket.latestAccumulativeFloatIssuanceSnapshot = accumulativeFloatIssuanceSnapshotId;
 
   longToken.syntheticMarket = syntheticMarket.id;
   longToken.latestPrice = initialState.latestTokenPriceLong.id;
@@ -358,11 +387,32 @@ export function handleSyntheticMarketCreated(
 
   syntheticMarket.save();
   // This function uses the synthetic market internally, so can only be created once the synthetic market has been created.
-  let initalLatestAccumulativeFloatIssuanceSnapshot = getOrCreateAccumulativeFloatIssuanceSnapshot(
-    syntheticMarket,
-    ZERO,
-    event
+
+  let accumulativeFloatIssunanceSnapshotRetrival = getOrInitializeAccumulativeFloatIssuanceSnapshot(
+    accumulativeFloatIssuanceSnapshotId
   );
+  if (!accumulativeFloatIssunanceSnapshotRetrival.wasCreated)
+    log.critical(
+      "There was an existing snapshot for a market that didn't exist yet",
+      []
+    );
+
+  let initalLatestAccumulativeFloatIssuanceSnapshot =
+    accumulativeFloatIssunanceSnapshotRetrival.entity;
+  initalLatestAccumulativeFloatIssuanceSnapshot.blockNumber =
+    event.block.number;
+  initalLatestAccumulativeFloatIssuanceSnapshot.creationTxHash =
+    event.transaction.hash;
+  initalLatestAccumulativeFloatIssuanceSnapshot.longToken =
+    syntheticMarket.syntheticLong;
+  initalLatestAccumulativeFloatIssuanceSnapshot.shortToken =
+    syntheticMarket.syntheticLong;
+  initalLatestAccumulativeFloatIssuanceSnapshot.timestamp =
+    event.block.timestamp;
+
+  // update latest staker state for market
+  syntheticMarket.latestAccumulativeFloatIssuanceSnapshot = accumulativeFloatIssuanceSnapshotId;
+
   paymentTokenEntity.save();
   initalLatestAccumulativeFloatIssuanceSnapshot.save();
   longToken.save();
@@ -436,7 +486,7 @@ export function handleNextPriceDeposit(event: NextPriceDeposit): void {
   let userAddress = event.params.user;
 
   let user = getUser(userAddress);
-  let syntheticMarket = getSyntheticMarket(marketIndex);
+  let syntheticMarket = getSyntheticMarket(marketIndex.toString());
 
   let userNextPriceActionComponent = createUserNextPriceActionComponent(
     user,
@@ -499,7 +549,7 @@ export function handleNextPriceRedeem(event: NextPriceRedeem): void {
   let userAddress = event.params.user;
 
   let user = getUser(userAddress);
-  let syntheticMarket = getSyntheticMarket(marketIndex);
+  let syntheticMarket = getSyntheticMarket(marketIndex.toString());
 
   let userNextPriceActionComponent = createUserNextPriceActionComponent(
     user,

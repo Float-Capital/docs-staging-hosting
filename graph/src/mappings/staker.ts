@@ -25,11 +25,18 @@ import {
   bigIntArrayToStringArray,
   saveEventToStateChange,
 } from "../utils/txEventHelpers";
+import { getOrCreateUser } from "../utils/globalStateManager";
 import {
-  getOrCreateUser,
-  getOrCreateAccumulativeFloatIssuanceSnapshot,
-  getLatestAccumulativeFloatIssuanceSnapshot,
-} from "../utils/globalStateManager";
+  generateSyntheticMarketId,
+  generateAccumulativeFloatIssuanceSnapshotId,
+  getOrInitializeAccumulativeFloatIssuanceSnapshot,
+  generateSystemStateId,
+  getOrInitializeGlobalState,
+  getOrInitializeSystemState,
+  getSystemState,
+  getSyntheticMarket,
+  getAccumulativeFloatIssuanceSnapshot,
+} from "../generated/EntityHelpers";
 
 import { ZERO, ONE, GLOBAL_STATE_ID, TEN_TO_THE_18 } from "../CONSTANTS";
 
@@ -128,17 +135,22 @@ export function handleAccumulativeIssuancePerStakedSynthSnapshotCreated(
     );
   }
 
-  let state = getOrCreateAccumulativeFloatIssuanceSnapshot(
-    syntheticMarket as SyntheticMarket,
-    accumulativeFloatIssuanceSnapshotIndex,
-    event
+  let accumulativeFloatIssuanceSnapshotId = generateAccumulativeFloatIssuanceSnapshotId(
+    marketIndex,
+    accumulativeFloatIssuanceSnapshotIndex
   );
+  let state = getOrInitializeAccumulativeFloatIssuanceSnapshot(
+    accumulativeFloatIssuanceSnapshotId
+  ).entity;
   state.blockNumber = blockNumber;
   state.creationTxHash = txHash;
   state.index = accumulativeFloatIssuanceSnapshotIndex;
   state.timestamp = timestamp;
   state.accumulativeFloatPerTokenLong = accumulativeLong;
   state.accumulativeFloatPerTokenShort = accumulativeShort;
+
+  syntheticMarket.latestAccumulativeFloatIssuanceSnapshot = accumulativeFloatIssuanceSnapshotId;
+  syntheticMarket.save();
 
   if (!accumulativeFloatIssuanceSnapshotIndex.equals(ZERO)) {
     let prevState = AccumulativeFloatIssuanceSnapshot.load(
@@ -265,11 +277,12 @@ export function handleStakeAdded(event: StakeAdded): void {
     );
   }
 
-  // NOTE: This will create a new (empyt) AccumulativeFloatIssuanceSnapshot if the user is not staking immediately
-  let state = getOrCreateAccumulativeFloatIssuanceSnapshot(
-    syntheticMarket as SyntheticMarket,
-    lastMintIndex,
-    event
+  // TODO: this code may need to change a bit once we are using the same index for LongShort updateIndexes and accumulativeFloatIssuance Indexes
+  let state = getAccumulativeFloatIssuanceSnapshot(
+    generateAccumulativeFloatIssuanceSnapshotId(
+      syntheticMarket.marketIndex,
+      lastMintIndex
+    )
   );
 
   let user = getOrCreateUser(userAddress, event);
@@ -406,8 +419,8 @@ export function handleFloatMinted(event: FloatMinted): void {
     );
   }
 
-  let latestAccumulativeFloatIssuanceSnapshot = getLatestAccumulativeFloatIssuanceSnapshot(
-    syntheticMarket as SyntheticMarket
+  let latestAccumulativeFloatIssuanceSnapshot = getAccumulativeFloatIssuanceSnapshot(
+    (syntheticMarket as SyntheticMarket).latestAccumulativeFloatIssuanceSnapshot
   );
 
   let user = getOrCreateUser(userAddress, event);

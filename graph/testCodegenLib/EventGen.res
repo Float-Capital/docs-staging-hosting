@@ -1,8 +1,6 @@
 let subgraphConfigString = Node_fs.readFileAsUtf8Sync("./subgraph.yaml")
 
-@module("js-yaml") external load: string => 'subgraphConfig = "load"
-
-let finalConfig = load(subgraphConfigString)
+let finalConfig = Utils.loadYaml(subgraphConfigString)
 
 let abisMapping = Js.Dict.empty()
 
