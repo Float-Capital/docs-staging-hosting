@@ -17,7 +17,7 @@ contract Staker is IStaker, Initializable {
   /* ══════ Fixed-precision constants ══════ */
   uint256 public constant FLOAT_ISSUANCE_FIXED_DECIMAL = 1e42;
   // 2^52 ~= 4.5e15
-  // With an exponent of 5, the largest total liquidity possible in a market (to avoid integer overflow on exponentiation) is ~10^31 or 10 Trillion (10^13)
+  // With an exponent of 5, the largest total liquidity possible in a market (to avoid integer overflow on exponentiation) is ~10^31 DAI decimal units or 10 Trillion DAI (10^13
   // NOTE: this also means if the total market value is less than 2^52 there will be a division by zero error
   uint256 public constant safeExponentBitShifting = 52;
 
@@ -505,7 +505,7 @@ contract Staker is IStaker, Initializable {
       uint256 numerator = (uint256(int256(shortValue) - equilibriumOffsetMarketScaled) >>
         (safeExponentBitShifting - 1))**balanceIncentiveCurve_exponent[marketIndex];
 
-      // NOTE: `x * 5e17` == `(x * 10e18) / 2`
+      // NOTE: `x * 5e17` == `(x * 1e18) / 2`
       uint256 longRewardUnscaled = (numerator * 5e17) / denominator;
       uint256 shortRewardUnscaled = 1e18 - longRewardUnscaled;
 
