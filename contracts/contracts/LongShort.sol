@@ -378,9 +378,9 @@ contract LongShort is ILongShort, Initializable {
 
     // Add new staker funds with fresh synthetic tokens.
     IStaker(staker).addNewStakingFund(
-      latestMarket,
-      syntheticTokens[latestMarket][true],
-      syntheticTokens[latestMarket][false],
+      marketIndex,
+      syntheticTokens[marketIndex][true],
+      syntheticTokens[marketIndex][false],
       kInitialMultiplier,
       kPeriod,
       unstakeFee_e18,
