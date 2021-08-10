@@ -36,6 +36,7 @@ let testUnit =
         syntheticTokenSmocked->SyntheticTokenSmocked.mockTransferToReturn(
           true,
         );
+
         connectedStaker :=
           staker->ContractHelpers.connect(~address=userWallet.contents);
         call :=

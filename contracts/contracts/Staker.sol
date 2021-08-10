@@ -42,7 +42,7 @@ contract Staker is IStaker, Initializable {
   mapping(address => uint32) public marketIndexOfToken;
 
   /* ══════ Reward specific ══════ */
-  mapping(uint32 => uint256) public latestRewardIndex;
+  mapping(uint32 => uint256) public latestRewardIndex; // This is synced to be the same as LongShort
   mapping(uint32 => mapping(uint256 => AccumulativeIssuancePerStakedSynthSnapshot))
     public accumulativeFloatPerSyntheticTokenSnapshots;
   struct AccumulativeIssuancePerStakedSynthSnapshot {
@@ -56,18 +56,6 @@ contract Staker is IStaker, Initializable {
   mapping(address => mapping(address => uint256)) public userAmountStaked;
 
   /* ══════ Token shift management specific ══════ */
-  mapping(uint32 => uint256) public batched_stakerNextTokenShiftIndex;
-  /**
-  @notice Used to link a token shift to a staker state
-  @dev tokenShiftIndex => accumulativeFloatIssuanceSnapshotIndex
-    POSSIBLE OPTIMIZATION - could pack stakerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping and stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping into a struct of two uint128 for storage space optimization.
-  */
-  mapping(uint256 => uint256)
-    public stakerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping;
-  /// @notice Used to fetch the price from LongShort at that point in time
-  /// @dev tokenShiftIndex => longShortMarketPriceSnapshotIndex
-  mapping(uint256 => uint256)
-    public stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping;
   /// @dev marketIndex => usersAddress => stakerTokenShiftIndex
   mapping(uint32 => mapping(address => uint256))
     public userNextPrice_stakedSyntheticTokenShiftIndex;
@@ -127,8 +115,6 @@ contract Staker is IStaker, Initializable {
 
   event FloatPercentageUpdated(uint256 floatPercentage);
 
-  event SyntheticTokensShifted();
-
   event ChangeAdmin(address newAdmin);
 
   /*╔═════════════════════════════╗
@@ -177,8 +163,8 @@ contract Staker is IStaker, Initializable {
   ) internal virtual {
     if (
       userNextPrice_stakedSyntheticTokenShiftIndex[marketIndex][msg.sender] != 0 &&
-      userNextPrice_stakedSyntheticTokenShiftIndex[marketIndex][msg.sender] <
-      batched_stakerNextTokenShiftIndex[marketIndex]
+      userNextPrice_stakedSyntheticTokenShiftIndex[marketIndex][msg.sender] <=
+      latestRewardIndex[marketIndex]
     ) {
       _mintAccumulatedFloatAndExecuteOutstandingShifts(marketIndex, msg.sender);
     }
@@ -403,9 +389,6 @@ contract Staker is IStaker, Initializable {
 
     _changeUnstakeFee(marketIndex, unstakeFee_e18);
 
-    // Set this value to one initially - 0 is a null value and thus potentially bug prone.
-    batched_stakerNextTokenShiftIndex[marketIndex] = 1;
-
     emit MarketAddedToStaker(
       marketIndex,
       unstakeFee_e18,
@@ -554,18 +537,15 @@ contract Staker is IStaker, Initializable {
   /**
   @notice Computes the time since last accumulativeIssuancePerStakedSynthSnapshot for the given market in seconds.
   @param marketIndex The market referred to.
-  @return The time difference in seconds
+  @return timeDelta The time difference in seconds
   */
-  function _calculateTimeDeltaFromLastAccumulativeIssuancePerStakedSynthSnapshot(uint32 marketIndex)
-    internal
-    view
-    virtual
-    returns (uint256)
-  {
+  function _calculateTimeDeltaFromLastAccumulativeIssuancePerStakedSynthSnapshot(
+    uint32 marketIndex,
+    uint256 previousMarketUpdateIndex
+  ) internal view virtual returns (uint256 timeDelta) {
     return
       block.timestamp -
-      accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][latestRewardIndex[marketIndex]]
-      .timestamp;
+      accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][previousMarketUpdateIndex].timestamp;
   }
 
   /**
@@ -582,6 +562,7 @@ contract Staker is IStaker, Initializable {
   */
   function _calculateNewCumulativeIssuancePerStakedSynth(
     uint32 marketIndex,
+    uint256 previousMarketUpdateIndex,
     uint256 longPrice,
     uint256 shortPrice,
     uint256 longValue,
@@ -598,109 +579,68 @@ contract Staker is IStaker, Initializable {
 
     // Compute time since last accumulativeIssuancePerStakedSynthSnapshot for the given token.
     uint256 timeDelta = _calculateTimeDeltaFromLastAccumulativeIssuancePerStakedSynthSnapshot(
-      marketIndex
+      marketIndex,
+      previousMarketUpdateIndex
     );
 
     // Compute new cumulative 'r' value total.
     return (
-      accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][latestRewardIndex[marketIndex]]
+      accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][previousMarketUpdateIndex]
       .accumulativeFloatPerSyntheticToken_long + (timeDelta * longFloatPerSecond),
-      accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][latestRewardIndex[marketIndex]]
+      accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][previousMarketUpdateIndex]
       .accumulativeFloatPerSyntheticToken_short + (timeDelta * shortFloatPerSecond)
-    );
-  }
-
-  /**
-  @notice Creates a new accumulativeIssuancePerStakedSynthSnapshot for the given token and updates indexes.
-  @param shortValue The value locked in the short side of the market.
-  @param longValue The value locked in the long side of the market.
-  @param shortPrice The price of the short token as defined in LongShort.sol
-  @param longPrice The price of the long token as defined in LongShort.sol
-  @param marketIndex An identifier for the market.
-  */
-  function _setCurrentAccumulativeIssuancePerStakeStakedSynthSnapshot(
-    uint32 marketIndex,
-    uint256 longPrice,
-    uint256 shortPrice,
-    uint256 longValue,
-    uint256 shortValue
-  ) internal virtual {
-    (
-      uint256 newLongAccumulativeValue,
-      uint256 newShortAccumulativeValue
-    ) = _calculateNewCumulativeIssuancePerStakedSynth(
-      marketIndex,
-      longPrice,
-      shortPrice,
-      longValue,
-      shortValue
-    );
-
-    uint256 newIndex = latestRewardIndex[marketIndex] + 1;
-
-    // Set cumulative 'r' value on new accumulativeIssuancePerStakedSynthSnapshot.
-    accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][newIndex]
-    .accumulativeFloatPerSyntheticToken_long = newLongAccumulativeValue;
-    accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][newIndex]
-    .accumulativeFloatPerSyntheticToken_short = newShortAccumulativeValue;
-
-    // Set timestamp on new accumulativeIssuancePerStakedSynthSnapshot.
-    accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][newIndex].timestamp = block.timestamp;
-
-    // Update latest index to point to new accumulativeIssuancePerStakedSynthSnapshot.
-    latestRewardIndex[marketIndex] = newIndex;
-
-    emit AccumulativeIssuancePerStakedSynthSnapshotCreated(
-      marketIndex,
-      newIndex,
-      newLongAccumulativeValue,
-      newShortAccumulativeValue
     );
   }
 
   /**
   @notice Adds new accumulativeIssuancePerStakedSynthSnapshots for the given long/short tokens. Called by the
   ILongShort contract whenever there is a state change for a market.
-  @param stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted Mapping from this contract's shifts to LongShort.sols next price snapshots.
+  @param marketIndex An identifier for the market.
+  @param marketUpdateIndex Current update index in the LongShort contract for this market.
   @param shortValue The value locked in the short side of the market.
   @param longValue The value locked in the long side of the market.
   @param shortPrice The price of the short token as defined in LongShort.sol
   @param longPrice The price of the long token as defined in LongShort.sol
-  @param marketIndex An identifier for the market.
   */
   function pushUpdatedMarketPricesToUpdateFloatIssuanceCalculations(
     uint32 marketIndex,
+    uint256 marketUpdateIndex,
     uint256 longPrice,
     uint256 shortPrice,
     uint256 longValue,
-    uint256 shortValue,
-    uint256 stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted // This value should be ALWAYS be zero if no shift occured
+    uint256 shortValue
   ) external override onlyLongShort {
-    // Only add a new accumulativeIssuancePerStakedSynthSnapshot if some time has passed.
+    (
+      uint256 newLongAccumulativeValue,
+      uint256 newShortAccumulativeValue
+    ) = _calculateNewCumulativeIssuancePerStakedSynth(
+      marketIndex,
+      marketUpdateIndex - 1,
+      longPrice,
+      shortPrice,
+      longValue,
+      shortValue
+    );
 
-    // the `stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted` value will be 0 if there is no staker related action in an executed batch
-    if (stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted > 0) {
-      stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping[
-        batched_stakerNextTokenShiftIndex[marketIndex]
-      ] = stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted;
-      stakerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping[
-        batched_stakerNextTokenShiftIndex[marketIndex]
-      ] = latestRewardIndex[marketIndex] + 1;
-      batched_stakerNextTokenShiftIndex[marketIndex] += 1;
+    // Set cumulative 'r' value on new accumulativeIssuancePerStakedSynthSnapshot.
+    accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][marketUpdateIndex]
+    .accumulativeFloatPerSyntheticToken_long = newLongAccumulativeValue;
+    accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][marketUpdateIndex]
+    .accumulativeFloatPerSyntheticToken_short = newShortAccumulativeValue;
 
-      emit SyntheticTokensShifted();
-    }
+    // Set timestamp on new accumulativeIssuancePerStakedSynthSnapshot.
+    accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][marketUpdateIndex].timestamp = block
+    .timestamp;
 
-    // Time delta is fetched twice in below code, can pass through? Which is less gas?
-    if (_calculateTimeDeltaFromLastAccumulativeIssuancePerStakedSynthSnapshot(marketIndex) > 0) {
-      _setCurrentAccumulativeIssuancePerStakeStakedSynthSnapshot(
-        marketIndex,
-        longPrice,
-        shortPrice,
-        longValue,
-        shortValue
-      );
-    }
+    // Update latest index to point to new accumulativeIssuancePerStakedSynthSnapshot.
+    latestRewardIndex[marketIndex] = marketUpdateIndex;
+
+    emit AccumulativeIssuancePerStakedSynthSnapshotCreated(
+      marketIndex,
+      marketUpdateIndex,
+      newLongAccumulativeValue,
+      newShortAccumulativeValue
+    );
   }
 
   /*╔═══════════════════════════════════╗
@@ -762,13 +702,13 @@ contract Staker is IStaker, Initializable {
 
     uint256 usersShiftIndex = userNextPrice_stakedSyntheticTokenShiftIndex[marketIndex][user];
     // if there is a change in the users tokens held due to a token shift (or possibly another action in the future)
-    if (usersShiftIndex > 0 && usersShiftIndex < batched_stakerNextTokenShiftIndex[marketIndex]) {
+    if (usersShiftIndex > 0 && usersShiftIndex <= latestRewardIndex[marketIndex]) {
       floatReward = _calculateAccumulatedFloatInRange(
         marketIndex,
         amountStakedLong,
         amountStakedShort,
         usersLastRewardIndex,
-        stakerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping[usersShiftIndex]
+        usersShiftIndex
       );
 
       // Update the users balances
@@ -777,7 +717,7 @@ contract Staker is IStaker, Initializable {
           marketIndex,
           userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[marketIndex][true][user],
           true,
-          stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping[usersShiftIndex]
+          usersShiftIndex
         );
 
         amountStakedLong -= userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[marketIndex][
@@ -791,7 +731,7 @@ contract Staker is IStaker, Initializable {
           marketIndex,
           userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[marketIndex][false][user],
           false,
-          stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping[usersShiftIndex]
+          usersShiftIndex
         );
 
         amountStakedShort -= userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[marketIndex][
@@ -808,7 +748,7 @@ contract Staker is IStaker, Initializable {
         marketIndex,
         amountStakedLong,
         amountStakedShort,
-        stakerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping[usersShiftIndex],
+        usersShiftIndex,
         latestRewardIndex[marketIndex]
       );
 
@@ -950,6 +890,7 @@ contract Staker is IStaker, Initializable {
 
     userAmountStaked[token][user] = userAmountStaked[token][user] + amount;
 
+    // NOTE: Users retroactively earn a little bit of FLT because they start earning from the previous update index.
     userIndexOfLastClaimedReward[marketIndex][user] = latestRewardIndex[marketIndex];
 
     emit StakeAdded(user, address(token), amount, userIndexOfLastClaimedReward[marketIndex][user]);
@@ -995,9 +936,9 @@ contract Staker is IStaker, Initializable {
       msg.sender
     ] = totalAmountForNextShift;
 
-    userNextPrice_stakedSyntheticTokenShiftIndex[marketIndex][
-      msg.sender
-    ] = batched_stakerNextTokenShiftIndex[marketIndex];
+    userNextPrice_stakedSyntheticTokenShiftIndex[marketIndex][msg.sender] =
+      latestRewardIndex[marketIndex] +
+      1;
   }
 
   /*╔════════════════════════════╗

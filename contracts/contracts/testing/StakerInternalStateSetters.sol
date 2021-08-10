@@ -73,9 +73,7 @@ contract StakerInternalStateSetters is Staker {
     uint256 shiftAmountLong,
     uint256 shiftAmountShort,
     uint256 _userNextPrice_stakedSyntheticTokenShiftIndex,
-    uint256 _batched_stakerNextTokenShiftIndex,
-    uint256 _takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping,
-    uint256 _stakerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping
+    uint256 _latestRewardIndex
   ) public {
     userNextPrice_stakedSyntheticTokenShiftIndex[marketIndex][
       user
@@ -86,13 +84,8 @@ contract StakerInternalStateSetters is Staker {
     userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[marketIndex][false][
       user
     ] = shiftAmountShort;
-    batched_stakerNextTokenShiftIndex[marketIndex] = _batched_stakerNextTokenShiftIndex;
-    stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping[
-      _userNextPrice_stakedSyntheticTokenShiftIndex
-    ] = _takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping;
-    stakerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping[
-      _userNextPrice_stakedSyntheticTokenShiftIndex
-    ] = _stakerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping;
+
+    latestRewardIndex[marketIndex] = _latestRewardIndex;
   }
 
   function setShiftTokensParams(
@@ -102,13 +95,13 @@ contract StakerInternalStateSetters is Staker {
     uint256 amountSyntheticTokensToShift,
     uint256 _userAmountStaked,
     uint256 _userNextPrice_stakedSyntheticTokenShiftIndex,
-    uint256 _batched_stakerNextTokenShiftIndex,
+    uint256 _latestRewardIndex,
     address syntheticToken
   ) public {
     userNextPrice_stakedSyntheticTokenShiftIndex[marketIndex][
       user
     ] = _userNextPrice_stakedSyntheticTokenShiftIndex;
-    batched_stakerNextTokenShiftIndex[marketIndex] = _batched_stakerNextTokenShiftIndex;
+    latestRewardIndex[marketIndex] = _latestRewardIndex;
 
     if (isShiftFromLong) {
       userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[marketIndex][true][
@@ -149,12 +142,7 @@ contract StakerInternalStateSetters is Staker {
     syntheticTokens[marketIndex][false] = mockAddress;
   }
 
-  function setAddNewStateForFloatRewardsGlobals(
-    uint32 marketIndex,
-    uint256 _batched_stakerNextTokenShiftIndex,
-    uint256 _latestRewardIndex
-  ) external {
-    batched_stakerNextTokenShiftIndex[marketIndex] = _batched_stakerNextTokenShiftIndex;
+  function setLatestRewardIndexGlobals(uint32 marketIndex, uint256 _latestRewardIndex) external {
     latestRewardIndex[marketIndex] = _latestRewardIndex;
   }
 
@@ -185,7 +173,6 @@ contract StakerInternalStateSetters is Staker {
     uint256 latestRewardIndexForMarket,
     uint256 timestamp
   ) external {
-    latestRewardIndex[marketIndex] = latestRewardIndexForMarket;
     accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][latestRewardIndexForMarket]
     .timestamp = timestamp;
   }

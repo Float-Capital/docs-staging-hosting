@@ -27,6 +27,7 @@ let test =
           ~contracts,
           ~accounts,
         );
+
       let%AwaitThen _ =
         contracts^.staker
         ->Staker.Exposed.set_stakeParams(

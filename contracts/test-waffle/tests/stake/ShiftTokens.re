@@ -30,7 +30,7 @@ let testUnit =
           ~amountSyntheticTokensToShiftBeforeValue,
           ~amountSyntheticTokensToShift,
           ~userNextPrice_stakedSyntheticTokenShiftIndex,
-          ~batched_stakerNextTokenShiftIndex,
+          ~latestRewardIndex,
           ~userAmountStaked,
         ) => {
       let user = accounts.contents->Array.getUnsafe(0).address;
@@ -43,7 +43,7 @@ let testUnit =
           ~user,
           ~amountSyntheticTokensToShift=amountSyntheticTokensToShiftBeforeValue,
           ~userNextPrice_stakedSyntheticTokenShiftIndex,
-          ~batched_stakerNextTokenShiftIndex,
+          ~latestRewardIndex,
           ~userAmountStaked,
           ~syntheticToken=syntheticTokenSmocked.address,
         );
@@ -77,7 +77,7 @@ let testUnit =
         let user = accounts.contents->Array.getUnsafe(0).address;
         let userNextPrice_stakedSyntheticTokenShiftIndex =
           Helpers.randomInteger();
-        let batched_stakerNextTokenShiftIndex =
+        let latestRewardIndex =
           userNextPrice_stakedSyntheticTokenShiftIndex->add(
             Helpers.randomInteger(),
           );
@@ -87,7 +87,7 @@ let testUnit =
             ~isShiftFromLong,
             ~amountSyntheticTokensToShiftBeforeValue,
             ~userNextPrice_stakedSyntheticTokenShiftIndex,
-            ~batched_stakerNextTokenShiftIndex,
+            ~latestRewardIndex,
             ~amountSyntheticTokensToShift,
             ~userAmountStaked=
               amountSyntheticTokensToShift->add(
@@ -107,14 +107,14 @@ let testUnit =
     it(
       "doesn't call _mintAccumulatedFloatAndExecuteOutstandingShifts if userNextPrice_stakedSyntheticTokenShiftIndex == 0",
       () => {
-        let batched_stakerNextTokenShiftIndex = Helpers.randomInteger();
+        let latestRewardIndex = Helpers.randomInteger();
 
         let%Await _ =
           setup(
             ~isShiftFromLong,
             ~amountSyntheticTokensToShiftBeforeValue,
             ~userNextPrice_stakedSyntheticTokenShiftIndex=zeroBn,
-            ~batched_stakerNextTokenShiftIndex,
+            ~latestRewardIndex,
             ~amountSyntheticTokensToShift,
             ~userAmountStaked=
               amountSyntheticTokensToShift->add(
@@ -129,18 +129,18 @@ let testUnit =
       },
     );
     it(
-      "doesn't call _mintAccumulatedFloatAndExecuteOutstandingShifts if userNextPrice_stakedSyntheticTokenShiftIndex == batched_stakerNextTokenShiftIndex",
+      "doesn't call _mintAccumulatedFloatAndExecuteOutstandingShifts if userNextPrice_stakedSyntheticTokenShiftIndex == latestRewardIndex",
       () => {
         let userNextPrice_stakedSyntheticTokenShiftIndex =
           Helpers.randomInteger();
-        let batched_stakerNextTokenShiftIndex = userNextPrice_stakedSyntheticTokenShiftIndex;
+        let latestRewardIndex = userNextPrice_stakedSyntheticTokenShiftIndex;
 
         let%Await _ =
           setup(
             ~isShiftFromLong,
             ~amountSyntheticTokensToShiftBeforeValue,
             ~userNextPrice_stakedSyntheticTokenShiftIndex,
-            ~batched_stakerNextTokenShiftIndex,
+            ~latestRewardIndex,
             ~amountSyntheticTokensToShift,
             ~userAmountStaked=
               amountSyntheticTokensToShift->add(
@@ -156,18 +156,18 @@ let testUnit =
     );
 
     it(
-      "doesn't call _mintAccumulatedFloatAndExecuteOutstandingShifts if userNextPrice_stakedSyntheticTokenShiftIndex > batched_stakerNextTokenShiftIndex",
+      "doesn't call _mintAccumulatedFloatAndExecuteOutstandingShifts if userNextPrice_stakedSyntheticTokenShiftIndex > latestRewardIndex",
       () => {
-        let batched_stakerNextTokenShiftIndex = Helpers.randomInteger();
+        let latestRewardIndex = Helpers.randomInteger();
         let userNextPrice_stakedSyntheticTokenShiftIndex =
-          batched_stakerNextTokenShiftIndex->add(Helpers.randomInteger());
+          latestRewardIndex->add(Helpers.randomInteger());
 
         let%Await _ =
           setup(
             ~isShiftFromLong,
             ~amountSyntheticTokensToShiftBeforeValue,
             ~userNextPrice_stakedSyntheticTokenShiftIndex,
-            ~batched_stakerNextTokenShiftIndex,
+            ~latestRewardIndex,
             ~amountSyntheticTokensToShift,
             ~userAmountStaked=
               amountSyntheticTokensToShift->add(
@@ -183,9 +183,9 @@ let testUnit =
     );
 
     it(
-      "sets the userNextPrice_stakedSyntheticTokenShiftIndex for the user to the batched_stakerNextTokenShiftIndex value",
+      "sets the userNextPrice_stakedSyntheticTokenShiftIndex for the user to latestRewardIndex + 1",
       () => {
-        let batched_stakerNextTokenShiftIndex = Helpers.randomInteger();
+        let latestRewardIndex = Helpers.randomInteger();
         let user = accounts.contents->Array.getUnsafe(0).address;
 
         let%Await _ =
@@ -193,7 +193,7 @@ let testUnit =
             ~isShiftFromLong,
             ~amountSyntheticTokensToShiftBeforeValue,
             ~userNextPrice_stakedSyntheticTokenShiftIndex=zeroBn,
-            ~batched_stakerNextTokenShiftIndex,
+            ~latestRewardIndex,
             ~amountSyntheticTokensToShift,
             ~userAmountStaked=
               amountSyntheticTokensToShift->add(
@@ -210,7 +210,7 @@ let testUnit =
 
         Chai.bnEqual(
           userNextPrice_stakedSyntheticTokenShiftIndexAfter,
-          batched_stakerNextTokenShiftIndex,
+          latestRewardIndex->add(oneBn),
         );
       },
     );
@@ -222,14 +222,14 @@ let testUnit =
         ++ "NextPrice function on long short with the correct parameters",
         () => {
           let {longShortSmocked} = contracts.contents;
-          let batched_stakerNextTokenShiftIndex = Helpers.randomInteger();
+          let latestRewardIndex = Helpers.randomInteger();
 
           let%Await _ =
             setup(
               ~isShiftFromLong,
               ~amountSyntheticTokensToShiftBeforeValue,
               ~userNextPrice_stakedSyntheticTokenShiftIndex=zeroBn,
-              ~batched_stakerNextTokenShiftIndex,
+              ~latestRewardIndex,
               ~amountSyntheticTokensToShift,
               ~userAmountStaked=
                 amountSyntheticTokensToShift->add(
@@ -250,7 +250,7 @@ let testUnit =
         ++ (isShiftFromLong ? "Long" : "Short")
         ++ "User value with the amount to shift",
         () => {
-          let batched_stakerNextTokenShiftIndex = Helpers.randomInteger();
+          let latestRewardIndex = Helpers.randomInteger();
           let user = accounts.contents->Array.getUnsafe(0).address;
 
           let%Await _ =
@@ -258,7 +258,7 @@ let testUnit =
               ~isShiftFromLong,
               ~amountSyntheticTokensToShiftBeforeValue,
               ~userNextPrice_stakedSyntheticTokenShiftIndex=zeroBn,
-              ~batched_stakerNextTokenShiftIndex,
+              ~latestRewardIndex,
               ~amountSyntheticTokensToShift,
               ~userAmountStaked=
                 amountSyntheticTokensToShift->add(
