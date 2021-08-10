@@ -15,9 +15,18 @@ let make = (~marketName, ~isLong, ~yield, ~rewards, ~stakeYield) =>
       </div>
       <div className="flex-1 my-2 text-sm flex flex-col items-center">
         <div>
-        <div><span className="text-xs font-bold mr-2">{`Float rewards:`->React.string}</span> {`${mapVal(rewards)}`->React.string}</div>
-        <div className="mt-2"><span className="text-xs font-bold mr-2">{`Synthetic Yield:`->React.string}</span>{`${mapVal(yield)}`->React.string}</div>
-        <div className="mt-2"> <span className="text-xs font-bold mr-2">{`Stake Yield:`->React.string}</span>{`${mapVal(stakeYield)}`->React.string}</div>
+          <div>
+            <span className="text-xs font-bold mr-2"> {`Float rewards:`->React.string} </span>
+            {mapVal(rewards)->React.string}
+          </div>
+          <div className="mt-2">
+            <span className="text-xs font-bold mr-2"> {`Synthetic Yield:`->React.string} </span>
+            {mapVal(yield)->React.string}
+          </div>
+          <div className="mt-2">
+            <span className="text-xs font-bold mr-2"> {`Stake Yield:`->React.string} </span>
+            {mapVal(stakeYield)->React.string}
+          </div>
         </div>
       </div>
     </div>

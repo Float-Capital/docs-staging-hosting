@@ -45,7 +45,7 @@ function calcLongAndShortDollarFloatPerSecondUnscaled(longVal, shortVal, equibOf
   var totalLocked = longVal.add(shortVal);
   var equibOffsetScaled = equibOffset.mul(totalLocked).div(CONSTANTS.tenToThe18).div(CONSTANTS.twoBN);
   var shortValAfterOffset = shortVal.sub(equibOffsetScaled);
-  var longIsSideWithMoreValAfterOffset = shortValAfterOffset.lt(longVal);
+  var longIsSideWithMoreValAfterOffset = shortValAfterOffset.sub(equibOffsetScaled).lt(longVal);
   var sideWithLessValAfterEquibOffset = longIsSideWithMoreValAfterOffset ? shortValAfterOffset : longVal.add(equibOffsetScaled);
   var rewardsForSideMoreValAfterOffset;
   if (sideWithLessValAfterEquibOffset.lte(CONSTANTS.zeroBN)) {
@@ -74,13 +74,13 @@ function calculateFloatMintedOverPeriod(dollarFloatPerSecond, amount, period, pr
 }
 
 function calculateStakeAPYS(syntheticMarkets, $$global, apy) {
-  var totalTreasuryYield = {
+  var totalTreasuryYieldAfterYear = {
     contents: CONSTANTS.zeroBN
   };
   var totalFloatMintedAfterAYear = {
     contents: $$global.totalFloatMinted
   };
-  var tokenFloatMintedDict = Belt_HashMapString.make(10);
+  var tokenFloatMintedAfterAYearDict = Belt_HashMapString.make(10);
   var tokenAPYDict = Belt_HashMapString.make(10);
   Belt_Array.forEach(syntheticMarkets, (function (market) {
           var match = market.latestSystemState;
@@ -89,25 +89,30 @@ function calculateStakeAPYS(syntheticMarkets, $$global, apy) {
           var totalLockedLong = match.totalLockedLong;
           var match$1 = market.syntheticShort;
           var match$2 = market.syntheticLong;
-          var floatMarketShare = Caml_obj.caml_min(totalLockedLong.sub(totalLockedShort).abs().mul(CONSTANTS.yieldGradientHardcode).div(totalValueLocked), CONSTANTS.tenToThe18);
-          totalTreasuryYield.contents = totalTreasuryYield.contents.add(CONSTANTS.tenToThe18.sub(floatMarketShare).mul(apy).mul(totalValueLocked).div(CONSTANTS.tenToThe18).div(CONSTANTS.tenToThe18));
+          var marketsShareOfYield = Caml_obj.caml_min(totalLockedLong.sub(totalLockedShort).abs().mul(CONSTANTS.yieldGradientHardcode).div(totalValueLocked), CONSTANTS.tenToThe18);
+          totalTreasuryYieldAfterYear.contents = totalTreasuryYieldAfterYear.contents.add(CONSTANTS.tenToThe18.sub(marketsShareOfYield).mul(apy).mul(totalValueLocked).div(CONSTANTS.tenToThe18).div(CONSTANTS.tenToThe18));
           var match$3 = calcLongAndShortDollarFloatPerSecondUnscaled(totalLockedLong, totalLockedShort, CONSTANTS.equilibriumOffsetHardcode, market.timestampCreated, match.timestamp, CONSTANTS.kperiodHardcode, CONSTANTS.kmultiplierHardcode, CONSTANTS.balanceIncentiveExponentHardcode);
           var longFloatOverYear = calculateFloatMintedOverPeriod(match$3[0], match$2.totalStaked, Ethers$1.BigNumber.from(CONSTANTS.oneYearInSeconds), match$2.latestPrice.price.price);
           var shortFloatOverYear = calculateFloatMintedOverPeriod(match$3[1], match$1.totalStaked, Ethers$1.BigNumber.from(CONSTANTS.oneYearInSeconds), match$1.latestPrice.price.price);
           totalFloatMintedAfterAYear.contents = totalFloatMintedAfterAYear.contents.add(shortFloatOverYear).add(longFloatOverYear);
-          Belt_HashMapString.set(tokenFloatMintedDict, match$2.id, longFloatOverYear);
-          return Belt_HashMapString.set(tokenFloatMintedDict, match$1.id, shortFloatOverYear);
+          Belt_HashMapString.set(tokenFloatMintedAfterAYearDict, match$2.id, longFloatOverYear);
+          return Belt_HashMapString.set(tokenFloatMintedAfterAYearDict, match$1.id, shortFloatOverYear);
         }));
+  totalFloatMintedAfterAYear.contents = totalFloatMintedAfterAYear.contents.mul(CONSTANTS.tenToThe18.add(CONSTANTS.floatCapitalPercentE18HardCode)).div(CONSTANTS.tenToThe18);
   var floatAfterYearToAPYE18 = function (floatAfterYear, totalStaked, price) {
-    return floatAfterYear.mul(CONSTANTS.tenToThe18).div(totalFloatMintedAfterAYear.contents).mul(totalTreasuryYield.contents).div(totalStaked.mul(price).div(CONSTANTS.tenToThe18));
+    if (totalStaked.eq(CONSTANTS.zeroBN)) {
+      return CONSTANTS.zeroBN;
+    } else {
+      return floatAfterYear.mul(CONSTANTS.tenToThe18).div(totalFloatMintedAfterAYear.contents).mul(totalTreasuryYieldAfterYear.contents).div(totalStaked.mul(price).div(CONSTANTS.tenToThe18));
+    }
   };
   Belt_Array.forEach(syntheticMarkets, (function (market) {
           var match = market.syntheticShort;
           var shortId = match.id;
           var match$1 = market.syntheticLong;
           var longId = match$1.id;
-          var longApy = floatAfterYearToAPYE18(Belt_HashMapString.get(tokenFloatMintedDict, longId), match$1.totalStaked, match$1.latestPrice.price.price);
-          var shortApy = floatAfterYearToAPYE18(Belt_HashMapString.get(tokenFloatMintedDict, shortId), match.totalStaked, match.latestPrice.price.price);
+          var longApy = floatAfterYearToAPYE18(Belt_HashMapString.get(tokenFloatMintedAfterAYearDict, longId), match$1.totalStaked, match$1.latestPrice.price.price);
+          var shortApy = floatAfterYearToAPYE18(Belt_HashMapString.get(tokenFloatMintedAfterAYearDict, shortId), match.totalStaked, match.latestPrice.price.price);
           Belt_HashMapString.set(tokenAPYDict, longId, Number(Ethers.Utils.formatEther(longApy)));
           return Belt_HashMapString.set(tokenAPYDict, shortId, Number(Ethers.Utils.formatEther(shortApy)));
         }));

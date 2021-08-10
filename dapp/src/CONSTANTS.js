@@ -52,7 +52,7 @@ var kperiodHardcode = Ethers.BigNumber.from("1664000");
 
 var kmultiplierHardcode = Ethers.BigNumber.from("5000000000000000000");
 
-var floatCapitalHardCode = tenToThe18.div(fiveBN);
+var floatCapitalPercentE18HardCode = tenToThe18.div(fiveBN);
 
 var oneYearInSecondsMulTenToThe18 = Ethers.BigNumber.from(31536000).mul(tenToThe18);
 
@@ -127,7 +127,7 @@ exports.kmultiplierHardcode = kmultiplierHardcode;
 exports.equilibriumOffsetHardcode = equilibriumOffsetHardcode;
 exports.balanceIncentiveExponentHardcode = balanceIncentiveExponentHardcode;
 exports.yieldGradientHardcode = yieldGradientHardcode;
-exports.floatCapitalHardCode = floatCapitalHardCode;
+exports.floatCapitalPercentE18HardCode = floatCapitalPercentE18HardCode;
 exports.oneYearInSecondsMulTenToThe18 = oneYearInSecondsMulTenToThe18;
 exports.daiDisplayToken = daiDisplayToken;
 /* zeroAddress Not a pure module */

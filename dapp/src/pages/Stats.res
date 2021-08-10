@@ -7,7 +7,7 @@ module TrendingStakes = {
   let make = (~global) => {
     let marketDetailsQuery = Queries.MarketDetails.use()
     let apy = APYProvider.useAPY()
-    let bnApy = APYProvider.useBnApy();
+    let bnApy = APYProvider.useBnApy()
 
     {
       switch marketDetailsQuery {
@@ -16,7 +16,12 @@ module TrendingStakes = {
       | {data: Some({syntheticMarkets})} =>
         switch (apy, bnApy) {
         | (Loaded(apyVal), Loaded(bnApy)) => {
-            let trendingStakes = StatsCalcs.trendingStakes(~syntheticMarkets, ~apy=apyVal, ~global, ~bnApy=bnApy)
+            let trendingStakes = StatsCalcs.trendingStakes(
+              ~syntheticMarkets,
+              ~apy=apyVal,
+              ~global,
+              ~bnApy,
+            )
             trendingStakes
             ->Array.map(({marketName, isLong, apy, floatApy, stakeApy}) =>
               <StatsStakeCard
@@ -151,7 +156,7 @@ let stakingCard = (~totalValueStaked, ~global) =>
       </div>
     </div>
     <div className="text-left mt-4 pl-4 text-sm font-bold"> {`Trending`->React.string} </div>
-    <div className="pt-2 pb-5"> <TrendingStakes global/> </div>
+    <div className="pt-2 pb-5"> <TrendingStakes global /> </div>
   </Card>
 
 @react.component
@@ -171,7 +176,14 @@ let make = () => {
         {
           data: Some({
             globalStates: [
-              {totalFloatMinted, totalTxs, totalUsers, totalGasUsed, timestampLaunched, txHash} as global,
+              {
+                totalFloatMinted,
+                totalTxs,
+                totalUsers,
+                totalGasUsed,
+                timestampLaunched,
+                txHash,
+              } as global,
             ],
           }),
         },
@@ -199,7 +211,7 @@ let make = () => {
           <Divider>
             {syntheticAssetsCard(~totalSynthValue)} {floatTokenCard(~totalFloatMinted)}
           </Divider>
-          <Divider> {stakingCard(~totalValueStaked, ~global=global)} </Divider>
+          <Divider> {stakingCard(~totalValueStaked, ~global)} </Divider>
         </Container>
       </div>
 

@@ -24,11 +24,9 @@ module Header = {
     <h1 className="font-bold text-center pt-5 text-lg font-alphbeta"> {children} </h1>
 }
 
-
 let ifElement = (condition, element) =>
   if condition {
     element
   } else {
     React.null
   }
-

@@ -48,7 +48,7 @@ let make = (~orderPostion, ~orderPostionMobile, ~isLong, ~apy, ~floatApy, ~stake
                 ~heading="STAKE",
                 ~apy=stakeApy,
                 ~suffix=<span className="ml-1">
-                  <Tooltip tip="Expected yield from FLOAT buybacks" />
+                  <Tooltip tip="Expected yield from FLT token buybacks" />
                 </span>,
               ),
             )}

@@ -57,7 +57,7 @@ function StakeCardSide(Props) {
                   }, "+")), Masonry.ifElement(stakeApyGreaterThanZero, apyComponent("STAKE", React.createElement("span", {
                         className: "ml-1"
                       }, React.createElement(Tooltip.make, {
-                            tip: "Expected yield from FLOAT buybacks"
+                            tip: "Expected yield from FLT token buybacks"
                           })), stakeApy$1)));
     }
   }

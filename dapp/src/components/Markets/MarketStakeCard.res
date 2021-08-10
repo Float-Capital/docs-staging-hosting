@@ -11,12 +11,8 @@ let make = (
       totalLockedLong,
       totalLockedShort,
     },
-    syntheticLong: {
-      id: longId
-    },
-    syntheticShort: {
-      id: shortId
-    }
+    syntheticLong: {id: longId},
+    syntheticShort: {id: shortId},
   }: Queries.SyntheticMarketInfo.t,
 ) => {
   let longBeta = MarketCalculationHelpers.calculateBeta(
@@ -134,7 +130,6 @@ let make = (
             </div>
           </div>
         </div>
-
       </div>
       <MarketStakeCardSide
         orderPostionMobile={3}

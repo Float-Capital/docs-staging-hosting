@@ -63,7 +63,7 @@ let calcLongAndShortDollarFloatPerSecondUnscaled = (
 
   let shortValAfterOffset = shortVal->sub(equibOffsetScaled)
 
-  let longIsSideWithMoreValAfterOffset = shortValAfterOffset->lt(longVal)
+  let longIsSideWithMoreValAfterOffset = shortValAfterOffset->sub(equibOffsetScaled)->lt(longVal)
 
   let sideWithLessValAfterEquibOffset = longIsSideWithMoreValAfterOffset
     ? shortValAfterOffset
@@ -139,10 +139,33 @@ let calculateStakeAPYS = (
   ~global: Queries.GlobalStateInfo.t,
   ~apy: Ethers.BigNumber.t,
 ) => {
+  /*
+    Formula for APY:
+      stake APY = totalYieldForTreasuryAfterAYear 
+                  * percentOfTotalFloatMintedByStakingInThatSideAfterAYear
+                  / totalStakedForSideInDollars
+
+      = totalYieldForTreasuryAfterAYear * 
+        (totalFloatMintedForMarketSideDuringAYear / totalFloatMintedAllTimeAfterAYear) 
+        / totalStakedInThatMarket
+
+      Basically assuming that 
+        a) all yield from treasury goes to FLT token holders, and goes to them equally 
+           depending on how much FLT they have.
+        b) treating the yield like a dividend yield (if we just sent the cash 
+           to token holders).
+
+      b) is obviously strictly incorrect as we're using buybacks not dividends.
+    
+      but it kinda makes sense to me that in perfect markets they'd be sort of the same
+ */
+
   open Ethers.BigNumber
-  let totalTreasuryYield = ref(CONSTANTS.zeroBN)
+  let totalTreasuryYieldAfterYear = ref(CONSTANTS.zeroBN)
   let totalFloatMintedAfterAYear = ref(global.totalFloatMinted)
-  let tokenFloatMintedDict: HashMap.String.t<Ethers.BigNumber.t> = HashMap.String.make(~hintSize=10)
+  let tokenFloatMintedAfterAYearDict: HashMap.String.t<Ethers.BigNumber.t> = HashMap.String.make(
+    ~hintSize=10,
+  )
   let tokenAPYDict: HashMap.String.t<float> = HashMap.String.make(~hintSize=10)
 
   syntheticMarkets->Array.forEach(market => {
@@ -166,7 +189,7 @@ let calculateStakeAPYS = (
       },
     } = market
 
-    let floatMarketShare =
+    let marketsShareOfYield =
       totalLockedLong
       ->sub(totalLockedShort)
       ->Ethers.BigNumber.abs // compiler error if not fully qualified
@@ -174,10 +197,10 @@ let calculateStakeAPYS = (
       ->div(totalValueLocked)
       ->min(CONSTANTS.tenToThe18)
 
-    totalTreasuryYield :=
-      totalTreasuryYield.contents->add(
+    totalTreasuryYieldAfterYear :=
+      totalTreasuryYieldAfterYear.contents->add(
         CONSTANTS.tenToThe18
-        ->sub(floatMarketShare)
+        ->sub(marketsShareOfYield)
         ->mul(apy)
         ->mul(totalValueLocked)
         ->div(CONSTANTS.tenToThe18)
@@ -212,16 +235,27 @@ let calculateStakeAPYS = (
     totalFloatMintedAfterAYear :=
       totalFloatMintedAfterAYear.contents->add(shortFloatOverYear)->add(longFloatOverYear)
 
-    tokenFloatMintedDict->HashMap.String.set(longId, longFloatOverYear)
-    tokenFloatMintedDict->HashMap.String.set(shortId, shortFloatOverYear)
+    tokenFloatMintedAfterAYearDict->HashMap.String.set(longId, longFloatOverYear)
+    tokenFloatMintedAfterAYearDict->HashMap.String.set(shortId, shortFloatOverYear)
   })
 
+  // Account for Float percent minted for investors
+  totalFloatMintedAfterAYear :=
+    totalFloatMintedAfterAYear.contents
+    ->mul(CONSTANTS.tenToThe18->add(CONSTANTS.floatCapitalPercentE18HardCode))
+    ->div(CONSTANTS.tenToThe18)
+
   let floatAfterYearToAPYE18 = (floatAfterYear, totalStaked, price) => {
-    floatAfterYear
-    ->mul(CONSTANTS.tenToThe18)
-    ->div(totalFloatMintedAfterAYear.contents)
-    ->mul(totalTreasuryYield.contents)
-    ->div(totalStaked->mul(price)->div(CONSTANTS.tenToThe18))
+    if totalStaked->eq(CONSTANTS.zeroBN) {
+      // escape hatch, ill defined.
+      CONSTANTS.zeroBN
+    } else {
+      floatAfterYear
+      ->mul(CONSTANTS.tenToThe18)
+      ->div(totalFloatMintedAfterAYear.contents)
+      ->mul(totalTreasuryYieldAfterYear.contents)
+      ->div(totalStaked->mul(price)->div(CONSTANTS.tenToThe18))
+    }
   }
 
   syntheticMarkets->Array.forEach(market => {
@@ -239,13 +273,13 @@ let calculateStakeAPYS = (
     } = market
 
     let longApy =
-      tokenFloatMintedDict
+      tokenFloatMintedAfterAYearDict
       ->HashMap.String.get(longId)
       ->Option.getUnsafe
       ->floatAfterYearToAPYE18(totalStakedLong, longPrice)
 
     let shortApy =
-      tokenFloatMintedDict
+      tokenFloatMintedAfterAYearDict
       ->HashMap.String.get(shortId)
       ->Option.getUnsafe
       ->floatAfterYearToAPYE18(totalStakedShort, shortPrice)
