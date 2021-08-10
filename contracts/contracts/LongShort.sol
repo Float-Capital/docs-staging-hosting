@@ -949,13 +949,14 @@ contract LongShort is ILongShort, Initializable {
   /// @param marketIndex An int32 which uniquely identifies a market.
   /// @param amountSyntheticTokensToShift Amount in wei of synthetic tokens to shift from the one side to the other at the next oracle price update.
   /// @param isShiftFromLong Whether the token shift is from long to short (true), or short to long (false).
-  function _shiftPositionNextPrice(
+  function shiftPositionNextPrice(
     uint32 marketIndex,
     uint256 amountSyntheticTokensToShift,
     bool isShiftFromLong
   )
-    internal
+    public
     virtual
+    override
     updateSystemStateMarket(marketIndex)
     executeOutstandingNextPriceSettlements(msg.sender, marketIndex)
   {
@@ -992,7 +993,7 @@ contract LongShort is ILongShort, Initializable {
     external
     override
   {
-    _shiftPositionNextPrice(marketIndex, amountSyntheticTokensToShift, true);
+    shiftPositionNextPrice(marketIndex, amountSyntheticTokensToShift, true);
   }
 
   /// @notice Allows users to shift their position from short to long in a single transaction. To prevent front-running these shifts are executed on the next price update from the oracle.
@@ -1002,7 +1003,7 @@ contract LongShort is ILongShort, Initializable {
     external
     override
   {
-    _shiftPositionNextPrice(marketIndex, amountSyntheticTokensToShift, false);
+    shiftPositionNextPrice(marketIndex, amountSyntheticTokensToShift, false);
   }
 
   /*╔════════════════════════════════╗

@@ -30,9 +30,6 @@ let testUnit =
             ~functionName="_batchConfirmOutstandingPendingActions",
           );
 
-        LongShortSmocked.InternalMock.mock_handleTotalPaymentTokenValueChangeForMarketWithYieldManagerToReturn();
-        LongShortSmocked.InternalMock.mock_handleChangeInSyntheticTokensTotalSupplyToReturn();
-
         let%AwaitThen _ =
           longShort->LongShort.Exposed.setPerformOustandingBatchedSettlementsGlobals(
             ~marketIndex,
@@ -311,11 +308,6 @@ let testUnit =
         longSyntheticToken := smockedSynthLong;
         shortSyntheticToken := smockedSynthShort;
 
-        let _ = smockedSynthLong->SyntheticTokenSmocked.mockMintToReturn;
-        let _ = smockedSynthLong->SyntheticTokenSmocked.mockBurnToReturn;
-        let _ = smockedSynthShort->SyntheticTokenSmocked.mockMintToReturn;
-        let _ = smockedSynthShort->SyntheticTokenSmocked.mockBurnToReturn;
-
         longShort->LongShort.Exposed.setHandleChangeInSyntheticTokensTotalSupplyGlobals(
           ~marketIndex,
           ~longSyntheticToken=smockedSynthLong.address,
@@ -433,11 +425,6 @@ let testUnit =
           YieldManagerMockSmocked.make(yieldManager);
 
         yieldManagerRef := smockedYieldManager;
-
-        let _ =
-          smockedYieldManager->YieldManagerMockSmocked.mockDepositPaymentTokenToReturn;
-        let _ =
-          smockedYieldManager->YieldManagerMockSmocked.mockRemovePaymentTokenFromMarketToReturn;
 
         longShort->LongShort.Exposed.setHandleTotalValueChangeForMarketWithYieldManagerGlobals(
           ~marketIndex,

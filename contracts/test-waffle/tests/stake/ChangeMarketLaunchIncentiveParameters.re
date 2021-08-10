@@ -22,8 +22,6 @@ let test =
             ~functionName="changeMarketLaunchIncentiveParameters",
           );
 
-      StakerSmocked.InternalMock.mock_changeMarketLaunchIncentiveParametersToReturn();
-
       contracts^.staker
       ->Staker.Exposed.changeMarketLaunchIncentiveParameters(
           ~marketIndex,
