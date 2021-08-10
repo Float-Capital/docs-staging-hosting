@@ -48,7 +48,7 @@ dataSources:
         - event: ValueLockedInSystem(uint32,uint256,uint256,uint256)
           handler: handleValueLockedInSystem
 
-      file: ./src/float.ts
+      file: ./src/mappings/longShort.ts
 
   - kind: ethereum/contract
     name: Staker
@@ -105,7 +105,7 @@ dataSources:
           handler: handleStakerV1
         - event: SyntheticTokensShifted()
           handler: handleSyntheticTokensShifted
-      file: ./src/staker.ts
+      file: ./src/mappings/staker.ts
 
 templates:
   - kind: ethereum/contract
@@ -128,4 +128,4 @@ templates:
           handler: handleTransfer
         - event: Approval(indexed address,indexed address,uint256)
           handler: handleApproval
-      file: ./src/tokenTransfers.ts
+      file: ./src/mappings/tokenTransfers.ts

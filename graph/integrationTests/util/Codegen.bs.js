@@ -44,6 +44,8 @@ function paramTypeToRescriptType(paramType) {
   switch (paramType) {
     case "address" :
         return "address";
+    case "address[]" :
+        return "array<Ethers.ethAddress>";
     case "string" :
         return "string";
     case "uint256" :
@@ -51,7 +53,7 @@ function paramTypeToRescriptType(paramType) {
         return "bn";
     default:
       console.log("Please handle all types - " + paramType + " isn't handled by this script.");
-      return "unkownType";
+      return "unknownType";
   }
 }
 

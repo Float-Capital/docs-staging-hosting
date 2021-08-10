@@ -10,8 +10,8 @@ import {
   FloatPercentageUpdated,
   BalanceIncentiveEquilibriumOffsetUpdated,
   BalanceIncentiveExponentUpdated,
-} from "../generated/Staker/Staker";
-import { erc20 } from "../generated/templates";
+} from "../../generated/Staker/Staker";
+import { erc20 } from "../../generated/templates";
 import {
   GlobalState,
   SyntheticToken,
@@ -19,19 +19,19 @@ import {
   CurrentStake,
   Stake,
   AccumulativeFloatIssuanceSnapshot,
-} from "../generated/schema";
+} from "../../generated/schema";
 import { log, DataSourceContext } from "@graphprotocol/graph-ts";
 import {
   bigIntArrayToStringArray,
   saveEventToStateChange,
-} from "./utils/txEventHelpers";
+} from "../utils/txEventHelpers";
 import {
   getOrCreateUser,
   getOrCreateAccumulativeFloatIssuanceSnapshot,
   getLatestAccumulativeFloatIssuanceSnapshot,
-} from "./utils/globalStateManager";
+} from "../utils/globalStateManager";
 
-import { ZERO, ONE, GLOBAL_STATE_ID, TEN_TO_THE_18 } from "./CONSTANTS";
+import { ZERO, ONE, GLOBAL_STATE_ID, TEN_TO_THE_18 } from "../CONSTANTS";
 
 export function handleStakerV1(event: StakerV1): void {
   let floatAddress = event.params.floatToken;

@@ -25,11 +25,12 @@
     "res:start": "rescript build -w",
     "res:clean": "rescript clean",
     "test-codegen": "node ./test/util/Codegen.bs.js > ./test/stateChanges/Converters.res",
-    "test": "jest test"
+    "integration-test": "jest test ./integrationTests"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "^0.20.0",
     "@graphprotocol/graph-ts": "^0.20.0",
+    "matchstick-as": "^0.0.3",
     "semver": "^7.3.5"
   },
   "devDependencies": {
