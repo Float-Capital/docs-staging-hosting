@@ -16,14 +16,18 @@ dataSources:
       entities:
         - ExecuteNextPriceMintSettlementUser
         - ExecuteNextPriceRedeemSettlementUser
+        - ExecuteNextPriceMarketSideShiftSettlementUser
+        - ExecuteNextPriceMintSettlementUser
+        - ExecuteNextPriceRedeemSettlementUser
         - ExecuteNextPriceSettlementsUser
+        - LongShortV1
         - NewMarketLaunchedAndSeeded
         - NextPriceDeposit
         - NextPriceRedeem
+        - NextPriceSyntheticPositionShift
         - OracleUpdated
         - SyntheticMarketCreated
         - SystemStateUpdated
-        - LongShortV1
       abis:
         - name: LongShort
           file: ./abis/LongShort.json
@@ -62,8 +66,10 @@ dataSources:
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
+        - AccumulativeIssuancePerStakedSynthSnapshotCreated
         - BalanceIncentiveEquilibriumOffsetUpdated
         - BalanceIncentiveExponentUpdated
+        - ChangeAdmin
         - FloatMinted
         - FloatPercentageUpdated
         - MarketAddedToStaker
@@ -72,15 +78,19 @@ dataSources:
         - StakeWithdrawalFeeUpdated
         - StakeWithdrawn
         - StakerV1
-        - StateAdded
+        - SyntheticTokensShifted
       abis:
         - name: Staker
           file: ./abis/Staker.json
       eventHandlers:
+        - event: AccumulativeIssuancePerStakedSynthSnapshotCreated(uint32,uint256,uint256,uint256)
+          handler: handleAccumulativeIssuancePerStakedSynthSnapshotCreated
         - event: BalanceIncentiveEquilibriumOffsetUpdated(uint32,int256)
           handler: handleBalanceIncentiveEquilibriumOffsetUpdated
         - event: BalanceIncentiveExponentUpdated(uint32,uint256)
           handler: handleBalanceIncentiveExponentUpdated
+        - event: ChangeAdmin(address)
+          handler: handleChangeAdmin
         - event: FloatMinted(address,uint32,uint256)
           handler: handleFloatMinted
         - event: FloatPercentageUpdated(uint256)
@@ -95,10 +105,10 @@ dataSources:
           handler: handleStakeWithdrawalFeeUpdated
         - event: StakeWithdrawn(address,address,uint256)
           handler: handleStakeWithdrawn
-        - event: StakerV1(address,uint256)
+        - event: StakerV1(address,address,address,address,uint256)
           handler: handleStakerV1
-        - event: StateAdded(uint32,uint256,uint256,uint256)
-          handler: handleStateAdded
+        - event: SyntheticTokensShifted()
+          handler: handleSyntheticTokensShifted
       file: ./src/staker.ts
 
 templates:

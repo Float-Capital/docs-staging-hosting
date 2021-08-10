@@ -3,7 +3,7 @@ import {
   GlobalState,
   User,
   Price,
-  StakeState,
+  AccumulativeFloatIssuanceSnapshot,
   SyntheticToken,
   UserSyntheticTokenBalance,
   LatestPrice,
@@ -179,26 +179,29 @@ export function getOrCreateLatestSystemState(
   return latestSystemState as SystemState;
 }
 
-export function getStakerStateId(
+export function getAccumulativeFloatIssuanceSnapshotId(
   marketIndexId: string,
   stateIndex: BigInt
 ): string {
   return marketIndexId + "-" + stateIndex.toString();
 }
 
-export function getOrCreateStakerState(
+export function getOrCreateAccumulativeFloatIssuanceSnapshot(
   syntheticMarket: SyntheticMarket,
   stateIndex: BigInt,
   event: ethereum.Event
-): StakeState {
+): AccumulativeFloatIssuanceSnapshot {
   let marketIndexId = syntheticMarket.id;
-  let stateId = getStakerStateId(marketIndexId, stateIndex);
-  let state = StakeState.load(stateId);
+  let stateId = getAccumulativeFloatIssuanceSnapshotId(
+    marketIndexId,
+    stateIndex
+  );
+  let state = AccumulativeFloatIssuanceSnapshot.load(stateId);
   if (state == null) {
-    state = new StakeState(stateId);
+    state = new AccumulativeFloatIssuanceSnapshot(stateId);
     state.blockNumber = event.block.number;
     state.creationTxHash = event.transaction.hash;
-    state.stateIndex = ZERO;
+    state.index = ZERO;
     state.longToken = syntheticMarket.syntheticLong;
     state.shortToken = syntheticMarket.syntheticLong;
     state.timestamp = event.block.timestamp;
@@ -208,11 +211,27 @@ export function getOrCreateStakerState(
     state.floatRatePerTokenOverIntervalLong = ZERO;
     state.timeSinceLastUpdate = ZERO;
     // update latest staker state for market
-    syntheticMarket.latestStakerState = state.id;
+    syntheticMarket.latestAccumulativeFloatIssuanceSnapshot = state.id;
     syntheticMarket.save();
   }
 
-  return state as StakeState;
+  return state as AccumulativeFloatIssuanceSnapshot;
+}
+
+export function getLatestAccumulativeFloatIssuanceSnapshot(
+  syntheticMarket: SyntheticMarket
+): AccumulativeFloatIssuanceSnapshot {
+  let latestAccumulativeFloatIssuanceSnapshot = AccumulativeFloatIssuanceSnapshot.load(
+    syntheticMarket.latestAccumulativeFloatIssuanceSnapshot
+  );
+  if (latestAccumulativeFloatIssuanceSnapshot == null) {
+    log.critical(
+      "Error AccumulativeFloatIssuanceSnapshot is undefined with id {}. It should be defined since it is marked as the latest snapshot in the market",
+      []
+    );
+  }
+
+  return latestAccumulativeFloatIssuanceSnapshot as AccumulativeFloatIssuanceSnapshot;
 }
 
 export function getOrCreateGlobalState(): GlobalState {
