@@ -20,6 +20,7 @@ let make = (~children) => {
         </div>
       </div>
     </div>
+    <BridgeToPolygon />
     <Lost />
   </div>
 }
