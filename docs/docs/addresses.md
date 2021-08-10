@@ -18,7 +18,6 @@ NOTE: these testnet addresses are frequently changing during development 👷‍
 ### Contracts
 
 ```javascript
-// Deployer: "0x97D247303960fC0FCA4fD703f3dAaf0ADdA07598",
   "contracts": {
     "FloatCapital_v0": "0x263Fd5519885E4bf1c2c444d20F42b8DeF535F15",
     "FloatToken": "0x51b38ce62d076BFdEfF7EA310d3B86Cb52015b8C",
