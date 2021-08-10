@@ -273,10 +273,10 @@ contract StakerInternalStateSetters is Staker {
       user
     ] = _userNextPrice_stakedSyntheticTokenShiftIndex;
     syntheticTokens[marketIndex][true] = _syntheticTokens;
-    userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_long[marketIndex][
+    userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[marketIndex][true][
       user
     ] = _userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_long;
-    userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_short[marketIndex][
+    userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[marketIndex][false][
       user
     ] = _userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_short;
   }
