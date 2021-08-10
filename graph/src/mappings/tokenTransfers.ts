@@ -1,7 +1,7 @@
 import {
   Approval,
   Transfer as TransferEvent,
-} from "../generated/templates/erc20/erc20";
+} from "../../generated/templates/erc20/erc20";
 import {
   PaymentToken,
   PaymentTokenTransfer,
@@ -12,7 +12,7 @@ import {
   TokenApproval,
   UserPaymentTokenApproval,
   LongShortContract,
-} from "../generated/schema";
+} from "../../generated/schema";
 import {
   log,
   dataSource,
@@ -21,14 +21,14 @@ import {
   Address,
   Bytes,
 } from "@graphprotocol/graph-ts";
-import { saveEventToStateChange } from "./utils/txEventHelpers";
+import { saveEventToStateChange } from "../utils/txEventHelpers";
 import {
   updateBalanceTransfer,
   updateBalanceFloatTransfer,
   updateCollatoralBalanceTransfer,
-} from "./utils/helperFunctions";
-import { GLOBAL_STATE_ID, ONE, ZERO, ZERO_ADDRESS } from "./CONSTANTS";
-import { getOrCreateUser } from "./utils/globalStateManager";
+} from "../utils/helperFunctions";
+import { GLOBAL_STATE_ID, ONE, ZERO, ZERO_ADDRESS } from "../CONSTANTS";
+import { getOrCreateUser } from "../utils/globalStateManager";
 
 function saveTransferToStateChange(
   event: TransferEvent,

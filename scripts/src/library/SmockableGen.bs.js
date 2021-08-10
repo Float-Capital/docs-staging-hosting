@@ -157,29 +157,38 @@ function rescriptReturnAnnotation(params, context) {
 
 function getMockToReturnInternal(fn) {
   var params = getRescriptParamsForReturn(fn.returnValues);
-  return "\n  let mock" + uppercaseFirstLetter(fn.name) + "ToReturn: " + rescriptReturnAnnotation(fn.returnValues, /* Internal */1) + " = (" + params + ") => {\n    checkForExceptions(~functionName=\"" + fn.name + "\")\n    let _ = internalRef.contents->Option.map(_r => {\n\n      " + (
-          fn.returnValues.length !== 0 ? "let _ = %raw(\n        \"_r.smocked." + fn.name + "Mock.will.return.with([" + params + "])\"\n        )" : "let _ = %raw(\n        \"_r.smocked." + fn.name + "Mock.will.return()\"\n        )"
-        ) + "\n    })\n  }\n  ";
+  if (fn.returnValues.length !== 0) {
+    return "\n  @send @scope((\"smocked\", \"" + fn.name + "Mock\", \"will\", \"return\"))\n  external " + fn.name + "MockReturnRaw: (t, (" + basicReturn(fn.returnValues) + ")) => unit = \"with\"\n\n  let mock" + uppercaseFirstLetter(fn.name) + "ToReturn: " + rescriptReturnAnnotation(fn.returnValues, /* Internal */1) + " = (" + params + ") => {\n    checkForExceptions(~functionName=\"" + fn.name + "\")\n    let _ = internalRef.contents->Option.map(smockedContract => smockedContract->" + fn.name + "MockReturnRaw((" + params + ")))\n  }\n  ";
+  } else {
+    return "";
+  }
+}
+
+function getMockToRevertInternal(fn) {
+  return "\n  @send @scope((\"smocked\", \"" + fn.name + "Mock\", \"will\", \"revert\"))\n  external " + fn.name + "MockRevertRaw: (t, ~errorString: string) => unit = \"with\"\n\n  @send @scope((\"smocked\", \"" + fn.name + "Mock\", \"will\"))\n  external " + fn.name + "MockRevertNoReasonRaw: t => unit = \"revert\"\n\n  let mock" + uppercaseFirstLetter(fn.name) + "ToRevert = (~errorString) => {\n    checkForExceptions(~functionName=\"" + fn.name + "\")\n    let _ = internalRef.contents->Option.map(" + fn.name + "MockRevertRaw(~errorString))\n  }\n  let mock" + uppercaseFirstLetter(fn.name) + "ToRevertNoReason = () => {\n    checkForExceptions(~functionName=\"" + fn.name + "\")\n    let _ = internalRef.contents->Option.map(" + fn.name + "MockRevertNoReasonRaw)\n  }\n  ";
 }
 
 function getMockToReturnExternal(fn) {
-  var params = getRescriptParamsForReturn(fn.returnValues);
-  return "\n  let mock" + uppercaseFirstLetter(fn.name) + "ToReturn: " + rescriptReturnAnnotation(fn.returnValues, /* External */0) + " = (_r " + (
-          fn.returnValues.length !== 0 ? ", " + params + ")" : ")"
-        ) + " => {\n\n      " + (
-          fn.returnValues.length !== 0 ? "      let _ = %raw(\n        \"_r.smocked." + fn.name + ".will.return.with([" + params + "])\"\n        )" : "let _ = %raw(\n        \"_r.smocked." + fn.name + ".will.return()\"\n        )"
-        ) + "\n  }\n  ";
+  if (fn.returnValues.length !== 0) {
+    return " \n      @send @scope((\"smocked\", \"" + fn.name + "\", \"will\", \"return\"))\n      external mock" + uppercaseFirstLetter(fn.name) + "ToReturn: (t, (" + basicReturn(fn.returnValues) + ")) => unit = \"with\"\n    ";
+  } else {
+    return "";
+  }
+}
+
+function getMockToRevertExternal(fn) {
+  return "\n      @send @scope((\"smocked\", \"" + fn.name + "\", \"will\", \"revert\"))\n      external mock" + uppercaseFirstLetter(fn.name) + "ToRevert: (t, ~errorString: string) => unit = \"with\"\n\n      @send @scope((\"smocked\", \"" + fn.name + "\", \"will\"))\n      external mock" + uppercaseFirstLetter(fn.name) + "ToRevertNoReason: t => unit = \"revert\"\n  ";
 }
 
 function internalModule(functionsAndModifiers, contractName) {
   return "module InternalMock = {\n  let mockContractName = \"" + contractName + "ForInternalMocking\"\n  type t = {address: Ethers.ethAddress}\n\n  let internalRef: ref<option<t>> = ref(None)\n\n  let functionToNotMock: ref<string> = ref(\"\")\n\n  @module(\"@eth-optimism/smock\") external smock: 'a => Js.Promise.t<t> = \"smockit\"\n\n  let setup: " + contractName + ".t => JsPromise.t<ContractHelpers.transaction> = contract => {\n    ContractHelpers.deployContract0(mockContractName)\n    ->JsPromise.then(a => {\n      smock(a)\n    })\n    ->JsPromise.then(b => {\n      internalRef := Some(b)\n      contract->" + contractName + ".Exposed.setMocker(~mocker=(b->Obj.magic).address)\n    })\n  }\n\n  let setFunctionForUnitTesting = (contract, ~functionName) => {\n    functionToNotMock := functionName\n    contract->" + contractName + ".Exposed.setFunctionToNotMock(~functionToNotMock=functionName)\n  }\n\n  let setupFunctionForUnitTesting = (contract, ~functionName) => {\n    ContractHelpers.deployContract0(mockContractName)\n    ->JsPromise.then(a => {\n      smock(a)\n    })\n    ->JsPromise.then(b => {\n      internalRef := Some(b)\n      [\n        contract->" + contractName + ".Exposed.setMocker(~mocker=(b->Obj.magic).address),\n        contract->" + contractName + ".Exposed.setFunctionToNotMock(~functionToNotMock=functionName),\n      ]->JsPromise.all\n    })\n  }\n\n  exception MockingAFunctionThatYouShouldntBe\n\n  exception HaventSetupInternalMockingFor" + contractName + "\n\n  let checkForExceptions = (~functionName) => {\n    if functionToNotMock.contents == functionName {\n      raise(MockingAFunctionThatYouShouldntBe)\n    }\n    if internalRef.contents == None {\n      raise(HaventSetupInternalMockingFor" + contractName + ")\n    }\n  }\n\n  " + Globals.reduceStrArr(Belt_Array.map(functionsAndModifiers, (function (f) {
-                    return getMockToReturnInternal(f) + "\n" + paramTypeForCalls(f) + "\n" + getCallsInternal(f);
+                    return getMockToReturnInternal(f) + "\n" + paramTypeForCalls(f) + "\n" + getCallsInternal(f) + "\n" + getMockToRevertInternal(f);
                   }))) + "\n  }\n  ";
 }
 
 function externalModule(functions, contractName) {
   return "type t = {address: Ethers.ethAddress}\n\n@module(\"@eth-optimism/smock\") external make: " + contractName + ".t => Js.Promise.t<t> = \"smockit\"\n\nlet uninitializedValue: t = None->Obj.magic\n\n  " + Globals.reduceStrArr(Belt_Array.map(functions, (function (f) {
-                    return getMockToReturnExternal(f) + "\n" + paramTypeForCalls(f) + "\n" + getCallsExternal(f);
+                    return getMockToReturnExternal(f) + "\n" + paramTypeForCalls(f) + "\n" + getCallsExternal(f) + "\n" + getMockToRevertExternal(f);
                   }))) + "\n";
 }
 
@@ -224,7 +233,9 @@ exports.getRescriptParamsForReturn = getRescriptParamsForReturn;
 exports.basicReturn = basicReturn;
 exports.rescriptReturnAnnotation = rescriptReturnAnnotation;
 exports.getMockToReturnInternal = getMockToReturnInternal;
+exports.getMockToRevertInternal = getMockToRevertInternal;
 exports.getMockToReturnExternal = getMockToReturnExternal;
+exports.getMockToRevertExternal = getMockToRevertExternal;
 exports.internalModule = internalModule;
 exports.externalModule = externalModule;
 exports.entireModule = entireModule;

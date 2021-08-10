@@ -63,3 +63,9 @@ let oneYearInSecondsMulTenToThe18 =
 type displayToken = {name: string, iconUrl: string}
 
 let daiDisplayToken: displayToken = {name: "DAI", iconUrl: "/icons/dai.svg"}
+let polygonDisplayToken: displayToken = {name: "Polygon", iconUrl: "/icons/polygon.png"}
+
+/* Chains */
+type chainData = {name: string, chainId: int}
+let mumbai: chainData = {name: "mumbai", chainId: 80001}
+let polygon: chainData = {name: "polygon", chainId: 137}

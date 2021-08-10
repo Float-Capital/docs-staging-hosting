@@ -76,3 +76,8 @@ typings/
 .bsb.lock
 
 /abis-copy
+
+matchstick
+
+src/**/generated/*
+src/**/generate/.keep

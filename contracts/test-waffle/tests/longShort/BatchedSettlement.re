@@ -30,11 +30,8 @@ let testUnit =
             ~functionName="_batchConfirmOutstandingPendingActions",
           );
 
-        LongShortSmocked.InternalMock.mock_handleTotalPaymentTokenValueChangeForMarketWithYieldManagerToReturn();
-        LongShortSmocked.InternalMock.mock_handleChangeInSyntheticTokensTotalSupplyToReturn();
-
         let%AwaitThen _ =
-          longShort->LongShort.Exposed.setPerformOustandingBatchedSettlementsGlobals(
+          longShort->LongShort.Exposed.setPerformOutstandingBatchedSettlementsGlobals(
             ~marketIndex,
             ~batched_amountPaymentToken_depositLong,
             ~batched_amountPaymentToken_depositShort,
@@ -72,7 +69,7 @@ let testUnit =
         let calculatedValueChangeForShort = ref(None->Obj.magic);
         let calculatedValueChangeInSynthSupplyLong = ref(None->Obj.magic);
         let calculatedValueChangeInSynthSupplyShort = ref(None->Obj.magic);
-        let returnOfPerformOustandingBatchedSettlements =
+        let returnOfPerformOutstandingBatchedSettlements =
           ref(None->Obj.magic);
 
         before_each(() => {
@@ -152,7 +149,7 @@ let testUnit =
             ->sub(batched_amountSyntheticToken_redeemShort)
             ->add(batchedAmountSyntheticTokenToShiftToShort.contents)
             ->sub(batchedAmountSyntheticTokenToShiftFromShort);
-          returnOfPerformOustandingBatchedSettlements := functionCallReturn;
+          returnOfPerformOutstandingBatchedSettlements := functionCallReturn;
         });
         it(
           "call handleChangeInSyntheticTokensTotalSupply with the correct parameters",
@@ -197,7 +194,7 @@ let testUnit =
         );
         it("should return the correct values", () => {
           Chai.recordEqualDeep(
-            returnOfPerformOustandingBatchedSettlements.contents,
+            returnOfPerformOutstandingBatchedSettlements.contents,
             {
               long_changeInMarketValue_inPaymentToken:
                 calculatedValueChangeForLong.contents,
@@ -268,7 +265,27 @@ let testUnit =
           ~batchedAmountSyntheticTokenToShiftFromLong=
             Helpers.randomTokenAmount(),
           ~batchedAmountSyntheticTokenToShiftFromShort=zeroBn,
-        )
+        );
+        it(
+          "should set batched_amountSyntheticToken_toShiftAwayFrom_marketSide long to zero",
+          () => {
+            let%Await _ =
+              contracts.contents.longShort
+              ->LongShort.Exposed._batchConfirmOutstandingPendingActionsExposed(
+                  ~marketIndex,
+                  ~syntheticTokenPrice_inPaymentTokens_long,
+                  ~syntheticTokenPrice_inPaymentTokens_short,
+                );
+
+            let%Await resultAfterCall =
+              contracts.contents.longShort
+              ->LongShort.batched_amountSyntheticToken_toShiftAwayFrom_marketSide(
+                  marketIndex,
+                  true,
+                );
+            Chai.bnEqual(resultAfterCall, zeroBn);
+          },
+        );
       });
       describe("there is 1 shift from short to long", () => {
         runTest(
@@ -279,10 +296,30 @@ let testUnit =
           ~batchedAmountSyntheticTokenToShiftFromLong=zeroBn,
           ~batchedAmountSyntheticTokenToShiftFromShort=
             Helpers.randomTokenAmount(),
-        )
+        );
+        it(
+          "should set batched_amountSyntheticToken_toShiftAwayFrom_marketSide short to zero",
+          () => {
+            let%Await _ =
+              contracts.contents.longShort
+              ->LongShort.Exposed._batchConfirmOutstandingPendingActionsExposed(
+                  ~marketIndex,
+                  ~syntheticTokenPrice_inPaymentTokens_long,
+                  ~syntheticTokenPrice_inPaymentTokens_short,
+                );
+
+            let%Await resultAfterCall =
+              contracts.contents.longShort
+              ->LongShort.batched_amountSyntheticToken_toShiftAwayFrom_marketSide(
+                  marketIndex,
+                  false,
+                );
+            Chai.bnEqual(resultAfterCall, zeroBn);
+          },
+        );
       });
       describe(
-        "there random deposits and withdrawals (we could be more specific with this test possibly?)",
+        "there are random deposits and withdrawals (we could be more specific with this test possibly?)",
         () => {
         runTest(
           ~batched_amountPaymentToken_depositLong=Helpers.randomTokenAmount(),
@@ -310,11 +347,6 @@ let testUnit =
 
         longSyntheticToken := smockedSynthLong;
         shortSyntheticToken := smockedSynthShort;
-
-        let _ = smockedSynthLong->SyntheticTokenSmocked.mockMintToReturn;
-        let _ = smockedSynthLong->SyntheticTokenSmocked.mockBurnToReturn;
-        let _ = smockedSynthShort->SyntheticTokenSmocked.mockMintToReturn;
-        let _ = smockedSynthShort->SyntheticTokenSmocked.mockBurnToReturn;
 
         longShort->LongShort.Exposed.setHandleChangeInSyntheticTokensTotalSupplyGlobals(
           ~marketIndex,
@@ -433,11 +465,6 @@ let testUnit =
           YieldManagerMockSmocked.make(yieldManager);
 
         yieldManagerRef := smockedYieldManager;
-
-        let _ =
-          smockedYieldManager->YieldManagerMockSmocked.mockDepositPaymentTokenToReturn;
-        let _ =
-          smockedYieldManager->YieldManagerMockSmocked.mockRemovePaymentTokenFromMarketToReturn;
 
         longShort->LongShort.Exposed.setHandleTotalValueChangeForMarketWithYieldManagerGlobals(
           ~marketIndex,

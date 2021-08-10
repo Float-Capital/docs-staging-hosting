@@ -27,7 +27,6 @@ let test =
           ~contracts,
           ~accounts,
         );
-      StakerSmocked.InternalMock.mock_mintAccumulatedFloatToReturn();
 
       let%AwaitThen _ =
         contracts^.staker
@@ -65,7 +64,7 @@ let test =
       );
 
       it("calls mintAccumulatedFloat with correct args", () => {
-        StakerSmocked.InternalMock._mintAccumulatedFloatCalls()
+        StakerSmocked.InternalMock._mintAccumulatedFloatAndExecuteOutstandingShiftsCalls()
         ->Array.getExn(0)
         ->Chai.recordEqualFlat({marketIndex, user})
       });
@@ -105,7 +104,7 @@ let test =
       );
 
       it("doesn't call mintAccumulatedFloat", () => {
-        StakerSmocked.InternalMock._mintAccumulatedFloatCalls()
+        StakerSmocked.InternalMock._mintAccumulatedFloatAndExecuteOutstandingShiftsCalls()
         ->Array.length
         ->Chai.intEqual(0)
       });
@@ -119,7 +118,7 @@ let test =
       );
 
       it("doesn't call mintAccumulatedFloat", () => {
-        StakerSmocked.InternalMock._mintAccumulatedFloatCalls()
+        StakerSmocked.InternalMock._mintAccumulatedFloatAndExecuteOutstandingShiftsCalls()
         ->Array.length
         ->Chai.intEqual(0)
       });

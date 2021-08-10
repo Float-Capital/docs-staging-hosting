@@ -91,6 +91,21 @@ var daiDisplayToken = {
   iconUrl: "/icons/dai.svg"
 };
 
+var polygonDisplayToken = {
+  name: "Polygon",
+  iconUrl: "/icons/polygon.png"
+};
+
+var mumbai = {
+  name: "mumbai",
+  chainId: 80001
+};
+
+var polygon = {
+  name: "polygon",
+  chainId: 137
+};
+
 exports.zeroAddressStr = zeroAddressStr;
 exports.zeroAddress = zeroAddress;
 exports.zeroBN = zeroBN;
@@ -130,4 +145,7 @@ exports.yieldGradientHardcode = yieldGradientHardcode;
 exports.floatCapitalPercentE18HardCode = floatCapitalPercentE18HardCode;
 exports.oneYearInSecondsMulTenToThe18 = oneYearInSecondsMulTenToThe18;
 exports.daiDisplayToken = daiDisplayToken;
+exports.polygonDisplayToken = polygonDisplayToken;
+exports.mumbai = mumbai;
+exports.polygon = polygon;
 /* zeroAddress Not a pure module */

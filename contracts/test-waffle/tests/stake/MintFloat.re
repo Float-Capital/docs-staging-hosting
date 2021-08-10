@@ -35,7 +35,6 @@ let test =
       let%AwaitThen floatTokenSmocked =
         FloatTokenSmocked.make(contracts^.floatToken);
 
-      floatTokenSmocked->FloatTokenSmocked.mockMintToReturn;
       floatTokenSmockedRef := floatTokenSmocked;
 
       let%AwaitThen _ =

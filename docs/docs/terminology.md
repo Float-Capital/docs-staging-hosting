@@ -106,10 +106,6 @@ Examples of Blockchain wallets we recommend using:
 - [**MetaMask**](https://metamask.io/)
 - [**Torus**](https://tor.us/)
 
-### Kovan testnet
-
-Kovan is an [EVM](/docs/terminology#evm-ethereum-virtual-machine) compatible blockchain that is used for developing. This allows the team to develop and test the platform in a safe environment. Kovan has a [faucet](https://faucet.kovan.network/) allowing users to experiment with Kovan Ether (KETH) on the Kovan testnet. This is not the ethereum Mainnet and it holds no market value but can be used to make transactions on the Kovan testnet. Follow the guide on the [Kovan testnet](/docs/testnet) to test interacting with the system.
-
 ### Polygon (formerly Matic) network
 
 An [EVM](/docs/terminology#evm-ethereum-virtual-machine) compatible blockchain powered by a proof of stake algorithm. [Polygon](https://polygon.technology/) is a growing blockchain with a large ecosystem of projects and is far more affordable on gas/transaction fees.

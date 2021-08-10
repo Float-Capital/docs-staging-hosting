@@ -181,44 +181,61 @@ let rescriptReturnAnnotation: (array<typedIdentifier>, ~context: context) => str
 
 let getMockToReturnInternal: functionDef => string = fn => {
   let params = fn.returnValues->getRescriptParamsForReturn
-  `
-  let mock${fn.name->uppercaseFirstLetter}ToReturn: ${fn.returnValues->rescriptReturnAnnotation(
-      ~context=Internal,
-    )} = (${params}) => {
-    checkForExceptions(~functionName="${fn.name}")
-    let _ = internalRef.contents->Option.map(_r => {
 
-      ${if fn.returnValues->Array.length > 0 {
-      `let _ = %raw(
-        "_r.smocked.${fn.name}Mock.will.return.with([${params}])"
-        )`
-    } else {
-      `let _ = %raw(
-        "_r.smocked.${fn.name}Mock.will.return()"
-        )`
-    }}
-    })
+  if fn.returnValues->Array.length > 0 {
+    `
+  @send @scope(("smocked", "${fn.name}Mock", "will", "return"))
+  external ${fn.name}MockReturnRaw: (t, (${fn.returnValues->basicReturn})) => unit = "with"
+
+  let mock${fn.name->uppercaseFirstLetter}ToReturn: ${fn.returnValues->rescriptReturnAnnotation(
+        ~context=Internal,
+      )} = (${params}) => {
+    checkForExceptions(~functionName="${fn.name}")
+    let _ = internalRef.contents->Option.map(smockedContract => smockedContract->${fn.name}MockReturnRaw((${params})))
+  }
+  `
+  } else {
+    ""
+  }
+}
+
+let getMockToRevertInternal: functionDef => string = fn => {
+  `
+  @send @scope(("smocked", "${fn.name}Mock", "will", "revert"))
+  external ${fn.name}MockRevertRaw: (t, ~errorString: string) => unit = "with"
+
+  @send @scope(("smocked", "${fn.name}Mock", "will"))
+  external ${fn.name}MockRevertNoReasonRaw: t => unit = "revert"
+
+  let mock${fn.name->uppercaseFirstLetter}ToRevert = (~errorString) => {
+    checkForExceptions(~functionName="${fn.name}")
+    let _ = internalRef.contents->Option.map(${fn.name}MockRevertRaw(~errorString))
+  }
+  let mock${fn.name->uppercaseFirstLetter}ToRevertNoReason = () => {
+    checkForExceptions(~functionName="${fn.name}")
+    let _ = internalRef.contents->Option.map(${fn.name}MockRevertNoReasonRaw)
   }
   `
 }
 
 let getMockToReturnExternal: functionDef => string = fn => {
-  let params = fn.returnValues->getRescriptParamsForReturn
-  `
-  let mock${fn.name->uppercaseFirstLetter}ToReturn: ${fn.returnValues->rescriptReturnAnnotation(
-      ~context=External,
-    )} = (_r ${fn.returnValues->Array.length > 0 ? `, ${params})` : `)`} => {
-
-      ${if fn.returnValues->Array.length > 0 {
-      `      let _ = %raw(
-        "_r.smocked.${fn.name}.will.return.with([${params}])"
-        )`
-    } else {
-      `let _ = %raw(
-        "_r.smocked.${fn.name}.will.return()"
-        )`
-    }}
+  if fn.returnValues->Array.length > 0 {
+    ` 
+      @send @scope(("smocked", "${fn.name}", "will", "return"))
+      external mock${fn.name->uppercaseFirstLetter}ToReturn: (t, (${fn.returnValues->basicReturn})) => unit = "with"
+    `
+  } else {
+    ""
   }
+}
+
+let getMockToRevertExternal: functionDef => string = fn => {
+  `
+      @send @scope(("smocked", "${fn.name}", "will", "revert"))
+      external mock${fn.name->uppercaseFirstLetter}ToRevert: (t, ~errorString: string) => unit = "with"
+
+      @send @scope(("smocked", "${fn.name}", "will"))
+      external mock${fn.name->uppercaseFirstLetter}ToRevertNoReason: t => unit = "revert"
   `
 }
 
@@ -278,7 +295,13 @@ let internalModule = (functionsAndModifiers, ~contractName) =>
 
   ${functionsAndModifiers
     ->Array.map(f => {
-      f->getMockToReturnInternal ++ "\n" ++ f->paramTypeForCalls ++ "\n" ++ f->getCallsInternal
+      f->getMockToReturnInternal ++
+      "\n" ++
+      f->paramTypeForCalls ++
+      "\n" ++
+      f->getCallsInternal ++
+      "\n" ++
+      f->getMockToRevertInternal
     })
     ->reduceStrArr}
   }
@@ -293,7 +316,13 @@ let uninitializedValue: t = None->Obj.magic
 
   ${functions
     ->Array.map(f => {
-      f->getMockToReturnExternal ++ "\n" ++ f->paramTypeForCalls ++ "\n" ++ f->getCallsExternal
+      f->getMockToReturnExternal ++
+      "\n" ++
+      f->paramTypeForCalls ++
+      "\n" ++
+      f->getCallsExternal ++
+      "\n" ++
+      f->getMockToRevertExternal
     })
     ->reduceStrArr}
 `

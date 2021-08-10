@@ -8,10 +8,21 @@ let testUnit =
       ~accounts as _: ref(array(Ethers.Wallet.t)),
     ) => {
   let marketIndex = Helpers.randomJsInteger();
-  let (longPrice, shortPrice, longValue, shortValue, timeDeltaGreaterThanZero) =
-    Helpers.Tuple.make5(Helpers.randomInteger);
+  let (
+    longPrice,
+    shortPrice,
+    longValue,
+    shortValue,
+    timeDeltaGreaterThanZero,
+    longAccum,
+    shortAccum,
+  ) =
+    Helpers.Tuple.make7(Helpers.randomInteger);
 
   describe("pushUpdatedMarketPricesToUpdateFloatIssuanceCalculations", () => {
+    let timestampRef: ref(Ethers.BigNumber.t) = ref(CONSTANTS.zeroBn);
+    let txReference = ref("NotSetYet"->Obj.magic);
+
     before_once'(() => {
       contracts.contents.staker
       ->StakerSmocked.InternalMock.setupFunctionForUnitTesting(
@@ -20,26 +31,28 @@ let testUnit =
         )
     });
 
-    let setup =
-        (
-          ~stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted,
-          ~timeDelta,
-          ~forceAccumulativeIssuancePerStakeStakedSynthSnapshotEvenIfExistingWithSameTimestamp,
-        ) => {
+    let setup = (~marketUpdateIndex, ~timeDelta) => {
+      let%Await {timestamp} = Helpers.getBlock();
+      timestampRef := (timestamp + 1)->Ethers.BigNumber.fromInt /* one second per bloc*/;
+
       StakerSmocked.InternalMock.mock_calculateTimeDeltaFromLastAccumulativeIssuancePerStakedSynthSnapshotToReturn(
         timeDelta,
       );
+      StakerSmocked.InternalMock.mock_calculateNewCumulativeIssuancePerStakedSynthToReturn(
+        longAccum,
+        shortAccum,
+      );
 
-      contracts.contents.staker
-      ->Staker.pushUpdatedMarketPricesToUpdateFloatIssuanceCalculations(
-          ~marketIndex,
-          ~longPrice,
-          ~shortPrice,
-          ~longValue,
-          ~shortValue,
-          ~stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted,
-          ~forceAccumulativeIssuancePerStakeStakedSynthSnapshotEvenIfExistingWithSameTimestamp,
-        );
+      txReference :=
+        contracts.contents.staker
+        ->Staker.pushUpdatedMarketPricesToUpdateFloatIssuanceCalculations(
+            ~marketIndex,
+            ~longPrice,
+            ~shortPrice,
+            ~longValue,
+            ~shortValue,
+            ~marketUpdateIndex,
+          );
     };
 
     describe("modifiers", () =>
@@ -48,13 +61,11 @@ let testUnit =
           contracts.contents.staker
           ->Staker.pushUpdatedMarketPricesToUpdateFloatIssuanceCalculations(
               ~marketIndex,
+              ~marketUpdateIndex=Helpers.randomInteger(),
               ~longPrice,
               ~shortPrice,
               ~longValue,
               ~shortValue,
-              ~stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted=zeroBn,
-              ~forceAccumulativeIssuancePerStakeStakedSynthSnapshotEvenIfExistingWithSameTimestamp=
-                true,
             );
 
         StakerSmocked.InternalMock.onlyLongShortModifierLogicCalls()
@@ -64,149 +75,89 @@ let testUnit =
     );
 
     describe("case timeDelta > 0", () => {
-      let stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted =
-        Helpers.randomTokenAmount();
+      let marketUpdateIndex = Helpers.randomTokenAmount();
 
       before_once'(() =>
-        setup(
-          ~timeDelta=timeDeltaGreaterThanZero,
-          ~stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted,
-          ~forceAccumulativeIssuancePerStakeStakedSynthSnapshotEvenIfExistingWithSameTimestamp=
-            true,
-        )
+        setup(~timeDelta=timeDeltaGreaterThanZero, ~marketUpdateIndex)
       );
+    });
 
-      it("calls calculateTimeDelta with correct arguments", () => {
-        StakerSmocked.InternalMock._calculateTimeDeltaFromLastAccumulativeIssuancePerStakedSynthSnapshotCalls()
-        ->Chai.recordArrayDeepEqualFlat([|{marketIndex: marketIndex}|])
-      });
+    describe("case marketUpdateIndex > 0", () => {
+      let latestRewardIndex = Helpers.randomInteger();
+      let marketUpdateIndex = Helpers.randomInteger();
+      let pushUpdatedMarketPricesToUpdateFloatIssuanceCalculationsTxPromise =
+        ref("Not set yet"->Obj.magic);
 
-      it(
-        "calls setCurrentAccumulativeIssuancePerStakeStakedSynthSnapshot with correct arguments",
-        () => {
-        StakerSmocked.InternalMock._setCurrentAccumulativeIssuancePerStakeStakedSynthSnapshotCalls()
-        ->Chai.recordArrayDeepEqualFlat([|
-            {marketIndex, longPrice, shortPrice, longValue, shortValue},
-          |])
+      before_once'(() => {
+        let%Await _ =
+          contracts.contents.staker
+          ->Staker.Exposed.setLatestRewardIndexGlobals(
+              ~marketIndex,
+              ~latestRewardIndex,
+            );
+
+        pushUpdatedMarketPricesToUpdateFloatIssuanceCalculationsTxPromise :=
+          setup(~timeDelta=timeDeltaGreaterThanZero, ~marketUpdateIndex);
+
+        pushUpdatedMarketPricesToUpdateFloatIssuanceCalculationsTxPromise.
+          contents;
       });
     });
 
-    describe(
-      "case stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted > 0",
-      () => {
-        let batched_stakerNextTokenShiftIndex = Helpers.randomInteger();
-        let latestRewardIndex = Helpers.randomInteger();
-        let stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted =
-          Helpers.randomInteger();
-        let pushUpdatedMarketPricesToUpdateFloatIssuanceCalculationsTxPromise =
-          ref("Not set yet"->Obj.magic);
+    describe("", () => {
+      let marketUpdateIndex = Helpers.randomTokenAmount();
 
-        before_once'(() => {
-          let%Await _ =
-            contracts.contents.staker
-            ->Staker.Exposed.setAddNewStateForFloatRewardsGlobals(
-                ~marketIndex,
-                ~batched_stakerNextTokenShiftIndex,
-                ~latestRewardIndex,
-              );
+      before_once'(() =>
+        setup(~timeDelta=timeDeltaGreaterThanZero, ~marketUpdateIndex)
+      );
 
-          pushUpdatedMarketPricesToUpdateFloatIssuanceCalculationsTxPromise :=
-            setup(
-              ~timeDelta=timeDeltaGreaterThanZero,
-              ~stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted,
-              ~forceAccumulativeIssuancePerStakeStakedSynthSnapshotEvenIfExistingWithSameTimestamp=
-                true,
+      it(
+        "calls calculateNewCumulativeIssuancePerStakedSynth with correct arguments",
+        () => {
+        let%Await _ = txReference.contents;
+        StakerSmocked.InternalMock._calculateNewCumulativeIssuancePerStakedSynthCalls()
+        ->Chai.recordArrayDeepEqualFlat([|
+            {
+              marketIndex,
+              previousMarketUpdateIndex: marketUpdateIndex->sub(oneBn),
+              longPrice,
+              shortPrice,
+              longValue,
+              shortValue,
+            },
+          |]);
+      });
+      it("sets the latestRewardIndex correctly", () => {
+        let%Await latestRewardIndex =
+          contracts.contents.staker->Staker.latestRewardIndex(marketIndex);
+        latestRewardIndex->Chai.bnEqual(marketUpdateIndex);
+      });
+      it("mutates accumulativeFloatPerSyntheticTokenSnapshots", () => {
+        let%Await rewardParams =
+          contracts^.staker
+          ->Staker.accumulativeFloatPerSyntheticTokenSnapshots(
+              marketIndex,
+              marketUpdateIndex,
             );
-
-          pushUpdatedMarketPricesToUpdateFloatIssuanceCalculationsTxPromise.
-            contents;
+        rewardParams->Chai.recordEqualFlat({
+          timestamp: timestampRef.contents,
+          accumulativeFloatPerSyntheticToken_long: longAccum,
+          accumulativeFloatPerSyntheticToken_short: shortAccum,
         });
-
-        it(
-          "updates takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping to the 'stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted' value recieved from long short",
-          () => {
-            let%Await takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping =
-              contracts.contents.staker
-              ->Staker.stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping(
-                  batched_stakerNextTokenShiftIndex,
-                );
-            Chai.bnEqual(
-              takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping,
-              stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted,
-            );
-          },
-        );
-
-        it(
-          "increments the stakerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping",
-          () => {
-            let%Await stakerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping =
-              contracts.contents.staker
-              ->Staker.stakerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping(
-                  batched_stakerNextTokenShiftIndex,
-                );
-            Chai.bnEqual(
-              stakerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping,
-              latestRewardIndex->add(oneBn),
-            );
-          },
-        );
-
-        it("increments the batched_stakerNextTokenShiftIndex", () => {
-          let%Await updatedNextTokenShiftIndex =
-            contracts.contents.staker
-            ->Staker.batched_stakerNextTokenShiftIndex(marketIndex);
-          Chai.bnEqual(
-            updatedNextTokenShiftIndex,
-            batched_stakerNextTokenShiftIndex->add(oneBn),
-          );
-        });
-
-        it("emits the SyntheticTokensShifted event", () => {
-          Chai.callEmitEvents(
-            ~call=
-              pushUpdatedMarketPricesToUpdateFloatIssuanceCalculationsTxPromise.
-                contents,
-            ~contract=contracts.contents.staker->Obj.magic,
-            ~eventName="SyntheticTokensShifted",
+      });
+      it("emits AccumulativeIssuancePerStakedSynthSnapshotCreated event", () => {
+        Chai.callEmitEvents(
+          ~call=txReference.contents,
+          ~contract=contracts.contents.staker->Obj.magic,
+          ~eventName="AccumulativeIssuancePerStakedSynthSnapshotCreated",
+        )
+        ->Chai.withArgs4(
+            marketIndex,
+            marketUpdateIndex,
+            longAccum,
+            shortAccum,
           )
-          ->Chai.withArgs0
-        });
-      },
-    );
-
-    describe("case timeDelta == 0", () => {
-      it(
-        "doesn't call setCurrentAccumulativeIssuancePerStakeStakedSynthSnapshot if there isn't a forced update",
-        () => {
-          let%Await _ =
-            setup(
-              ~timeDelta=CONSTANTS.zeroBn,
-              ~stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted=zeroBn,
-              ~forceAccumulativeIssuancePerStakeStakedSynthSnapshotEvenIfExistingWithSameTimestamp=
-                false,
-            );
-          StakerSmocked.InternalMock._setCurrentAccumulativeIssuancePerStakeStakedSynthSnapshotCalls()
-          ->Chai.recordArrayDeepEqualFlat([||]);
-        },
-      );
-
-      it(
-        "still calls setCurrentAccumulativeIssuancePerStakeStakedSynthSnapshot if there IS a forced update",
-        () => {
-          let%Await _ =
-            setup(
-              ~timeDelta=CONSTANTS.zeroBn,
-              ~stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted=zeroBn,
-              ~forceAccumulativeIssuancePerStakeStakedSynthSnapshotEvenIfExistingWithSameTimestamp=
-                true,
-            );
-          StakerSmocked.InternalMock._setCurrentAccumulativeIssuancePerStakeStakedSynthSnapshotCalls()
-          ->Chai.recordArrayDeepEqualFlat([|
-              {marketIndex, longPrice, shortPrice, longValue, shortValue},
-            |]);
-        },
-      );
+      });
     });
   });
 };

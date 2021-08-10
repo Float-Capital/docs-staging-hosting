@@ -1,16 +1,16 @@
 import {
   SyntheticMarketCreated,
   OracleUpdated,
-} from "../generated-price-history/LongShort/LongShort";
-import { OracleManager } from "../generated-price-history/templates/OracleManager/OracleManager";
+} from "../../generated-price-history/LongShort/LongShort";
+import { OracleManager } from "../../generated-price-history/templates/OracleManager/OracleManager";
 import {
   Global,
   Oracle,
   PriceInterval,
   PriceIntervalManager,
-} from "../generated-price-history/schema";
+} from "../../generated-price-history/schema";
 import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
-import { ONE, PRICE_HISTORY_INTERVALS } from "./CONSTANTS";
+import { ONE, PRICE_HISTORY_INTERVALS } from "../CONSTANTS";
 
 export function getOrCreateGlobalState(): Global {
   let globalState = Global.load("GLOBAL");

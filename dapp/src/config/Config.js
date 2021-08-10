@@ -30,6 +30,8 @@ var blockExplorerName = config.blockExplorerName;
 
 var discordInviteLink = config.discordInviteLink;
 
+var polygonBridgeLink = config.polygonBridgeLink;
+
 var web3PollingInterval = config.web3PollingInterval;
 
 var apolloConnectToDevTools = config.apolloConnectToDevTools;
@@ -55,6 +57,7 @@ exports.paymentTokenName = paymentTokenName;
 exports.blockExplorer = blockExplorer;
 exports.blockExplorerName = blockExplorerName;
 exports.discordInviteLink = discordInviteLink;
+exports.polygonBridgeLink = polygonBridgeLink;
 exports.web3PollingInterval = web3PollingInterval;
 exports.apolloConnectToDevTools = apolloConnectToDevTools;
 exports.longShort = longShort;
