@@ -167,11 +167,11 @@ contract YieldManagerAave is IYieldManager {
       address(this)
     );
 
-    address[] memory rewardsDepositedAssets = new address[](1);
-    rewardsDepositedAssets[0] = address(paymentToken);
+    address[] memory rewardsAccrualAssets = new address[](1);
+    rewardsAccrualAssets[0] = address(aToken);
 
     IAaveIncentivesController(aaveIncentivesController).claimRewards(
-      rewardsDepositedAssets,
+      rewardsAccrualAssets,
       amount,
       treasury
     );
