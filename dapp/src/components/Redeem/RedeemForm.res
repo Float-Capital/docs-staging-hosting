@@ -19,8 +19,11 @@ module ApproxDollarReturns = {
         ? tokenPrice->Ethers.BigNumber.fromUnsafe
         : CONSTANTS.zeroBN
     let valueBN =
-      numberStrRegex->Js.Re.test_(value) ? value->Ethers.BigNumber.fromUnsafe : CONSTANTS.zeroBN
-    let dollarValue = valueBN->Ethers.BigNumber.mul(tokenPriceBN)
+      numberStrRegex->Js.Re.test_(value)
+        ? Ethers.Utils.parseEtherUnsafe(~amount=value)
+        : CONSTANTS.zeroBN
+    let dollarValue =
+      valueBN->Ethers.BigNumber.mul(tokenPriceBN)->Ethers.BigNumber.div(CONSTANTS.tenToThe18)
 
     <>
       {numberStrRegex->Js.Re.test_(value)

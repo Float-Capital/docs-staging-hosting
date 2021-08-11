@@ -413,8 +413,8 @@ function RedeemForm$ApproxDollarReturns(Props) {
   var value = Props.value;
   var numberStrRegex = /^[+]?\d+(\.\d+)?$/;
   var tokenPriceBN = numberStrRegex.test(tokenPrice) ? Ethers$1.BigNumber.from(tokenPrice) : CONSTANTS.zeroBN;
-  var valueBN = numberStrRegex.test(value) ? Ethers$1.BigNumber.from(value) : CONSTANTS.zeroBN;
-  var dollarValue = valueBN.mul(tokenPriceBN);
+  var valueBN = numberStrRegex.test(value) ? Ethers.Utils.parseEtherUnsafe(value) : CONSTANTS.zeroBN;
+  var dollarValue = valueBN.mul(tokenPriceBN).div(CONSTANTS.tenToThe18);
   return React.createElement(React.Fragment, undefined, numberStrRegex.test(value) ? React.createElement("div", {
                     className: "flex flex-row items-center justify-end mb-2 w-full text-right"
                   }, React.createElement("span", {
