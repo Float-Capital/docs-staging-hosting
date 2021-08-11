@@ -65,7 +65,7 @@ module.exports = {
     mumbai: {
       chainId: 80001,
       //url: "https://rpc-mumbai.maticvigil.com/v1",
-      url: mumbaiAlchemyUrl,
+      url: mumbaiAlchemyUrl || "https://rpc-mumbai.maticvigil.com/v1",
       // accounts: { mnemonic },
     },
   },

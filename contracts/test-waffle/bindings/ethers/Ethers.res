@@ -92,6 +92,15 @@ module Wallet = {
   type rawSignature
   @send
   external signMessage: (t, string) => JsPromise.t<rawSignature> = "signMessage"
+
+  @send external getBalance: t => JsPromise.t<BigNumber.t> = "getBalance"
+
+  type sendParams = {
+    to_: ethAddress,
+    value: BigNumber.t,
+  }
+  @send
+  external sendTransaction: (t, sendParams) => JsPromise.t<txResult> = "sendTransaction"
 }
 
 @val @scope("ethers")

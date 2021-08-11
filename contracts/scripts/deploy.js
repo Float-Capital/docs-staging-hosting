@@ -1,4 +1,5 @@
-const { deployProxy } = require("@openzeppelin/truffle-upgrades");
+const { runTestTransactions } = require("./RunTestTransactions");
+
 const STAKER = "Staker";
 const COLLATERAL_TOKEN = "Dai";
 const TREASURY = "Treasury_v0";
@@ -27,11 +28,12 @@ async function main() {
     return;
   }
 
+  let paymentToken
   // We use actual bUSD for the BSC testnet instead of fake DAI.
   if (network.name != "mumbai") {
     console.log(network.name);
-    let Dai = await DAI.deploy("dai token", "DAI");
-    console.log("dai address", Dai.address);
+    paymentToken = await DAI.deploy("dai token", "DAI");
+    console.log("dai address", paymentToken.address);
   }
 
   console.log("Deploying contracts with the account:", deployer.address);
@@ -92,6 +94,10 @@ async function main() {
   console.log("staker address:", staker.address);
   console.log("longShort address:", longShort.address);
   console.log("tokenFactory address:", tokenFactory.address);
+
+  console.log("before test txs")
+  await runTestTransactions({ staker, longShort: longShort.connect(admin), paymentToken, treasury })
+  console.log("after test txs")
 }
 
 main()

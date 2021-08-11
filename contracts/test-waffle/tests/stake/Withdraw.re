@@ -115,7 +115,7 @@ let testUnit =
 
     describe("withdraw", () => {
       let token = Helpers.randomAddress();
-      let user = Helpers.randomAddress();
+      // let user = Helpers.randomAddress();
       let amountWithdrawn = Helpers.randomTokenAmount();
 
       before_once'(() => {
@@ -144,7 +144,7 @@ let testUnit =
       );
 
       it("should not allow shifts > userAmountStaked", () => {
-        let adminWallet = accounts.contents->Array.getUnsafe(0); 
+        let adminWallet = accounts.contents->Array.getUnsafe(0);
 
         let%Await _ =
           contracts.contents.staker
@@ -157,8 +157,10 @@ let testUnit =
               ~token,
               ~userNextPrice_stakedSyntheticTokenShiftIndex=bnFromInt(777),
               ~syntheticTokens=token,
-              ~userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_long=Helpers.randomTokenAmount(),
-              ~userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_short=Helpers.randomTokenAmount(),
+              ~userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_long=
+                Helpers.randomTokenAmount(),
+              ~userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_short=
+                Helpers.randomTokenAmount(),
             );
 
         Chai.expectRevert(
@@ -185,9 +187,11 @@ let testUnit =
               ~user=userWallet.contents.address,
               ~amountStaked,
               ~userNextPrice_stakedSyntheticTokenShiftIndex=bnFromInt(1),
-              ~syntheticTokens=Helpers.randomAddress(), 
-              ~userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_long=bnFromInt(0),
-              ~userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_short=bnFromInt(0),
+              ~syntheticTokens=Helpers.randomAddress(),
+              ~userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_long=
+                bnFromInt(0),
+              ~userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_short=
+                bnFromInt(0),
             );
 
         contracts.contents.staker
