@@ -883,12 +883,10 @@ contract LongShort is ILongShort, Initializable {
     updateSystemStateMarket(marketIndex)
     executeOutstandingNextPriceSettlements(msg.sender, marketIndex)
   {
-    require(
-      ISyntheticToken(syntheticTokens[marketIndex][isLong]).transferFrom(
-        msg.sender,
-        address(this),
-        tokens_redeem
-      )
+    ISyntheticToken(syntheticTokens[marketIndex][isLong]).transferFrom(
+      msg.sender,
+      address(this),
+      tokens_redeem
     );
 
     userNextPrice_syntheticToken_redeemAmount[marketIndex][isLong][msg.sender] += tokens_redeem;
@@ -1010,11 +1008,9 @@ contract LongShort is ILongShort, Initializable {
           userNextPrice_currentUpdateIndex[marketIndex][user]
         ]
       );
-      require(
-        ISyntheticToken(syntheticTokens[marketIndex][isLong]).transfer(
-          user,
-          amountSyntheticTokensToTransferToUser
-        )
+      ISyntheticToken(syntheticTokens[marketIndex][isLong]).transfer(
+        user,
+        amountSyntheticTokensToTransferToUser
       );
 
       emit ExecuteNextPriceMintSettlementUser(

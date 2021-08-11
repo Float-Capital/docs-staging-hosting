@@ -980,7 +980,7 @@ contract Staker is IStaker, Initializable {
     _mintAccumulatedFloatAndExecuteOutstandingShifts(marketIndex, msg.sender);
 
     address token = syntheticTokens[marketIndex][isWithdrawFromLong];
-    uint256 userAmountStakedBeforeWithdrawal = userAmountStaked[token][msg.sender];
+    userAmountStaked[token][msg.sender] -= amount;
 
     if (userNextPrice_stakedSyntheticTokenShiftIndex[marketIndex][msg.sender] > 0) {
       // If they still have outstanding shifts after minting float, then check
@@ -995,7 +995,6 @@ contract Staker is IStaker, Initializable {
       );
     }
 
-    userAmountStaked[token][msg.sender] = userAmountStakedBeforeWithdrawal - amount;
     _withdraw(marketIndex, token, amount);
   }
 
