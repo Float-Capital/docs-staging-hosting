@@ -10,9 +10,36 @@ module RedeemForm = %form(
   }
 )
 
+module ApproxDollarReturns = {
+  @react.component
+  let make = (~tokenPrice, ~value) => {
+    let numberStrRegex = %re(`/^[+]?\d+(\.\d+)?$/`)
+    let tokenPriceBN =
+      numberStrRegex->Js.Re.test_(tokenPrice)
+        ? tokenPrice->Ethers.BigNumber.fromUnsafe
+        : CONSTANTS.zeroBN
+    let valueBN =
+      numberStrRegex->Js.Re.test_(value) ? value->Ethers.BigNumber.fromUnsafe : CONSTANTS.zeroBN
+    let dollarValue = valueBN->Ethers.BigNumber.mul(tokenPriceBN)
+
+    <>
+      {numberStrRegex->Js.Re.test_(value)
+        ? <div className="flex flex-row items-center justify-end mb-2 w-full text-right">
+            <span className="text-xxs text-gray-500 pr-2"> {`approx`->React.string} </span>
+            <span className="text-sm text-gray-500"> {`~$`->React.string} </span>
+            <span className="text-sm text-gray-800">
+              {dollarValue->Misc.NumberFormat.formatEther->React.string}
+            </span>
+          </div>
+        : React.null}
+    </>
+  }
+}
+
 module RedeemFormInput = {
   @react.component
   let make = (
+    ~tokenPrice="",
     ~onSubmit=_ => (),
     ~value="",
     ~optBalance=None,
@@ -30,6 +57,7 @@ module RedeemFormInput = {
         ? <LongOrShortSelect isLong selectPosition={val => onChangeSide(val)} disabled />
         : React.null}
       <AmountInput value optBalance disabled onBlur onChange onMaxClick />
+      <ApproxDollarReturns tokenPrice value />
       {submitButton}
       {value == ""
         ? React.null
@@ -171,8 +199,13 @@ module ConnectedRedeemForm = {
       None
     }, [txState])
 
+    let tokenPrice = isLong
+      ? market.latestSystemState.longTokenPrice.price.price->Ethers.BigNumber.toString
+      : market.latestSystemState.shortTokenPrice.price.price->Ethers.BigNumber.toString
+
     hasTokens
       ? <RedeemFormInput
+          tokenPrice
           onSubmit=form.submit
           value={form.input.amount}
           optBalance={optTokenBalance}

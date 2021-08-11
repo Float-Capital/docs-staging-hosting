@@ -9,6 +9,8 @@ var zeroAddress = Ethers.utils.getAddress(zeroAddressStr);
 
 var zeroBN = Ethers.BigNumber.from(0);
 
+var oneBN = Ethers.BigNumber.from(1);
+
 var twoBN = Ethers.BigNumber.from(2);
 
 var eightBN = Ethers.BigNumber.from(8);
@@ -90,6 +92,7 @@ var daiDisplayToken = {
 exports.zeroAddressStr = zeroAddressStr;
 exports.zeroAddress = zeroAddress;
 exports.zeroBN = zeroBN;
+exports.oneBN = oneBN;
 exports.twoBN = twoBN;
 exports.eightBN = eightBN;
 exports.tenToThe5 = tenToThe5;

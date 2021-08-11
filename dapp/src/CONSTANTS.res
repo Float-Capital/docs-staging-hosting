@@ -2,6 +2,7 @@ let zeroAddressStr = "0x0000000000000000000000000000000000000000"
 let zeroAddress = Ethers.Utils.getAddressUnsafe(zeroAddressStr)
 
 let zeroBN = Ethers.BigNumber.fromInt(0)
+let oneBN = Ethers.BigNumber.fromInt(1)
 let twoBN = Ethers.BigNumber.fromInt(2)
 let eightBN = Ethers.BigNumber.fromInt(8)
 let tenToThe5 = Ethers.BigNumber.fromUnsafe("100000")

@@ -2,6 +2,7 @@
 'use strict';
 
 var Form = require("../Form.js");
+var Misc = require("../../libraries/Misc.js");
 var Next = require("../../bindings/Next.js");
 var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
@@ -407,7 +408,30 @@ var RedeemForm = {
   useForm: useForm
 };
 
+function RedeemForm$ApproxDollarReturns(Props) {
+  var tokenPrice = Props.tokenPrice;
+  var value = Props.value;
+  var numberStrRegex = /^[+]?\d+(\.\d+)?$/;
+  var tokenPriceBN = numberStrRegex.test(tokenPrice) ? Ethers$1.BigNumber.from(tokenPrice) : CONSTANTS.zeroBN;
+  var valueBN = numberStrRegex.test(value) ? Ethers$1.BigNumber.from(value) : CONSTANTS.zeroBN;
+  var dollarValue = valueBN.mul(tokenPriceBN);
+  return React.createElement(React.Fragment, undefined, numberStrRegex.test(value) ? React.createElement("div", {
+                    className: "flex flex-row items-center justify-end mb-2 w-full text-right"
+                  }, React.createElement("span", {
+                        className: "text-xxs text-gray-500 pr-2"
+                      }, "approx"), React.createElement("span", {
+                        className: "text-sm text-gray-500"
+                      }, "~$"), React.createElement("span", {
+                        className: "text-sm text-gray-800"
+                      }, Misc.NumberFormat.formatEther(undefined, dollarValue))) : null);
+}
+
+var ApproxDollarReturns = {
+  make: RedeemForm$ApproxDollarReturns
+};
+
 function RedeemForm$RedeemFormInput(Props) {
+  var tokenPriceOpt = Props.tokenPrice;
   var onSubmitOpt = Props.onSubmit;
   var valueOpt = Props.value;
   var optBalanceOpt = Props.optBalance;
@@ -419,6 +443,7 @@ function RedeemForm$RedeemFormInput(Props) {
   var isLongOpt = Props.isLong;
   var hasBothTokensOpt = Props.hasBothTokens;
   var submitButtonOpt = Props.submitButton;
+  var tokenPrice = tokenPriceOpt !== undefined ? tokenPriceOpt : "";
   var onSubmit = onSubmitOpt !== undefined ? onSubmitOpt : (function (param) {
         
       });
@@ -455,6 +480,9 @@ function RedeemForm$RedeemFormInput(Props) {
                   onBlur: onBlur,
                   onChange: onChange,
                   onMaxClick: onMaxClick
+                }), React.createElement(RedeemForm$ApproxDollarReturns, {
+                  tokenPrice: tokenPrice,
+                  value: value
                 }), submitButton, value === "" ? null : React.createElement("p", {
                     className: "text-xxs text-yellow-600 text-center mt-3"
                   }, "⚡ Redeeming your position requires a second withdraw transaction once the oracle price has updated ⚡"));
@@ -615,8 +643,10 @@ function RedeemForm$ConnectedRedeemForm(Props) {
           }
           
         }), [txState]);
+  var tokenPrice = isLong ? market.latestSystemState.longTokenPrice.price.price.toString() : market.latestSystemState.shortTokenPrice.price.price.toString();
   if (match[2]) {
     return React.createElement(RedeemForm$RedeemFormInput, {
+                tokenPrice: tokenPrice,
                 onSubmit: form.submit,
                 value: form.input.amount,
                 optBalance: optTokenBalance,
@@ -692,6 +722,7 @@ function RedeemForm$1(Props) {
 var make = RedeemForm$1;
 
 exports.RedeemForm = RedeemForm;
+exports.ApproxDollarReturns = ApproxDollarReturns;
 exports.RedeemFormInput = RedeemFormInput;
 exports.tokenRedeemPosition = tokenRedeemPosition;
 exports.isGreaterThanBalance = isGreaterThanBalance;
