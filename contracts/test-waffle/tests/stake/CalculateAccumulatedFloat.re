@@ -59,7 +59,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
           ~newUserAmountStakedShort,
         );
       let%Await floatDue =
-        staker->Staker.Exposed._calculateAccumulatedFloatExposedCall(
+        staker->Staker.Exposed._calculateAccumulatedFloatAndExecuteOutstandingShiftsExposedCall(
           ~marketIndex,
           ~user,
         );
@@ -109,7 +109,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
             ~newUserAmountStakedShort,
           );
         let%Await floatDue =
-          staker->Staker.Exposed._calculateAccumulatedFloatExposedCall(
+          staker->Staker.Exposed._calculateAccumulatedFloatAndExecuteOutstandingShiftsExposedCall(
             ~marketIndex,
             ~user,
           );
@@ -148,7 +148,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
           ~newUserAmountStakedShort=Ethers.BigNumber.fromInt(0),
         );
       let%Await floatDue =
-        staker->Staker.Exposed._calculateAccumulatedFloatExposedCall(
+        staker->Staker.Exposed._calculateAccumulatedFloatAndExecuteOutstandingShiftsExposedCall(
           ~marketIndex,
           ~user,
         );
@@ -167,16 +167,11 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
       let amountToShift = Helpers.randomTokenAmount();
       let userNextPrice_stakedSyntheticTokenShiftIndex =
         Helpers.randomInteger();
-      let takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping =
-        Helpers.randomInteger();
-      let batched_stakerNextTokenShiftIndex =
+      let latestRewardIndex =
         userNextPrice_stakedSyntheticTokenShiftIndex->add(oneBn);
-      let stakerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping =
-        usersLatestClaimedReward->add(Helpers.randomInteger());
       let newLatestRewardIndex =
-        stakerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping->add(
-          Helpers.randomInteger(),
-        );
+        latestRewardIndex->add(Helpers.randomInteger());
+
       let amountOfStakeShifted = Helpers.randomTokenAmount();
       let amountStakedBothSidesInitially =
         amountToShift->add(amountOfStakeShifted);
@@ -214,9 +209,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
             ~shiftAmountLong=isShiftFromLong ? amountToShift : zeroBn,
             ~shiftAmountShort=isShiftFromLong ? zeroBn : amountToShift,
             ~userNextPrice_stakedSyntheticTokenShiftIndex,
-            ~batched_stakerNextTokenShiftIndex,
-            ~takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping,
-            ~stakerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping,
+            ~latestRewardIndex,
           );
         let%AwaitThen longShortSmocked = longShort->LongShortSmocked.make;
         let%AwaitThen _ =
@@ -236,7 +229,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
               rewardAfterShiftInterval,
             |]);
 
-        staker->Staker.Exposed._calculateAccumulatedFloatExposedCall(
+        staker->Staker.Exposed._calculateAccumulatedFloatAndExecuteOutstandingShiftsExposedCall(
           ~marketIndex,
           ~user,
         );
@@ -274,7 +267,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
                 amountStakedLong: amountStakedBothSidesInitially,
                 amountStakedShort: amountStakedBothSidesInitially,
                 rewardIndexFrom: usersLatestClaimedReward,
-                rewardIndexTo: stakerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping,
+                rewardIndexTo: userNextPrice_stakedSyntheticTokenShiftIndex,
               },
               {
                 marketIndex,
@@ -282,8 +275,8 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
                   isShiftFromLong ? stakeDecreasedSide : stakeIncreasedSide,
                 amountStakedShort:
                   isShiftFromLong ? stakeIncreasedSide : stakeDecreasedSide,
-                rewardIndexFrom: stakerTokenShiftIndex_to_accumulativeFloatIssuanceSnapshotIndex_mapping,
-                rewardIndexTo: newLatestRewardIndex,
+                rewardIndexFrom: userNextPrice_stakedSyntheticTokenShiftIndex,
+                rewardIndexTo: latestRewardIndex,
               },
             |],
           );
@@ -304,7 +297,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
                   marketIndex,
                   amountSyntheticToken_redeemOnOriginSide: amountToShift,
                   isShiftFromLong,
-                  priceSnapshotIndex: takerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mapping,
+                  priceSnapshotIndex: userNextPrice_stakedSyntheticTokenShiftIndex,
                 },
               |],
             );
@@ -324,19 +317,18 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
             // the setup function only simulates the call, it doesn't execute it, execute it here.
             let%Await _ =
               contracts.contents.staker
-              ->Staker.Exposed._calculateAccumulatedFloatExposed(
+              ->Staker.Exposed._calculateAccumulatedFloatAndExecuteOutstandingShiftsExposed(
                   ~marketIndex,
                   ~user,
                 );
 
-            let getAmountToShiftFromSideUser =
-              isShiftFromLong
-                ? Staker.userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_long
-                : Staker.userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_short;
-
             let%Await amountToShiftForSideAfter =
               contracts.contents.staker
-              ->getAmountToShiftFromSideUser(marketIndex, user);
+              ->Staker.userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom(
+                  marketIndex,
+                  isShiftFromLong,
+                  user,
+                );
 
             Chai.bnEqual(amountToShiftForSideAfter, zeroBn);
           },
@@ -357,7 +349,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
         // the setup function only simulates the call, it doesn't execute it, execute it here.
         let%Await _ =
           contracts.contents.staker
-          ->Staker.Exposed._calculateAccumulatedFloatExposed(
+          ->Staker.Exposed._calculateAccumulatedFloatAndExecuteOutstandingShiftsExposed(
               ~marketIndex,
               ~user,
             );

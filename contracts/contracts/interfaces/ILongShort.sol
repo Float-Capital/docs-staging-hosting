@@ -17,6 +17,12 @@ abstract contract ILongShort {
     external
     virtual;
 
+  function shiftPositionNextPrice(
+    uint32 marketIndex,
+    uint256 amountSyntheticTokensToShift,
+    bool isShiftFromLong
+  ) public virtual;
+
   function shiftPositionFromLongNextPrice(uint32 marketIndex, uint256 amountSyntheticTokensToShift)
     external
     virtual;

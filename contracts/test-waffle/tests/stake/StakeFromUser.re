@@ -28,8 +28,6 @@ let test =
 
       let%Await longShortSmocked = longShort->LongShortSmocked.make;
 
-      let _ = longShortSmocked->LongShortSmocked.mockUpdateSystemStateToReturn;
-
       longShortSmockedRef := longShortSmocked;
 
       mockTokenWalletRef := (accounts^)->Array.getExn(6);
@@ -41,8 +39,6 @@ let test =
             ~token=mockTokenWalletRef^.address,
             ~marketIndexForToken,
           );
-
-      StakerSmocked.InternalMock.mock_stakeToReturn();
 
       contracts^.staker
       ->ContractHelpers.connect(~address=mockTokenWalletRef^)

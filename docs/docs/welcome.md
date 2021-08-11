@@ -29,7 +29,7 @@ Float is a novel protocol, creating an efficient synthetic asset marketplace, go
 
 ## Float Capital Vision ✊
 
-The vision of Float is to provide decentralized, trustless, and non-KYC gated exposure to various asset classes. Traditional financial markets are often complex, opaque and geographically separated, making it difficult for the average user to hold a diversified basket of assets. Further, traditional markets encompass layers of various services providers, all carrying subtle yet significant fees, tending to erode a large amount of the end-users investment returns.
+The vision of Float is to provide decentralize and trustless exposure to various asset classes. Traditional financial markets are often complex, opaque and geographically separated, making it difficult for the average user to hold a diversified basket of assets. Further, traditional markets encompass layers of various services providers, all carrying subtle yet significant fees, tending to erode a large amount of the end-users investment returns.
 
 Smart contracts allow for trustworthy and efficient coordination of a financial system where the user’s exposure to various assets can be built in a peer-to-peer marketplace.
 

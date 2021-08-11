@@ -30,7 +30,7 @@ let testUnit =
           ~amountSyntheticTokensToShiftBeforeValue,
           ~amountSyntheticTokensToShift,
           ~userNextPrice_stakedSyntheticTokenShiftIndex,
-          ~batched_stakerNextTokenShiftIndex,
+          ~latestRewardIndex,
           ~userAmountStaked,
         ) => {
       let user = accounts.contents->Array.getUnsafe(0).address;
@@ -43,7 +43,7 @@ let testUnit =
           ~user,
           ~amountSyntheticTokensToShift=amountSyntheticTokensToShiftBeforeValue,
           ~userNextPrice_stakedSyntheticTokenShiftIndex,
-          ~batched_stakerNextTokenShiftIndex,
+          ~latestRewardIndex,
           ~userAmountStaked,
           ~syntheticToken=syntheticTokenSmocked.address,
         );
@@ -72,12 +72,12 @@ let testUnit =
     });
 
     it(
-      "calls _mintAccumulatedFloat with the correct argumetns if the user has a 'confirmed' shift that needs to be settled",
+      "calls _mintAccumulatedFloatAndExecuteOutstandingShifts (via modifier) with the correct arguments if the user has a 'confirmed' shift that needs to be settled",
       () => {
         let user = accounts.contents->Array.getUnsafe(0).address;
         let userNextPrice_stakedSyntheticTokenShiftIndex =
           Helpers.randomInteger();
-        let batched_stakerNextTokenShiftIndex =
+        let latestRewardIndex =
           userNextPrice_stakedSyntheticTokenShiftIndex->add(
             Helpers.randomInteger(),
           );
@@ -87,13 +87,16 @@ let testUnit =
             ~isShiftFromLong,
             ~amountSyntheticTokensToShiftBeforeValue,
             ~userNextPrice_stakedSyntheticTokenShiftIndex,
-            ~batched_stakerNextTokenShiftIndex,
+            ~latestRewardIndex,
             ~amountSyntheticTokensToShift,
-            ~userAmountStaked=amountSyntheticTokensToShift,
+            ~userAmountStaked=
+              amountSyntheticTokensToShift->add(
+                amountSyntheticTokensToShiftBeforeValue,
+              ),
           );
 
         let mintAccumulatedFloatCalls =
-          StakerSmocked.InternalMock._mintAccumulatedFloatCalls();
+          StakerSmocked.InternalMock._updateUsersStakedPosition_mintAccumulatedFloatAndExecuteOutstandingShiftsCalls();
 
         mintAccumulatedFloatCalls->Chai.recordArrayDeepEqualFlat([|
           {marketIndex, user},
@@ -102,78 +105,87 @@ let testUnit =
     );
 
     it(
-      "doesn't call _mintAccumulatedFloat if userNextPrice_stakedSyntheticTokenShiftIndex == 0",
+      "doesn't call _mintAccumulatedFloatAndExecuteOutstandingShifts if userNextPrice_stakedSyntheticTokenShiftIndex == 0",
       () => {
-        let batched_stakerNextTokenShiftIndex = Helpers.randomInteger();
+        let latestRewardIndex = Helpers.randomInteger();
 
         let%Await _ =
           setup(
             ~isShiftFromLong,
             ~amountSyntheticTokensToShiftBeforeValue,
             ~userNextPrice_stakedSyntheticTokenShiftIndex=zeroBn,
-            ~batched_stakerNextTokenShiftIndex,
+            ~latestRewardIndex,
             ~amountSyntheticTokensToShift,
-            ~userAmountStaked=amountSyntheticTokensToShift,
+            ~userAmountStaked=
+              amountSyntheticTokensToShift->add(
+                amountSyntheticTokensToShiftBeforeValue,
+              ),
           );
 
         let mintAccumulatedFloatCalls =
-          StakerSmocked.InternalMock._mintAccumulatedFloatCalls();
+          StakerSmocked.InternalMock._mintAccumulatedFloatAndExecuteOutstandingShiftsCalls();
 
         mintAccumulatedFloatCalls->Chai.recordArrayDeepEqualFlat([||]);
       },
     );
     it(
-      "doesn't call _mintAccumulatedFloat if userNextPrice_stakedSyntheticTokenShiftIndex == batched_stakerNextTokenShiftIndex",
+      "doesn't call _mintAccumulatedFloatAndExecuteOutstandingShifts if userNextPrice_stakedSyntheticTokenShiftIndex == latestRewardIndex",
       () => {
         let userNextPrice_stakedSyntheticTokenShiftIndex =
           Helpers.randomInteger();
-        let batched_stakerNextTokenShiftIndex = userNextPrice_stakedSyntheticTokenShiftIndex;
+        let latestRewardIndex = userNextPrice_stakedSyntheticTokenShiftIndex;
 
         let%Await _ =
           setup(
             ~isShiftFromLong,
             ~amountSyntheticTokensToShiftBeforeValue,
             ~userNextPrice_stakedSyntheticTokenShiftIndex,
-            ~batched_stakerNextTokenShiftIndex,
+            ~latestRewardIndex,
             ~amountSyntheticTokensToShift,
-            ~userAmountStaked=amountSyntheticTokensToShift,
+            ~userAmountStaked=
+              amountSyntheticTokensToShift->add(
+                amountSyntheticTokensToShiftBeforeValue,
+              ),
           );
 
         let mintAccumulatedFloatCalls =
-          StakerSmocked.InternalMock._mintAccumulatedFloatCalls();
+          StakerSmocked.InternalMock._mintAccumulatedFloatAndExecuteOutstandingShiftsCalls();
 
         mintAccumulatedFloatCalls->Chai.recordArrayDeepEqualFlat([||]);
       },
     );
 
     it(
-      "doesn't call _mintAccumulatedFloat if userNextPrice_stakedSyntheticTokenShiftIndex > batched_stakerNextTokenShiftIndex",
+      "doesn't call _mintAccumulatedFloatAndExecuteOutstandingShifts if userNextPrice_stakedSyntheticTokenShiftIndex > latestRewardIndex",
       () => {
-        let batched_stakerNextTokenShiftIndex = Helpers.randomInteger();
+        let latestRewardIndex = Helpers.randomInteger();
         let userNextPrice_stakedSyntheticTokenShiftIndex =
-          batched_stakerNextTokenShiftIndex->add(Helpers.randomInteger());
+          latestRewardIndex->add(Helpers.randomInteger());
 
         let%Await _ =
           setup(
             ~isShiftFromLong,
             ~amountSyntheticTokensToShiftBeforeValue,
             ~userNextPrice_stakedSyntheticTokenShiftIndex,
-            ~batched_stakerNextTokenShiftIndex,
+            ~latestRewardIndex,
             ~amountSyntheticTokensToShift,
-            ~userAmountStaked=amountSyntheticTokensToShift,
+            ~userAmountStaked=
+              amountSyntheticTokensToShift->add(
+                amountSyntheticTokensToShiftBeforeValue,
+              ),
           );
 
         let mintAccumulatedFloatCalls =
-          StakerSmocked.InternalMock._mintAccumulatedFloatCalls();
+          StakerSmocked.InternalMock._mintAccumulatedFloatAndExecuteOutstandingShiftsCalls();
 
         mintAccumulatedFloatCalls->Chai.recordArrayDeepEqualFlat([||]);
       },
     );
 
     it(
-      "sets the userNextPrice_stakedSyntheticTokenShiftIndex for the user to the batched_stakerNextTokenShiftIndex value",
+      "sets the userNextPrice_stakedSyntheticTokenShiftIndex for the user to latestRewardIndex + 1",
       () => {
-        let batched_stakerNextTokenShiftIndex = Helpers.randomInteger();
+        let latestRewardIndex = Helpers.randomInteger();
         let user = accounts.contents->Array.getUnsafe(0).address;
 
         let%Await _ =
@@ -181,9 +193,12 @@ let testUnit =
             ~isShiftFromLong,
             ~amountSyntheticTokensToShiftBeforeValue,
             ~userNextPrice_stakedSyntheticTokenShiftIndex=zeroBn,
-            ~batched_stakerNextTokenShiftIndex,
+            ~latestRewardIndex,
             ~amountSyntheticTokensToShift,
-            ~userAmountStaked=amountSyntheticTokensToShift,
+            ~userAmountStaked=
+              amountSyntheticTokensToShift->add(
+                amountSyntheticTokensToShiftBeforeValue,
+              ),
           );
 
         let%Await userNextPrice_stakedSyntheticTokenShiftIndexAfter =
@@ -195,7 +210,7 @@ let testUnit =
 
         Chai.bnEqual(
           userNextPrice_stakedSyntheticTokenShiftIndexAfter,
-          batched_stakerNextTokenShiftIndex,
+          latestRewardIndex->add(oneBn),
         );
       },
     );
@@ -207,33 +222,27 @@ let testUnit =
         ++ "NextPrice function on long short with the correct parameters",
         () => {
           let {longShortSmocked} = contracts.contents;
-          let batched_stakerNextTokenShiftIndex = Helpers.randomInteger();
+          let latestRewardIndex = Helpers.randomInteger();
 
           let%Await _ =
             setup(
               ~isShiftFromLong,
               ~amountSyntheticTokensToShiftBeforeValue,
               ~userNextPrice_stakedSyntheticTokenShiftIndex=zeroBn,
-              ~batched_stakerNextTokenShiftIndex,
+              ~latestRewardIndex,
               ~amountSyntheticTokensToShift,
-              ~userAmountStaked=amountSyntheticTokensToShift,
+              ~userAmountStaked=
+                amountSyntheticTokensToShift->add(
+                  amountSyntheticTokensToShiftBeforeValue,
+                ),
             );
 
-          let shiftPositionFromLongNextPriceCalls =
-            longShortSmocked->LongShortSmocked.shiftPositionFromLongNextPriceCalls;
-          let shiftPositionFromShortNextPriceCalls =
-            longShortSmocked->LongShortSmocked.shiftPositionFromShortNextPriceCalls;
-          if (isShiftFromLong) {
-            shiftPositionFromLongNextPriceCalls->Chai.recordArrayDeepEqualFlat([|
-              {marketIndex, amountSyntheticTokensToShift},
-            |]);
-            shiftPositionFromShortNextPriceCalls->Chai.recordArrayDeepEqualFlat([||]);
-          } else {
-            shiftPositionFromLongNextPriceCalls->Chai.recordArrayDeepEqualFlat([||]);
-            shiftPositionFromShortNextPriceCalls->Chai.recordArrayDeepEqualFlat([|
-              {marketIndex, amountSyntheticTokensToShift},
-            |]);
-          };
+          let shiftPositionNextPriceCalls =
+            longShortSmocked->LongShortSmocked.shiftPositionNextPriceCalls;
+
+          shiftPositionNextPriceCalls->Chai.recordArrayDeepEqualFlat([|
+            {marketIndex, amountSyntheticTokensToShift, isShiftFromLong},
+          |]);
         },
       );
       it(
@@ -241,7 +250,7 @@ let testUnit =
         ++ (isShiftFromLong ? "Long" : "Short")
         ++ "User value with the amount to shift",
         () => {
-          let batched_stakerNextTokenShiftIndex = Helpers.randomInteger();
+          let latestRewardIndex = Helpers.randomInteger();
           let user = accounts.contents->Array.getUnsafe(0).address;
 
           let%Await _ =
@@ -249,19 +258,21 @@ let testUnit =
               ~isShiftFromLong,
               ~amountSyntheticTokensToShiftBeforeValue,
               ~userNextPrice_stakedSyntheticTokenShiftIndex=zeroBn,
-              ~batched_stakerNextTokenShiftIndex,
+              ~latestRewardIndex,
               ~amountSyntheticTokensToShift,
-              ~userAmountStaked=amountSyntheticTokensToShift,
+              ~userAmountStaked=
+                amountSyntheticTokensToShift->add(
+                  amountSyntheticTokensToShiftBeforeValue,
+                ),
             );
-
-          let getTotalAmountToShiftFromSide =
-            isShiftFromLong
-              ? Staker.userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_long
-              : Staker.userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_short;
 
           let%Await totalAmountToShiftFromSide =
             contracts.contents.staker
-            ->getTotalAmountToShiftFromSide(marketIndex, user);
+            ->Staker.userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom(
+                marketIndex,
+                isShiftFromLong,
+                user,
+              );
 
           Chai.bnEqual(
             totalAmountToShiftFromSide,

@@ -29,9 +29,6 @@ let test =
           ~contracts,
           ~accounts,
         );
-      StakerSmocked.InternalMock.mock_changeMarketLaunchIncentiveParametersToReturn();
-      StakerSmocked.InternalMock.mock_changeUnstakeFeeToReturn();
-      // StakerSmocked.InternalMock.mockOnlyFloatToReturn();
 
       let longShortAddress = (accounts^)->Array.getUnsafe(5);
       let%AwaitThen _ =

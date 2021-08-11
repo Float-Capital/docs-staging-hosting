@@ -28,7 +28,7 @@ dataSources:
           handler: handleMarketOracleUpdated
       blockHandlers:
         - handler: handleBlock
-      file: ./src/priceHistory.ts
+      file: ./src/mappings/priceHistory.ts
 
 templates:
   - kind: ethereum/contract
@@ -45,4 +45,4 @@ templates:
       language: wasm/assemblyscript
       entities: []
       eventHandlers: []
-      file: ./src/priceHistory.ts
+      file: ./src/mappings/priceHistory.ts
