@@ -815,9 +815,9 @@ contract LongShort is ILongShort, Initializable {
     }
   }
 
-  /*╔════════════════════════════════╗
-    ║           DEPOSIT              ║
-    ╚════════════════════════════════╝*/
+  /*╔═══════════════════════════╗
+    ║          DEPOSIT          ║
+    ╚═══════════════════════════╝*/
 
   /// @notice Transfers payment tokens for a market from msg.sender to this contract.
   /// @dev Tokens are transferred directly to this contract to be deposited by the yield manager in the batch to earn yield.
@@ -1124,7 +1124,7 @@ contract LongShort is ILongShort, Initializable {
 
   /// @notice After markets have been batched updated on a new oracle price, transfers any owed tokens to a user from their next price actions for that update to that user.
   /// @dev Once the market has updated for the next price, should be guaranteed (through modifiers) to execute for a user before user initiation of new next price actions.
-  /// @param user The address of the user for whom to execute the function for.
+  /// @param user The address of the user for whom to execute the function.
   /// @param marketIndex An int32 which uniquely identifies a market.
   function _executeOutstandingNextPriceSettlements(address user, uint32 marketIndex)
     internal
@@ -1146,7 +1146,7 @@ contract LongShort is ILongShort, Initializable {
   }
 
   /// @notice After markets have been batched updated on a new oracle price, transfers any owed tokens to a user from their next price actions for that update to that user.
-  /// @param user The address of the user for whom to execute the function for.
+  /// @param user The address of the user for whom to execute the function.
   /// @param marketIndex An int32 which uniquely identifies a market.
   function executeOutstandingNextPriceSettlementsUser(address user, uint32 marketIndex)
     external
@@ -1156,7 +1156,7 @@ contract LongShort is ILongShort, Initializable {
   }
 
   /// @notice Executes outstanding next price settlements for a user for multiple markets.
-  /// @param user The address of the user for whom to execute the function for.
+  /// @param user The address of the user for whom to execute the function.
   /// @param marketIndexes An array of int32s which each uniquely identify a market.
   function executeOutstandingNextPriceSettlementsUserMulti(
     address user,
