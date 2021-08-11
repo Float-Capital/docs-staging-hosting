@@ -3,7 +3,7 @@ let zeroAddress = Ethers.Utils.getAddressUnsafe(zeroAddressStr)
 
 let zeroBN = Ethers.BigNumber.fromInt(0)
 let twoBN = Ethers.BigNumber.fromInt(2)
-let eightBN = Ethers.BigNumber.fromInt(8)
+let fiveBN = Ethers.BigNumber.fromInt(5)
 let tenToThe5 = Ethers.BigNumber.fromUnsafe("100000")
 let tenToThe6 = Ethers.BigNumber.fromUnsafe("1000000")
 let tenToThe9 = Ethers.BigNumber.fromUnsafe("1000000000")
@@ -46,14 +46,15 @@ let threeMonthsInSeconds = 7884087
 let oneYearInSeconds = 31536000
 
 let hotAPYThreshold = 0.15
+let multiplierHotAPYThreshold = 1.0
 
-// TODO: Pull the hardcoded values in from graph / sushiswap
+// TODO: Pull the hardcoded values in from graph
 let kperiodHardcode = Ethers.BigNumber.fromUnsafe("1664000") // ~20 days
 let kmultiplierHardcode = Ethers.BigNumber.fromUnsafe("5000000000000000000")
 let equilibriumOffsetHardcode = zeroBN
 let balanceIncentiveExponentHardcode = twoBN
-let floatTokenDollarWorthHardcode = tenToThe18->Ethers.BigNumber.div(eightBN)
-// ^ thumbsuck to make apy not too ridiculous = 0.125 dollars
+let yieldGradientHardcode = tenToThe18
+let floatCapitalPercentE18HardCode = tenToThe18->Ethers.BigNumber.div(fiveBN)
 
 let oneYearInSecondsMulTenToThe18 =
   oneYearInSeconds->Ethers.BigNumber.fromInt->Ethers.BigNumber.mul(tenToThe18)

@@ -47,8 +47,17 @@ var Header = {
   make: Masonry$Header
 };
 
+function ifElement(condition, element) {
+  if (condition) {
+    return element;
+  } else {
+    return null;
+  }
+}
+
 exports.Container = Container;
 exports.Divider = Divider;
 exports.Card = Card;
 exports.Header = Header;
+exports.ifElement = ifElement;
 /* react Not a pure module */

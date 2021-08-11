@@ -9,6 +9,7 @@ var Belt_Array = require("rescript/lib/js/belt_Array.js");
 
 function StakeList(Props) {
   var marketDetailsQuery = DataHooks.useGetMarkets(undefined);
+  var stakeApys = DataHooks.useStakingAPYs(undefined);
   var tmp;
   tmp = typeof marketDetailsQuery === "number" ? React.createElement("div", {
           className: "m-auto"
@@ -16,6 +17,7 @@ function StakeList(Props) {
       marketDetailsQuery.TAG === /* GraphError */0 ? "Error: " + marketDetailsQuery._0 : React.createElement("div", undefined, Belt_Array.map(marketDetailsQuery._0, (function (syntheticMarket) {
                     return React.createElement(StakeCard.make, {
                                 syntheticMarket: syntheticMarket,
+                                _stakeApys: stakeApys,
                                 key: syntheticMarket.name
                               });
                   })))
