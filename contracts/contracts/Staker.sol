@@ -292,7 +292,8 @@ contract Staker is IStaker, Initializable {
     uint256 _balanceIncentiveCurve_exponent
   ) internal virtual {
     require(
-      // The exponent has to be less than 5 in these versions of the contracts.
+      // The exponent has to be less than or equal to 5 in these versions of
+      // the contracts otherwise we risk overflowing the 256 bit integers.
       _balanceIncentiveCurve_exponent > 0 && _balanceIncentiveCurve_exponent < 6,
       "balanceIncentiveCurve_exponent out of bounds"
     );
