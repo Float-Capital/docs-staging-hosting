@@ -9,6 +9,8 @@ var zeroAddress = Ethers.utils.getAddress(zeroAddressStr);
 
 var zeroBN = Ethers.BigNumber.from(0);
 
+var oneBN = Ethers.BigNumber.from(1);
+
 var twoBN = Ethers.BigNumber.from(2);
 
 var fiveBN = Ethers.BigNumber.from(5);
@@ -109,6 +111,7 @@ var polygon = {
 exports.zeroAddressStr = zeroAddressStr;
 exports.zeroAddress = zeroAddress;
 exports.zeroBN = zeroBN;
+exports.oneBN = oneBN;
 exports.twoBN = twoBN;
 exports.fiveBN = fiveBN;
 exports.tenToThe5 = tenToThe5;
