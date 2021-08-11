@@ -11,6 +11,11 @@ import "./interfaces/IFloatToken.sol";
  @notice The Float Token is the governance token for the Float Capital protocol
  */
 contract FloatToken is IFloatToken, ERC20PresetMinterPauserUpgradeable {
+  /// @dev function disabled to prevent confusion or using the wrong initializer.
+  function initialize(string memory, string memory) public override {
+    revert("!authorized");
+  }
+
   /**
    @notice Initialize the Float Token with relevant
    @dev This function is called `initializeFloatToken` to differentiate it from `initialize(string,string)` in the parent contract which should NOT be called to initialize this contract. 
@@ -23,15 +28,15 @@ contract FloatToken is IFloatToken, ERC20PresetMinterPauserUpgradeable {
     string calldata symbol,
     address stakerAddress
   ) external initializer {
-    initialize(name, symbol);
-
-    _setupRole(DEFAULT_ADMIN_ROLE, stakerAddress);
-    _setupRole(MINTER_ROLE, stakerAddress);
-    _setupRole(PAUSER_ROLE, stakerAddress);
+    super.initialize(name, symbol);
 
     renounceRole(DEFAULT_ADMIN_ROLE, msg.sender);
     renounceRole(MINTER_ROLE, msg.sender);
     renounceRole(PAUSER_ROLE, msg.sender);
+
+    _setupRole(DEFAULT_ADMIN_ROLE, stakerAddress);
+    _setupRole(MINTER_ROLE, stakerAddress);
+    _setupRole(PAUSER_ROLE, stakerAddress);
   }
 
   /*╔═══════════════════════════════════════════════════════════════════╗
