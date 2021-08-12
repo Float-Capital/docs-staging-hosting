@@ -128,4 +128,13 @@ contract FloatToken is
   {
     super._burn(account, amount);
   }
+
+  function transfer(address recipient, uint256 amount)
+    public
+    virtual
+    override(ERC20Upgradeable, IFloatToken)
+    returns (bool)
+  {
+    return ERC20Upgradeable.transfer(recipient, amount);
+  }
 }

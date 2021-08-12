@@ -951,8 +951,8 @@ contract Staker is IStaker, Initializable {
   ) internal virtual {
     uint256 amountFees = (amount * marketUnstakeFee_e18[marketIndex]) / 1e18;
 
-    IERC20(token).transfer(floatTreasury, amountFees);
-    IERC20(token).transfer(msg.sender, amount - amountFees);
+    IFloatToken(token).transfer(floatTreasury, amountFees);
+    IFloatToken(token).transfer(msg.sender, amount - amountFees);
 
     emit StakeWithdrawn(msg.sender, token, amount);
   }
