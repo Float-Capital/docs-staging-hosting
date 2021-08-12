@@ -8,9 +8,7 @@ pragma solidity 0.8.3;
         underlying asset with floating exposure.
 */
 interface ISyntheticToken {
-  function MINTER_ROLE() external returns (bytes32);
-
-  function PAUSER_ROLE() external returns (bytes32);
+  // function MINTER_ROLE() external returns (bytes32);
 
   /// @notice Allows users to stake their synthetic tokens to earn Float.
   function stake(uint256) external;

@@ -4,6 +4,7 @@ pragma solidity 0.8.3;
 
 import "./SyntheticToken.sol";
 import "./interfaces/ITokenFactory.sol";
+import "hardhat/console.sol";
 
 /// @title TokenFactory
 /// @notice contract is used to reliably mint the synthetic tokens used by the float protocol.
@@ -56,20 +57,6 @@ contract TokenFactory is ITokenFactory {
     address _syntheticToken = address(
       new SyntheticToken(syntheticName, syntheticSymbol, longShort, staker, marketIndex, isLong)
     );
-
-    bytes32 DEFAULT_ADMIN_ROLE = SyntheticToken(_syntheticToken).DEFAULT_ADMIN_ROLE();
-    bytes32 MINTER_ROLE = SyntheticToken(_syntheticToken).MINTER_ROLE();
-    bytes32 PAUSER_ROLE = SyntheticToken(_syntheticToken).PAUSER_ROLE();
-
-    // Give minter roles
-    SyntheticToken(_syntheticToken).grantRole(DEFAULT_ADMIN_ROLE, longShort);
-    SyntheticToken(_syntheticToken).grantRole(MINTER_ROLE, longShort);
-    SyntheticToken(_syntheticToken).grantRole(PAUSER_ROLE, longShort);
-
-    // Revoke roles
-    SyntheticToken(_syntheticToken).revokeRole(MINTER_ROLE, address(this));
-    SyntheticToken(_syntheticToken).revokeRole(PAUSER_ROLE, address(this));
-    SyntheticToken(_syntheticToken).revokeRole(DEFAULT_ADMIN_ROLE, address(this));
 
     syntheticToken = _syntheticToken;
   }

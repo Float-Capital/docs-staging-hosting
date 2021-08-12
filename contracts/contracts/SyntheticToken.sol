@@ -19,8 +19,7 @@ import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
      The contract inherits from ERC20PresetMinterPauser.sol
 */
 contract SyntheticToken is ISyntheticToken, ERC20, ERC20Burnable, AccessControl, ERC20Permit {
-  bytes32 public constant override MINTER_ROLE = keccak256("MINTER_ROLE");
-  bytes32 public constant override PAUSER_ROLE = keccak256("PAUSER_ROLE");
+  bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
   /// @notice Address of the LongShort contract, a deployed LongShort.sol
   address public longShort;
@@ -51,6 +50,9 @@ contract SyntheticToken is ISyntheticToken, ERC20, ERC20Burnable, AccessControl,
     staker = _staker;
     marketIndex = _marketIndex;
     isLong = _isLong;
+
+    _setupRole(DEFAULT_ADMIN_ROLE, _longShort);
+    _setupRole(MINTER_ROLE, _longShort);
   }
 
   /// @notice Allows users to stake their synthetic tokens to earn Float.
@@ -69,7 +71,7 @@ contract SyntheticToken is ISyntheticToken, ERC20, ERC20Burnable, AccessControl,
     ╚══════════════════════════════════════════════════════╝*/
 
   function totalSupply() public view virtual override(ERC20, ISyntheticToken) returns (uint256) {
-    ERC20.totalSupply();
+    return ERC20.totalSupply();
   }
 
   /** 
