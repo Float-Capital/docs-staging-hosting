@@ -10,6 +10,7 @@ import {
   FloatPercentageUpdated,
   BalanceIncentiveEquilibriumOffsetUpdated,
   BalanceIncentiveExponentUpdated,
+  ChangeAdmin,
 } from "../../generated/Staker/Staker";
 import { erc20 } from "../../generated/templates";
 import {
@@ -558,6 +559,19 @@ export function handleStakeWithdrawalFeeUpdate(
     [marketIndex.toString(), stakeWithdralFee.toString()],
     ["marketIndex", "stakeWithdralFee"],
     ["uint32", "uint256"],
+    [],
+    []
+  );
+}
+
+export function handleChangeAdmin(event: ChangeAdmin): void {
+  // TODO: add functionality
+  saveEventToStateChange(
+    event,
+    "ChangeAdmin",
+    [event.params.newAdmin.toHex()],
+    ["newAdmin"],
+    ["address"],
     [],
     []
   );
