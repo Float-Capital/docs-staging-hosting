@@ -26,6 +26,9 @@ contract YieldManagerAave is IYieldManager {
   /// @notice address of treasury contract - this is the address that can claim aave incentives rewards
   address public treasury;
 
+  /// @notice boolean to prevent markets using an already initialized market
+  bool public isInitialized = false;
+
   /// @notice The payment token the yield manager supports
   /// @dev DAI token
   ERC20 public paymentToken;
@@ -222,5 +225,11 @@ contract YieldManagerAave is IYieldManager {
     lendingPool.withdraw(address(paymentToken), amountToWithdrawForTreasury, treasury);
 
     emit WithdrawTreasuryFunds();
+  }
+
+  /// @notice Initializes a specific yield manager to a given market
+  function initializeForMarket() external override longShortOnly {
+    require(!isInitialized, "Yield Manager is already in use");
+    isInitialized = true;
   }
 }

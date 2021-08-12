@@ -275,6 +275,9 @@ contract LongShort is ILongShort, Initializable {
   ) external adminOnly {
     latestMarket++;
 
+    // Ensure new markets don't use the same yield manager
+    IYieldManager(_yieldManager).initializeForMarket();
+
     // Create new synthetic long token.
     syntheticTokens[latestMarket][true] = ITokenFactory(tokenFactory).createSyntheticToken(
       string(abi.encodePacked("Float Up ", syntheticName)),

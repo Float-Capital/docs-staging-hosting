@@ -148,7 +148,7 @@ let testIntegration =
       ~contracts: ref(Helpers.coreContracts),
       ~accounts as _: ref(array(Ethers.Wallet.t)),
     ) => {
-  describe("initializeMarket", () => {
+  describe_only("initializeMarket", () => {
     it("Shouldn't allow initialization of a market that doesn't exist", () => {
       let nonExistantMarket = 654654;
 
@@ -192,11 +192,14 @@ let testIntegration =
     });
 
     it(
-      "Shouldn't allow initialization with less than 0.1 eth units of payment token",
+      "Shouldn't allow initialization with less than 1 eth units of payment token",
       () => {
       let {longShort, markets} = contracts.contents;
-      let {paymentToken, oracleManager, yieldManager} =
-        markets->Array.getUnsafe(0);
+      let {paymentToken, oracleManager} = markets->Array.getUnsafe(0);
+
+      //Can't deploy a market with the same yield manager as another market
+      let%Await newYieldManager =
+        Helpers.deployAYieldManager(~longShort=longShort.address);
 
       let%Await _ =
         longShort->LongShort.createNewSyntheticMarket(
@@ -204,7 +207,7 @@ let testIntegration =
           ~syntheticSymbol="T",
           ~paymentToken=paymentToken.address,
           ~oracleManager=oracleManager.address,
-          ~yieldManager=yieldManager.address,
+          ~yieldManager=newYieldManager.address,
         );
       let%Await latestMarket = longShort->LongShort.latestMarket;
 
@@ -221,6 +224,26 @@ let testIntegration =
             ~marketTreasurySplitGradient_e18=bnFromInt(1),
           ),
         ~reason="Insufficient market seed",
+      );
+    });
+
+    it(
+      "Shouldn't allow creation of a market with the a yield manager already in use",
+      () => {
+      let {longShort, markets} = contracts.contents;
+      let {paymentToken, oracleManager, yieldManager} =
+        markets->Array.getUnsafe(0);
+
+      Chai.expectRevert(
+        ~transaction=
+          longShort->LongShort.createNewSyntheticMarket(
+            ~syntheticName="Test",
+            ~syntheticSymbol="T",
+            ~paymentToken=paymentToken.address,
+            ~oracleManager=oracleManager.address,
+            ~yieldManager=yieldManager.address,
+          ),
+        ~reason="Yield Manager is already in use",
       );
     });
   });

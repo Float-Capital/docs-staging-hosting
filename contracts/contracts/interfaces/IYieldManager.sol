@@ -39,4 +39,7 @@ abstract contract IYieldManager {
 
   /// @notice Withdraw treasury allocated accrued yield from the lending pool to the treasury contract
   function withdrawTreasuryFunds() external virtual;
+
+  /// @notice Initializes a specific yield manager to a given market
+  function initializeForMarket() external virtual;
 }
