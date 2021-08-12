@@ -862,7 +862,7 @@ contract Staker is IStaker, Initializable {
   @param from Address to stake for.
   */
   function stakeFromUser(address from, uint256 amount)
-    public
+    external
     virtual
     override
     onlyValidSynthetic((msg.sender))

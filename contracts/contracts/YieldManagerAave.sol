@@ -112,7 +112,7 @@ contract YieldManagerAave is IYieldManager {
     // If amountReservedInCaseOfInsufficientAaveLiquidity isn't zero, then efficiently net the difference between the amount
     //    It basically always be zero besides extreme and unlikely situations with aave.
     if (amountReservedInCaseOfInsufficientAaveLiquidity != 0) {
-      if (amountReservedInCaseOfInsufficientAaveLiquidity > amount) {
+      if (amountReservedInCaseOfInsufficientAaveLiquidity >= amount) {
         amountReservedInCaseOfInsufficientAaveLiquidity -= amount;
         // Return early, nothing to deposit into the lending pool
         return;
