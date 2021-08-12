@@ -273,38 +273,38 @@ contract LongShort is ILongShort, Initializable {
     address _oracleManager,
     address _yieldManager
   ) external adminOnly {
-    latestMarket++;
+    uint32 marketIndex = ++latestMarket;
 
     // Create new synthetic long token.
-    syntheticTokens[latestMarket][true] = ITokenFactory(tokenFactory).createSyntheticToken(
+    syntheticTokens[marketIndex][true] = ITokenFactory(tokenFactory).createSyntheticToken(
       string(abi.encodePacked("Float Up ", syntheticName)),
       string(abi.encodePacked("fu", syntheticSymbol)),
       staker,
-      latestMarket,
+      marketIndex,
       true
     );
 
     // Create new synthetic short token.
-    syntheticTokens[latestMarket][false] = ITokenFactory(tokenFactory).createSyntheticToken(
+    syntheticTokens[marketIndex][false] = ITokenFactory(tokenFactory).createSyntheticToken(
       string(abi.encodePacked("Float Down ", syntheticName)),
       string(abi.encodePacked("fd", syntheticSymbol)),
       staker,
-      latestMarket,
+      marketIndex,
       false
     );
 
     // Initial market state.
-    paymentTokens[latestMarket] = _paymentToken;
-    yieldManagers[latestMarket] = _yieldManager;
-    oracleManagers[latestMarket] = _oracleManager;
-    assetPrice[latestMarket] = uint256(IOracleManager(oracleManagers[latestMarket]).updatePrice());
+    paymentTokens[marketIndex] = _paymentToken;
+    yieldManagers[marketIndex] = _yieldManager;
+    oracleManagers[marketIndex] = _oracleManager;
+    assetPrice[marketIndex] = uint256(IOracleManager(oracleManagers[marketIndex]).updatePrice());
 
     emit SyntheticMarketCreated(
-      latestMarket,
-      syntheticTokens[latestMarket][true],
-      syntheticTokens[latestMarket][false],
+      marketIndex,
+      syntheticTokens[marketIndex][true],
+      syntheticTokens[marketIndex][false],
       _paymentToken,
-      assetPrice[latestMarket],
+      assetPrice[marketIndex],
       syntheticName,
       syntheticSymbol,
       _oracleManager,
@@ -330,11 +330,11 @@ contract LongShort is ILongShort, Initializable {
     _transferPaymentTokensFromUserToYieldManager(marketIndex, amountToLockInYieldManager);
     IYieldManager(yieldManagers[marketIndex]).depositPaymentToken(amountToLockInYieldManager);
 
-    ISyntheticToken(syntheticTokens[latestMarket][true]).mint(
+    ISyntheticToken(syntheticTokens[marketIndex][true]).mint(
       PERMANENT_INITIAL_LIQUIDITY_HOLDER,
       initialMarketSeedForEachMarketSide
     );
-    ISyntheticToken(syntheticTokens[latestMarket][false]).mint(
+    ISyntheticToken(syntheticTokens[marketIndex][false]).mint(
       PERMANENT_INITIAL_LIQUIDITY_HOLDER,
       initialMarketSeedForEachMarketSide
     );
@@ -531,9 +531,12 @@ contract LongShort is ILongShort, Initializable {
     returns (uint256 confirmedButNotSettledBalance)
   {
     uint256 currentMarketUpdateIndex = marketUpdateIndex[marketIndex];
+    uint256 userNextPrice_currentUpdateIndex_forMarket = userNextPrice_currentUpdateIndex[
+      marketIndex
+    ][user];
     if (
-      userNextPrice_currentUpdateIndex[marketIndex][user] != 0 &&
-      userNextPrice_currentUpdateIndex[marketIndex][user] <= currentMarketUpdateIndex
+      userNextPrice_currentUpdateIndex_forMarket != 0 &&
+      userNextPrice_currentUpdateIndex_forMarket <= currentMarketUpdateIndex
     ) {
       uint256 amountPaymentTokenDeposited = userNextPrice_paymentToken_depositAmount[marketIndex][
         isLong
@@ -541,7 +544,7 @@ contract LongShort is ILongShort, Initializable {
 
       if (amountPaymentTokenDeposited > 0) {
         uint256 syntheticTokenPrice = syntheticToken_priceSnapshot[marketIndex][isLong][
-          currentMarketUpdateIndex
+          userNextPrice_currentUpdateIndex_forMarket
         ];
 
         confirmedButNotSettledBalance = _getAmountSyntheticToken(
@@ -557,9 +560,9 @@ contract LongShort is ILongShort, Initializable {
       if (amountSyntheticTokensToBeShiftedAwayFromOriginSide > 0) {
         uint256 syntheticTokenPriceOnOriginSide = syntheticToken_priceSnapshot[marketIndex][
           !isLong
-        ][currentMarketUpdateIndex];
+        ][userNextPrice_currentUpdateIndex_forMarket];
         uint256 syntheticTokenPriceOnTargetSide = syntheticToken_priceSnapshot[marketIndex][isLong][
-          currentMarketUpdateIndex
+          userNextPrice_currentUpdateIndex_forMarket
         ];
 
         confirmedButNotSettledBalance += _getEquivalentAmountSyntheticTokensOnTargetSide(
