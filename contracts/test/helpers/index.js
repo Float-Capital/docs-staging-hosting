@@ -50,7 +50,7 @@ const initialize = async (admin) => {
   const floatToken = await FloatToken.new({
     from: admin,
   });
-  await floatToken.initializeFloatToken(
+  await floatToken.initialize(
     "Float token",
     "FLOAT TOKEN",
     staker.address,
