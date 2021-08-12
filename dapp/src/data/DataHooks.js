@@ -10,8 +10,10 @@ var Globals = require("../libraries/Globals.js");
 var Queries = require("./Queries.js");
 var CONSTANTS = require("../CONSTANTS.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
+var APYProvider = require("../libraries/APYProvider.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
 var FromUnixTime = require("date-fns/fromUnixTime").default;
+var MarketCalculationHelpers = require("../libraries/MarketCalculationHelpers.js");
 
 function liftGraphResponse2(a, b) {
   if (typeof a === "number") {
@@ -36,6 +38,44 @@ function liftGraphResponse2(a, b) {
             _0: [
               a._0,
               b._0
+            ],
+            [Symbol.for("name")]: "Response"
+          };
+  }
+}
+
+function liftGraphResponse3(a, b, c) {
+  if (typeof a === "number") {
+    return /* Loading */0;
+  } else if (a.TAG === /* GraphError */0) {
+    return {
+            TAG: 0,
+            _0: a._0,
+            [Symbol.for("name")]: "GraphError"
+          };
+  } else if (typeof b === "number") {
+    return /* Loading */0;
+  } else if (b.TAG === /* GraphError */0) {
+    return {
+            TAG: 0,
+            _0: b._0,
+            [Symbol.for("name")]: "GraphError"
+          };
+  } else if (typeof c === "number") {
+    return /* Loading */0;
+  } else if (c.TAG === /* GraphError */0) {
+    return {
+            TAG: 0,
+            _0: c._0,
+            [Symbol.for("name")]: "GraphError"
+          };
+  } else {
+    return {
+            TAG: 1,
+            _0: [
+              a._0,
+              b._0,
+              c._0
             ],
             [Symbol.for("name")]: "Response"
           };
@@ -942,11 +982,88 @@ function queryToResponse(query) {
   }
 }
 
+function apyToResponse(a) {
+  if (typeof a === "number") {
+    return /* Loading */0;
+  } else if (a.TAG === /* Loaded */0) {
+    return {
+            TAG: 1,
+            _0: a._0,
+            [Symbol.for("name")]: "Response"
+          };
+  } else {
+    return {
+            TAG: 0,
+            _0: a._0,
+            [Symbol.for("name")]: "GraphError"
+          };
+  }
+}
+
 var Util = {
   graphResponseToOption: graphResponseToOption,
   graphResponseToResult: graphResponseToResult,
-  queryToResponse: queryToResponse
+  queryToResponse: queryToResponse,
+  apyToResponse: apyToResponse
 };
+
+function useStakingAPYs(param) {
+  var marketsQuery = Curry.app(Queries.MarketDetails.use, [
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined
+      ]);
+  var globalQuery = Curry.app(Queries.GlobalState.use, [
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined
+      ]);
+  var apy = APYProvider.useBnApy(undefined);
+  var a = liftGraphResponse3(queryToResponse(marketsQuery), queryToResponse(globalQuery), apyToResponse(apy));
+  if (typeof a === "number") {
+    return /* Loading */0;
+  }
+  if (a.TAG === /* GraphError */0) {
+    return {
+            TAG: 1,
+            _0: a._0,
+            [Symbol.for("name")]: "Error"
+          };
+  }
+  var match = a._0;
+  var match$1 = match[1].globalStates;
+  if (match$1.length !== 1) {
+    return /* Loading */0;
+  }
+  var $$global = match$1[0];
+  return {
+          TAG: 0,
+          _0: MarketCalculationHelpers.calculateStakeAPYS(match[0].syntheticMarkets, $$global, match[2]),
+          [Symbol.for("name")]: "Loaded"
+        };
+}
 
 function useTokenMarketId(tokenId) {
   var marketIdQuery = Curry.app(Queries.TokenMarketId.use, [
@@ -1047,6 +1164,7 @@ function useOracleLastUpdate(marketIndex) {
 var ethAdrToLowerStr = Globals.ethAdrToLowerStr;
 
 exports.liftGraphResponse2 = liftGraphResponse2;
+exports.liftGraphResponse3 = liftGraphResponse3;
 exports.ethAdrToLowerStr = ethAdrToLowerStr;
 exports.useGetMarkets = useGetMarkets;
 exports.useTotalClaimableFloatForUser = useTotalClaimableFloatForUser;
@@ -1064,6 +1182,7 @@ exports.useSyntheticTokenBalance = useSyntheticTokenBalance;
 exports.useSyntheticTokenBalanceOrZero = useSyntheticTokenBalanceOrZero;
 exports.useTokenPriceAtTime = useTokenPriceAtTime;
 exports.Util = Util;
+exports.useStakingAPYs = useStakingAPYs;
 exports.useTokenMarketId = useTokenMarketId;
 exports.getUnixTime = getUnixTime;
 exports.useOracleLastUpdate = useOracleLastUpdate;

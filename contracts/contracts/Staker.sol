@@ -215,7 +215,7 @@ contract Staker is IStaker, Initializable {
     ║       ADMIN       ║
     ╚═══════════════════╝*/
 
-  /** 
+  /**
   @notice Changes admin for the contract
   @param _admin The address of the new admin.
   */
@@ -292,7 +292,8 @@ contract Staker is IStaker, Initializable {
     uint256 _balanceIncentiveCurve_exponent
   ) internal virtual {
     require(
-      // The exponent has to be less than 5 in these versions of the contracts.
+      // The exponent has to be less than or equal to 5 in these versions of
+      // the contracts otherwise we risk overflowing the 256 bit integers.
       _balanceIncentiveCurve_exponent > 0 && _balanceIncentiveCurve_exponent < 6,
       "balanceIncentiveCurve_exponent out of bounds"
     );
@@ -300,7 +301,7 @@ contract Staker is IStaker, Initializable {
     balanceIncentiveCurve_exponent[marketIndex] = _balanceIncentiveCurve_exponent;
   }
 
-  /** 
+  /**
   @notice Changes the balance incentive exponent for a market
   @param marketIndex Identifies the market.
   @param _balanceIncentiveCurve_exponent The new exponent for the curve.
@@ -418,15 +419,15 @@ contract Staker is IStaker, Initializable {
     virtual
     returns (uint256 period, uint256 multiplier)
   {
-    period = marketLaunchIncentive_period[marketIndex];
-    multiplier = marketLaunchIncentive_multipliers[marketIndex];
+    period = marketLaunchIncentive_period[marketIndex]; // seconds TODO change name to contain seconds
+    multiplier = marketLaunchIncentive_multipliers[marketIndex]; // 1e18 TODO change name to contain E18
 
     if (multiplier < 1e18) {
       multiplier = 1e18; // multiplier of 1 by default
     }
   }
 
-  /** 
+  /**
   @notice Returns the extent to which a markets float generation should be adjusted
   based on the market's launch incentive parameters. Should start at multiplier
   then linearly change to 1e18 over time.
@@ -489,21 +490,21 @@ contract Staker is IStaker, Initializable {
     int256 equilibriumOffsetMarketScaled = (balanceIncentiveCurve_equilibriumOffset[marketIndex] *
       int256(totalLocked)) / 2e18;
 
-    uint256 denominator = ((totalLocked >> safeExponentBitShifting) **
-      balanceIncentiveCurve_exponent[marketIndex]);
-
     // Float is scaled by the percentage of the total market value held in
     // the opposite position. This incentivises users to stake on the
     // weaker position.
-    if (int256(shortValue) - equilibriumOffsetMarketScaled < int256(longValue)) {
+    if (int256(shortValue) - (2 * equilibriumOffsetMarketScaled) < int256(longValue)) {
       if (equilibriumOffsetMarketScaled >= int256(shortValue)) {
         // edge case: imbalanced far past the equilibrium offset - full rewards go to short token
         //            extremeley unlikely to happen in practice
-        return (0, 1e18 * k * shortPrice);
+        return (0, k * shortPrice);
       }
 
       uint256 numerator = (uint256(int256(shortValue) - equilibriumOffsetMarketScaled) >>
         (safeExponentBitShifting - 1))**balanceIncentiveCurve_exponent[marketIndex];
+
+      uint256 denominator = ((totalLocked >> safeExponentBitShifting) **
+        balanceIncentiveCurve_exponent[marketIndex]);
 
       // NOTE: `x * 5e17` == `(x * 1e18) / 2`
       uint256 longRewardUnscaled = (numerator * 5e17) / denominator;
@@ -517,13 +518,16 @@ contract Staker is IStaker, Initializable {
       if (-equilibriumOffsetMarketScaled >= int256(longValue)) {
         // edge case: imbalanced far past the equilibrium offset - full rewards go to long token
         //            extremeley unlikely to happen in practice
-        return (1e18 * k * longPrice, 0);
+        return (k * longPrice, 0);
       }
 
       uint256 numerator = (uint256(int256(longValue) + equilibriumOffsetMarketScaled) >>
         (safeExponentBitShifting - 1))**balanceIncentiveCurve_exponent[marketIndex];
 
-      // NOTE: `x * 5e17` == `(x * 10e18) / 2`
+      uint256 denominator = ((totalLocked >> safeExponentBitShifting) **
+        balanceIncentiveCurve_exponent[marketIndex]);
+
+      // NOTE: `x * 5e17` == `(x * 1e18) / 2`
       uint256 shortRewardUnscaled = (numerator * 5e17) / denominator;
       uint256 longRewardUnscaled = 1e18 - shortRewardUnscaled;
 
@@ -676,7 +680,7 @@ contract Staker is IStaker, Initializable {
     }
   }
 
-  /** 
+  /**
   @notice Calculates float owed to the user since the user last minted float for a market.
   @param marketIndex Identifier for the market which the user staked in.
   @param user The address of the user.
@@ -897,7 +901,7 @@ contract Staker is IStaker, Initializable {
   }
 
   /**
-  @notice Allows users to shift their staked tokens from one side of the market to 
+  @notice Allows users to shift their staked tokens from one side of the market to
   the other at the next price.
   @param amountSyntheticTokensToShift Amount of tokens to shift.
   @param marketIndex Identifier for the market.

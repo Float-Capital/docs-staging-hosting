@@ -30,6 +30,9 @@ module Tuple = {
 @ocaml.doc(`Generates random BigNumber between 1 and 2147483647 (max js int)`)
 let randomInteger = () => Js.Math.random_int(1, Js.Int.max)->Ethers.BigNumber.fromInt
 
+@ocaml.doc(`Generates random BigNumber between x and y`)
+let randomBigIntInRange = (x, y) => Js.Math.random_int(x, y)->Ethers.BigNumber.fromInt
+
 @ocaml.doc(`Generates a random JS integer between 0 and 2147483647 (max js int)`)
 let randomJsInteger = () => Js.Math.random_int(0, Js.Int.max)
 

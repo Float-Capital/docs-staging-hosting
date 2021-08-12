@@ -3,6 +3,7 @@
 
 var React = require("react");
 var Loader = require("../UI/Base/Loader.js");
+var Masonry = require("../UI/Masonry.js");
 var Tooltip = require("../UI/Base/Tooltip.js");
 var CONSTANTS = require("../../CONSTANTS.js");
 
@@ -14,6 +15,7 @@ function MarketStakeCardSide(Props) {
   var apy = Props.apy;
   var floatApy = Props.floatApy;
   var beta = Props.beta;
+  var stakeApy = Props.stakeApy;
   var tradeType = isLong ? "long" : "short";
   var textPosition = isLong ? "text-left" : "text-right";
   var mapAPY = function (apy) {
@@ -25,33 +27,56 @@ function MarketStakeCardSide(Props) {
       return maybeHotFlame + apyDisplay + "%";
     }
   };
+  var apyComponent = function (header, apy, suffix) {
+    return React.createElement("div", {
+                className: "flex flex-col justify-center pt-0 my-1"
+              }, React.createElement("h3", {
+                    className: "text-xxs"
+                  }, React.createElement("span", {
+                        className: "font-bold  text-gray-600"
+                      }, header), " APY", suffix), React.createElement("p", {
+                    className: "text-sm tracking-widest font-alphbeta"
+                  }, (apy * 100).toFixed(2) + "%"));
+  };
   var tmp;
-  tmp = typeof apy === "number" ? React.createElement(Loader.Tiny.make, {}) : (
-      apy.TAG === /* Loaded */0 ? React.createElement("p", {
-              className: "text-lg  tracking-widest font-alphbeta"
-            }, mapAPY(apy._0)) : React.createElement(Loader.Tiny.make, {})
-    );
+  var exit = 0;
+  if (typeof apy === "number" || apy.TAG !== /* Loaded */0) {
+    exit = 1;
+  } else {
+    var apyVal = apy._0;
+    if (typeof stakeApy === "number" || stakeApy.TAG !== /* Loaded */0) {
+      exit = 1;
+    } else {
+      var stakeApy$1 = stakeApy._0;
+      var apyGreaterThanZero = apyVal >= 0.01;
+      var stakeApyGreaterThanZero = stakeApy$1 >= 0.01;
+      tmp = React.createElement(React.Fragment, undefined, Masonry.ifElement(apyGreaterThanZero, apyComponent("SYNTH", apyVal, null)), Masonry.ifElement(stakeApyGreaterThanZero && apyGreaterThanZero, React.createElement("span", {
+                    className: "mx-1"
+                  }, "+")), Masonry.ifElement(stakeApyGreaterThanZero, apyComponent("STAKE", stakeApy$1, React.createElement("span", {
+                        className: "ml-1"
+                      }, React.createElement(Tooltip.make, {
+                            tip: "Expected yield from FLT token buybacks"
+                          })))));
+    }
+  }
+  if (exit === 1) {
+    tmp = React.createElement(Loader.Tiny.make, {});
+  }
   return React.createElement("div", {
-              className: textPosition + " order-" + String(orderPostionMobile) + " md:order-" + String(orderPostion) + " w-1/2 md:w-1/4 flex flex grow flex-wrap flex-col"
-            }, React.createElement("h2", {
-                  className: "font-bold text-sm"
-                }, marketName, React.createElement("span", {
-                      className: "text-xs"
-                    }, isLong ? "↗️" : "↘️")), React.createElement("div", {
+              className: textPosition + " order-" + String(orderPostionMobile) + " md:order-" + String(orderPostion) + " w-1/2 md:w-1/4 flex my-auto grow flex-wrap flex-col"
+            }, React.createElement("div", {
                   className: "flex flex-col justify-center pt-0 my-1"
                 }, React.createElement("h3", {
                       className: "text-xxs mt-2"
                     }, React.createElement("span", {
                           className: "font-bold  text-gray-600"
-                        }, isLong ? "LONG" : "SHORT"), " FLOAT rewards"), React.createElement("p", {
+                        }, isLong ? "LONG" : "SHORT"), " FLOAT Multiplier"), React.createElement("p", {
                       className: "text-lg md:text-xl tracking-widest font-alphbeta"
                     }, mapAPY(floatApy))), React.createElement("div", {
-                  className: "flex flex-col justify-center pt-0 my-1"
-                }, React.createElement("h3", {
-                      className: "text-xxs"
-                    }, React.createElement("span", {
-                          className: "font-bold  text-gray-600"
-                        }, isLong ? "LONG" : "SHORT"), " APY"), tmp), React.createElement("div", {
+                  className: "flex " + (
+                    isLong ? "justify-start" : "justify-end"
+                  ) + " items-center"
+                }, tmp), React.createElement("div", {
                   className: "text-sm my-1"
                 }, React.createElement("h3", {
                       className: "text-xxs"
@@ -64,7 +89,10 @@ function MarketStakeCardSide(Props) {
                     }, beta + "%")));
 }
 
+var ifElement = Masonry.ifElement;
+
 var make = MarketStakeCardSide;
 
+exports.ifElement = ifElement;
 exports.make = make;
 /* react Not a pure module */
