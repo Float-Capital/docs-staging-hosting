@@ -14,7 +14,6 @@ describe("Float System", () => {
     let treasury = loadedAccounts->Array.getUnsafe(1);
 
     let longShortAddress = Ethers.Wallet.createRandom().address;
-    let fundTokenAddress = Ethers.Wallet.createRandom().address;
 
     let%Await lendingPoolMock = LendingPoolAaveMock.make();
     let%Await lendingPoolSmocked =
@@ -24,8 +23,9 @@ describe("Float System", () => {
       ERC20Mock.make(~name="Payment Token Mock", ~symbol="PaymentToken");
     let%Await paymentTokenSmocked = ERC20MockSmocked.make(paymentTokenMock);
 
-    let%Await erc20Mock =
+    let%Await aTokenMock =
       ERC20Mock.make(~name="Test APaymentToken", ~symbol="APaymentToken");
+    let%Await aTokenSmocked = ERC20MockSmocked.make(aTokenMock);
 
     let%Await aaveIncentivesControllerMock =
       AaveIncentivesControllerMock.make();
@@ -37,7 +37,7 @@ describe("Float System", () => {
         ~longShort=longShortAddress,
         ~treasury=treasury.address,
         ~paymentToken=paymentTokenSmocked.address,
-        ~aToken=fundTokenAddress,
+        ~aToken=aTokenSmocked.address,
         ~lendingPool=lendingPoolSmocked.address,
         ~aaveIncentivesController=aaveIncentivesControllerSmocked.address,
         ~aaveReferralCode=6543,
@@ -45,7 +45,7 @@ describe("Float System", () => {
 
     contracts :=
       {
-        "erc20Mock": erc20Mock,
+        "aToken": aTokenSmocked,
         "yieldManagerAave": yieldManagerAave,
         "paymentToken": paymentTokenSmocked,
         "treasury": treasury,

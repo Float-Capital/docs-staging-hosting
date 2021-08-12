@@ -4,25 +4,32 @@ open Masonry
 module TrendingStakes = {
   open APYProvider
   @react.component
-  let make = () => {
+  let make = (~global) => {
     let marketDetailsQuery = Queries.MarketDetails.use()
     let apy = APYProvider.useAPY()
+    let bnApy = APYProvider.useBnApy()
 
     {
       switch marketDetailsQuery {
       | {loading: true} => <div className="m-auto"> <Loader.Mini /> </div>
       | {error: Some(_error)} => "Error loading data"->React.string
       | {data: Some({syntheticMarkets})} =>
-        switch apy {
-        | Loaded(apyVal) => {
-            let trendingStakes = StatsCalcs.trendingStakes(~syntheticMarkets, ~apy=apyVal)
+        switch (apy, bnApy) {
+        | (Loaded(apyVal), Loaded(bnApy)) => {
+            let trendingStakes = StatsCalcs.trendingStakes(
+              ~syntheticMarkets,
+              ~apy=apyVal,
+              ~global,
+              ~bnApy,
+            )
             trendingStakes
-            ->Array.map(({marketName, isLong, apy, floatApy}) =>
+            ->Array.map(({marketName, isLong, apy, floatApy, stakeApy}) =>
               <StatsStakeCard
                 marketName={marketName}
                 isLong={isLong}
                 yield={apy}
                 rewards={floatApy}
+                stakeYield={stakeApy}
                 key={marketName ++ (isLong ? "-long" : "-short")}
               />
             )
@@ -139,7 +146,7 @@ let floatTokenCard = (~totalFloatMinted) =>
     />
   </Card>
 
-let stakingCard = (~totalValueStaked) =>
+let stakingCard = (~totalValueStaked, ~global) =>
   <Card>
     <Header> {`Staking 🔥`->React.string} </Header>
     <div className="text-center mt-5">
@@ -149,7 +156,7 @@ let stakingCard = (~totalValueStaked) =>
       </div>
     </div>
     <div className="text-left mt-4 pl-4 text-sm font-bold"> {`Trending`->React.string} </div>
-    <div className="pt-2 pb-5"> <TrendingStakes /> </div>
+    <div className="pt-2 pb-5"> <TrendingStakes global /> </div>
   </Card>
 
 @react.component
@@ -157,7 +164,7 @@ let make = () => {
   let globalStateQuery = Queries.GlobalState.use()
   let marketDetailsQuery = Queries.MarketDetails.use()
 
-  <div className="w-screen flex flex-col overflow-x-hidden">
+  <div className="flex flex-col overflow-x-hidden">
     {switch (globalStateQuery, marketDetailsQuery) {
     | ({loading: true}, _)
     | (_, {loading: true}) =>
@@ -169,7 +176,14 @@ let make = () => {
         {
           data: Some({
             globalStates: [
-              {totalFloatMinted, totalTxs, totalUsers, totalGasUsed, timestampLaunched, txHash},
+              {
+                totalFloatMinted,
+                totalTxs,
+                totalUsers,
+                totalGasUsed,
+                timestampLaunched,
+                txHash,
+              } as global,
             ],
           }),
         },
@@ -197,7 +211,7 @@ let make = () => {
           <Divider>
             {syntheticAssetsCard(~totalSynthValue)} {floatTokenCard(~totalFloatMinted)}
           </Divider>
-          <Divider> {stakingCard(~totalValueStaked)} </Divider>
+          <Divider> {stakingCard(~totalValueStaked, ~global)} </Divider>
         </Container>
       </div>
 

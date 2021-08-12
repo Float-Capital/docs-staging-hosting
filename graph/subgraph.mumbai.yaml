@@ -16,14 +16,18 @@ dataSources:
       entities:
         - ExecuteNextPriceMintSettlementUser
         - ExecuteNextPriceRedeemSettlementUser
+        - ExecuteNextPriceMarketSideShiftSettlementUser
+        - ExecuteNextPriceMintSettlementUser
+        - ExecuteNextPriceRedeemSettlementUser
         - ExecuteNextPriceSettlementsUser
+        - LongShortV1
         - NewMarketLaunchedAndSeeded
         - NextPriceDeposit
         - NextPriceRedeem
+        - NextPriceSyntheticPositionShift
         - OracleUpdated
         - SyntheticMarketCreated
         - SystemStateUpdated
-        - LongShortV1
       abis:
         - name: LongShort
           file: ./abis/LongShort.json
@@ -48,7 +52,7 @@ dataSources:
           handler: handleSystemStateUpdated
         - event: LongShortV1(address,address,address,address)
           handler: handleLongShortV1
-      file: ./src/float.ts
+      file: ./src/mappings/longShort.ts
 
   - kind: ethereum/contract
     name: Staker
@@ -62,8 +66,10 @@ dataSources:
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
+        - AccumulativeIssuancePerStakedSynthSnapshotCreated
         - BalanceIncentiveEquilibriumOffsetUpdated
         - BalanceIncentiveExponentUpdated
+        - ChangeAdmin
         - FloatMinted
         - FloatPercentageUpdated
         - MarketAddedToStaker
@@ -72,15 +78,19 @@ dataSources:
         - StakeWithdrawalFeeUpdated
         - StakeWithdrawn
         - StakerV1
-        - StateAdded
+        - SyntheticTokensShifted
       abis:
         - name: Staker
           file: ./abis/Staker.json
       eventHandlers:
+        - event: AccumulativeIssuancePerStakedSynthSnapshotCreated(uint32,uint256,uint256,uint256)
+          handler: handleAccumulativeIssuancePerStakedSynthSnapshotCreated
         - event: BalanceIncentiveEquilibriumOffsetUpdated(uint32,int256)
           handler: handleBalanceIncentiveEquilibriumOffsetUpdated
         - event: BalanceIncentiveExponentUpdated(uint32,uint256)
           handler: handleBalanceIncentiveExponentUpdated
+        - event: ChangeAdmin(address)
+          handler: handleChangeAdmin
         - event: FloatMinted(address,uint32,uint256)
           handler: handleFloatMinted
         - event: FloatPercentageUpdated(uint256)
@@ -95,11 +105,11 @@ dataSources:
           handler: handleStakeWithdrawalFeeUpdated
         - event: StakeWithdrawn(address,address,uint256)
           handler: handleStakeWithdrawn
-        - event: StakerV1(address,uint256)
+        - event: StakerV1(address,address,address,address,uint256)
           handler: handleStakerV1
-        - event: StateAdded(uint32,uint256,uint256,uint256)
-          handler: handleStateAdded
-      file: ./src/staker.ts
+        - event: SyntheticTokensShifted()
+          handler: handleSyntheticTokensShifted
+      file: ./src/mappings/staker.ts
 
 templates:
   - kind: ethereum/contract
@@ -123,4 +133,4 @@ templates:
           handler: handleTransfer
         - event: Approval(indexed address,indexed address,uint256)
           handler: handleApproval
-      file: ./src/tokenTransfers.ts
+      file: ./src/mappings/tokenTransfers.ts

@@ -34,9 +34,9 @@ let testUnit =
       |]);
     });
 
-    it("calls _mintAccumulatedFloatMulti with the correct arguments", () => {
+    it("calls _mintAccumulatedFloatAndExecuteOutstandingShiftsMulti with the correct arguments", () => {
       let mintAccumulatedFloatMultiCalls =
-        StakerSmocked.InternalMock._mintAccumulatedFloatMultiCalls();
+        StakerSmocked.InternalMock._mintAccumulatedFloatAndExecuteOutstandingShiftsMultiCalls();
       ();
       mintAccumulatedFloatMultiCalls->Chai.recordArrayDeepEqualFlat([|
         {marketIndexes: marketIndices, user: getUser()},

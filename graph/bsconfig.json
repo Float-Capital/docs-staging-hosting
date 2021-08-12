@@ -31,7 +31,11 @@
   },
   "sources": [
     {
-      "dir": "test",
+      "dir": "testCodegenLib",
+      "subdirs": true
+    },
+    {
+      "dir": "integrationTests",
       "subdirs": true
     }
   ],

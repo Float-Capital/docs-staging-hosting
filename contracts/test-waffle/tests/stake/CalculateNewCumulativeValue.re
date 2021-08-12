@@ -61,6 +61,7 @@ let test =
       promiseRef :=
         staker->Staker.Exposed._calculateNewCumulativeIssuancePerStakedSynthExposed(
           ~marketIndex,
+          ~previousMarketUpdateIndex=latestRewardIndexForMarket,
           ~longPrice,
           ~shortPrice,
           ~longValue,
@@ -119,7 +120,10 @@ let test =
       let call =
         StakerSmocked.InternalMock._calculateTimeDeltaFromLastAccumulativeIssuancePerStakedSynthSnapshotCalls()
         ->Array.getUnsafe(0);
-      call->Chai.recordEqualFlat({marketIndex: marketIndex});
+      call->Chai.recordEqualFlat({
+        marketIndex,
+        previousMarketUpdateIndex: latestRewardIndexForMarket,
+      });
     });
   });
 };

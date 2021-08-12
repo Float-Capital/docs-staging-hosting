@@ -16,12 +16,12 @@ abstract contract IStaker {
 
   function pushUpdatedMarketPricesToUpdateFloatIssuanceCalculations(
     uint32 marketIndex,
+    uint256 marketUpdateIndex,
     uint256 longTokenPrice,
     uint256 shortTokenPrice,
     uint256 longValue,
-    uint256 shortValue,
-    uint256 stakerTokenShiftIndex_to_longShortMarketPriceSnapshotIndex_mappingIfShiftExecuted
+    uint256 shortValue
   ) external virtual;
 
-  function stakeFromUser(address from, uint256 amount) public virtual;
+  function stakeFromUser(address from, uint256 amount) external virtual;
 }

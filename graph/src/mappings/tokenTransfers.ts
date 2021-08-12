@@ -1,7 +1,7 @@
 import {
   Approval,
   Transfer as TransferEvent,
-} from "../generated/templates/erc20/erc20";
+} from "../../generated/templates/erc20/erc20";
 import {
   PaymentToken,
   PaymentTokenTransfer,
@@ -12,7 +12,7 @@ import {
   TokenApproval,
   UserPaymentTokenApproval,
   LongShortContract,
-} from "../generated/schema";
+} from "../../generated/schema";
 import {
   log,
   dataSource,
@@ -21,14 +21,14 @@ import {
   Address,
   Bytes,
 } from "@graphprotocol/graph-ts";
-import { saveEventToStateChange } from "./utils/txEventHelpers";
+import { saveEventToStateChange } from "../utils/txEventHelpers";
 import {
   updateBalanceTransfer,
   updateBalanceFloatTransfer,
   updateCollatoralBalanceTransfer,
-} from "./utils/helperFunctions";
-import { GLOBAL_STATE_ID, ONE, ZERO } from "./CONSTANTS";
-import { getOrCreateUser } from "./utils/globalStateManager";
+} from "../utils/helperFunctions";
+import { GLOBAL_STATE_ID, ONE, ZERO, ZERO_ADDRESS } from "../CONSTANTS";
+import { getOrCreateUser } from "../utils/globalStateManager";
 
 function saveTransferToStateChange(
   event: TransferEvent,
@@ -69,6 +69,14 @@ export function handleTransfer(event: TransferEvent): void {
   if (isFloatToken) {
     updateBalanceFloatTransfer(fromAddress, amount, true, event);
     updateBalanceFloatTransfer(toAddress, amount, false, event);
+    if(toAddressString == ZERO_ADDRESS){
+      // token burn
+      let globalState = GlobalState.load(GLOBAL_STATE_ID);
+      if(globalState != null){
+        globalState.totalFloatMinted = globalState.totalFloatMinted.minus(amount);
+        globalState.save();
+      }
+    }
     saveTransferToStateChange(event, stateChangeParams, bothUsers);
   } else {
     let syntheticToken = SyntheticToken.load(tokenAddressString);

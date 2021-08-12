@@ -4,10 +4,13 @@
 var Ethers = require("../ethereum/Ethers.js");
 var CONSTANTS = require("../CONSTANTS.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
+var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var Belt_SortArray = require("rescript/lib/js/belt_SortArray.js");
+var Belt_HashMapString = require("rescript/lib/js/belt_HashMapString.js");
 var MarketCalculationHelpers = require("./MarketCalculationHelpers.js");
 
-function trendingStakes(syntheticMarkets, apy) {
+function trendingStakes(syntheticMarkets, apy, $$global, bnApy) {
+  var stakeApys = MarketCalculationHelpers.calculateStakeAPYS(syntheticMarkets, $$global, bnApy);
   return Belt_Array.slice(Belt_SortArray.stableSortBy(Belt_Array.reduce(syntheticMarkets, [], (function (previous, param) {
                         var match = param.latestSystemState;
                         var totalLockedShort = match.totalLockedShort;
@@ -17,25 +20,27 @@ function trendingStakes(syntheticMarkets, apy) {
                         var marketName = param.name;
                         var longApy = MarketCalculationHelpers.calculateLendingProviderAPYForSide(apy, Number(Ethers.Utils.formatEther(totalLockedLong)), Number(Ethers.Utils.formatEther(totalLockedShort)), "long");
                         var shortApy = MarketCalculationHelpers.calculateLendingProviderAPYForSide(apy, Number(Ethers.Utils.formatEther(totalLockedLong)), Number(Ethers.Utils.formatEther(totalLockedShort)), "short");
-                        var longFloatApy = MarketCalculationHelpers.calculateFloatAPY(totalLockedLong, totalLockedShort, CONSTANTS.kperiodHardcode, CONSTANTS.kmultiplierHardcode, timestampCreated, currentTimestamp, CONSTANTS.equilibriumOffsetHardcode, CONSTANTS.balanceIncentiveExponentHardcode, CONSTANTS.floatTokenDollarWorthHardcode, "long");
-                        var shortFloatApy = MarketCalculationHelpers.calculateFloatAPY(totalLockedLong, totalLockedShort, CONSTANTS.kperiodHardcode, CONSTANTS.kmultiplierHardcode, timestampCreated, currentTimestamp, CONSTANTS.equilibriumOffsetHardcode, CONSTANTS.balanceIncentiveExponentHardcode, CONSTANTS.floatTokenDollarWorthHardcode, "short");
+                        var longFloatApy = MarketCalculationHelpers.calculateFloatAPY(totalLockedLong, totalLockedShort, CONSTANTS.kperiodHardcode, CONSTANTS.kmultiplierHardcode, timestampCreated, currentTimestamp, CONSTANTS.equilibriumOffsetHardcode, CONSTANTS.balanceIncentiveExponentHardcode, "long");
+                        var shortFloatApy = MarketCalculationHelpers.calculateFloatAPY(totalLockedLong, totalLockedShort, CONSTANTS.kperiodHardcode, CONSTANTS.kmultiplierHardcode, timestampCreated, currentTimestamp, CONSTANTS.equilibriumOffsetHardcode, CONSTANTS.balanceIncentiveExponentHardcode, "short");
                         return Belt_Array.concat(previous, [
                                     {
                                       marketName: marketName,
                                       isLong: true,
                                       apy: longApy,
-                                      floatApy: Number(Ethers.Utils.formatEther(longFloatApy))
+                                      floatApy: Number(Ethers.Utils.formatEther(longFloatApy)),
+                                      stakeApy: Belt_Option.getExn(Belt_HashMapString.get(stakeApys, param.syntheticLong.id))
                                     },
                                     {
                                       marketName: marketName,
                                       isLong: false,
                                       apy: shortApy,
-                                      floatApy: Number(Ethers.Utils.formatEther(shortFloatApy))
+                                      floatApy: Number(Ethers.Utils.formatEther(shortFloatApy)),
+                                      stakeApy: Belt_Option.getExn(Belt_HashMapString.get(stakeApys, param.syntheticShort.id))
                                     }
                                   ]);
                       })), (function (token1, token2) {
-                    var match = token1.apy + token1.floatApy;
-                    var match$1 = token2.apy + token2.floatApy;
+                    var match = token1.apy + token1.floatApy + token1.stakeApy;
+                    var match$1 = token2.apy + token2.floatApy + token2.stakeApy;
                     if (match < match$1) {
                       return 1;
                     } else if (match$1 > match) {
