@@ -8,7 +8,7 @@ let test =
       ~contracts: ref(Helpers.coreContracts),
       ~accounts: ref(array(Ethers.Wallet.t)),
     ) => {
-  describe_only("stakeFromUser", () => {
+  describe("stakeFromUser", () => {
     let longShortSmockedRef: ref(LongShortSmocked.t) = ref(None->Obj.magic);
     let marketIndexForToken = Helpers.randomJsInteger();
 

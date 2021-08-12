@@ -855,9 +855,9 @@ contract Staker is IStaker, Initializable {
     ╚═══════════════════════╝*/
 
   /**
-  @notice A from with synthetic msg.senders stakes by calling stake on the msg.sender
+  @notice A user with synthetic tokens stakes by calling stake on the token
   contract which calls this function. We need to first update the
-  state of the LongShort contract for this market before staking to correctly calculate from rewards.
+  state of the LongShort contract for this market before staking to correctly calculate user rewards.
   @param amount Amount to stake.
   @param from Address to stake for.
   */
@@ -885,7 +885,7 @@ contract Staker is IStaker, Initializable {
     // NOTE: Users retroactively earn a little bit of FLT because they start earning from the previous update index.
     userIndexOfLastClaimedReward[marketIndex][from] = currentRewardIndex;
 
-    emit StakeAdded(from, msg.sender, amount, userCurrentIndexOfLastClaimedReward);
+    emit StakeAdded(from, msg.sender, amount, currentRewardIndex);
   }
 
   /**
