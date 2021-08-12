@@ -419,8 +419,8 @@ contract Staker is IStaker, Initializable {
     virtual
     returns (uint256 period, uint256 multiplier)
   {
-      period = marketLaunchIncentive_period[marketIndex]; // seconds TODO change name to contain seconds
-      multiplier = marketLaunchIncentive_multipliers[marketIndex]; // 1e18 TODO change name to contain E18
+    period = marketLaunchIncentive_period[marketIndex]; // seconds TODO change name to contain seconds
+    multiplier = marketLaunchIncentive_multipliers[marketIndex]; // 1e18 TODO change name to contain E18
 
     if (multiplier < 1e18) {
       multiplier = 1e18; // multiplier of 1 by default
@@ -504,7 +504,7 @@ contract Staker is IStaker, Initializable {
         (safeExponentBitShifting - 1))**balanceIncentiveCurve_exponent[marketIndex];
 
       uint256 denominator = ((totalLocked >> safeExponentBitShifting) **
-                             balanceIncentiveCurve_exponent[marketIndex]);
+        balanceIncentiveCurve_exponent[marketIndex]);
 
       // NOTE: `x * 5e17` == `(x * 1e18) / 2`
       uint256 longRewardUnscaled = (numerator * 5e17) / denominator;
@@ -525,7 +525,7 @@ contract Staker is IStaker, Initializable {
         (safeExponentBitShifting - 1))**balanceIncentiveCurve_exponent[marketIndex];
 
       uint256 denominator = ((totalLocked >> safeExponentBitShifting) **
-                             balanceIncentiveCurve_exponent[marketIndex]);
+        balanceIncentiveCurve_exponent[marketIndex]);
 
       // NOTE: `x * 5e17` == `(x * 1e18) / 2`
       uint256 shortRewardUnscaled = (numerator * 5e17) / denominator;

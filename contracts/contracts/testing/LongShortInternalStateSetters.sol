@@ -110,10 +110,10 @@ contract LongShortInternalStateSetters is LongShort {
     userNextPrice_paymentToken_depositAmount[marketIndex][!isLong][user] = 0; // reset other side for good measure
 
     syntheticToken_priceSnapshot[marketIndex][isLong][
-      _marketUpdateIndex
+      _userNextPrice_currentUpdateIndex
     ] = _syntheticToken_priceSnapshot_isLong;
     syntheticToken_priceSnapshot[marketIndex][!isLong][
-      _marketUpdateIndex
+      _userNextPrice_currentUpdateIndex
     ] = _syntheticToken_priceSnapshot_notIsLong;
 
     userNextPrice_syntheticToken_toShiftAwayFrom_marketSide[marketIndex][!isLong][
