@@ -93,7 +93,7 @@ module SyntheticTokenHelpers = {
 module YieldManagerAaveHelpers = {
   type contractsType = {
     .
-    "erc20Mock": ERC20Mock.t,
+    "aToken": ERC20MockSmocked.t,
     "yieldManagerAave": YieldManagerAave.t,
     "paymentToken": ERC20MockSmocked.t,
     "treasury": Ethers.Wallet.t,
