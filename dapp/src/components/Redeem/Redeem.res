@@ -14,7 +14,7 @@ let make = () => {
         syntheticMarkets[marketIndex->Belt.Int.fromString->Option.getWithDefault(1) - 1]
       switch optFirstMarket {
       | Some(firstMarket) =>
-        <RedeemForm market={firstMarket} isLong={actionOption == "short" ? false : true} />
+        <RedeemForm market={firstMarket} isLong={actionOption->Js.String2.toLowerCase == "long" ? true : false} />
       | None => <p> {"No markets exist"->React.string} </p>
       }
     | {data: None, error: None, loading: false} =>
