@@ -980,10 +980,12 @@ contract Staker is IStaker, Initializable {
     bool isWithdrawFromLong,
     uint256 amount
   ) external {
+    address token = syntheticTokens[marketIndex][isWithdrawFromLong];
+    require(userAmountStaked[token][msg.sender] >= amount, "not enough to withdraw");
+
     ILongShort(longShort).updateSystemState(marketIndex);
     _mintAccumulatedFloatAndExecuteOutstandingShifts(marketIndex, msg.sender);
 
-    address token = syntheticTokens[marketIndex][isWithdrawFromLong];
     userAmountStaked[token][msg.sender] -= amount;
 
     if (userNextPrice_stakedSyntheticTokenShiftIndex[marketIndex][msg.sender] > 0) {

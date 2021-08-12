@@ -103,11 +103,11 @@ let testUnit =
       });
 
       describe("sad case", () => {
-        before_once'(() => setup(zeroBn));
+        before_once'(() => setup(amountWithdrawn->sub(oneBn)));
         it("reverts if nothing to withdraw", () => {
           Chai.expectRevert(
             ~transaction=call.contents,
-            ~reason="nothing to withdraw",
+            ~reason="not enough to withdraw",
           )
         });
       });
@@ -196,10 +196,8 @@ let testUnit =
               ~amountStaked,
               ~userNextPrice_stakedSyntheticTokenShiftIndex=bnFromInt(1),
               ~syntheticTokens=Helpers.randomAddress(),
-              ~userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_long=
-                bnFromInt(0),
-              ~userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_short=
-                bnFromInt(0),
+              ~userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_long=bnFromInt(0),
+              ~userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_short=bnFromInt(0),
             );
 
         contracts.contents.staker
