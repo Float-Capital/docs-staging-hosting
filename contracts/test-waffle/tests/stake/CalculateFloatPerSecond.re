@@ -16,7 +16,7 @@ let test =
   let (randomValueLocked1, randomValueLocked2) =
     Helpers.Tuple.make2(() => Helpers.randomJsInteger() / 10 + 1);
 
-  describe_only("calculateFloatPerSecond", () => {
+  describe("calculateFloatPerSecond", () => {
     let calculateFloatPerSecondPerPaymentTokenLocked =
         (
           ~underBalancedSideValue,
