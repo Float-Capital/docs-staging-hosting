@@ -148,7 +148,7 @@ let testIntegration =
       ~contracts: ref(Helpers.coreContracts),
       ~accounts as _: ref(array(Ethers.Wallet.t)),
     ) => {
-  describe_only("initializeMarket", () => {
+  describe("initializeMarket", () => {
     it("Shouldn't allow initialization of a market that doesn't exist", () => {
       let nonExistantMarket = 654654;
 
