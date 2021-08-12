@@ -147,7 +147,7 @@ contract("LongShort (staking)", (accounts) => {
     assert.equal(user2, a);
   });
 
-  it("users who have no stake cannot withdraw", async () => {
+  it.skip("users who have no stake cannot withdraw", async () => {
     await expectRevert(
       staker.withdraw(longToken.address, new BN(oneHundred), {
         from: user1,
