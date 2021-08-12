@@ -67,9 +67,9 @@ contract TokenFactory is ITokenFactory {
     SyntheticToken(_syntheticToken).grantRole(PAUSER_ROLE, longShort);
 
     // Revoke roles
-    SyntheticToken(_syntheticToken).revokeRole(DEFAULT_ADMIN_ROLE, address(this));
     SyntheticToken(_syntheticToken).revokeRole(MINTER_ROLE, address(this));
     SyntheticToken(_syntheticToken).revokeRole(PAUSER_ROLE, address(this));
+    SyntheticToken(_syntheticToken).revokeRole(DEFAULT_ADMIN_ROLE, address(this));
 
     syntheticToken = _syntheticToken;
   }
