@@ -531,9 +531,11 @@ contract LongShort is ILongShort, Initializable {
     returns (uint256 confirmedButNotSettledBalance)
   {
     uint256 currentMarketUpdateIndex = marketUpdateIndex[marketIndex];
+    uint256 userNextPrice_currentUpdateIndex = userNextPrice_currentUpdateIndex[marketIndex][user];
+
     if (
-      userNextPrice_currentUpdateIndex[marketIndex][user] != 0 &&
-      userNextPrice_currentUpdateIndex[marketIndex][user] <= currentMarketUpdateIndex
+      userNextPrice_currentUpdateIndex != 0 &&
+      userNextPrice_currentUpdateIndex <= currentMarketUpdateIndex
     ) {
       uint256 amountPaymentTokenDeposited = userNextPrice_paymentToken_depositAmount[marketIndex][
         isLong
@@ -541,7 +543,7 @@ contract LongShort is ILongShort, Initializable {
 
       if (amountPaymentTokenDeposited > 0) {
         uint256 syntheticTokenPrice = syntheticToken_priceSnapshot[marketIndex][isLong][
-          currentMarketUpdateIndex
+          userNextPrice_currentUpdateIndex
         ];
 
         confirmedButNotSettledBalance = _getAmountSyntheticToken(
@@ -557,9 +559,9 @@ contract LongShort is ILongShort, Initializable {
       if (amountSyntheticTokensToBeShiftedAwayFromOriginSide > 0) {
         uint256 syntheticTokenPriceOnOriginSide = syntheticToken_priceSnapshot[marketIndex][
           !isLong
-        ][currentMarketUpdateIndex];
+        ][userNextPrice_currentUpdateIndex];
         uint256 syntheticTokenPriceOnTargetSide = syntheticToken_priceSnapshot[marketIndex][isLong][
-          currentMarketUpdateIndex
+          userNextPrice_currentUpdateIndex
         ];
 
         confirmedButNotSettledBalance += _getEquivalentAmountSyntheticTokensOnTargetSide(
