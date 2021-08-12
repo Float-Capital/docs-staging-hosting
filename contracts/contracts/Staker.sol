@@ -855,9 +855,9 @@ contract Staker is IStaker, Initializable {
     ╚═══════════════════════╝*/
 
   /**
-  @notice A user with synthetic tokens stakes by calling stake on the token
+  @notice A from with synthetic msg.senders stakes by calling stake on the msg.sender
   contract which calls this function. We need to first update the
-  state of the LongShort contract for this market before staking to correctly calculate user rewards.
+  state of the LongShort contract for this market before staking to correctly calculate from rewards.
   @param amount Amount to stake.
   @param from Address to stake for.
   */
@@ -865,39 +865,27 @@ contract Staker is IStaker, Initializable {
     external
     virtual
     override
-    onlyValidSynthetic((msg.sender))
+    onlyValidSynthetic(msg.sender)
   {
-    ILongShort(longShort).updateSystemState(marketIndexOfToken[(msg.sender)]);
-    _stake((msg.sender), amount, from);
-  }
+    uint32 marketIndex = marketIndexOfToken[msg.sender];
+    ILongShort(longShort).updateSystemState(marketIndex);
 
-  /**
-  @dev Internal logic for staking.
-  @param token Address of the token for which to stake.
-  @param amount Amount to stake.
-  @param user Address to stake for.
-  */
-  function _stake(
-    address token,
-    uint256 amount,
-    address user
-  ) internal virtual {
-    uint32 marketIndex = marketIndexOfToken[token];
-
+    uint256 userCurrentIndexOfLastClaimedReward = userIndexOfLastClaimedReward[marketIndex][from];
+    uint256 currentRewardIndex = latestRewardIndex[marketIndex];
     // If they already have staked and have rewards due, mint these.
     if (
-      userIndexOfLastClaimedReward[marketIndex][user] != 0 &&
-      userIndexOfLastClaimedReward[marketIndex][user] < latestRewardIndex[marketIndex]
+      userCurrentIndexOfLastClaimedReward != 0 &&
+      userCurrentIndexOfLastClaimedReward < currentRewardIndex
     ) {
-      _mintAccumulatedFloatAndExecuteOutstandingShifts(marketIndex, user);
+      _mintAccumulatedFloatAndExecuteOutstandingShifts(marketIndex, from);
     }
 
-    userAmountStaked[token][user] = userAmountStaked[token][user] + amount;
+    userAmountStaked[msg.sender][from] += amount;
 
     // NOTE: Users retroactively earn a little bit of FLT because they start earning from the previous update index.
-    userIndexOfLastClaimedReward[marketIndex][user] = latestRewardIndex[marketIndex];
+    userIndexOfLastClaimedReward[marketIndex][from] = currentRewardIndex;
 
-    emit StakeAdded(user, address(token), amount, userIndexOfLastClaimedReward[marketIndex][user]);
+    emit StakeAdded(from, msg.sender, amount, userCurrentIndexOfLastClaimedReward);
   }
 
   /**

@@ -8,15 +8,26 @@ let test =
       ~contracts: ref(Helpers.coreContracts),
       ~accounts: ref(array(Ethers.Wallet.t)),
     ) => {
-  describe("stakeFromUser", () => {
+  describe_only("stakeFromUser", () => {
     let longShortSmockedRef: ref(LongShortSmocked.t) = ref(None->Obj.magic);
     let marketIndexForToken = Helpers.randomJsInteger();
 
+    let latestRewardIndex =
+      Js.Math.random_int(2, Js.Int.max)->Ethers.BigNumber.fromInt;
+    let randomRewardIndexBelow = num =>
+      Js.Math.random_int(1, num->Ethers.BigNumber.toNumber)
+      ->Ethers.BigNumber.fromInt;
+
     let from = Helpers.randomAddress();
-    let amount = Helpers.randomTokenAmount();
     let mockTokenWalletRef: ref(Ethers.Wallet.t) = ref(None->Obj.magic);
 
-    before_once'(() => {
+    let (userAmountStaked, userAmountToStake) =
+      Helpers.Tuple.make2(Helpers.randomTokenAmount); // will be at least two
+
+    let promiseRef: ref(JsPromise.t(ContractHelpers.transaction)) =
+      ref(None->Obj.magic);
+
+    let setup = (~userLastRewardIndex, ~latestRewardIndex) => {
       let%Await _ =
         deployAndSetupStakerToUnitTest(
           ~functionName="stakeFromUser",
@@ -24,49 +35,130 @@ let test =
           ~accounts,
         );
 
-      let {longShort} = contracts^;
-
+      let {longShort} = contracts.contents;
       let%Await longShortSmocked = longShort->LongShortSmocked.make;
-
       longShortSmockedRef := longShortSmocked;
 
-      mockTokenWalletRef := (accounts^)->Array.getExn(6);
+      mockTokenWalletRef := accounts.contents->Array.getExn(6);
 
       let%Await _ =
-        contracts^.staker
+        contracts.contents.staker
         ->Staker.Exposed.setStakeFromUserParams(
             ~longshort=longShortSmocked.address,
-            ~token=mockTokenWalletRef^.address,
+            ~token=mockTokenWalletRef.contents.address,
             ~marketIndexForToken,
+            ~user=from,
+            ~latestRewardIndex,
+            ~userAmountStaked,
+            ~userLastRewardIndex,
           );
 
-      contracts^.staker
-      ->ContractHelpers.connect(~address=mockTokenWalletRef^)
-      ->Staker.stakeFromUser(~from, ~amount);
-    });
+      let promise =
+        contracts.contents.staker
+        ->ContractHelpers.connect(~address=mockTokenWalletRef.contents)
+        ->Staker.stakeFromUser(~from, ~amount=userAmountToStake);
+      promiseRef := promise;
+      promise;
+    };
 
     it_skip("calls onlyValidSynthetic with correct args", () => {
       // StakerSmocked.InternalMock.onlyValidSyntheticCalls()
       // ->Array.getExn(0)
-      // ->Chai.recordEqualFlat({synth: mockTokenWalletRef^.address})
+      // ->Chai.recordEqualFlat({synth: mockTokenWalletRef.contents.address})
       ()
     });
 
-    it("calls _stake with correct args", () =>
-      StakerSmocked.InternalMock._stakeCalls()
-      ->Array.getExn(0)
-      ->Chai.recordEqualFlat({
-          token: mockTokenWalletRef^.address,
-          amount,
-          user: from,
-        })
-    );
-
     it("calls updateSystemState on longshort with correct args", () => {
-      (longShortSmockedRef^)
+      let%Await _ =
+        setup(
+          ~userLastRewardIndex=randomRewardIndexBelow(latestRewardIndex),
+          ~latestRewardIndex,
+        );
+      Js.log(marketIndexForToken);
+
+      longShortSmockedRef.contents
       ->LongShortSmocked.updateSystemStateCalls
-      ->Array.getExn(0)
-      ->Chai.recordEqualFlat({marketIndex: marketIndexForToken})
+      ->Chai.recordArrayDeepEqualFlat([|
+          {marketIndex: marketIndexForToken},
+        |]);
+    });
+
+    describe("case user has outstanding float to be minted", () => {
+      before_once'(() =>
+        setup(
+          ~userLastRewardIndex=randomRewardIndexBelow(latestRewardIndex),
+          ~latestRewardIndex,
+        )
+      );
+
+      it("calls mintAccumulatedFloat with correct args", () => {
+        StakerSmocked.InternalMock._mintAccumulatedFloatAndExecuteOutstandingShiftsCalls()
+        ->Array.getExn(0)
+        ->Chai.recordEqualFlat({marketIndex: marketIndexForToken, user: from})
+      });
+      it("mutates userAmountStaked", () => {
+        let%Await amountStaked =
+          contracts.contents.staker
+          ->Staker.userAmountStaked(
+              mockTokenWalletRef.contents.address,
+              from,
+            );
+        amountStaked->Chai.bnEqual(
+          userAmountStaked->Ethers.BigNumber.add(userAmountToStake),
+        );
+      });
+
+      it("mutates userIndexOfLastClaimedReward", () => {
+        let%Await lastClaimedReward =
+          contracts.contents.staker
+          ->Staker.userIndexOfLastClaimedReward(marketIndexForToken, from);
+
+        lastClaimedReward->Chai.bnEqual(latestRewardIndex);
+      });
+
+      it("emits StakeAdded", () =>
+        Chai.callEmitEvents(
+          ~call=promiseRef.contents,
+          ~contract=contracts.contents.staker->Obj.magic,
+          ~eventName="StakeAdded",
+        )
+        ->Chai.withArgs4(
+            from,
+            mockTokenWalletRef.contents.address,
+            userAmountToStake,
+            latestRewardIndex,
+          )
+      );
+    });
+
+    // next two cases still do everything except call mintFloat but unwieldy to test
+    describe("case user has last claimed index of 0", () => {
+      before_once'(() =>
+        setup(
+          ~userLastRewardIndex=CONSTANTS.zeroBn,
+          ~latestRewardIndex=Helpers.randomInteger(),
+        )
+      );
+
+      it("doesn't call mintAccumulatedFloat", () => {
+        StakerSmocked.InternalMock._mintAccumulatedFloatAndExecuteOutstandingShiftsCalls()
+        ->Array.length
+        ->Chai.intEqual(0)
+      });
+    });
+
+    describe(
+      "case users last claimed index == latestRewardIndex for market", () => {
+      let index = Helpers.randomInteger();
+      before_once'(() =>
+        setup(~userLastRewardIndex=index, ~latestRewardIndex=index)
+      );
+
+      it("doesn't call mintAccumulatedFloat", () => {
+        StakerSmocked.InternalMock._mintAccumulatedFloatAndExecuteOutstandingShiftsCalls()
+        ->Array.length
+        ->Chai.intEqual(0)
+      });
     });
   });
 };

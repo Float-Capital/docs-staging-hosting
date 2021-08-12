@@ -146,7 +146,6 @@ describe("Float System", () => {
       MintAccumulatedFloat.test(~contracts, ~accounts);
       ClaimFloat.test(~contracts, ~accounts);
       StakeFromUser.test(~contracts, ~accounts);
-      Stake.test(~contracts, ~accounts);
       StakerAdminFunctions.testUnit(~contracts, ~accounts);
       StakerModifiers.testUnit(~contracts, ~accounts);
     });

@@ -115,7 +115,6 @@ let testUnit =
 
     describe_skip("withdraw", () => {
       let token = Helpers.randomAddress();
-      let user = Helpers.randomAddress();
       let amountWithdrawn = Helpers.randomTokenAmount();
 
       before_once'(() => {

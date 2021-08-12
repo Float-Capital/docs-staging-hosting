@@ -162,8 +162,16 @@ contract StakerInternalStateSetters is Staker {
   function setStakeFromUserParams(
     address longshort,
     address token,
-    uint32 marketIndexForToken
+    uint32 marketIndexForToken,
+    address user,
+    uint256 _latestRewardIndex,
+    uint256 _userAmountStaked,
+    uint256 userLastRewardIndex
   ) external {
+    latestRewardIndex[marketIndexForToken] = _latestRewardIndex;
+    userAmountStaked[token][user] = _userAmountStaked;
+    userIndexOfLastClaimedReward[marketIndexForToken][user] = userLastRewardIndex;
+
     longShort = address(longshort);
     marketIndexOfToken[token] = marketIndexForToken;
   }
@@ -216,20 +224,6 @@ contract StakerInternalStateSetters is Staker {
     uint256 latestRewardIndexForMarket
   ) public {
     latestRewardIndex[marketIndex] = latestRewardIndexForMarket;
-  }
-
-  function set_stakeParams(
-    address user,
-    uint32 marketIndex,
-    uint256 _latestRewardIndex,
-    address token,
-    uint256 _userAmountStaked,
-    uint256 userLastRewardIndex
-  ) external {
-    marketIndexOfToken[token] = marketIndex;
-    latestRewardIndex[marketIndex] = _latestRewardIndex;
-    userAmountStaked[token][user] = _userAmountStaked;
-    userIndexOfLastClaimedReward[marketIndex][user] = userLastRewardIndex;
   }
 
   function set_withdrawGlobals(
