@@ -4,7 +4,6 @@ pragma solidity 0.8.3;
 
 import "./SyntheticToken.sol";
 import "./interfaces/ITokenFactory.sol";
-import "hardhat/console.sol";
 
 /// @title TokenFactory
 /// @notice contract is used to reliably mint the synthetic tokens used by the float protocol.
