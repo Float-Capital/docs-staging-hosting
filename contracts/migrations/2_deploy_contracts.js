@@ -73,7 +73,7 @@ module.exports = async function (deployer, networkName, accounts) {
     }
   );
 
-  await floatToken.initializeFloatToken(
+  await floatToken.initialize(
     "Float token",
     "FLOAT TOKEN",
     staker.address,

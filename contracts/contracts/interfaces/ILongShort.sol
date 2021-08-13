@@ -2,39 +2,35 @@
 
 pragma solidity 0.8.3;
 
-abstract contract ILongShort {
-  function updateSystemState(uint32 marketIndex) external virtual;
+interface ILongShort {
+  function updateSystemState(uint32 marketIndex) external;
 
-  function updateSystemStateMulti(uint32[] calldata marketIndex) external virtual;
+  function updateSystemStateMulti(uint32[] calldata marketIndex) external;
 
   function getUsersConfirmedButNotSettledSynthBalance(
     address user,
     uint32 marketIndex,
     bool isLong
-  ) external view virtual returns (uint256 confirmedButNotSettledBalance);
+  ) external view returns (uint256 confirmedButNotSettledBalance);
 
-  function executeOutstandingNextPriceSettlementsUser(address user, uint32 marketIndex)
-    external
-    virtual;
+  function executeOutstandingNextPriceSettlementsUser(address user, uint32 marketIndex) external;
 
   function shiftPositionNextPrice(
     uint32 marketIndex,
     uint256 amountSyntheticTokensToShift,
     bool isShiftFromLong
-  ) public virtual;
+  ) external;
 
   function shiftPositionFromLongNextPrice(uint32 marketIndex, uint256 amountSyntheticTokensToShift)
-    external
-    virtual;
+    external;
 
   function shiftPositionFromShortNextPrice(uint32 marketIndex, uint256 amountSyntheticTokensToShift)
-    external
-    virtual;
+    external;
 
   function getAmountSyntheticTokenToMintOnTargetSide(
     uint32 marketIndex,
     uint256 amountSyntheticTokenShiftedFromOneSide,
     bool isShiftFromLong,
     uint256 priceSnapshotIndex
-  ) public view virtual returns (uint256 amountSynthShiftedToOtherSide);
+  ) external view returns (uint256 amountSynthShiftedToOtherSide);
 }
