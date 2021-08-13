@@ -682,7 +682,7 @@ contract LongShort is ILongShort, Initializable {
     int256 valueChange = ((newAssetPrice - oldAssetPrice) * underbalancedSideValue) / oldAssetPrice;
 
     if (valueChange < 0) {
-      valueChange = -valueChange; // make value change possitive
+      valueChange = -valueChange; // make value change positive
 
       // handle 'impossible' edge case where underlying price feed changes more than 100% downwards gracefully.
       if (uint256(valueChange) > longValue) {
