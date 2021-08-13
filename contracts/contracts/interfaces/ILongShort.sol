@@ -37,4 +37,8 @@ abstract contract ILongShort {
     bool isShiftFromLong,
     uint256 priceSnapshotIndex
   ) public view virtual returns (uint256 amountSynthShiftedToOtherSide);
+
+  function mintLongNextPrice(uint32 marketIndex, uint256 amount) external virtual;
+
+  function mintShortNextPrice(uint32 marketIndex, uint256 amount) external virtual;
 }
