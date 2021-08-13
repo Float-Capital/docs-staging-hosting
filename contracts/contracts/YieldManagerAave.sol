@@ -145,7 +145,7 @@ contract YieldManagerAave is IYieldManager {
 
     amountReservedInCaseOfInsufficientAaveLiquidity -= amount;
 
-    // If this reverts (ie aave unable to make payout), then the whole transaction will revent. User will have to wait until sufficient liquidity available.
+    // If this reverts (ie aave unable to make payout), then the whole transaction will revert. User will have to wait until sufficient liquidity available.
     lendingPool.withdraw(address(paymentToken), amount, user);
   }
 
