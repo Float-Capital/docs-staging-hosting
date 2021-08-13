@@ -16,6 +16,7 @@ function solASTTypeToRescriptType(typeDescrStr) {
         return "array<Ethers.ethAddress>";
     case "bool" :
         return "bool";
+    case "bytes" :
     case "bytes32" :
     case "bytes4" :
     case "string" :
@@ -34,6 +35,8 @@ function solASTTypeToRescriptType(typeDescrStr) {
       if (Globals.containsRe(typeDescrStr, /\[/g)) {
         console.warn("Rescript type conversion for array types for type " + typeDescrStr + " currently limited. YOu'll have to put in the correct bindings for this type when you call it");
         return "array<'" + typeDescrStr + ">";
+      } else if (typeDescrStr.startsWith("struct")) {
+        return "'struct";
       } else if (typeDescrStr.startsWith("enum")) {
         return "int";
       } else if (typeDescrStr.startsWith("uint") || typeDescrStr.startsWith("int")) {

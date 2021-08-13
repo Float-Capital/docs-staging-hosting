@@ -15,6 +15,7 @@ let solASTTypeToRescriptType = typeDescrStr =>
   switch typeDescrStr {
   | "bool" => "bool"
   | "string" => "string"
+  | "bytes"
   | "bytes32" => "string"
   | "bytes4" => "string"
   | "int8"
@@ -32,6 +33,7 @@ let solASTTypeToRescriptType = typeDescrStr =>
       )
       `array<'${t}>`
     }
+  | t if t->startsWith("struct") => "'struct" // We aren't modeling structs currently. Could implement!
   | t if t->startsWith("enum") => "int"
   | t if t->startsWith("uint") || t->startsWith("int") => "Ethers.BigNumber.t"
   | t if t->startsWith("contract") || t == "address" => "Ethers.ethAddress"
