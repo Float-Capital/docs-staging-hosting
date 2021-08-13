@@ -8,6 +8,10 @@ var Caml_splice_call = require("rescript/lib/js/caml_splice_call.js");
 
 var files = Fs.readdirSync("../contracts/abis");
 
+function startsWith(prim0, prim1) {
+  return prim0.startsWith(prim1);
+}
+
 var lowerCaseFirstLetter = ((someString) => someString.charAt(0).toLowerCase() + someString.slice(1));
 
 var removePrefixUnderscores = ((someString) => {
@@ -33,7 +37,7 @@ function getMmoduleName(fileName) {
 function getRescriptType(typeString) {
   if (typeString === "bool") {
     return "bool";
-  } else if (typeString === "bytes32") {
+  } else if (typeString === "bytes" || typeString === "bytes32") {
     return "bytes32";
   } else if (typeString === "uint16" || typeString === "uint32") {
     return "int";
@@ -51,6 +55,8 @@ function getRescriptType(typeString) {
     return "int";
   } else if (typeString === "bytes4") {
     return "bytes4";
+  } else if (typeString.startsWith("tuple")) {
+    return "tuple";
   } else {
     console.log("Please handle all types - " + typeString + " isn't handled by this script.");
     return "unknownType";
@@ -177,6 +183,7 @@ var _writeFiles = Belt_Array.map(Js_dict.entries(moduleDictionary), (function (p
       }));
 
 exports.files = files;
+exports.startsWith = startsWith;
 exports.lowerCaseFirstLetter = lowerCaseFirstLetter;
 exports.removePrefixUnderscores = removePrefixUnderscores;
 exports.formatKeywords = formatKeywords;

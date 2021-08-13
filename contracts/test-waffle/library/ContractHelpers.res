@@ -3,6 +3,7 @@ type t
 
 type bytes4
 type bytes32
+type tuple // used by some open-zeppelin contracts
 type transaction = unit // TODO: make this better
 
 @val @scope("ethers")

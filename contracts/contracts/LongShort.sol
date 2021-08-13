@@ -512,7 +512,7 @@ contract LongShort is ILongShort, Initializable {
         - "Confirmed" - means the next price has been updated by the updateSystemState function. There is still
         -               outstanding (lazy) computation that needs to be executed per user in the batch.
         - "Settled" - there is no more computation left for the user.
-        - "Non-existant" - user has no next price actions.
+        - "Non-existent" - user has no next price actions.
     This function returns a calculated value only in the case of 'confirmed' next price actions.
     It should return zero for all other types of next price actions.
   @dev Used in SyntheticToken.sol balanceOf to allow for automatic reflection of next price actions.
@@ -681,12 +681,22 @@ contract LongShort is ILongShort, Initializable {
     // Interact with this equation: https://www.desmos.com/calculator/t8gr6j5vsq
     int256 valueChange = ((newAssetPrice - oldAssetPrice) * underbalancedSideValue) / oldAssetPrice;
 
-    if (valueChange > 0) {
+    if (valueChange < 0) {
+      valueChange = -valueChange; // make value change positive
+
+      // handle 'impossible' edge case where underlying price feed changes more than 100% downwards gracefully.
+      if (uint256(valueChange) > longValue) {
+        valueChange = (int256(longValue) * 99999) / 100000;
+      }
+      longValue -= uint256(valueChange);
+      shortValue += uint256(valueChange);
+    } else {
+      // handle 'impossible' edge case where underlying price feed changes more than 100% upwards gracefully.
+      if (uint256(valueChange) > shortValue) {
+        valueChange = (int256(shortValue) * 99999) / 100000;
+      }
       longValue += uint256(valueChange);
       shortValue -= uint256(valueChange);
-    } else {
-      longValue -= uint256(-valueChange);
-      shortValue += uint256(-valueChange);
     }
   }
 
@@ -863,14 +873,14 @@ contract LongShort is ILongShort, Initializable {
   /// @notice Allows users to mint long synthetic assets for a market. To prevent front-running these mints are executed on the next price update from the oracle.
   /// @param marketIndex An uint32 which uniquely identifies a market.
   /// @param amount Amount of payment tokens in that token's lowest denominationfor which to mint synthetic assets at next price.
-  function mintLongNextPrice(uint32 marketIndex, uint256 amount) external {
+  function mintLongNextPrice(uint32 marketIndex, uint256 amount) external override {
     _mintNextPrice(marketIndex, amount, true);
   }
 
   /// @notice Allows users to mint short synthetic assets for a market. To prevent front-running these mints are executed on the next price update from the oracle.
   /// @param marketIndex An uint32 which uniquely identifies a market.
   /// @param amount Amount of payment tokens in that token's lowest denominationfor which to mint synthetic assets at next price.
-  function mintShortNextPrice(uint32 marketIndex, uint256 amount) external {
+  function mintShortNextPrice(uint32 marketIndex, uint256 amount) external override {
     _mintNextPrice(marketIndex, amount, false);
   }
 
@@ -1158,7 +1168,7 @@ contract LongShort is ILongShort, Initializable {
     ╚═══════════════════════════════════════════╝*/
 
   /// @notice Either transfers funds from the yield manager to this contract if redeems > deposits,
-  /// and visa versa. The yield manager handles depositing and withdrawing the funds from a yield market.
+  /// and vice versa. The yield manager handles depositing and withdrawing the funds from a yield market.
   /// @dev When all batched next price actions are handled the total value in the market can either increase or decrease based on the value of mints and redeems.
   /// @param marketIndex An uint32 which uniquely identifies a market.
   /// @param totalPaymentTokenValueChangeForMarket An int256 which indicates the magnitude and direction of the change in market value.
@@ -1231,7 +1241,7 @@ contract LongShort is ILongShort, Initializable {
     int256 changeInSupply_syntheticToken_long;
     int256 changeInSupply_syntheticToken_short;
 
-    // NOTE: the only reason we are re-uising amountForCurrentAction_workingVariable for all actions (redeemLong, redeemShort, mintLong, mintShort, shiftFromLong, shiftFromShort) is to reduce stack usage
+    // NOTE: the only reason we are reusing amountForCurrentAction_workingVariable for all actions (redeemLong, redeemShort, mintLong, mintShort, shiftFromLong, shiftFromShort) is to reduce stack usage
     uint256 amountForCurrentAction_workingVariable = batched_amountPaymentToken_deposit[
       marketIndex
     ][true];

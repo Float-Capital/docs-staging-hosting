@@ -1,5 +1,6 @@
 let files = Node.Fs.readdirSync("../contracts/abis")
 
+let {startsWith} = module(Js.String2)
 let lowerCaseFirstLetter = %raw(`(someString) => someString.charAt(0).toLowerCase() + someString.slice(1)`)
 let removePrefixUnderscores = %raw(`(someString) => {
   if (someString.charAt(0) == "_") {
@@ -26,9 +27,11 @@ let getRescriptType = typeString =>
   | #string => "string"
   | #address => "Ethers.ethAddress"
   | #bytes4 => "bytes4"
+  | #bytes
   | #bytes32 => "bytes32"
   | #bool => "bool"
   | #"address[]" => "array<Ethers.ethAddress>"
+  | t if t->Obj.magic->startsWith("tuple") => "tuple"
   | unknownType =>
     Js.log(`Please handle all types - ${unknownType->Obj.magic} isn't handled by this script.`)
     "unknownType"
