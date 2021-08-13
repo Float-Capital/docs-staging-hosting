@@ -36,6 +36,10 @@ contract LongShortInternalStateSetters is LongShort {
     }
   }
 
+  function setAssetPrice(uint32 marketIndex, uint256 _assetPrice) external {
+    assetPrice[marketIndex] = _assetPrice;
+  }
+
   function set_updateSystemStateInternalGlobals(
     uint32 marketIndex,
     uint256 _latestUpdateIndexForMarket,
