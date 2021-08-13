@@ -241,7 +241,7 @@ contract Staker is IStaker, Initializable {
 
   /// @dev Logic for changeUnstakeFee
   function _changeUnstakeFee(uint32 marketIndex, uint256 newMarketUnstakeFee_e18) internal virtual {
-    require(newMarketUnstakeFee_e18 <= 5e16); // Explicitely stating 5% fee as the max fee possible.
+    require(newMarketUnstakeFee_e18 <= 5e16); // Explicitly stating 5% fee as the max fee possible.
     marketUnstakeFee_e18[marketIndex] = newMarketUnstakeFee_e18;
   }
 
@@ -496,7 +496,7 @@ contract Staker is IStaker, Initializable {
     if (int256(shortValue) - (2 * equilibriumOffsetMarketScaled) < int256(longValue)) {
       if (equilibriumOffsetMarketScaled >= int256(shortValue)) {
         // edge case: imbalanced far past the equilibrium offset - full rewards go to short token
-        //            extremeley unlikely to happen in practice
+        //            extremely unlikely to happen in practice
         return (0, k * shortPrice);
       }
 
@@ -517,7 +517,7 @@ contract Staker is IStaker, Initializable {
     } else {
       if (-equilibriumOffsetMarketScaled >= int256(longValue)) {
         // edge case: imbalanced far past the equilibrium offset - full rewards go to long token
-        //            extremeley unlikely to happen in practice
+        //            extremely unlikely to happen in practice
         return (k * longPrice, 0);
       }
 
