@@ -681,12 +681,22 @@ contract LongShort is ILongShort, Initializable {
     // Interact with this equation: https://www.desmos.com/calculator/t8gr6j5vsq
     int256 valueChange = ((newAssetPrice - oldAssetPrice) * underbalancedSideValue) / oldAssetPrice;
 
-    if (valueChange > 0) {
+    if (valueChange < 0) {
+      valueChange = -valueChange; // make value change possitive
+
+      // handle 'impossible' edge case where underlying price feed changes more than 100% downwards gracefully.
+      if (uint256(valueChange) > longValue) {
+        valueChange = (int256(longValue) * 99999) / 100000;
+      }
+      longValue -= uint256(valueChange);
+      shortValue += uint256(valueChange);
+    } else {
+      // handle 'impossible' edge case where underlying price feed changes more than 100% upwards gracefully.
+      if (uint256(valueChange) > shortValue) {
+        valueChange = (int256(shortValue) * 99999) / 100000;
+      }
       longValue += uint256(valueChange);
       shortValue -= uint256(valueChange);
-    } else {
-      longValue -= uint256(-valueChange);
-      shortValue += uint256(-valueChange);
     }
   }
 
