@@ -710,21 +710,23 @@ contract LongShort is ILongShort, Initializable {
     int256 newAssetPrice = IOracleManager(oracleManagers[marketIndex]).updatePrice();
     int256 oldAssetPrice = int256(assetPrice[marketIndex]);
 
+    uint256 currentMarketIndex = marketUpdateIndex[marketIndex];
+
     bool assetPriceHasChanged = oldAssetPrice != newAssetPrice;
 
     if (assetPriceHasChanged) {
       uint256 syntheticTokenPrice_inPaymentTokens_long = syntheticToken_priceSnapshot[marketIndex][
         true
-      ][marketUpdateIndex[marketIndex]];
+      ][currentMarketIndex];
       uint256 syntheticTokenPrice_inPaymentTokens_short = syntheticToken_priceSnapshot[marketIndex][
         false
-      ][marketUpdateIndex[marketIndex]];
+      ][currentMarketIndex];
       // if there is a price change and the 'staker' contract has pending updates, push the stakers price snapshot index to the staker
       // (so the staker can handle its internal accounting)
 
       IStaker(staker).pushUpdatedMarketPricesToUpdateFloatIssuanceCalculations(
         marketIndex,
-        marketUpdateIndex[marketIndex],
+        currentMarketIndex,
         syntheticTokenPrice_inPaymentTokens_long,
         syntheticTokenPrice_inPaymentTokens_short,
         marketSideValueInPaymentToken[marketIndex][true],
@@ -746,14 +748,16 @@ contract LongShort is ILongShort, Initializable {
       );
 
       assetPrice[marketIndex] = uint256(newAssetPrice);
-      marketUpdateIndex[marketIndex] += 1;
+
+      currentMarketIndex++;
+      marketUpdateIndex[marketIndex] = currentMarketIndex;
 
       syntheticToken_priceSnapshot[marketIndex][true][
-        marketUpdateIndex[marketIndex]
+        currentMarketIndex
       ] = syntheticTokenPrice_inPaymentTokens_long;
 
       syntheticToken_priceSnapshot[marketIndex][false][
-        marketUpdateIndex[marketIndex]
+        currentMarketIndex
       ] = syntheticTokenPrice_inPaymentTokens_short;
 
       (
@@ -776,7 +780,7 @@ contract LongShort is ILongShort, Initializable {
 
       emit SystemStateUpdated(
         marketIndex,
-        marketUpdateIndex[marketIndex],
+        currentMarketIndex,
         newAssetPrice,
         newLongPoolValue,
         newShortPoolValue,
