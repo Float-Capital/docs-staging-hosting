@@ -969,24 +969,19 @@ contract Staker is IStaker, Initializable {
     uint256 amount
   ) external {
     address token = syntheticTokens[marketIndex][isWithdrawFromLong];
-    require(userAmountStaked[token][msg.sender] >= amount, "not enough to withdraw");
 
     ILongShort(longShort).updateSystemState(marketIndex);
     _mintAccumulatedFloatAndExecuteOutstandingShifts(marketIndex, msg.sender);
 
-    userAmountStaked[token][msg.sender] -= amount;
+    uint256 currentAmountStaked = userAmountStaked[token][msg.sender];
+    // If this value is greater than zero they have pending nextPriceShifts; don't allow user to shit these reserved tokens.
+    uint256 amountToShiftForThisToken = userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[
+      marketIndex
+    ][isWithdrawFromLong][msg.sender];
 
-    if (userNextPrice_stakedSyntheticTokenShiftIndex[marketIndex][msg.sender] > 0) {
-      // If they still have outstanding shifts after minting float, then check
-      // that they don't withdraw more than their shifts allow.
-      uint256 amountToShiftForThisToken = userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[
-        marketIndex
-      ][isWithdrawFromLong][msg.sender];
-
-      require(
-        userAmountStaked[token][msg.sender] >= amountToShiftForThisToken,
-        "Outstanding next price stake shifts too great"
-      );
+    unchecked {
+      require(currentAmountStaked >= amount + amountToShiftForThisToken, "not enough to withdraw");
+      userAmountStaked[token][msg.sender] = currentAmountStaked - amount;
     }
 
     _withdraw(marketIndex, token, amount);
