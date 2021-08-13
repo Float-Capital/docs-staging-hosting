@@ -13,7 +13,7 @@ contract TokenFactory is ITokenFactory {
     ╚═══════════════════════════╝*/
 
   /// @notice address of long short contract
-  address public longShort;
+  address public immutable longShort;
 
   /*╔═══════════════════════════╗
     ║         MODIFIERS         ║

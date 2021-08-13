@@ -36,7 +36,7 @@ contract LongShortInternalStateSetters is LongShort {
     }
   }
 
-  function setAssetPrice(uint32 marketIndex, uint256 _assetPrice) external {
+  function setAssetPrice(uint32 marketIndex, int256 _assetPrice) external {
     assetPrice[marketIndex] = _assetPrice;
   }
 
@@ -45,7 +45,7 @@ contract LongShortInternalStateSetters is LongShort {
     uint256 _latestUpdateIndexForMarket,
     uint256 syntheticTokenPrice_inPaymentTokens_long,
     uint256 syntheticTokenPrice_inPaymentTokens_short,
-    uint256 _assetPrice,
+    int256 _assetPrice,
     uint256 longValue,
     uint256 shortValue,
     address oracleManager,
