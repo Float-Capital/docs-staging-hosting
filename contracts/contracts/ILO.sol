@@ -17,7 +17,7 @@ contract ILO is Initializable, UUPSUpgradeable, AccessControlUpgradeable {
 
   address public longShort;
 
-  // whitlist of partipants
+  // whitelist of participants
   mapping(address => mapping(uint32 => uint256)) public whitelistAllocation;
 
   // timestamp at which user added liquidity....
