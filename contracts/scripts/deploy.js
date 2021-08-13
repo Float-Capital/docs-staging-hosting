@@ -28,7 +28,7 @@ async function main() {
     return;
   }
 
-  let paymentToken
+  let paymentToken;
   // We use actual bUSD for the BSC testnet instead of fake DAI.
   if (network.name != "mumbai") {
     console.log(network.name);
@@ -95,9 +95,14 @@ async function main() {
   console.log("longShort address:", longShort.address);
   console.log("tokenFactory address:", tokenFactory.address);
 
-  console.log("before test txs")
-  await runTestTransactions({ staker, longShort: longShort.connect(admin), paymentToken, treasury })
-  console.log("after test txs")
+  console.log("before test txs");
+  await runTestTransactions({
+    staker,
+    longShort: longShort.connect(admin),
+    paymentToken,
+    treasury
+  });
+  console.log("after test txs");
 }
 
 main()
