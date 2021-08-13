@@ -33,4 +33,9 @@ interface ILongShort {
     bool isShiftFromLong,
     uint256 priceSnapshotIndex
   ) external view returns (uint256 amountSynthShiftedToOtherSide);
+
+  function mintLongNextPrice(uint32 marketIndex, uint256 amount) external virtual;
+
+  function mintShortNextPrice(uint32 marketIndex, uint256 amount) external virtual;
+
 }

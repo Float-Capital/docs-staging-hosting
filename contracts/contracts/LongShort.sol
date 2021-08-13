@@ -869,14 +869,14 @@ contract LongShort is ILongShort, Initializable {
   /// @notice Allows users to mint long synthetic assets for a market. To prevent front-running these mints are executed on the next price update from the oracle.
   /// @param marketIndex An uint32 which uniquely identifies a market.
   /// @param amount Amount of payment tokens in that token's lowest denominationfor which to mint synthetic assets at next price.
-  function mintLongNextPrice(uint32 marketIndex, uint256 amount) external {
+  function mintLongNextPrice(uint32 marketIndex, uint256 amount) external override {
     _mintNextPrice(marketIndex, amount, true);
   }
 
   /// @notice Allows users to mint short synthetic assets for a market. To prevent front-running these mints are executed on the next price update from the oracle.
   /// @param marketIndex An uint32 which uniquely identifies a market.
   /// @param amount Amount of payment tokens in that token's lowest denominationfor which to mint synthetic assets at next price.
-  function mintShortNextPrice(uint32 marketIndex, uint256 amount) external {
+  function mintShortNextPrice(uint32 marketIndex, uint256 amount) external override {
     _mintNextPrice(marketIndex, amount, false);
   }
 
