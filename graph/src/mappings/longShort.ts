@@ -90,7 +90,6 @@ export function handleLongShortV1(event: LongShortV1): void {
   let admin = event.params.admin;
   let tokenFactoryParam = event.params.tokenFactory;
   // TODO: do something with the treasury - not recorded at the moment!
-  let treasury = event.params.treasury;
   let tokenFactoryString = tokenFactoryParam.toHex();
   let stakerParam = event.params.staker;
   let stakerString = stakerParam.toHex();
@@ -126,9 +125,9 @@ export function handleLongShortV1(event: LongShortV1): void {
   saveEventToStateChange(
     event,
     "LongShortV1",
-    [admin.toHex(), treasury.toHex(), tokenFactoryString, stakerString],
-    ["admin", "treasury", "tokenFactory", "staker"],
-    ["address", "address", "address", "address"],
+    [admin.toHex(), tokenFactoryString, stakerString],
+    ["admin", "tokenFactory", "staker"],
+    ["address", "address", "address"],
     [],
     []
   );
