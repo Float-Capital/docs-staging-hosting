@@ -277,7 +277,7 @@ let testUnit =
               );
             LongShortSmocked.InternalMock._claimAndDistributeYieldThenRebalanceMarketCalls()
             ->Chai.recordArrayDeepEqualFlat([|
-                {marketIndex, oldAssetPrice, newAssetPrice},
+                {marketIndex, newAssetPrice},
               |]);
           },
         );

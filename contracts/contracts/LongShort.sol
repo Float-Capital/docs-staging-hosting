@@ -634,14 +634,14 @@ contract LongShort is ILongShort, Initializable {
   /// This prevents an attack whereby the user imbalances a side to capture all accrued yield.
   /// @param marketIndex The market for which to execute the function for.
   /// @param newAssetPrice The new asset price.
-  /// @param oldAssetPrice The old asset price.
   /// @return longValue The value of the long side after rebalancing.
   /// @return shortValue The value of the short side after rebalancing.
-  function _claimAndDistributeYieldThenRebalanceMarket(
-    uint32 marketIndex,
-    int256 newAssetPrice,
-    int256 oldAssetPrice
-  ) internal virtual returns (uint256 longValue, uint256 shortValue) {
+  function _claimAndDistributeYieldThenRebalanceMarket(uint32 marketIndex, int256 newAssetPrice)
+    internal
+    virtual
+    returns (uint256 longValue, uint256 shortValue)
+  {
+    int256 oldAssetPrice = int256(assetPrice[marketIndex]);
     // Claiming and distributing the yield
     longValue = marketSideValueInPaymentToken[marketIndex][true];
     shortValue = marketSideValueInPaymentToken[marketIndex][false];
@@ -718,23 +718,24 @@ contract LongShort is ILongShort, Initializable {
   {
     // If a negative int is return this should fail.
     int256 newAssetPrice = IOracleManager(oracleManagers[marketIndex]).updatePrice();
-    int256 oldAssetPrice = int256(assetPrice[marketIndex]);
 
-    bool assetPriceHasChanged = oldAssetPrice != newAssetPrice;
+    uint256 currentMarketIndex = marketUpdateIndex[marketIndex];
+
+    bool assetPriceHasChanged = int256(assetPrice[marketIndex]) != newAssetPrice;
 
     if (assetPriceHasChanged) {
       uint256 syntheticTokenPrice_inPaymentTokens_long = syntheticToken_priceSnapshot[marketIndex][
         true
-      ][marketUpdateIndex[marketIndex]];
+      ][currentMarketIndex];
       uint256 syntheticTokenPrice_inPaymentTokens_short = syntheticToken_priceSnapshot[marketIndex][
         false
-      ][marketUpdateIndex[marketIndex]];
+      ][currentMarketIndex];
       // if there is a price change and the 'staker' contract has pending updates, push the stakers price snapshot index to the staker
       // (so the staker can handle its internal accounting)
 
       IStaker(staker).pushUpdatedMarketPricesToUpdateFloatIssuanceCalculations(
         marketIndex,
-        marketUpdateIndex[marketIndex],
+        currentMarketIndex,
         syntheticTokenPrice_inPaymentTokens_long,
         syntheticTokenPrice_inPaymentTokens_short,
         marketSideValueInPaymentToken[marketIndex][true],
@@ -744,7 +745,7 @@ contract LongShort is ILongShort, Initializable {
       (
         uint256 newLongPoolValue,
         uint256 newShortPoolValue
-      ) = _claimAndDistributeYieldThenRebalanceMarket(marketIndex, newAssetPrice, oldAssetPrice);
+      ) = _claimAndDistributeYieldThenRebalanceMarket(marketIndex, newAssetPrice);
 
       syntheticTokenPrice_inPaymentTokens_long = _getSyntheticTokenPrice(
         newLongPoolValue,
@@ -756,14 +757,16 @@ contract LongShort is ILongShort, Initializable {
       );
 
       assetPrice[marketIndex] = uint256(newAssetPrice);
-      marketUpdateIndex[marketIndex] += 1;
+
+      currentMarketIndex++;
+      marketUpdateIndex[marketIndex] = currentMarketIndex;
 
       syntheticToken_priceSnapshot[marketIndex][true][
-        marketUpdateIndex[marketIndex]
+        currentMarketIndex
       ] = syntheticTokenPrice_inPaymentTokens_long;
 
       syntheticToken_priceSnapshot[marketIndex][false][
-        marketUpdateIndex[marketIndex]
+        currentMarketIndex
       ] = syntheticTokenPrice_inPaymentTokens_short;
 
       (
@@ -786,7 +789,7 @@ contract LongShort is ILongShort, Initializable {
 
       emit SystemStateUpdated(
         marketIndex,
-        marketUpdateIndex[marketIndex],
+        currentMarketIndex,
         newAssetPrice,
         newLongPoolValue,
         newShortPoolValue,

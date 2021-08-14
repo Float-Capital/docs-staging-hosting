@@ -37,5 +37,4 @@ interface ILongShort {
   function mintLongNextPrice(uint32 marketIndex, uint256 amount) external virtual;
 
   function mintShortNextPrice(uint32 marketIndex, uint256 amount) external virtual;
-
 }
