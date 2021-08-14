@@ -701,6 +701,7 @@ contract Staker is IStaker, Initializable {
       // Handle shifts from LONG side:
 
 
+		// Handle shifts from LONG side:
         uint256 amountToShiftAwayFromCurrentSide
        = userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[marketIndex][true][user];
       // Update the users balances
