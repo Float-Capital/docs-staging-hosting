@@ -81,18 +81,6 @@ contract LongShortInternalStateSetters is LongShort {
     overRideexecuteOutstandingNextPriceSettlements = shouldUseMock;
   }
 
-  function _executeOutstandingNextPriceSettlementsMock(address _user, uint32 _marketIndex)
-    internal
-  {
-    emit executeOutstandingNextPriceSettlementsMock(_user, _marketIndex);
-  }
-
-  function _executeOutstandingNextPriceSettlementsExposedWithEvent(address user, uint32 marketIndex)
-    external
-  {
-    _executeOutstandingNextPriceSettlements(user, marketIndex);
-  }
-
   function setGetUsersConfirmedButNotSettledBalanceGlobals(
     uint32 marketIndex,
     address user,
