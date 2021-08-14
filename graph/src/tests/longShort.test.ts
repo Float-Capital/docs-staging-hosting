@@ -38,29 +38,17 @@ export function runTests(): void {
     let admin = Address.fromString(
       "0x0000000000000000000000000000000000000001"
     );
-    let treasury = Address.fromString(
-      "0x0000000000000000000000000000000000000002"
-    );
     let tokenFactory = Address.fromString(
       "0x0000000000000000000000000000000000000003"
     );
     let staker = Address.fromString(
       "0x0000000000000000000000000000000000000004"
     );
-    let longShortEvent = createLongShortV1Event(
-      admin,
-      treasury,
-      tokenFactory,
-      staker
-    );
+    let longShortEvent = createLongShortV1Event(admin, tokenFactory, staker);
 
     assert.equals(
       ethereum.Value.fromAddress(longShortEvent.params.admin),
       ethereum.Value.fromAddress(admin)
-    );
-    assert.equals(
-      ethereum.Value.fromAddress(longShortEvent.params.treasury),
-      ethereum.Value.fromAddress(treasury)
     );
     assert.equals(
       ethereum.Value.fromAddress(longShortEvent.params.tokenFactory),
