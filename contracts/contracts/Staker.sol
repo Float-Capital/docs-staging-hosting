@@ -698,13 +698,12 @@ contract Staker is IStaker, Initializable {
         usersShiftIndex
       );
 
-      // Handle shifts from LONG side:
+      // Update the users balances
 
 
-		// Handle shifts from LONG side:
         uint256 amountToShiftAwayFromCurrentSide
        = userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[marketIndex][true][user];
-      // Update the users balances
+      // Handle shifts from LONG side:
       if (amountToShiftAwayFromCurrentSide > 0) {
         amountStakedShort += ILongShort(longShort).getAmountSyntheticTokenToMintOnTargetSide(
           marketIndex,
@@ -717,10 +716,10 @@ contract Staker is IStaker, Initializable {
         userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[marketIndex][true][user] = 0;
       }
 
-      // Handle shifts from SHORT side:
       amountToShiftAwayFromCurrentSide = userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[
         marketIndex
       ][false][user];
+      // Handle shifts from SHORT side:
       if (amountToShiftAwayFromCurrentSide > 0) {
         amountStakedLong += ILongShort(longShort).getAmountSyntheticTokenToMintOnTargetSide(
           marketIndex,

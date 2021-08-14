@@ -274,7 +274,7 @@ contract LongShort is ILongShort, Initializable {
     syntheticTokens[marketIndex][true] = ITokenFactory(tokenFactory).createSyntheticToken(
       string(abi.encodePacked("Float Up ", syntheticName)),
       string(abi.encodePacked("fu", syntheticSymbol)),
-      staker,
+      _staker,
       marketIndex,
       true
     );
@@ -283,7 +283,7 @@ contract LongShort is ILongShort, Initializable {
     syntheticTokens[marketIndex][false] = ITokenFactory(tokenFactory).createSyntheticToken(
       string(abi.encodePacked("Float Down ", syntheticName)),
       string(abi.encodePacked("fd", syntheticSymbol)),
-      staker,
+      _staker,
       marketIndex,
       false
     );
