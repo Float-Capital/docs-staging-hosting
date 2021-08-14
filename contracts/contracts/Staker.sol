@@ -698,6 +698,8 @@ contract Staker is IStaker, Initializable {
         usersShiftIndex
       );
 
+      // Handle shifts from LONG side:
+
 
         uint256 amountToShiftAwayFromCurrentSide
        = userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[marketIndex][true][user];
@@ -714,6 +716,7 @@ contract Staker is IStaker, Initializable {
         userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[marketIndex][true][user] = 0;
       }
 
+      // Handle shifts from SHORT side:
       amountToShiftAwayFromCurrentSide = userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[
         marketIndex
       ][false][user];

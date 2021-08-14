@@ -464,7 +464,7 @@ export function handleSyntheticMarketCreated(
   );
 }
 
-export function handleMarketOracleUpdated(event: OracleUpdated): void {
+export function handleOracleUpdated(event: OracleUpdated): void {
   let marketIndex = event.params.marketIndex;
   let oldOracleAddress = event.params.oldOracleAddress;
   let newOracleAddress = event.params.newOracleAddress;
