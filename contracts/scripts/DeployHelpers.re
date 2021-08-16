@@ -8,12 +8,9 @@ let minRecieverBalance = bnFromString("20000000000000000");
 let topupBalanceIfLow = (~from: Wallet.t, ~to_: Wallet.t) => {
   let%AwaitThen senderBalance = from->Wallet.getBalance;
 
-  Js.log({"sender balance": senderBalance->bnToString});
   if (senderBalance->bnLt(minSenderBalance)) {
-    Js.log(
+    Js.Exn.raiseError(
       "WARNING - Sender doesn't have enough eth - need at least 0.05 ETH! (top up to over 1 ETH to be safe)",
-      // %raw
-      // {|throw "Sender doesn't have enough eth - need at least 0.05 ETH! (top up to over 1 ETH to be safe)"|};
     );
   };
   let%Await recieverBalance = to_->Wallet.getBalance;
@@ -27,15 +24,15 @@ let topupBalanceIfLow = (~from: Wallet.t, ~to_: Wallet.t) => {
   };
 };
 
-let mintAndApprove = (token, amount, user, approvedAddress) => {
-  let%AwaitThen _ = token->ERC20Mock.mint(~_to=user.address, ~amount);
+let mintAndApprove = (~paymentToken, ~amount, ~user, ~approvedAddress) => {
+  let%AwaitThen _ = paymentToken->ERC20Mock.mint(~_to=user.address, ~amount);
 
-  token
+  paymentToken
   ->ContractHelpers.connect(~address=user)
   ->ERC20Mock.approve(~spender=approvedAddress, ~amount);
 };
 
-let stakeSynthLong = (amount, longShort, marketIndex, user) => {
+let stakeSynthLong = (~amount, ~longShort, ~marketIndex, ~user) => {
   let%AwaitThen longAddress =
     longShort->LongShort.syntheticTokens(marketIndex, true);
   let%AwaitThen synth = SyntheticToken.at(longAddress);
@@ -61,15 +58,7 @@ let executeOnMarkets =
   );
 };
 
-let setOracleManagerPrice = (longShort, marketIndex, admin) => {
-  let%AwaitThen longAddress =
-    longShort->LongShort.syntheticTokens(marketIndex, true);
-
-  let%AwaitThen shortAddress =
-    longShort->LongShort.syntheticTokens(marketIndex, false);
-  let%AwaitThen long = SyntheticToken.at(longAddress);
-  let%AwaitThen short = SyntheticToken.at(shortAddress);
-
+let setOracleManagerPrice = (~longShort, ~marketIndex, ~admin) => {
   let%AwaitThen oracleManagerAddr =
     longShort->LongShort.oracleManagers(marketIndex);
   let%AwaitThen oracleManager = OracleManagerMock.at(oracleManagerAddr);
@@ -77,57 +66,80 @@ let setOracleManagerPrice = (longShort, marketIndex, admin) => {
   let%AwaitThen currentPrice = oracleManager->OracleManagerMock.getLatestPrice;
   let nextPrice = currentPrice->mul(bnFromInt(101))->div(bnFromInt(100));
 
-  Js.log("Set Oracle Price to:" ++ nextPrice->bnToString);
   oracleManager
   ->ContractHelpers.connect(~address=admin)
   ->OracleManagerMock.setPrice(~newPrice=nextPrice);
 };
 
 let redeemShortNextPriceWithSystemUpdate =
-    (amount, marketIndex, longShort, user, admin) => {
+    (~amount, ~marketIndex, ~longShort, ~user, ~admin) => {
   let%AwaitThen _ =
     longShort
     ->ContractHelpers.connect(~address=user)
     ->LongShort.redeemShortNextPrice(~marketIndex, ~tokens_redeem=amount);
-  let%AwaitThen _ = setOracleManagerPrice(longShort, marketIndex, admin);
+  let%AwaitThen _ = setOracleManagerPrice(~longShort, ~marketIndex, ~admin);
   longShort->LongShort.updateSystemState(~marketIndex);
 };
 
 let mintLongNextPriceWithSystemUpdate =
-    (amount, marketIndex, paymentToken, longShort: LongShort.t, user, admin) => {
+    (
+      ~amount,
+      ~marketIndex,
+      ~paymentToken,
+      ~longShort: LongShort.t,
+      ~user,
+      ~admin,
+    ) => {
   let%AwaitThen _ =
-    mintAndApprove(paymentToken, amount, user, longShort.address);
+    mintAndApprove(
+      ~paymentToken,
+      ~amount,
+      ~user,
+      ~approvedAddress=longShort.address,
+    );
   let%AwaitThen _ =
     longShort
     ->ContractHelpers.connect(~address=user)
     ->LongShort.mintLongNextPrice(~marketIndex, ~amount);
-  let%AwaitThen _ = setOracleManagerPrice(longShort, marketIndex, admin);
+  let%AwaitThen _ = setOracleManagerPrice(~longShort, ~marketIndex, ~admin);
   longShort->LongShort.updateSystemState(~marketIndex);
 };
 
 let mintShortNextPriceWithSystemUpdate =
-    (amount, marketIndex, paymentToken, longShort: LongShort.t, user, admin) => {
+    (
+      ~amount,
+      ~marketIndex,
+      ~paymentToken,
+      ~longShort: LongShort.t,
+      ~user,
+      ~admin,
+    ) => {
   let%AwaitThen _ =
-    mintAndApprove(paymentToken, amount, user, longShort.address);
+    mintAndApprove(
+      ~paymentToken,
+      ~amount,
+      ~user,
+      ~approvedAddress=longShort.address,
+    );
   let%AwaitThen _ =
     longShort
     ->ContractHelpers.connect(~address=user)
     ->LongShort.mintShortNextPrice(~marketIndex, ~amount);
 
-  let%AwaitThen _ = setOracleManagerPrice(longShort, marketIndex, admin);
+  let%AwaitThen _ = setOracleManagerPrice(~longShort, ~marketIndex, ~admin);
 
   longShort->LongShort.updateSystemState(~marketIndex);
 };
 
 let deployTestMarket =
     (
-      syntheticName,
-      syntheticSymbol,
-      longShortInstance: LongShort.t,
-      treasuryInstance: Treasury_v0.t,
-      admin,
-      networkName,
-      paymentToken: ERC20Mock.t,
+      ~syntheticName,
+      ~syntheticSymbol,
+      ~longShortInstance: LongShort.t,
+      ~treasuryInstance: Treasury_v0.t,
+      ~admin,
+      ~networkName,
+      ~paymentToken: ERC20Mock.t,
     ) => {
   let%AwaitThen oracleManager = OracleManagerMock.make(~admin=admin.address);
 
@@ -161,11 +173,12 @@ let deployTestMarket =
 
   let%AwaitThen _ =
     mintAndApprove(
-      paymentToken,
-      bnFromString("2000000000000000000"),
-      admin,
-      longShortInstance.address,
+      ~paymentToken,
+      ~amount=bnFromString("2000000000000000000"),
+      ~user=admin,
+      ~approvedAddress=longShortInstance.address,
     );
+
   let unstakeFee_e18 = bnFromString("5000000000000000"); // 50 basis point unstake fee
   let initialMarketSeedForEachMarketSide =
     bnFromString("1000000000000000000");

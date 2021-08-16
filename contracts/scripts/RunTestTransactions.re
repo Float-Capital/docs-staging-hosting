@@ -25,35 +25,35 @@ let runTestTransactions = ({staker, longShort, treasury, paymentToken}) => {
 
   let%AwaitThen _ =
     deployTestMarket(
-      "ETH Killers",
-      "ETHK",
-      longShort,
-      treasury,
-      admin,
-      "networkName",
-      paymentToken: ERC20Mock.t,
+      ~syntheticName="Eth Market",
+      ~syntheticSymbol="FL_ETH",
+      ~longShortInstance=longShort,
+      ~treasuryInstance=treasury,
+      ~admin,
+      ~networkName="networkName",
+      ~paymentToken: ERC20Mock.t,
     );
 
   let%AwaitThen _ =
     deployTestMarket(
-      "The Flippening",
-      "EBD",
-      longShort,
-      treasury,
-      admin,
-      "networkName",
-      paymentToken: ERC20Mock.t,
+      ~syntheticName="The Flippening",
+      ~syntheticSymbol="FL_FLIP",
+      ~longShortInstance=longShort,
+      ~treasuryInstance=treasury,
+      ~admin,
+      ~networkName="networkName",
+      ~paymentToken: ERC20Mock.t,
     );
 
   let%AwaitThen _ =
     deployTestMarket(
-      "Doge Market",
-      "FL_DOGE",
-      longShort,
-      treasury,
-      admin,
-      "networkName",
-      paymentToken: ERC20Mock.t,
+      ~syntheticName="Doge Market",
+      ~syntheticSymbol="FL_DOGE",
+      ~longShortInstance=longShort,
+      ~treasuryInstance=treasury,
+      ~admin,
+      ~networkName="networkName",
+      ~paymentToken: ERC20Mock.t,
     );
   let initialMarkets = [|1, 2, 3|];
 
@@ -62,7 +62,6 @@ let runTestTransactions = ({staker, longShort, treasury, paymentToken}) => {
   let redeemShortAmount = shortMintAmount->div(bnFromInt(2));
   let longStakeAmount = bnFromInt(1);
 
-  let%AwaitThen currentMarketIndex = longShort->LongShort.latestMarket;
   Js.log("running update system state");
   let%AwaitThen _ =
     executeOnMarkets(
@@ -74,12 +73,12 @@ let runTestTransactions = ({staker, longShort, treasury, paymentToken}) => {
     executeOnMarkets(
       initialMarkets,
       mintLongNextPriceWithSystemUpdate(
-        longMintAmount,
-        _,
-        paymentToken,
-        longShort,
-        user1,
-        admin,
+        ~amount=longMintAmount,
+        ~marketIndex=_,
+        ~paymentToken,
+        ~longShort,
+        ~user=user1,
+        ~admin,
       ),
     );
 
@@ -88,12 +87,12 @@ let runTestTransactions = ({staker, longShort, treasury, paymentToken}) => {
     executeOnMarkets(
       initialMarkets,
       mintShortNextPriceWithSystemUpdate(
-        shortMintAmount,
-        _,
-        paymentToken,
-        longShort,
-        user1,
-        admin,
+        ~amount=shortMintAmount,
+        ~marketIndex=_,
+        ~paymentToken,
+        ~longShort,
+        ~user=user1,
+        ~admin,
       ),
     );
 
@@ -102,18 +101,18 @@ let runTestTransactions = ({staker, longShort, treasury, paymentToken}) => {
     executeOnMarkets(
       initialMarkets,
       redeemShortNextPriceWithSystemUpdate(
-        redeemShortAmount,
-        _,
-        longShort,
-        user1,
-        admin,
+        ~amount=redeemShortAmount,
+        ~marketIndex=_,
+        ~longShort,
+        ~user=user1,
+        ~admin,
       ),
     );
 
   let%AwaitThen _ =
     executeOnMarkets(
       initialMarkets,
-      setOracleManagerPrice(longShort, _, admin),
+      setOracleManagerPrice(~longShort, ~marketIndex=_, ~admin),
     );
 
   Js.log("Executing update system state");
@@ -126,10 +125,13 @@ let runTestTransactions = ({staker, longShort, treasury, paymentToken}) => {
   let%AwaitThen _ =
     executeOnMarkets(
       initialMarkets,
-      stakeSynthLong(longStakeAmount, longShort, _, user1),
+      stakeSynthLong(
+        ~amount=longStakeAmount,
+        ~longShort,
+        ~marketIndex=_,
+        ~user=user1,
+      ),
     );
-
-  Js.log("End deploy tests");
 
   JsPromise.resolve();
 };
