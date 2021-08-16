@@ -831,13 +831,11 @@ contract LongShort is ILongShort, Initializable {
     internal
     virtual
   {
-    require(
       IERC20(paymentTokens[marketIndex]).safeTransferFrom(
         msg.sender,
         yieldManagers[marketIndex],
         amount
-      )
-    );
+      );
   }
 
   /*╔═══════════════════════════╗
