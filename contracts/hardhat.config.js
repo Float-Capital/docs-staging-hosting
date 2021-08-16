@@ -17,7 +17,7 @@ const {
   etherscanApiKey,
   polygonscanApiKey,
   mumbaiProviderUrl,
-} = require("./secretsManager.js");
+} = require("./secretsManager.example.js");
 
 let runCoverage =
   !process.env.DONT_RUN_REPORT_SUMMARY ||
