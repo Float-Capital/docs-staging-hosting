@@ -2,6 +2,7 @@
 'use strict';
 
 var Curry = require("rescript/lib/js/curry.js");
+var Js_exn = require("rescript/lib/js/js_exn.js");
 var LetOps = require("../test-waffle/library/LetOps.js");
 var Globals = require("../test-waffle/library/Globals.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
@@ -15,11 +16,8 @@ var minRecieverBalance = Globals.bnFromString("20000000000000000");
 
 function topupBalanceIfLow(from, to_) {
   return LetOps.AwaitThen.let_(from.getBalance(), (function (senderBalance) {
-                console.log({
-                      "sender balance": Globals.bnToString(senderBalance)
-                    });
                 if (Globals.bnLt(senderBalance, minSenderBalance)) {
-                  console.log("WARNING - Sender doesn't have enough eth - need at least 0.05 ETH! (top up to over 1 ETH to be safe)");
+                  Js_exn.raiseError("WARNING - Sender doesn't have enough eth - need at least 0.05 ETH! (top up to over 1 ETH to be safe)");
                 }
                 return LetOps.Await.let_(to_.getBalance(), (function (recieverBalance) {
                               if (Globals.bnLt(recieverBalance, minRecieverBalance)) {
@@ -34,9 +32,9 @@ function topupBalanceIfLow(from, to_) {
               }));
 }
 
-function mintAndApprove(token, amount, user, approvedAddress) {
-  return LetOps.AwaitThen.let_(token.mint(user.address, amount), (function (param) {
-                return token.connect(user).approve(approvedAddress, amount);
+function mintAndApprove(paymentToken, amount, user, approvedAddress) {
+  return LetOps.AwaitThen.let_(paymentToken.mint(user.address, amount), (function (param) {
+                return paymentToken.connect(user).approve(approvedAddress, amount);
               }));
 }
 
@@ -63,20 +61,11 @@ function executeOnMarkets(marketIndexes, functionToExecute) {
 }
 
 function setOracleManagerPrice(longShort, marketIndex, admin) {
-  return LetOps.AwaitThen.let_(longShort.syntheticTokens(marketIndex, true), (function (longAddress) {
-                return LetOps.AwaitThen.let_(longShort.syntheticTokens(marketIndex, false), (function (shortAddress) {
-                              return LetOps.AwaitThen.let_(SyntheticToken.at(longAddress), (function ($$long) {
-                                            return LetOps.AwaitThen.let_(SyntheticToken.at(shortAddress), (function ($$short) {
-                                                          return LetOps.AwaitThen.let_(longShort.oracleManagers(marketIndex), (function (oracleManagerAddr) {
-                                                                        return LetOps.AwaitThen.let_(OracleManagerMock.at(oracleManagerAddr), (function (oracleManager) {
-                                                                                      return LetOps.AwaitThen.let_(oracleManager.getLatestPrice(), (function (currentPrice) {
-                                                                                                    var nextPrice = Globals.div(Globals.mul(currentPrice, Globals.bnFromInt(101)), Globals.bnFromInt(100));
-                                                                                                    console.log("Set Oracle Price to:" + Globals.bnToString(nextPrice));
-                                                                                                    return oracleManager.connect(admin).setPrice(nextPrice);
-                                                                                                  }));
-                                                                                    }));
-                                                                      }));
-                                                        }));
+  return LetOps.AwaitThen.let_(longShort.oracleManagers(marketIndex), (function (oracleManagerAddr) {
+                return LetOps.AwaitThen.let_(OracleManagerMock.at(oracleManagerAddr), (function (oracleManager) {
+                              return LetOps.AwaitThen.let_(oracleManager.getLatestPrice(), (function (currentPrice) {
+                                            var nextPrice = Globals.div(Globals.mul(currentPrice, Globals.bnFromInt(101)), Globals.bnFromInt(100));
+                                            return oracleManager.connect(admin).setPrice(nextPrice);
                                           }));
                             }));
               }));

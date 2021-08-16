@@ -18,7 +18,7 @@ async function main() {
   const FloatCapital = await ethers.getContractFactory(FLOAT_CAPITAL);
 
   if (network.name == "matic") {
-    throw "Don't save or run this migration if on mainnet (remove when ready)";
+    throw "Don't save or run this migration if on matic (remove when ready)";
   }
 
   const [deployer, admin] = await ethers.getSigners();
@@ -29,7 +29,6 @@ async function main() {
   }
 
   let paymentToken;
-  // We use actual bUSD for the BSC testnet instead of fake DAI.
   if (network.name != "mumbai") {
     console.log(network.name);
     paymentToken = await DAI.deploy("dai token", "DAI");
@@ -77,7 +76,7 @@ async function main() {
     );
   await floatToken
     .connect(admin)
-    .initializeFloatToken("Float token", "FLOAT TOKEN", staker.address);
+    .initialize("Float token", "FLOAT TOKEN", staker.address);
 
   // Initialize here as there are circular contract dependencies.
   await staker.connect(admin).initialize(
@@ -100,7 +99,7 @@ async function main() {
     staker,
     longShort: longShort.connect(admin),
     paymentToken,
-    treasury
+    treasury,
   });
   console.log("after test txs");
 }
