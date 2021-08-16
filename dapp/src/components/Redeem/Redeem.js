@@ -42,7 +42,7 @@ function Redeem(Props) {
     var optFirstMarket = Belt_Array.get(match.syntheticMarkets, Belt_Option.getWithDefault(Belt_Int.fromString(marketIndex), 1) - 1 | 0);
     tmp = optFirstMarket !== undefined ? React.createElement(RedeemForm.make, {
             market: optFirstMarket,
-            isLong: actionOption !== "short"
+            isLong: actionOption.toLowerCase() === "long"
           }) : React.createElement("p", undefined, "No markets exist");
   } else {
     tmp = "You might think this is impossible, but depending on the situation it might not be!";

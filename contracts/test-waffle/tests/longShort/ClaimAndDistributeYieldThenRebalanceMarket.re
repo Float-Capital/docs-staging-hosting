@@ -23,11 +23,16 @@ let testUnit =
     });
 
     let setup = (~newAssetPrice) => {
+      let%AwaitThen _ =
+        contracts.contents.longShort
+        ->LongShort.Exposed.setAssetPrice(
+            ~marketIndex,
+            ~assetPrice=oldAssetPrice,
+          );
       contracts.contents.longShort
       ->LongShort.Exposed._claimAndDistributeYieldThenRebalanceMarketExposedCall(
           ~marketIndex,
           ~newAssetPrice,
-          ~oldAssetPrice,
         );
     };
 

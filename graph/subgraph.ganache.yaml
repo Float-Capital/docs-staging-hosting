@@ -14,8 +14,6 @@ dataSources:
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
-        - ExecuteNextPriceMintSettlementUser
-        - ExecuteNextPriceRedeemSettlementUser
         - ExecuteNextPriceMarketSideShiftSettlementUser
         - ExecuteNextPriceMintSettlementUser
         - ExecuteNextPriceRedeemSettlementUser
@@ -38,10 +36,6 @@ dataSources:
           handler: handleExecuteNextPriceRedeemSettlementUser
         - event: ExecuteNextPriceMarketSideShiftSettlementUser(address,uint32,bool,uint256)
           handler: handleExecuteNextPriceMarketSideShiftSettlementUser
-        - event: ExecuteNextPriceMintSettlementUser(address,uint32,bool,uint256)
-          handler: handleExecuteNextPriceMintSettlementUser
-        - event: ExecuteNextPriceRedeemSettlementUser(address,uint32,bool,uint256)
-          handler: handleExecuteNextPriceRedeemSettlementUser
         - event: ExecuteNextPriceSettlementsUser(address,uint32)
           handler: handleExecuteNextPriceSettlementsUser
         - event: LongShortV1(address,address,address,address)
@@ -55,7 +49,7 @@ dataSources:
         - event: NextPriceSyntheticPositionShift(uint32,bool,uint256,address,uint256)
           handler: handleNextPriceSyntheticPositionShift
         - event: OracleUpdated(uint32,address,address)
-          handler: handleOracleUpdated
+          handler: handleMarketOracleUpdated
         - event: SyntheticMarketCreated(uint32,address,address,address,uint256,string,string,address,address)
           handler: handleSyntheticMarketCreated
         - event: SystemStateUpdated(uint32,uint256,int256,uint256,uint256,uint256,uint256)
@@ -86,7 +80,6 @@ dataSources:
         - StakeWithdrawalFeeUpdated
         - StakeWithdrawn
         - StakerV1
-        - SyntheticTokensShifted
       abis:
         - name: Staker
           file: ./abis/Staker.json
@@ -115,8 +108,6 @@ dataSources:
           handler: handleStakeWithdrawn
         - event: StakerV1(address,address,address,address,uint256)
           handler: handleStakerV1
-        - event: SyntheticTokensShifted()
-          handler: handleSyntheticTokensShifted
       file: ./src/mappings/staker.ts
 
 templates:

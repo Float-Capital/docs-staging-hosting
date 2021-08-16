@@ -18,6 +18,8 @@ contract YieldManagerMock is IYieldManager {
   address public longShort;
   address public treasury;
 
+  bool public isInitialized = false;
+
   // Fixed-precision scale for interest percentages and fees.
   uint256 public constant TEN_TO_THE_18 = 1e18;
 
@@ -152,4 +154,9 @@ contract YieldManagerMock is IYieldManager {
   }
 
   function withdrawTreasuryFunds() external override longShortOnly {}
+
+  function initializeForMarket() external override longShortOnly {
+    require(!isInitialized, "Yield Manager is already in use");
+    isInitialized = true;
+  }
 }

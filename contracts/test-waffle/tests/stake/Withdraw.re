@@ -11,7 +11,7 @@ let testUnit =
     let marketIndex = Helpers.randomJsInteger();
     let amountStaked = Helpers.randomTokenAmount();
 
-    describe("_withdraw", () => {
+    describe_skip("_withdraw", () => {
       let userWallet: ref(Ethers.Wallet.t) = ref(None->Obj.magic);
       let treasury = Helpers.randomAddress();
       let amountWithdrawn =
@@ -103,17 +103,17 @@ let testUnit =
       });
 
       describe("sad case", () => {
-        before_once'(() => setup(zeroBn));
+        before_once'(() => setup(amountWithdrawn->sub(oneBn)));
         it("reverts if nothing to withdraw", () => {
           Chai.expectRevert(
             ~transaction=call.contents,
-            ~reason="nothing to withdraw",
+            ~reason="not enough to withdraw",
           )
         });
       });
     });
 
-    describe("withdraw", () => {
+    describe_skip("withdraw", () => {
       let token = Helpers.randomAddress();
       let amountWithdrawn = Helpers.randomTokenAmount();
 
@@ -127,7 +127,11 @@ let testUnit =
             );
 
         contracts.contents.staker
-        ->Staker.withdraw(~token, ~amount=amountWithdrawn);
+        ->Staker.withdraw(
+            ~marketIndex,
+            ~isWithdrawFromLong=true,
+            ~amount=amountWithdrawn,
+          );
       });
 
       it("calls updateSystemState on longShort with correct args", () => {
@@ -166,13 +170,17 @@ let testUnit =
           ~transaction=
             contracts.contents.staker
             ->ContractHelpers.connect(~address=adminWallet)
-            ->Staker.withdraw(~token, ~amount=amountWithdrawn),
+            ->Staker.withdraw(
+                ~marketIndex,
+                ~isWithdrawFromLong=true,
+                ~amount=amountWithdrawn,
+              ),
           ~reason="Outstanding next price stake shifts too great",
         );
       });
     });
 
-    describe("withdrawAll", () => {
+    describe_skip("withdrawAll", () => {
       let token = Helpers.randomAddress();
       let userWallet: ref(Ethers.Wallet.t) = ref(None->Obj.magic);
       before_once'(() => {
@@ -195,7 +203,7 @@ let testUnit =
 
         contracts.contents.staker
         ->ContractHelpers.connect(~address=userWallet.contents)
-        ->Staker.withdrawAll(~token);
+        ->Staker.withdrawAll(~marketIndex, ~isWithdrawFromLong=true);
       });
 
       it("calls updateSystemState on longShort with correct args", () => {

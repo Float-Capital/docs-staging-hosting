@@ -174,7 +174,7 @@ let initialize = (~admin: Ethers.Wallet.t, ~exposeInternals: bool) => {
   )) => {
     TokenFactory.make(~longShort=longShort.address)->JsPromise.then(tokenFactory => {
       JsPromise.all4((
-        floatToken->FloatToken.initializeFloatToken(
+        floatToken->FloatToken.initialize(
           ~name="Float token",
           ~symbol="FLOAT TOKEN",
           ~stakerAddress=staker.address,
@@ -281,6 +281,20 @@ type longShortUnitTestContracts = {
   tokenFactorySmocked: TokenFactorySmocked.t,
   yieldManagerSmocked: YieldManagerAaveSmocked.t,
   oracleManagerSmocked: OracleManagerMockSmocked.t,
+}
+
+let deployAYieldManager = (~longShort: Ethers.ethAddress) => {
+  ERC20Mock.make(~name="Pay Token 1", ~symbol="PT1")->JsPromise.then(paymentToken =>
+    YieldManagerAave.make(
+      ~longShort,
+      ~treasury=CONSTANTS.zeroAddress,
+      ~paymentToken=paymentToken.address,
+      ~aToken=CONSTANTS.zeroAddress,
+      ~lendingPool=randomAddress(),
+      ~aaveIncentivesController=randomAddress(),
+      ~aaveReferralCode=0,
+    )
+  )
 }
 
 let initializeLongShortUnit = () => {

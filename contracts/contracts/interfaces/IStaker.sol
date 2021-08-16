@@ -2,7 +2,7 @@
 
 pragma solidity 0.8.3;
 
-abstract contract IStaker {
+interface IStaker {
   function addNewStakingFund(
     uint32 marketIndex,
     address longTokenAddress,
@@ -12,7 +12,7 @@ abstract contract IStaker {
     uint256 unstakeFee_e18,
     uint256 _balanceIncentiveCurve_exponent,
     int256 _balanceIncentiveCurve_equilibriumOffset
-  ) external virtual;
+  ) external;
 
   function pushUpdatedMarketPricesToUpdateFloatIssuanceCalculations(
     uint32 marketIndex,
@@ -21,7 +21,7 @@ abstract contract IStaker {
     uint256 shortTokenPrice,
     uint256 longValue,
     uint256 shortValue
-  ) external virtual;
+  ) external;
 
-  function stakeFromUser(address from, uint256 amount) public virtual;
+  function stakeFromUser(address from, uint256 amount) external;
 }

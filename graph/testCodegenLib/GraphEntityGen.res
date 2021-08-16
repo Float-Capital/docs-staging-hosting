@@ -12,7 +12,7 @@ let entityDefinitions = result["definitions"]
 
 let getDefaultValues = typeString =>
   switch typeString {
-  | "Bytes" => `Bytes.fromHexString("0x0") as Bytes`
+  | "Bytes" => `Bytes.fromHexString("0x00") as Bytes` // needs to be even length for some reason
   | "Address" => `Address.fromString("0x0000000000000000000000000000000000000000")`
   | "Int" => "0"
   | "String" => `""`
@@ -107,7 +107,10 @@ let functions =
         let fieldName = field["name"]["value"]
 
         fieldName == "id"
-          ? ""
+          ? "\n" ++
+            `    loaded${name} = new ${name}(entityId);` ++
+            "\n" ++
+            `    returnObject.entity = loaded${name} as ${name};`
           : `    loaded${name}.${fieldName} = ${field["type"]->getFieldDefaultTypeWithNull}`
       })
       ->Array.joinWith("\n", a => a)
@@ -117,11 +120,9 @@ let functions =
       ->Js.Dict.get(name)
       ->Option.map(idArgs => {
         let argsDefinition = idArgs->Array.joinWith(",", arg => `${arg["name"]}: ${arg["type"]}`)
+        // no string interpolation in assemblyscript :(
         let idString =
-          "`" ++
-          idArgs->Array.joinWith("-", arg =>
-            "${" ++ toStringConverter(arg["name"], arg["type"]) ++ "}"
-          ) ++ "`"
+          idArgs->Array.joinWith(` + "-" + `, arg => toStringConverter(arg["name"], arg["type"]))
 
         `export function generate${name}Id(
   ${argsDefinition}

@@ -35,7 +35,7 @@ let testUnit =
         ->Chai.withArgs1(randomRewardAmount)
       });
       it(
-        "it calls claimRewards with the correct parameters on the AaveIncentiveController",
+        "it calls getUserUnclaimedRewardsCalls with the correct parameters on the AaveIncentiveController",
         () => {
           let aaveIncentivesControllerSmockedContract =
             (contracts.contents)#aaveIncentivesController;
@@ -59,7 +59,7 @@ let testUnit =
           ->AaveIncentivesControllerMockSmocked.claimRewardsCalls
           ->Chai.recordArrayDeepEqualFlat([|
               {
-                assets: [|(contracts.contents)#paymentToken.address|],
+                assets: [|(contracts.contents)#aToken.address|],
                 amount: randomRewardAmount,
                 _to: treasury.address,
               },

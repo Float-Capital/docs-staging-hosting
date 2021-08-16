@@ -17,7 +17,7 @@ contract Staker is IStaker, Initializable {
   /* ══════ Fixed-precision constants ══════ */
   uint256 public constant FLOAT_ISSUANCE_FIXED_DECIMAL = 1e42;
   // 2^52 ~= 4.5e15
-  // With an exponent of 5, the largest total liquidity possible in a market (to avoid integer overflow on exponentiation) is ~10^31 or 10 Trillion (10^13)
+  // With an exponent of 5, the largest total liquidity possible in a market (to avoid integer overflow on exponentiation) is ~10^31 DAI decimal units or 10 Trillion DAI (10^13
   // NOTE: this also means if the total market value is less than 2^52 there will be a division by zero error
   uint256 public constant safeExponentBitShifting = 52;
 
@@ -241,7 +241,7 @@ contract Staker is IStaker, Initializable {
 
   /// @dev Logic for changeUnstakeFee
   function _changeUnstakeFee(uint32 marketIndex, uint256 newMarketUnstakeFee_e18) internal virtual {
-    require(newMarketUnstakeFee_e18 <= 5e16); // Explicitely stating 5% fee as the max fee possible.
+    require(newMarketUnstakeFee_e18 <= 5e16); // Explicitly stating 5% fee as the max fee possible.
     marketUnstakeFee_e18[marketIndex] = newMarketUnstakeFee_e18;
   }
 
@@ -292,7 +292,8 @@ contract Staker is IStaker, Initializable {
     uint256 _balanceIncentiveCurve_exponent
   ) internal virtual {
     require(
-      // The exponent has to be less than 5 in these versions of the contracts.
+      // The exponent has to be less than or equal to 5 in these versions of
+      // the contracts otherwise we risk overflowing the 256 bit integers.
       _balanceIncentiveCurve_exponent > 0 && _balanceIncentiveCurve_exponent < 6,
       "balanceIncentiveCurve_exponent out of bounds"
     );
@@ -495,7 +496,7 @@ contract Staker is IStaker, Initializable {
     if (int256(shortValue) - (2 * equilibriumOffsetMarketScaled) < int256(longValue)) {
       if (equilibriumOffsetMarketScaled >= int256(shortValue)) {
         // edge case: imbalanced far past the equilibrium offset - full rewards go to short token
-        //            extremeley unlikely to happen in practice
+        //            extremely unlikely to happen in practice
         return (0, k * shortPrice);
       }
 
@@ -516,7 +517,7 @@ contract Staker is IStaker, Initializable {
     } else {
       if (-equilibriumOffsetMarketScaled >= int256(longValue)) {
         // edge case: imbalanced far past the equilibrium offset - full rewards go to long token
-        //            extremeley unlikely to happen in practice
+        //            extremely unlikely to happen in practice
         return (k * longPrice, 0);
       }
 
@@ -861,42 +862,30 @@ contract Staker is IStaker, Initializable {
   @param from Address to stake for.
   */
   function stakeFromUser(address from, uint256 amount)
-    public
+    external
     virtual
     override
-    onlyValidSynthetic((msg.sender))
+    onlyValidSynthetic(msg.sender)
   {
-    ILongShort(longShort).updateSystemState(marketIndexOfToken[(msg.sender)]);
-    _stake((msg.sender), amount, from);
-  }
+    uint32 marketIndex = marketIndexOfToken[msg.sender];
+    ILongShort(longShort).updateSystemState(marketIndex);
 
-  /**
-  @dev Internal logic for staking.
-  @param token Address of the token for which to stake.
-  @param amount Amount to stake.
-  @param user Address to stake for.
-  */
-  function _stake(
-    address token,
-    uint256 amount,
-    address user
-  ) internal virtual {
-    uint32 marketIndex = marketIndexOfToken[token];
-
+    uint256 userCurrentIndexOfLastClaimedReward = userIndexOfLastClaimedReward[marketIndex][from];
+    uint256 currentRewardIndex = latestRewardIndex[marketIndex];
     // If they already have staked and have rewards due, mint these.
     if (
-      userIndexOfLastClaimedReward[marketIndex][user] != 0 &&
-      userIndexOfLastClaimedReward[marketIndex][user] < latestRewardIndex[marketIndex]
+      userCurrentIndexOfLastClaimedReward != 0 &&
+      userCurrentIndexOfLastClaimedReward < currentRewardIndex
     ) {
-      _mintAccumulatedFloatAndExecuteOutstandingShifts(marketIndex, user);
+      _mintAccumulatedFloatAndExecuteOutstandingShifts(marketIndex, from);
     }
 
-    userAmountStaked[token][user] = userAmountStaked[token][user] + amount;
+    userAmountStaked[msg.sender][from] += amount;
 
     // NOTE: Users retroactively earn a little bit of FLT because they start earning from the previous update index.
-    userIndexOfLastClaimedReward[marketIndex][user] = latestRewardIndex[marketIndex];
+    userIndexOfLastClaimedReward[marketIndex][from] = currentRewardIndex;
 
-    emit StakeAdded(user, address(token), amount, userIndexOfLastClaimedReward[marketIndex][user]);
+    emit StakeAdded(from, msg.sender, amount, currentRewardIndex);
   }
 
   /**
@@ -960,15 +949,10 @@ contract Staker is IStaker, Initializable {
     address token,
     uint256 amount
   ) internal virtual {
-    require(userAmountStaked[token][msg.sender] > 0, "nothing to withdraw");
-    _mintAccumulatedFloatAndExecuteOutstandingShifts(marketIndex, msg.sender);
-
-    userAmountStaked[token][msg.sender] = userAmountStaked[token][msg.sender] - amount;
-
     uint256 amountFees = (amount * marketUnstakeFee_e18[marketIndex]) / 1e18;
 
-    IERC20(token).transfer(floatTreasury, amountFees);
-    IERC20(token).transfer(msg.sender, amount - amountFees);
+    IFloatToken(token).transfer(floatTreasury, amountFees);
+    IFloatToken(token).transfer(msg.sender, amount - amountFees);
 
     emit StakeWithdrawn(msg.sender, token, amount);
   }
@@ -976,42 +960,51 @@ contract Staker is IStaker, Initializable {
   /**
   @notice Withdraw function. Allows users to unstake.
   @param amount Amount to withdraw.
-  @param token Address of the token for which to withdraw.
+  @param marketIndex Market index of staked synthetic token
+  @param isWithdrawFromLong is synthetic token to be withdrawn long or short
   */
-  function withdraw(address token, uint256 amount) external {
-    ILongShort(longShort).updateSystemState(marketIndexOfToken[token]);
+  function withdraw(
+    uint32 marketIndex,
+    bool isWithdrawFromLong,
+    uint256 amount
+  ) external {
+    address token = syntheticTokens[marketIndex][isWithdrawFromLong];
 
-    uint32 marketIndex = marketIndexOfToken[token];
+    ILongShort(longShort).updateSystemState(marketIndex);
+    _mintAccumulatedFloatAndExecuteOutstandingShifts(marketIndex, msg.sender);
+
+    uint256 currentAmountStaked = userAmountStaked[token][msg.sender];
+    // If this value is greater than zero they have pending nextPriceShifts; don't allow user to shit these reserved tokens.
+    uint256 amountToShiftForThisToken = userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[
+      marketIndex
+    ][isWithdrawFromLong][msg.sender];
+
+    unchecked {
+      require(currentAmountStaked >= amount + amountToShiftForThisToken, "not enough to withdraw");
+      userAmountStaked[token][msg.sender] = currentAmountStaked - amount;
+    }
 
     _withdraw(marketIndex, token, amount);
-
-    if (userNextPrice_stakedSyntheticTokenShiftIndex[marketIndex][msg.sender] > 0) {
-      // If they still have outstanding shifts after minting float, then check
-      // that they don't withdraw more than their shifts allow.
-      uint256 amountToShiftForThisToken = syntheticTokens[marketIndex][true] == token
-        ? userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[marketIndex][true][msg.sender]
-        : userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[marketIndex][false][msg.sender];
-
-      require(
-        userAmountStaked[token][msg.sender] >= amountToShiftForThisToken,
-        "Outstanding next price stake shifts too great"
-      );
-    }
   }
 
   /**
   @notice Allows users to withdraw their entire stake for a token.
-  @param token Address of the token for which to withdraw.
+  @param marketIndex Market index of staked synthetic token
+  @param isWithdrawFromLong is synthetic token to be withdrawn long or short
   */
-  function withdrawAll(address token) external {
-    ILongShort(longShort).updateSystemState(marketIndexOfToken[token]);
+  function withdrawAll(uint32 marketIndex, bool isWithdrawFromLong) external {
+    ILongShort(longShort).updateSystemState(marketIndex);
+    _mintAccumulatedFloatAndExecuteOutstandingShifts(marketIndex, msg.sender);
 
-    uint32 marketIndex = marketIndexOfToken[token];
+    address token = syntheticTokens[marketIndex][isWithdrawFromLong];
 
-    uint256 amountToShiftForThisToken = syntheticTokens[marketIndex][true] == token
-      ? userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[marketIndex][true][msg.sender]
-      : userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[marketIndex][false][msg.sender];
+    uint256 userAmountStakedBeforeWithdrawal = userAmountStaked[token][msg.sender];
 
-    _withdraw(marketIndex, token, userAmountStaked[token][msg.sender] - amountToShiftForThisToken);
+    uint256 amountToShiftForThisToken = userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[
+      marketIndex
+    ][isWithdrawFromLong][msg.sender];
+    userAmountStaked[token][msg.sender] = amountToShiftForThisToken;
+
+    _withdraw(marketIndex, token, userAmountStakedBeforeWithdrawal - amountToShiftForThisToken);
   }
 }

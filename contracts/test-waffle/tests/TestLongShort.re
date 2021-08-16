@@ -232,6 +232,7 @@ describe("Float System", () => {
     ShiftNextPrice.testUnit(~contracts, ~accounts);
     ExecuteNextPriceAction.testUnit(~contracts, ~accounts);
     ExecuteOutstandingNextPriceSettlements.testUnit(~contracts, ~accounts);
+    ExecuteOutstandingNextPriceSettlementsUserMulti.testUnit(~contracts, ~accounts);    
     RedeemNextPrice.testUnit(~contracts, ~accounts);
     DepositFunds.testUnit(~contracts, ~accounts);
   });

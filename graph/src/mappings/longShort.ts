@@ -12,6 +12,8 @@ import {
   ExecuteNextPriceSettlementsUser,
   ExecuteNextPriceRedeemSettlementUser,
   ExecuteNextPriceMintSettlementUser,
+  ExecuteNextPriceMarketSideShiftSettlementUser,
+  NextPriceSyntheticPositionShift,
 } from "../../generated/LongShort/LongShort";
 import {
   SyntheticMarket,
@@ -39,6 +41,7 @@ import {
   updateOrCreatePaymentToken,
   getOrCreateGlobalState,
   getUser,
+  getOrCreateUser,
   getSyntheticTokenById,
   getSyntheticTokenByMarketIdAndTokenType,
 } from "../utils/globalStateManager";
@@ -240,12 +243,13 @@ export function handleSystemStateUpdated(event: SystemStateUpdated): void {
         .times(TEN_TO_THE_18)
         .div(shortTokenPrice);
 
-      let hasMint = tokensMintedLong.gt(ZERO) || tokensMintedShort.gt(ZERO);
-
-      if (hasMint) {
+      if (tokensMintedLong.gt(ZERO)) {
         increaseUserMints(user, syntheticTokenLong, tokensMintedLong);
-        increaseUserMints(user, syntheticTokenShort, tokensMintedShort);
         updateUserBalance(longTokenId, user, tokensMintedLong, true, timestamp);
+      }
+
+      if (tokensMintedShort.gt(ZERO)) {
+        increaseUserMints(user, syntheticTokenShort, tokensMintedShort);
         updateUserBalance(
           shortTokenId,
           user,
@@ -485,7 +489,7 @@ export function handleNextPriceDeposit(event: NextPriceDeposit): void {
   let isLong = event.params.isLong;
   let userAddress = event.params.user;
 
-  let user = getUser(userAddress);
+  let user = getOrCreateUser(userAddress, event);
   let syntheticMarket = getSyntheticMarket(marketIndex.toString());
 
   let userNextPriceActionComponent = createUserNextPriceActionComponent(
@@ -711,6 +715,53 @@ export function handleExecuteNextPriceMintSettlementUser(
     ["marketIndex", "userAddress", "isLong", "amount"],
     ["uint32", "address", "bool", "uint256"],
     [userAddress],
+    []
+  );
+}
+
+export function handleNextPriceSyntheticPositionShift(
+  event: NextPriceSyntheticPositionShift
+): void {
+  // TODO Add functionality.
+  saveEventToStateChange(
+    event,
+    "NextPriceSyntheticPositionShift",
+    [
+      event.params.marketIndex.toString(),
+      event.params.isShiftFromLong ? "true" : "false",
+      event.params.synthShifted.toString(),
+      event.params.user.toHex(),
+      event.params.oracleUpdateIndex.toString(),
+    ],
+    [
+      "marketIndex",
+      "isShiftFromLong",
+      "synthShifted",
+      "user",
+      "oracleUpdateIndex",
+    ],
+    ["uint32", "bool", "uint256", "address", "uint256"],
+    [event.params.user],
+    []
+  );
+}
+
+export function handleExecuteNextPriceMarketSideShiftSettlementUser(
+  event: ExecuteNextPriceMarketSideShiftSettlementUser
+): void {
+  // TODO Add functionality.
+  saveEventToStateChange(
+    event,
+    "ExecuteNextPriceMarketSideShiftSettlementUser",
+    [
+      event.params.user.toHex(),
+      event.params.marketIndex.toString(),
+      event.params.isShiftFromLong ? "true" : "false",
+      event.params.amount.toString(),
+    ],
+    ["user", "marketIndex", "isShiftFromLong", "amount"],
+    ["address", "uint32", "bool", "uint256"],
+    [event.params.user],
     []
   );
 }
