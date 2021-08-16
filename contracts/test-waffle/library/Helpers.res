@@ -182,7 +182,6 @@ let initialize = (~admin: Ethers.Wallet.t, ~exposeInternals: bool) => {
         treasury->Treasury_v0.initialize(~admin=admin.address),
         longShort->LongShort.initialize(
           ~admin=admin.address,
-          ~treasury=treasury.address,
           ~tokenFactory=tokenFactory.address,
           ~staker=staker.address,
         ),

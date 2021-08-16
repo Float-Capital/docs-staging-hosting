@@ -65,7 +65,6 @@ const initialize = async (admin) => {
 
   await longShort.initialize(
     admin,
-    treasury.address,
     tokenFactory.address,
     staker.address,
     {

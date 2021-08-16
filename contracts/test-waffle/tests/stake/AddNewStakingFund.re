@@ -33,13 +33,7 @@ let test =
       let longShortAddress = (accounts^)->Array.getUnsafe(5);
       let%AwaitThen _ =
         contracts^.staker
-        ->Staker.Exposed.setAddNewStakingFundParams(
-            ~marketIndex=1,
-            ~longToken=sampleLongAddress,
-            ~shortToken=sampleShortAddress,
-            ~mockAddress=sampleMockAddress,
-            ~longShortAddress=longShortAddress.address,
-          );
+        ->Staker.Exposed.setLongShort(~longShort=longShortAddress.address);
 
       let%AwaitThen {timestamp} = Helpers.getBlock();
       timestampRef := timestamp;
