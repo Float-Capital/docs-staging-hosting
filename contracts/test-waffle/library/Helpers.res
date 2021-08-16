@@ -228,9 +228,6 @@ let initialize = (~admin: Ethers.Wallet.t, ~exposeInternals: bool) => {
 
 type stakerUnitTestContracts = {
   staker: Staker.t,
-  longShort: LongShort.t,
-  floatToken: FloatToken.t,
-  syntheticToken: SyntheticToken.t,
   longShortSmocked: LongShortSmocked.t,
   floatTokenSmocked: FloatTokenSmocked.t,
   syntheticTokenSmocked: SyntheticTokenSmocked.t,
@@ -238,43 +235,22 @@ type stakerUnitTestContracts = {
 
 let initializeStakerUnit = () => {
   JsPromise.all4((
-    Staker.Exposed.make(),
-    LongShort.make(),
-    FloatToken.make(),
-    SyntheticToken.make(
-      ~name="baseTestSyntheticToken",
-      ~symbol="BTST",
-      ~longShort=CONSTANTS.zeroAddress,
-      ~staker=CONSTANTS.zeroAddress,
-      ~marketIndex=0,
-      ~isLong=false,
-    ),
-  ))->JsPromise.then(((staker, longShort, floatToken, syntheticToken)) => {
-    JsPromise.all4((
-      staker->StakerSmocked.InternalMock.setup,
-      longShort->LongShortSmocked.make,
-      floatToken->FloatTokenSmocked.make,
-      syntheticToken->SyntheticTokenSmocked.make,
-    ))->JsPromise.map(((_, longShortSmocked, floatTokenSmocked, syntheticTokenSmocked)) => {
-      staker: staker,
-      longShort: longShort,
-      floatToken: floatToken,
-      syntheticToken: syntheticToken,
-      longShortSmocked: longShortSmocked,
-      floatTokenSmocked: floatTokenSmocked,
-      syntheticTokenSmocked: syntheticTokenSmocked,
-    })
+    Staker.Exposed.make()->JsPromise.then(staker => {
+      staker->StakerSmocked.InternalMock.setup->JsPromise.map(_ => staker)
+    }),
+    LongShortSmocked.make(),
+    FloatTokenSmocked.make(),
+    SyntheticTokenSmocked.make(),
+  ))->JsPromise.map(((staker, longShortSmocked, floatTokenSmocked, syntheticTokenSmocked)) => {
+    staker: staker,
+    longShortSmocked: longShortSmocked,
+    floatTokenSmocked: floatTokenSmocked,
+    syntheticTokenSmocked: syntheticTokenSmocked,
   })
 }
 
 type longShortUnitTestContracts = {
-  staker: Staker.t,
   longShort: LongShort.t,
-  floatToken: FloatToken.t,
-  syntheticToken: SyntheticToken.t,
-  tokenFactory: TokenFactory.t,
-  yieldManager: YieldManagerAave.t,
-  oracleManager: OracleManagerMock.t,
   stakerSmocked: StakerSmocked.t,
   floatTokenSmocked: FloatTokenSmocked.t,
   syntheticTokenSmocked: SyntheticTokenSmocked.t,
@@ -298,72 +274,35 @@ let deployAYieldManager = (~longShort: Ethers.ethAddress) => {
 }
 
 let initializeLongShortUnit = () => {
-  ERC20Mock.make(~name="Pay Token 1", ~symbol="PT1")->JsPromise.then(paymentToken =>
-    JsPromise.all7((
-      LongShort.Exposed.make(),
-      Staker.make(),
-      FloatToken.make(),
-      TokenFactory.make(~longShort=CONSTANTS.zeroAddress),
-      YieldManagerAave.make(
-        ~longShort=CONSTANTS.zeroAddress,
-        ~treasury=CONSTANTS.zeroAddress,
-        ~paymentToken=paymentToken.address,
-        ~aToken=CONSTANTS.zeroAddress,
-        ~lendingPool=randomAddress(),
-        ~aaveIncentivesController=randomAddress(),
-        ~aaveReferralCode=0,
-      ),
-      OracleManagerMock.make(~admin=CONSTANTS.zeroAddress),
-      SyntheticToken.make(
-        ~name="baseTestSyntheticToken",
-        ~symbol="BTST",
-        ~longShort=CONSTANTS.zeroAddress,
-        ~staker=CONSTANTS.zeroAddress,
-        ~marketIndex=0,
-        ~isLong=false,
-      ),
-    ))->JsPromise.then(((
-      longShort,
-      staker,
-      floatToken,
-      tokenFactory,
-      yieldManager,
-      oracleManager,
-      syntheticToken,
-    )) => {
-      JsPromise.all7((
-        longShort->LongShortSmocked.InternalMock.setup,
-        staker->StakerSmocked.make,
-        floatToken->FloatTokenSmocked.make,
-        syntheticToken->SyntheticTokenSmocked.make,
-        tokenFactory->TokenFactorySmocked.make,
-        yieldManager->YieldManagerAaveSmocked.make,
-        oracleManager->OracleManagerMockSmocked.make,
-      ))->JsPromise.map(((
-        _,
-        stakerSmocked,
-        floatTokenSmocked,
-        syntheticTokenSmocked,
-        tokenFactorySmocked,
-        yieldManagerSmocked,
-        oracleManagerSmocked,
-      )) => {
-        staker: staker,
-        longShort: longShort,
-        floatToken: floatToken,
-        syntheticToken: syntheticToken,
-        tokenFactory: tokenFactory,
-        yieldManager: yieldManager,
-        oracleManager: oracleManager,
-        stakerSmocked: stakerSmocked,
-        floatTokenSmocked: floatTokenSmocked,
-        yieldManagerSmocked: yieldManagerSmocked,
-        oracleManagerSmocked: oracleManagerSmocked,
-        syntheticTokenSmocked: syntheticTokenSmocked,
-        tokenFactorySmocked: tokenFactorySmocked,
-      })
-    })
-  )
+  JsPromise.all7((
+    LongShort.Exposed.make()->JsPromise.then(staker => {
+      staker->LongShortSmocked.InternalMock.setup->JsPromise.map(_ => staker)
+    }),
+    StakerSmocked.make(),
+    FloatTokenSmocked.make(),
+    SyntheticTokenSmocked.make(),
+    TokenFactorySmocked.make(),
+    YieldManagerAaveSmocked.make(),
+    OracleManagerMockSmocked.make(),
+  ))->JsPromise.map(((
+    longShort,
+    stakerSmocked,
+    floatTokenSmocked,
+    syntheticTokenSmocked,
+    tokenFactorySmocked,
+    yieldManagerSmocked,
+    oracleManagerSmocked,
+  )) => {
+    {
+      longShort: longShort,
+      stakerSmocked: stakerSmocked,
+      floatTokenSmocked: floatTokenSmocked,
+      yieldManagerSmocked: yieldManagerSmocked,
+      oracleManagerSmocked: oracleManagerSmocked,
+      syntheticTokenSmocked: syntheticTokenSmocked,
+      tokenFactorySmocked: tokenFactorySmocked,
+    }
+  })
 }
 
 let increaseTime: int => JsPromise.t<

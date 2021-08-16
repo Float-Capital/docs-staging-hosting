@@ -30,9 +30,7 @@ let testUnit =
       });
 
       it("should call the onlyAdmin modifier", () => {
-        StakerSmocked.InternalMock.onlyAdminModifierLogicCalls()
-        ->Array.length
-        ->Chai.intEqual(1)
+        StakerSmocked.InternalMock.onlyAdminModifierLogicCallCheck()
       });
 
       it("emits ChangeAdmin with correct argument", () => {
@@ -88,15 +86,13 @@ let testUnit =
       });
 
       it("should call the onlyAdmin modifier", () => {
-        StakerSmocked.InternalMock.onlyAdminModifierLogicCalls()
-        ->Array.length
-        ->Chai.intEqual(1)
+        StakerSmocked.InternalMock.onlyAdminModifierLogicCallCheck()
       });
 
       it("should call _changeFloatPercentage with correct argument", () => {
-        StakerSmocked.InternalMock._changeFloatPercentageCalls()
-        ->Array.getUnsafe(0)
-        ->Chai.recordEqualFlat({newFloatPercentage: newFloatPerc})
+        StakerSmocked.InternalMock._changeFloatPercentageCallCheck({
+          newFloatPercentage: newFloatPerc,
+        })
       });
 
       it("emits FloatPercentageUpdated with correct argument", () => {
@@ -181,12 +177,10 @@ let testUnit =
       });
 
       it("should call _changeUnstakeFee with correct arguments", () => {
-        StakerSmocked.InternalMock._changeUnstakeFeeCalls()
-        ->Array.getUnsafe(0)
-        ->Chai.recordEqualFlat({
-            marketIndex,
-            newMarketUnstakeFee_e18: unstakeFeeBasisPoints,
-          })
+        StakerSmocked.InternalMock._changeUnstakeFeeCallCheck({
+          marketIndex,
+          newMarketUnstakeFee_e18: unstakeFeeBasisPoints,
+        })
       });
 
       it("should emit StakeWithdrawalFeeUpdated with correct arguments", () => {
@@ -271,20 +265,16 @@ let testUnit =
               ~marketIndex,
               ~balanceIncentiveCurve_exponent=updatedExponent,
             );
-        StakerSmocked.InternalMock.onlyAdminModifierLogicCalls()
-        ->Array.length
-        ->Chai.intEqual(1);
+        StakerSmocked.InternalMock.onlyAdminModifierLogicCallCheck();
       });
 
       it(
         "should call _changeBalanceIncentiveExponent with correct arguments",
         () => {
-        StakerSmocked.InternalMock._changeBalanceIncentiveExponentCalls()
-        ->Array.getUnsafe(0)
-        ->Chai.recordEqualFlat({
-            marketIndex,
-            balanceIncentiveCurve_exponent: updatedExponent,
-          })
+        StakerSmocked.InternalMock._changeBalanceIncentiveExponentCallCheck({
+          marketIndex,
+          balanceIncentiveCurve_exponent: updatedExponent,
+        })
       });
 
       it(
@@ -382,20 +372,16 @@ let testUnit =
               ~marketIndex,
               ~balanceIncentiveCurve_equilibriumOffset=updatedEquilibriumOffset,
             );
-        StakerSmocked.InternalMock.onlyAdminModifierLogicCalls()
-        ->Array.length
-        ->Chai.intEqual(1);
+        StakerSmocked.InternalMock.onlyAdminModifierLogicCallCheck();
       });
 
       it(
         "should call _changeBalanceIncentiveEquilibriumOffset with correct arguments",
         () => {
-        StakerSmocked.InternalMock._changeBalanceIncentiveEquilibriumOffsetCalls()
-        ->Array.getUnsafe(0)
-        ->Chai.recordEqualFlat({
-            marketIndex,
-            balanceIncentiveCurve_equilibriumOffset: updatedEquilibriumOffset,
-          })
+        StakerSmocked.InternalMock._changeBalanceIncentiveEquilibriumOffsetCallCheck({
+          marketIndex,
+          balanceIncentiveCurve_equilibriumOffset: updatedEquilibriumOffset,
+        })
       });
 
       it(

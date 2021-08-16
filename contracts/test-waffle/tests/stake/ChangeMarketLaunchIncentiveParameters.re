@@ -33,7 +33,7 @@ let test =
     before_each(() => setup());
 
     it_skip("calls the onlyAdminModifier", () => {
-      // StakerSmocked.InternalMock.onlyAdminCalls()
+      // StakerSmocked.InternalMock.onlyAdminCallCheck()
       // ->Array.length
       // ->Chai.intEqual(1)
       ()
@@ -41,9 +41,11 @@ let test =
 
     it(
       "calls _changeMarketLaunchIncentiveParameters with correct arguments", () => {
-      StakerSmocked.InternalMock._changeMarketLaunchIncentiveParametersCalls()
-      ->Array.getUnsafe(0)
-      ->Chai.recordEqualFlat({marketIndex, period, initialMultiplier})
+      StakerSmocked.InternalMock._changeMarketLaunchIncentiveParametersCallCheck({
+        marketIndex,
+        period,
+        initialMultiplier,
+      })
     });
 
     it("emits MarketLaunchIncentiveParametersChanges event", () => {

@@ -62,7 +62,7 @@ let test =
     });
 
     it_skip("calls the onlyLongShortModifier", () => {
-      // StakerSmocked.InternalMock.onlyFloatCalls()
+      // StakerSmocked.InternalMock.onlyFloatCallCheck()
       // ->Array.length
       // ->Chai.intEqual(1)
       ()
@@ -70,22 +70,18 @@ let test =
 
     it(
       "calls _changeMarketLaunchIncentiveParameters with correct arguments", () => {
-      StakerSmocked.InternalMock._changeMarketLaunchIncentiveParametersCalls()
-      ->Array.getUnsafe(0)
-      ->Chai.recordEqualFlat({
-          marketIndex,
-          period: kPeriod,
-          initialMultiplier: kInitialMultiplier,
-        })
+      StakerSmocked.InternalMock._changeMarketLaunchIncentiveParametersCallCheck({
+        marketIndex,
+        period: kPeriod,
+        initialMultiplier: kInitialMultiplier,
+      })
     });
 
     it("calls _changeUnstakeFee with correct arguments", () => {
-      StakerSmocked.InternalMock._changeUnstakeFeeCalls()
-      ->Array.getUnsafe(0)
-      ->Chai.recordEqualFlat({
-          marketIndex,
-          newMarketUnstakeFee_e18: unstakeFee_e18,
-        })
+      StakerSmocked.InternalMock._changeUnstakeFeeCallCheck({
+        marketIndex,
+        newMarketUnstakeFee_e18: unstakeFee_e18,
+      })
     });
 
     it("mutates accumulativeFloatPerSyntheticTokenSnapshots", () => {
