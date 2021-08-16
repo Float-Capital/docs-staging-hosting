@@ -4,6 +4,7 @@ pragma solidity 0.8.3;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 import "./interfaces/IYieldManager.sol";
 import "./interfaces/aave/ILendingPool.sol";
@@ -17,6 +18,10 @@ import "./interfaces/aave/IAaveIncentivesController.sol";
   @dev https://docs.aave.com/portal/
   */
 contract YieldManagerAave is IYieldManager {
+
+  //Using Open Zeppelin safe transfer library for token transfers
+  using SafeERC20 for ERC20;
+
   /*╔═════════════════════════════╗
     ║          VARIABLES          ║
     ╚═════════════════════════════╝*/
@@ -136,12 +141,8 @@ contract YieldManagerAave is IYieldManager {
     override
     longShortOnly
   {
-    try paymentToken.transfer(user, amount) returns (bool transferSuccess) {
-      if (transferSuccess) {
-        // If the transfer is successful return early, otherwise try pay the user out with the amountReservedInCaseOfInsufficientAaveLiquidity
-        return;
-      }
-    } catch {}
+    // If the transfer is successful return early, otherwise try pay the user out with the amountReservedInCaseOfInsufficientAaveLiquidity
+    paymentToken.safeTransfer(user, amount);
 
     amountReservedInCaseOfInsufficientAaveLiquidity -= amount;
 
