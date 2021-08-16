@@ -6,6 +6,7 @@ const kovanProviderUrl = "";
 
 const etherscanApiKey = "";
 const polygonscanApiKey = "";
+const mumbaiProviderUrl = "";
 module.exports = {
   mnemonic,
   mainnetProviderUrl,
@@ -13,4 +14,5 @@ module.exports = {
   goerliProviderUrl,
   kovanProviderUrl,
   etherscanApiKey,
+  mumbaiProviderUrl,
 };

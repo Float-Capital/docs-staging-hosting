@@ -195,8 +195,10 @@ let testUnit =
               ~amountStaked,
               ~userNextPrice_stakedSyntheticTokenShiftIndex=bnFromInt(1),
               ~syntheticTokens=Helpers.randomAddress(),
-              ~userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_long=bnFromInt(0),
-              ~userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_short=bnFromInt(0),
+              ~userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_long=
+                bnFromInt(0),
+              ~userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_short=
+                bnFromInt(0),
             );
 
         contracts.contents.staker
