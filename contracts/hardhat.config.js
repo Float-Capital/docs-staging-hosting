@@ -3,6 +3,8 @@ require("@tenderly/hardhat-tenderly"); // https://hardhat.org/plugins/tenderly-h
 require("@float-capital/solidity-coverage");
 require("@openzeppelin/hardhat-upgrades");
 require("./hardhat-plugins/codegen");
+require("hardhat-deploy");
+require("@nomiclabs/hardhat-ethers");
 
 require("hardhat-docgen");
 
@@ -14,8 +16,8 @@ const {
   goerliProviderUrl,
   etherscanApiKey,
   polygonscanApiKey,
-  mumbaiAlchemyUrl,
-} = require("./secretsManager.example.js");
+  mumbaiProviderUrl,
+} = require("./secretsManager.js");
 
 let runCoverage =
   !process.env.DONT_RUN_REPORT_SUMMARY ||
@@ -64,9 +66,7 @@ module.exports = {
     },
     mumbai: {
       chainId: 80001,
-      //url: "https://rpc-mumbai.maticvigil.com/v1",
-      url: mumbaiAlchemyUrl || "https://rpc-mumbai.maticvigil.com/v1",
-      // accounts: { mnemonic },
+      url: mumbaiProviderUrl || "https://rpc-mumbai.maticvigil.com/v1",
     },
   },
   paths: {

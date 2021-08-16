@@ -31,8 +31,7 @@
     "update-testnet-contracts": "yarn prepair-upgrade && rm -f .openzeppelin/unknown-{97,1337}.json && truffle migrate --network binanceTest --reset && mv .openzeppelin/unknown-1337.json .openzeppelin/unknown-97.json && yarn save-deployment",
     "generate-contract-interfaces": "yarn compile && node ../scripts/src/AbiInterfaceGen.bs.js && rescript format -all",
     "generate-test-contracts": "rm -f contracts/testing/generated/* && yarn compile --force --quiet && node ../scripts/src/MockablesGen.bs.js && yarn format-contracts && rescript format -all",
-    "generate-all": "yarn generate-test-contracts && yarn compile && node ../scripts/src/AbiInterfaceGen.bs.js && yarn res:build;",
-    "deploy" : "npx hardhat run scripts/deploy.js"
+    "generate-all": "yarn generate-test-contracts && yarn compile && node ../scripts/src/AbiInterfaceGen.bs.js && yarn res:build;"
   },
   "dependencies": {
     "@chainlink/contracts": "^0.1.7",
@@ -73,8 +72,6 @@
     "rescript": "^9.1.4",
     "solhint": "^3.3.6",
     "truffle": "^5.3.0",
-    "truffle-plugin-verify": "^0.5.10",
-    "ts-node": "^10.2.0",
-    "typescript": "^4.3.5"
+    "truffle-plugin-verify": "^0.5.10"
   }
 }
