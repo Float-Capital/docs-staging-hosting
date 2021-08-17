@@ -3,6 +3,7 @@
 pragma solidity 0.8.3;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
@@ -12,6 +13,10 @@ import "./interfaces/ILongShort.sol";
 
 /** @title ILO Contract */
 contract ILO is Initializable, UUPSUpgradeable, AccessControlUpgradeable {
+
+  //Using Open Zeppelin safe transfer library for token transfers
+  using SafeERC20 for IERC20;
+
   bytes32 public constant UPGRADER_ROLE = keccak256("UPGRADER_ROLE");
   bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
 
@@ -60,7 +65,7 @@ contract ILO is Initializable, UUPSUpgradeable, AccessControlUpgradeable {
     require(whitelistAllocation[msg.sender][marketIndex] == amount, "not whitelisted");
     whitelistAllocation[msg.sender][marketIndex] = 0;
     //need to get the payment Token for the market still
-    require(IERC20(paymentToken).transferFrom(msg.sender, address(this), amount));
+    IERC20(paymentToken).safeTransferFrom(msg.sender, address(this), amount);
 
     //Any whitelisted provider should deposit at least 1e18
     uint256 splitAmount = amount / 2;
