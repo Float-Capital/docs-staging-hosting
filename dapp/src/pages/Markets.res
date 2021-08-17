@@ -12,7 +12,7 @@ module PriceCard = {
     md:my-3
     h-md
     md:w-price-width
-    md:mx-2
+    md:mr-4
     md:h-price-height
     custom-cursor
     bg-white
@@ -152,15 +152,37 @@ let make = () => {
   let selectedStr = router.query->Js.Dict.get("selected")->Option.getWithDefault("0")
   let selectedFloat = selectedStr->parseFloatInt
   let selectedInt = selectedFloat->Js.Float.isNaN ? 0 : selectedFloat->floatToIntUnsafe
+  let marketIndexStr = router.query->Js.Dict.get("marketIndex")
 
-  <div className="md:h-80-percent-screen flex flex-col items-center justify-center w-full">
+  let isMarketPage = marketIndexStr->Option.isSome
+
+  <div
+    className={isMarketPage
+      ? "w-full max-w-5xl mx-auto px-2 md:px-0"
+      : "md:h-80-percent-screen flex flex-col items-center justify-center w-full"}>
     {switch marketsQuery {
-    | Response(markets) if markets->Array.length > 0 => {
+    | Response(markets) if markets->Array.length > 0 =>
+      if isMarketPage {
+        let queryMarketIndex = marketIndexStr->Option.getUnsafe
+        if (
+          queryMarketIndex->Belt.Int.fromString->Option.mapWithDefault(1000, x => x) <=
+            markets->Belt.Array.length
+        ) {
+          let selectedMarketData =
+            markets[queryMarketIndex->Belt.Int.fromString->Option.mapWithDefault(1000, x => x) - 1]
+          switch selectedMarketData {
+          | Some(marketData) => <Market marketData />
+          | None => React.null
+          }
+        } else {
+          React.null
+        }
+      } else {
         let selected = selectedInt >= 0 && selectedInt < markets->Array.length ? selectedInt : 0
         <div className="w-9/10 md:w-auto flex flex-col">
           {if markets->Array.length > 1 {
             <div
-              className="pb-10 flex md:order-1 order-2 flex-col md:flex-row w-full md:w-auto justify-center">
+              className="pb-6 flex md:order-1 order-2 flex-col md:flex-row w-full md:w-auto justify-center">
               {markets
               ->Array.mapWithIndex((index, market) =>
                 <PriceCard
