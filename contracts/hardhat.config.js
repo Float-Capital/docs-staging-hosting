@@ -81,6 +81,18 @@ module.exports = {
     admin: {
       default: 1,
     },
+    user1: {
+      default: 2,
+    },
+    user2: {
+      default: 3,
+    },
+    user3: {
+      default: 4,
+    },
+    user4: {
+      default: 5,
+    },
   },
   gasReporter: {
     // Disabled by default for faster running of tests
