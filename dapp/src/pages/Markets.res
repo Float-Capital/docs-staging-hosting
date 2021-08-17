@@ -77,7 +77,8 @@ module PriceCard = {
 
     <Card selected>
       <div className="z-10 absolute w-full h-full flex items-center justify-center" onClick />
-      <div className="pt-2 text-xs font-medium flex-1 md:w-full flex justify-between">
+      <div
+        className="pt-2 text-xs font-medium flex-1 md:flex-initial md:w-full flex justify-between">
         <div className="mx-3"> {market.name->React.string} </div>
         <div className="mx-3">
           {switch state {

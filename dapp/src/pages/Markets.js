@@ -190,7 +190,7 @@ function Markets$PriceCard(Props) {
                   className: "z-10 absolute w-full h-full flex items-center justify-center",
                   onClick: onClick
                 }), React.createElement("div", {
-                  className: "pt-2 text-xs font-medium flex-1 md:w-full flex justify-between"
+                  className: "pt-2 text-xs font-medium flex-1 md:flex-initial md:w-full flex justify-between"
                 }, React.createElement("div", {
                       className: "mx-3"
                     }, market.name), React.createElement("div", {
