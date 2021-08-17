@@ -270,22 +270,6 @@ contract Staker is IStaker, Initializable {
     marketLaunchIncentive_multipliers[marketIndex] = initialMultiplier;
   }
 
-  /**
-  @notice Changes the market launch incentive parameters for a market
-  @param marketIndex Identifies the market.
-  @param period The new period for which float token generation should be boosted.
-  @param initialMultiplier The new multiplier on Float generation.
-  */
-  function changeMarketLaunchIncentiveParameters(
-    uint32 marketIndex,
-    uint256 period,
-    uint256 initialMultiplier
-  ) external onlyAdmin {
-    _changeMarketLaunchIncentiveParameters(marketIndex, period, initialMultiplier);
-
-    emit MarketLaunchIncentiveParametersChanges(marketIndex, period, initialMultiplier);
-  }
-
   /// @dev Logic for changeBalanceIncentiveExponent
   function _changeBalanceIncentiveExponent(
     uint32 marketIndex,
@@ -376,10 +360,6 @@ contract Staker is IStaker, Initializable {
     marketIndexOfToken[shortToken] = marketIndex;
 
     accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][0].timestamp = block.timestamp;
-    accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][0]
-    .accumulativeFloatPerSyntheticToken_long = 0;
-    accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][0]
-    .accumulativeFloatPerSyntheticToken_short = 0;
 
     syntheticTokens[marketIndex][true] = longToken;
     syntheticTokens[marketIndex][false] = shortToken;
@@ -462,7 +442,8 @@ contract Staker is IStaker, Initializable {
   a fixed decimal scale of 1e42 (!!!) for numerical stability. The return
   values are float per second per synthetic token (hence the requirement
   to multiply by price)
-  @dev to see below math in latex form see TODO add link
+  @dev to see below math in latex form see:
+  https://ipfs.io/ipfs/QmRWbr8P1F588XqRTzm7wCsRPu8DcDVPWGriBach4f22Fq/staker-fps.pdf
   to interact with the equations see https://www.desmos.com/calculator/optkaxyihr
   @param marketIndex The market referred to.
   @param longPrice Price of the synthetic long token in units of payment token
@@ -699,14 +680,16 @@ contract Staker is IStaker, Initializable {
 
     uint256 usersLastRewardIndex = userIndexOfLastClaimedReward[marketIndex][user];
 
+    uint256 currentRewardIndex = latestRewardIndex[marketIndex];
+
     // Don't do the calculation and return zero immediately if there is no change
-    if (usersLastRewardIndex == latestRewardIndex[marketIndex]) {
+    if (usersLastRewardIndex == currentRewardIndex) {
       return 0;
     }
 
     uint256 usersShiftIndex = userNextPrice_stakedSyntheticTokenShiftIndex[marketIndex][user];
     // if there is a change in the users tokens held due to a token shift (or possibly another action in the future)
-    if (usersShiftIndex > 0 && usersShiftIndex <= latestRewardIndex[marketIndex]) {
+    if (usersShiftIndex > 0 && usersShiftIndex <= currentRewardIndex) {
       floatReward = _calculateAccumulatedFloatInRange(
         marketIndex,
         amountStakedLong,
@@ -716,31 +699,36 @@ contract Staker is IStaker, Initializable {
       );
 
       // Update the users balances
-      if (userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[marketIndex][true][user] > 0) {
+
+
+        uint256 amountToShiftAwayFromCurrentSide
+       = userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[marketIndex][true][user];
+      // Handle shifts from LONG side:
+      if (amountToShiftAwayFromCurrentSide > 0) {
         amountStakedShort += ILongShort(longShort).getAmountSyntheticTokenToMintOnTargetSide(
           marketIndex,
-          userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[marketIndex][true][user],
+          amountToShiftAwayFromCurrentSide,
           true,
           usersShiftIndex
         );
 
-        amountStakedLong -= userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[marketIndex][
-          true
-        ][user];
+        amountStakedLong -= amountToShiftAwayFromCurrentSide;
         userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[marketIndex][true][user] = 0;
       }
 
-      if (userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[marketIndex][false][user] > 0) {
+      amountToShiftAwayFromCurrentSide = userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[
+        marketIndex
+      ][false][user];
+      // Handle shifts from SHORT side:
+      if (amountToShiftAwayFromCurrentSide > 0) {
         amountStakedLong += ILongShort(longShort).getAmountSyntheticTokenToMintOnTargetSide(
           marketIndex,
-          userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[marketIndex][false][user],
+          amountToShiftAwayFromCurrentSide,
           false,
           usersShiftIndex
         );
 
-        amountStakedShort -= userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[marketIndex][
-          false
-        ][user];
+        amountStakedShort -= amountToShiftAwayFromCurrentSide;
         userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[marketIndex][false][user] = 0;
       }
 
@@ -753,7 +741,7 @@ contract Staker is IStaker, Initializable {
         amountStakedLong,
         amountStakedShort,
         usersShiftIndex,
-        latestRewardIndex[marketIndex]
+        currentRewardIndex
       );
 
       userNextPrice_stakedSyntheticTokenShiftIndex[marketIndex][user] = 0;
@@ -763,7 +751,7 @@ contract Staker is IStaker, Initializable {
         amountStakedLong,
         amountStakedShort,
         usersLastRewardIndex,
-        latestRewardIndex[marketIndex]
+        currentRewardIndex
       );
     }
   }

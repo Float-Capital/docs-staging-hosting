@@ -121,27 +121,6 @@ contract StakerInternalStateSetters is Staker {
     longShort = _longShort;
   }
 
-  function setAddNewStakingFundParams(
-    uint32 marketIndex,
-    address longToken,
-    address shortToken,
-    address mockAddress,
-    address longShortAddress
-  ) public {
-    longShort = address(longShortAddress);
-    marketIndexOfToken[longToken] = marketIndex;
-    marketIndexOfToken[shortToken] = marketIndex;
-
-    accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][0].timestamp = 0; // don't test with 0
-    accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][0]
-    .accumulativeFloatPerSyntheticToken_long = 1;
-    accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][0]
-    .accumulativeFloatPerSyntheticToken_short = 1;
-
-    syntheticTokens[marketIndex][true] = mockAddress;
-    syntheticTokens[marketIndex][false] = mockAddress;
-  }
-
   function setLatestRewardIndexGlobals(uint32 marketIndex, uint256 _latestRewardIndex) external {
     latestRewardIndex[marketIndex] = _latestRewardIndex;
   }

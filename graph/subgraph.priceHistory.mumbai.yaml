@@ -25,7 +25,7 @@ dataSources:
         - event: SyntheticMarketCreated(uint32,address,address,address,uint256,string,string,address,address)
           handler: handleSyntheticMarketCreated
         - event: OracleUpdated(uint32,address,address)
-          handler: handleMarketOracleUpdated
+          handler: handleOracleUpdated
       blockHandlers:
         - handler: handleBlock
       file: ./src/mappings/priceHistory.ts

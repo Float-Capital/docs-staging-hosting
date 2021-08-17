@@ -23,23 +23,23 @@ contract YieldManagerAave is IYieldManager {
     ╚═════════════════════════════╝*/
 
   /// @notice address of longShort contract
-  address public longShort;
+  address public immutable longShort;
   /// @notice address of treasury contract - this is the address that can claim aave incentives rewards
-  address public treasury;
+  address public immutable treasury;
 
   /// @notice boolean to prevent markets using an already initialized market
-  bool public isInitialized = false;
+  bool public isInitialized;
 
   /// @notice The payment token the yield manager supports
   /// @dev DAI token
-  IERC20 public paymentToken;
+  IERC20 public immutable paymentToken;
   /// @notice The token representing the interest accruing payment token position from Aave
   /// @dev ADAI token
-  IERC20Upgradeable public aToken;
+  IERC20Upgradeable public immutable aToken;
   /// @notice The specific Aave lending pool contract
-  ILendingPool public lendingPool;
+  ILendingPool public immutable lendingPool;
   /// @notice The specific Aave incentives controller contract
-  IAaveIncentivesController public aaveIncentivesController;
+  IAaveIncentivesController public immutable aaveIncentivesController;
 
   /// @dev An aave specific referralCode that has been a depricated feature. This will be set to 0 for "no referral" at deployment
   uint16 referralCode;
@@ -101,7 +101,7 @@ contract YieldManagerAave is IYieldManager {
     aaveIncentivesController = IAaveIncentivesController(_aaveIncentivesController);
 
     // Approve tokens for aave lending pool maximally.
-    paymentToken.approve(address(lendingPool), type(uint256).max);
+    ERC20(_paymentToken).approve(_lendingPool, type(uint256).max);
   }
 
   /*╔════════════════════════╗
@@ -167,18 +167,15 @@ contract YieldManagerAave is IYieldManager {
     @dev This is specifically implemented to allow withdrawal of aave reward wMatic tokens accrued
   */
   function claimAaveRewardsToTreasury() external {
-    uint256 amount = IAaveIncentivesController(aaveIncentivesController).getUserUnclaimedRewards(
-      address(this)
+    IAaveIncentivesController _aaveIncentivesController = IAaveIncentivesController(
+      aaveIncentivesController
     );
+    uint256 amount = _aaveIncentivesController.getUserUnclaimedRewards(address(this));
 
     address[] memory aTokenAddresses = new address[](1);
     aTokenAddresses[0] = address(aToken);
 
-    IAaveIncentivesController(aaveIncentivesController).claimRewards(
-      aTokenAddresses,
-      amount,
-      treasury
-    );
+    _aaveIncentivesController.claimRewards(aTokenAddresses, amount, treasury);
 
     emit ClaimAaveRewardTokenToTreasury(amount);
   }
@@ -195,22 +192,23 @@ contract YieldManagerAave is IYieldManager {
     uint256 treasuryYieldPercent_e18
   ) external override longShortOnly returns (uint256) {
     uint256 totalHeld = aToken.balanceOf(address(this));
+    uint256 _totalReservedForTreasury = totalReservedForTreasury;
 
     uint256 totalRealized = totalValueRealizedForMarket +
-      totalReservedForTreasury +
+      _totalReservedForTreasury +
       amountReservedInCaseOfInsufficientAaveLiquidity;
 
     if (totalRealized == totalHeld) {
       return 0;
     }
 
-    // will revert in case totalRealized > totalHeld which should be never.
+    // will revert in case totalRealized > totalHeld which should never occur since yield is always possitive with aave.
     uint256 unrealizedYield = totalHeld - totalRealized;
 
     uint256 amountForTreasury = (unrealizedYield * treasuryYieldPercent_e18) / 1e18;
     uint256 amountForMarketIncentives = unrealizedYield - amountForTreasury;
 
-    totalReservedForTreasury += amountForTreasury;
+    totalReservedForTreasury = _totalReservedForTreasury + amountForTreasury;
 
     emit YieldDistributed(unrealizedYield, treasuryYieldPercent_e18);
 

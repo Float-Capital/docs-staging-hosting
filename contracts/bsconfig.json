@@ -9,6 +9,10 @@
     {
       "dir": "test-waffle",
       "subdirs": true
+    },
+    {
+      "dir": "scripts",
+      "subdirs": true
     }
   ],
   "package-specs": {
