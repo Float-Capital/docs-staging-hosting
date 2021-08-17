@@ -70,7 +70,6 @@ async function main() {
     .connect(admin)
     .initialize(
       admin.address,
-      treasury.address,
       tokenFactory.address,
       staker.address
     );
