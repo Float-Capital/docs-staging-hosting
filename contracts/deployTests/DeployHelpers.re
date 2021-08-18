@@ -86,6 +86,31 @@ let redeemShortNextPriceWithSystemUpdate =
   updateSystemState(~longShort, ~admin, ~marketIndex);
 };
 
+let shiftFromShortNextPriceWithSystemUpdate =
+    (~amount, ~marketIndex, ~longShort, ~user, ~admin) => {
+  let%AwaitThen _ =
+    longShort
+    ->ContractHelpers.connect(~address=user)
+    ->LongShort.shiftPositionFromShortNextPrice(
+        ~marketIndex,
+        ~amountSyntheticTokensToShift=amount,
+      );
+  let%AwaitThen _ = setOracleManagerPrice(~longShort, ~marketIndex, ~admin);
+  longShort->LongShort.updateSystemState(~marketIndex);
+};
+let shiftFromLongNextPriceWithSystemUpdate =
+    (~amount, ~marketIndex, ~longShort, ~user, ~admin) => {
+  let%AwaitThen _ =
+    longShort
+    ->ContractHelpers.connect(~address=user)
+    ->LongShort.shiftPositionFromLongNextPrice(
+        ~marketIndex,
+        ~amountSyntheticTokensToShift=amount,
+      );
+  let%AwaitThen _ = setOracleManagerPrice(~longShort, ~marketIndex, ~admin);
+  longShort->LongShort.updateSystemState(~marketIndex);
+};
+
 let mintLongNextPriceWithSystemUpdate =
     (
       ~amount,

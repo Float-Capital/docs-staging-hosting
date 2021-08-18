@@ -24,7 +24,6 @@ import "./interfaces/IOracleManager.sol";
 /// It is merely for convenince when unit testing.
 /// @custom:auditors This contract balances long and short sides.
 contract LongShort is ILongShort, Initializable {
-
   //Using Open Zeppelin safe transfer library for token transfers
   using SafeERC20 for IERC20;
 
@@ -827,11 +826,11 @@ contract LongShort is ILongShort, Initializable {
     internal
     virtual
   {
-      IERC20(paymentTokens[marketIndex]).safeTransferFrom(
-        msg.sender,
-        yieldManagers[marketIndex],
-        amount
-      );
+    IERC20(paymentTokens[marketIndex]).safeTransferFrom(
+      msg.sender,
+      yieldManagers[marketIndex],
+      amount
+    );
   }
 
   /*╔═══════════════════════════╗
