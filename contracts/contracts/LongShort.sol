@@ -809,7 +809,8 @@ contract LongShort is ILongShort, Initializable {
   /// @notice Updates the state of multiples markets to account for their latest oracle price updates.
   /// @param marketIndexes An array of int32s which uniquely identify markets.
   function updateSystemStateMulti(uint32[] calldata marketIndexes) external override {
-    for (uint256 i = 0; i < marketIndexes.length; i++) {
+    uint256 length = marketIndexes.length;
+    for (uint256 i = 0; i < length; i++) {
       _updateSystemStateInternal(marketIndexes[i]);
     }
   }
@@ -1147,7 +1148,8 @@ contract LongShort is ILongShort, Initializable {
     address user,
     uint32[] memory marketIndexes
   ) external {
-    for (uint256 i = 0; i < marketIndexes.length; i++) {
+    uint256 length = marketIndexes.length;
+    for (uint256 i = 0; i < length; i++) {
       _executeOutstandingNextPriceSettlements(user, marketIndexes[i]);
     }
   }

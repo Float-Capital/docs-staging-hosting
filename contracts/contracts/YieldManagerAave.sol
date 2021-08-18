@@ -7,6 +7,7 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 
 import "./interfaces/IYieldManager.sol";
 import "./interfaces/aave/ILendingPool.sol";
+import "./interfaces/aave/ILendingPoolAddressesProvider.sol";
 import "./interfaces/aave/IAaveIncentivesController.sol";
 
 /** @title YieldManagerAave
@@ -17,7 +18,6 @@ import "./interfaces/aave/IAaveIncentivesController.sol";
   @dev https://docs.aave.com/portal/
   */
 contract YieldManagerAave is IYieldManager {
-
   /*╔═════════════════════════════╗
     ║          VARIABLES          ║
     ╚═════════════════════════════╝*/
@@ -36,8 +36,8 @@ contract YieldManagerAave is IYieldManager {
   /// @notice The token representing the interest accruing payment token position from Aave
   /// @dev ADAI token
   IERC20Upgradeable public immutable aToken;
-  /// @notice The specific Aave lending pool contract
-  ILendingPool public immutable lendingPool;
+  /// @notice The specific Aave lending pool address provider contract
+  ILendingPoolAddressesProvider public immutable lendingPoolAddressesProvider;
   /// @notice The specific Aave incentives controller contract
   IAaveIncentivesController public immutable aaveIncentivesController;
 
@@ -77,7 +77,7 @@ contract YieldManagerAave is IYieldManager {
     @param _treasury address of the treasury contract
     @param _paymentToken address of the payment token
     @param _aToken address of the interest accruing token linked to the payment token
-    @param _lendingPool address of the aave lending pool contract
+    @param _lendingPoolAddressesProvider address of the aave lending pool address provider contract
     @param _aaveReferralCode unique code for aave referrals
     @dev referral code will be set to 0, depricated Aave feature
   */
@@ -86,7 +86,7 @@ contract YieldManagerAave is IYieldManager {
     address _treasury,
     address _paymentToken,
     address _aToken,
-    address _lendingPool,
+    address _lendingPoolAddressesProvider,
     address _aaveIncentivesController,
     uint16 _aaveReferralCode
   ) {
@@ -97,11 +97,18 @@ contract YieldManagerAave is IYieldManager {
 
     paymentToken = IERC20(_paymentToken);
     aToken = IERC20Upgradeable(_aToken);
-    lendingPool = ILendingPool(_lendingPool);
+    lendingPoolAddressesProvider = ILendingPoolAddressesProvider(_lendingPoolAddressesProvider);
     aaveIncentivesController = IAaveIncentivesController(_aaveIncentivesController);
 
     // Approve tokens for aave lending pool maximally.
-    ERC20(_paymentToken).approve(_lendingPool, type(uint256).max);
+    IERC20(_paymentToken).approve(
+      ILendingPoolAddressesProvider(_lendingPoolAddressesProvider).getLendingPool(),
+      type(uint256).max
+    );
+  }
+
+  function updateLatestLendingPoolAddress() external {
+    IERC20(paymentToken).approve(lendingPoolAddressesProvider.getLendingPool(), type(uint256).max);
   }
 
   /*╔════════════════════════╗
@@ -126,7 +133,12 @@ contract YieldManagerAave is IYieldManager {
       }
     }
 
-    lendingPool.deposit(address(paymentToken), amount, address(this), referralCode);
+    ILendingPool(lendingPoolAddressesProvider.getLendingPool()).deposit(
+      address(paymentToken),
+      amount,
+      address(this),
+      referralCode
+    );
   }
 
   /// @notice Allows the LongShort pay out a user from tokens already withdrawn from Aave
@@ -147,7 +159,11 @@ contract YieldManagerAave is IYieldManager {
     amountReservedInCaseOfInsufficientAaveLiquidity -= amount;
 
     // If this reverts (ie aave unable to make payout), then the whole transaction will revert. User will have to wait until sufficient liquidity available.
-    lendingPool.withdraw(address(paymentToken), amount, user);
+    ILendingPool(lendingPoolAddressesProvider.getLendingPool()).withdraw(
+      address(paymentToken),
+      amount,
+      user
+    );
   }
 
   /// @notice Allows the LongShort contract to redeem aTokens for the payment token
@@ -155,7 +171,13 @@ contract YieldManagerAave is IYieldManager {
   /// @dev This will update the amountReservedInCaseOfInsufficientAaveLiquidity if not enough liquidity is avaiable on aave.
   ///      This means that our system can continue to operate even if there is insufficient liquidity in Aave for any reason.
   function removePaymentTokenFromMarket(uint256 amount) external override longShortOnly {
-    try lendingPool.withdraw(address(paymentToken), amount, address(this)) {} catch {
+    try
+      ILendingPool(lendingPoolAddressesProvider.getLendingPool()).withdraw(
+        address(paymentToken),
+        amount,
+        address(this)
+      )
+    {} catch {
       // In theory we should only catch `VL_CURRENT_AVAILABLE_LIQUIDITY_NOT_ENOUGH` errors.
       // Safe to revert on all errors, if aave completely blocks withdrawals the amountReservedInCaseOfInsufficientAaveLiquidity can grow until it is fixed without problems.
       amountReservedInCaseOfInsufficientAaveLiquidity += amount;
@@ -221,7 +243,11 @@ contract YieldManagerAave is IYieldManager {
     totalReservedForTreasury = 0;
 
     // Redeem aToken for payment tokens.
-    lendingPool.withdraw(address(paymentToken), amountToWithdrawForTreasury, treasury);
+    ILendingPool(lendingPoolAddressesProvider.getLendingPool()).withdraw(
+      address(paymentToken),
+      amountToWithdrawForTreasury,
+      treasury
+    );
 
     emit WithdrawTreasuryFunds();
   }

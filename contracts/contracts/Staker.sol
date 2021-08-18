@@ -797,7 +797,8 @@ contract Staker is IStaker, Initializable {
     address user
   ) internal virtual {
     uint256 floatTotal = 0;
-    for (uint256 i = 0; i < marketIndexes.length; i++) {
+    uint256 length = marketIndexes.length;
+    for (uint256 i = 0; i < length; i++) {
       uint256 floatToMint = _calculateAccumulatedFloatAndExecuteOutstandingShifts(
         marketIndexes[i],
         user
