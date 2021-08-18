@@ -52,12 +52,6 @@ contract YieldManagerAave is IYieldManager {
   uint256 public amountReservedInCaseOfInsufficientAaveLiquidity;
 
   /*╔═════════════════════════════╗
-    ║           EVENTS            ║
-    ╚═════════════════════════════╝*/
-
-  event ClaimAaveRewardTokenToTreasury(uint256 amount);
-
-  /*╔═════════════════════════════╗
     ║          MODIFIERS          ║
     ╚═════════════════════════════╝*/
 
