@@ -197,9 +197,23 @@ let testIntegration =
         let {longShort, markets} = contracts.contents;
         let {paymentToken, oracleManager} = markets->Array.getUnsafe(0);
 
+        let%Await lendingPoolAddressesProviderMock =
+          LendingPoolAddressesProviderMock.make();
+        let%Await lendingPoolAddressesProviderSmocked =
+          LendingPoolAddressesProviderMockSmocked.make(
+            lendingPoolAddressesProviderMock,
+          );
+        lendingPoolAddressesProviderSmocked->LendingPoolAddressesProviderMockSmocked.mockGetLendingPoolToReturn(
+          Helpers.randomAddress(),
+        );
+
         //Can't deploy a market with the same yield manager as another market
         let%Await newYieldManager =
-          Helpers.deployAYieldManager(~longShort=longShort.address);
+          Helpers.deployAYieldManager(
+            ~longShort=longShort.address,
+            ~lendingPoolAddressesProvider=
+              lendingPoolAddressesProviderSmocked.address,
+          );
 
         let%Await _ =
           longShort->LongShort.createNewSyntheticMarket(

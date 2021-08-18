@@ -119,7 +119,7 @@ function mintShortNextPriceWithSystemUpdate(amount, marketIndex, paymentToken, l
               }));
 }
 
-function deployTestMarket(syntheticName, syntheticSymbol, longShortInstance, treasuryInstance, admin, networkName, paymentToken) {
+function deployTestMarket(syntheticName, syntheticSymbol, longShortInstance, treasuryInstance, admin, paymentToken) {
   return LetOps.AwaitThen.let_(OracleManagerMock.make(admin.address), (function (oracleManager) {
                 return LetOps.AwaitThen.let_(YieldManagerMock.make(longShortInstance.address, treasuryInstance.address, paymentToken.address), (function (yieldManager) {
                               return LetOps.AwaitThen.let_(paymentToken.MINTER_ROLE(), (function (mintRole) {

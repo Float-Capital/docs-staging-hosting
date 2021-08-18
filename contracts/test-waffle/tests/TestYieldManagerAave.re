@@ -31,6 +31,12 @@ describe("Float System", () => {
       AaveIncentivesControllerMock.make();
     let%Await aaveIncentivesControllerSmocked =
       AaveIncentivesControllerMockSmocked.make(aaveIncentivesControllerMock);
+    let%Await lendingPoolAddressesProviderMock =
+      LendingPoolAddressesProviderMock.make();
+    let%Await lendingPoolAddressesProviderSmocked =
+      LendingPoolAddressesProviderMockSmocked.make(
+        lendingPoolAddressesProviderMock,
+      );
 
     let%Await yieldManagerAave =
       YieldManagerAave.make(
@@ -38,7 +44,8 @@ describe("Float System", () => {
         ~treasury=treasury.address,
         ~paymentToken=paymentTokenSmocked.address,
         ~aToken=aTokenSmocked.address,
-        ~lendingPool=lendingPoolSmocked.address,
+        ~lendingPoolAddressesProvider=
+          lendingPoolAddressesProviderSmocked.address,
         ~aaveIncentivesController=aaveIncentivesControllerSmocked.address,
         ~aaveReferralCode=6543,
       );

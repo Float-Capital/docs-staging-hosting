@@ -129,6 +129,7 @@ module.exports = {
       ":OracleManagerChainlink$",
       ":OracleManagerMock$",
       ":LendingPoolAaveMock$",
+      ":LendingPoolAddressesProviderMock$",
       ":AaveIncentivesControllerMock$",
       "Mockable$",
     ],

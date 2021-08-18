@@ -282,14 +282,14 @@ type longShortUnitTestContracts = {
   oracleManagerSmocked: OracleManagerMockSmocked.t,
 }
 
-let deployAYieldManager = (~longShort: Ethers.ethAddress) => {
+let deployAYieldManager = (~longShort: Ethers.ethAddress, ~lendingPoolAddressesProvider) => {
   ERC20Mock.make(~name="Pay Token 1", ~symbol="PT1")->JsPromise.then(paymentToken =>
     YieldManagerAave.make(
       ~longShort,
       ~treasury=CONSTANTS.zeroAddress,
       ~paymentToken=paymentToken.address,
       ~aToken=CONSTANTS.zeroAddress,
-      ~lendingPool=randomAddress(),
+      ~lendingPoolAddressesProvider,
       ~aaveIncentivesController=randomAddress(),
       ~aaveReferralCode=0,
     )
@@ -303,15 +303,24 @@ let initializeLongShortUnit = () => {
       Staker.make(),
       FloatToken.make(),
       TokenFactory.make(~longShort=CONSTANTS.zeroAddress),
-      YieldManagerAave.make(
-        ~longShort=CONSTANTS.zeroAddress,
-        ~treasury=CONSTANTS.zeroAddress,
-        ~paymentToken=paymentToken.address,
-        ~aToken=CONSTANTS.zeroAddress,
-        ~lendingPool=randomAddress(),
-        ~aaveIncentivesController=randomAddress(),
-        ~aaveReferralCode=0,
-      ),
+      LendingPoolAddressesProviderMock.make()
+      ->JsPromise.then(lendingPoolAddressesProviderMock =>
+        LendingPoolAddressesProviderMockSmocked.make(lendingPoolAddressesProviderMock)
+      )
+      ->JsPromise.then(lendingPoolAddressesProviderSmocked => {
+        lendingPoolAddressesProviderSmocked->LendingPoolAddressesProviderMockSmocked.mockGetLendingPoolToReturn(
+          randomAddress(),
+        )
+        YieldManagerAave.make(
+          ~longShort=CONSTANTS.zeroAddress,
+          ~treasury=CONSTANTS.zeroAddress,
+          ~paymentToken=paymentToken.address,
+          ~aToken=CONSTANTS.zeroAddress,
+          ~lendingPoolAddressesProvider=lendingPoolAddressesProviderSmocked.address,
+          ~aaveIncentivesController=randomAddress(),
+          ~aaveReferralCode=0,
+        )
+      }),
       OracleManagerMock.make(~admin=CONSTANTS.zeroAddress),
       SyntheticToken.make(
         ~name="baseTestSyntheticToken",

@@ -31,7 +31,8 @@ contract LongShortInternalStateSetters is LongShort {
   }
 
   function setMarketExistsMulti(uint32[] calldata marketIndexes) external {
-    for (uint256 i = 0; i < marketIndexes.length; i++) {
+    uint256 length = marketIndexes.length;
+    for (uint256 i = 0; i < length; i++) {
       marketExists[marketIndexes[i]] = true;
     }
   }
