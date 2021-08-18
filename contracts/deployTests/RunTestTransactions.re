@@ -1,6 +1,5 @@
 open LetOps;
 open DeployHelpers;
-open ContractHelpers;
 open Globals;
 
 type allContracts = {
@@ -11,7 +10,7 @@ type allContracts = {
   syntheticToken: SyntheticToken.t,
 };
 
-let runTestTransactions = ({staker, longShort, treasury, paymentToken}) => {
+let runTestTransactions = ({longShort, treasury, paymentToken}) => {
   let%Await loadedAccounts = Ethers.getSigners();
 
   let admin = loadedAccounts->Array.getUnsafe(1);
@@ -31,7 +30,6 @@ let runTestTransactions = ({staker, longShort, treasury, paymentToken}) => {
       ~longShortInstance=longShort,
       ~treasuryInstance=treasury,
       ~admin,
-      ~networkName="networkName",
       ~paymentToken: ERC20Mock.t,
     );
 
@@ -42,7 +40,6 @@ let runTestTransactions = ({staker, longShort, treasury, paymentToken}) => {
       ~longShortInstance=longShort,
       ~treasuryInstance=treasury,
       ~admin,
-      ~networkName="networkName",
       ~paymentToken: ERC20Mock.t,
     );
 
@@ -53,7 +50,6 @@ let runTestTransactions = ({staker, longShort, treasury, paymentToken}) => {
       ~longShortInstance=longShort,
       ~treasuryInstance=treasury,
       ~admin,
-      ~networkName="networkName",
       ~paymentToken: ERC20Mock.t,
     );
   let initialMarkets = [|1, 2, 3|];

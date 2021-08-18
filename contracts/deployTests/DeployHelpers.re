@@ -143,7 +143,6 @@ let deployTestMarket =
       ~longShortInstance: LongShort.t,
       ~treasuryInstance: Treasury_v0.t,
       ~admin,
-      ~networkName,
       ~paymentToken: ERC20Mock.t,
     ) => {
   let%AwaitThen oracleManager = OracleManagerMock.make(~admin=admin.address);

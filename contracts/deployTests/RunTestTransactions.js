@@ -18,9 +18,9 @@ function runTestTransactions(param) {
                               return LetOps.AwaitThen.let_(DeployHelpers.topupBalanceIfLow(admin, user2), (function (param) {
                                             return LetOps.AwaitThen.let_(DeployHelpers.topupBalanceIfLow(admin, user3), (function (param) {
                                                           console.log("deploying markets");
-                                                          return LetOps.AwaitThen.let_(DeployHelpers.deployTestMarket("Eth Market", "FL_ETH", longShort, treasury, admin, "networkName", paymentToken), (function (param) {
-                                                                        return LetOps.AwaitThen.let_(DeployHelpers.deployTestMarket("The Flippening", "FL_FLIP", longShort, treasury, admin, "networkName", paymentToken), (function (param) {
-                                                                                      return LetOps.AwaitThen.let_(DeployHelpers.deployTestMarket("Doge Market", "FL_DOGE", longShort, treasury, admin, "networkName", paymentToken), (function (param) {
+                                                          return LetOps.AwaitThen.let_(DeployHelpers.deployTestMarket("Eth Market", "FL_ETH", longShort, treasury, admin, paymentToken), (function (param) {
+                                                                        return LetOps.AwaitThen.let_(DeployHelpers.deployTestMarket("The Flippening", "FL_FLIP", longShort, treasury, admin, paymentToken), (function (param) {
+                                                                                      return LetOps.AwaitThen.let_(DeployHelpers.deployTestMarket("Doge Market", "FL_DOGE", longShort, treasury, admin, paymentToken), (function (param) {
                                                                                                     var initialMarkets = [
                                                                                                       1,
                                                                                                       2,
