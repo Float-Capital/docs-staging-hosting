@@ -2898,6 +2898,10 @@ var query$33 = (require("@apollo/client").gql`
         startTimestamp
         endPrice
       }
+      latestPriceInterval  {
+        __typename
+        endPrice
+      }
     }
   }
 `);
@@ -2909,6 +2913,7 @@ function parse$33(value) {
     tmp = undefined;
   } else {
     var value$2 = value$1.prices;
+    var value$3 = value$1.latestPriceInterval;
     tmp = {
       __typename: value$1.__typename,
       id: value$1.id,
@@ -2918,7 +2923,11 @@ function parse$33(value) {
                     startTimestamp: GqlConverters.$$Date.parse(value.startTimestamp),
                     endPrice: GqlConverters.$$BigInt.parse(value.endPrice)
                   };
-          })
+          }),
+      latestPriceInterval: {
+        __typename: value$3.__typename,
+        endPrice: GqlConverters.$$BigInt.parse(value$3.endPrice)
+      }
     };
   }
   return {
@@ -2930,8 +2939,16 @@ function serialize$33(value) {
   var value$1 = value.priceIntervalManager;
   var priceIntervalManager;
   if (value$1 !== undefined) {
-    var value$2 = value$1.prices;
-    var prices = value$2.map(function (value) {
+    var value$2 = value$1.latestPriceInterval;
+    var value$3 = value$2.endPrice;
+    var value$4 = GqlConverters.$$BigInt.serialize(value$3);
+    var value$5 = value$2.__typename;
+    var latestPriceInterval = {
+      __typename: value$5,
+      endPrice: value$4
+    };
+    var value$6 = value$1.prices;
+    var prices = value$6.map(function (value) {
           var value$1 = value.endPrice;
           var value$2 = GqlConverters.$$BigInt.serialize(value$1);
           var value$3 = value.startTimestamp;
@@ -2943,12 +2960,13 @@ function serialize$33(value) {
                   endPrice: value$2
                 };
         });
-    var value$3 = value$1.id;
-    var value$4 = value$1.__typename;
+    var value$7 = value$1.id;
+    var value$8 = value$1.__typename;
     priceIntervalManager = {
-      __typename: value$4,
-      id: value$3,
-      prices: prices
+      __typename: value$8,
+      id: value$7,
+      prices: prices,
+      latestPriceInterval: latestPriceInterval
     };
   } else {
     priceIntervalManager = null;

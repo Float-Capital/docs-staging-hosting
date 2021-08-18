@@ -2,7 +2,7 @@
 
 pragma solidity 0.8.3;
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 
 import "./interfaces/IYieldManager.sol";
@@ -17,6 +17,7 @@ import "./interfaces/aave/IAaveIncentivesController.sol";
   @dev https://docs.aave.com/portal/
   */
 contract YieldManagerAave is IYieldManager {
+
   /*╔═════════════════════════════╗
     ║          VARIABLES          ║
     ╚═════════════════════════════╝*/
@@ -31,7 +32,7 @@ contract YieldManagerAave is IYieldManager {
 
   /// @notice The payment token the yield manager supports
   /// @dev DAI token
-  ERC20 public immutable paymentToken;
+  IERC20 public immutable paymentToken;
   /// @notice The token representing the interest accruing payment token position from Aave
   /// @dev ADAI token
   IERC20Upgradeable public immutable aToken;
@@ -94,7 +95,7 @@ contract YieldManagerAave is IYieldManager {
 
     referralCode = _aaveReferralCode;
 
-    paymentToken = ERC20(_paymentToken);
+    paymentToken = IERC20(_paymentToken);
     aToken = IERC20Upgradeable(_aToken);
     lendingPool = ILendingPool(_lendingPool);
     aaveIncentivesController = IAaveIncentivesController(_aaveIncentivesController);

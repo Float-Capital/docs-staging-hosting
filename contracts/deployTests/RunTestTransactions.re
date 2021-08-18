@@ -22,6 +22,7 @@ let runTestTransactions = ({staker, longShort, treasury, paymentToken}) => {
   let%AwaitThen _ = DeployHelpers.topupBalanceIfLow(~from=admin, ~to_=user1);
   let%AwaitThen _ = DeployHelpers.topupBalanceIfLow(~from=admin, ~to_=user2);
   let%AwaitThen _ = DeployHelpers.topupBalanceIfLow(~from=admin, ~to_=user3);
+  Js.log("deploying markets");
 
   let%AwaitThen _ =
     deployTestMarket(
@@ -66,7 +67,7 @@ let runTestTransactions = ({staker, longShort, treasury, paymentToken}) => {
   let%AwaitThen _ =
     executeOnMarkets(
       initialMarkets,
-      LongShort.updateSystemState(longShort, ~marketIndex=_),
+      updateSystemState(~longShort, ~admin, ~marketIndex=_),
     );
   Js.log("Executing Long Mints");
   let%AwaitThen _ =
@@ -119,7 +120,7 @@ let runTestTransactions = ({staker, longShort, treasury, paymentToken}) => {
   let%AwaitThen _ =
     executeOnMarkets(
       initialMarkets,
-      LongShort.updateSystemState(longShort, ~marketIndex=_),
+      updateSystemState(~longShort, ~admin, ~marketIndex=_),
     );
   Js.log("Staking long position");
   let%AwaitThen _ =
