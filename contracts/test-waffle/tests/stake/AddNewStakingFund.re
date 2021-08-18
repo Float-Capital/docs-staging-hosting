@@ -61,17 +61,6 @@ let test =
       ()
     });
 
-    it(
-      "calls _changeMarketLaunchIncentiveParameters with correct arguments", () => {
-      StakerSmocked.InternalMock._changeMarketLaunchIncentiveParametersCalls()
-      ->Array.getUnsafe(0)
-      ->Chai.recordEqualFlat({
-          marketIndex,
-          period: kPeriod,
-          initialMultiplier: kInitialMultiplier,
-        })
-    });
-
     it("calls _changeUnstakeFee with correct arguments", () => {
       StakerSmocked.InternalMock._changeUnstakeFeeCalls()
       ->Array.getUnsafe(0)
