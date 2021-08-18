@@ -17,7 +17,6 @@ import "./interfaces/aave/IAaveIncentivesController.sol";
   @dev https://docs.aave.com/portal/
   */
 contract YieldManagerAave is IYieldManager {
-
   /*╔═════════════════════════════╗
     ║          VARIABLES          ║
     ╚═════════════════════════════╝*/
@@ -101,7 +100,7 @@ contract YieldManagerAave is IYieldManager {
     aaveIncentivesController = IAaveIncentivesController(_aaveIncentivesController);
 
     // Approve tokens for aave lending pool maximally.
-    ERC20(_paymentToken).approve(_lendingPool, type(uint256).max);
+    IERC20(_paymentToken).approve(_lendingPool, type(uint256).max);
   }
 
   /*╔════════════════════════╗

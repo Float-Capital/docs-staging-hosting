@@ -65,7 +65,6 @@ module.exports = async function (deployer, networkName, accounts) {
 
   await longShort.initialize(
     admin,
-    treasury.address,
     tokenFactory.address,
     staker.address,
     {
