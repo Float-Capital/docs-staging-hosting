@@ -180,56 +180,51 @@ let testIntegration =
       );
     });
 
-    it_only(
+    it(
       "Shouldn't allow initialization with less than 1 eth units of payment token",
       () => {
-        let {longShort, markets} = contracts.contents;
-        let {paymentToken, oracleManager} = markets->Array.getUnsafe(0);
+      let {longShort, markets} = contracts.contents;
+      let {paymentToken, oracleManager} = markets->Array.getUnsafe(0);
 
-        let%Await lendingPoolAddressesProviderMock =
-          LendingPoolAddressesProviderMock.make();
-        let%Await lendingPoolAddressesProviderSmocked =
-          LendingPoolAddressesProviderMockSmocked.make(
-            lendingPoolAddressesProviderMock,
-          );
-        lendingPoolAddressesProviderSmocked->LendingPoolAddressesProviderMockSmocked.mockGetLendingPoolToReturn(
-          Helpers.randomAddress(),
+      let%Await lendingPoolAddressesProviderSmocked =
+        LendingPoolAddressesProviderMockSmocked.make();
+      lendingPoolAddressesProviderSmocked->LendingPoolAddressesProviderMockSmocked.mockGetLendingPoolToReturn(
+        Helpers.randomAddress(),
+      );
+
+      //Can't deploy a market with the same yield manager as another market
+      let%Await newYieldManager =
+        Helpers.deployAYieldManager(
+          ~longShort=longShort.address,
+          ~lendingPoolAddressesProvider=
+            lendingPoolAddressesProviderSmocked.address,
         );
 
-        //Can't deploy a market with the same yield manager as another market
-        let%Await newYieldManager =
-          Helpers.deployAYieldManager(
-            ~longShort=longShort.address,
-            ~lendingPoolAddressesProvider=
-              lendingPoolAddressesProviderSmocked.address,
-          );
-
-        let%Await _ =
-          longShort->LongShort.createNewSyntheticMarket(
-            ~syntheticName="Test",
-            ~syntheticSymbol="T",
-            ~paymentToken=paymentToken.address,
-            ~oracleManager=oracleManager.address,
-            ~yieldManager=newYieldManager.address,
-          );
-        let%Await latestMarket = longShort->LongShort.latestMarket;
-
-        Chai.expectRevert(
-          ~transaction=
-            longShort->LongShort.initializeMarket(
-              ~marketIndex=latestMarket,
-              ~kInitialMultiplier=CONSTANTS.tenToThe18,
-              ~kPeriod=CONSTANTS.oneBn,
-              ~unstakeFee_e18=Ethers.BigNumber.fromUnsafe("5000000000000000"), // 0.5% or 50 basis points
-              ~initialMarketSeedForEachMarketSide=CONSTANTS.oneBn,
-              ~balanceIncentiveCurve_exponent=bnFromInt(5),
-              ~balanceIncentiveCurve_equilibriumOffset=bnFromInt(0),
-              ~marketTreasurySplitGradient_e18=bnFromInt(1),
-            ),
-          ~reason="Insufficient market seed",
+      let%Await _ =
+        longShort->LongShort.createNewSyntheticMarket(
+          ~syntheticName="Test",
+          ~syntheticSymbol="T",
+          ~paymentToken=paymentToken.address,
+          ~oracleManager=oracleManager.address,
+          ~yieldManager=newYieldManager.address,
         );
-      },
-    );
+      let%Await latestMarket = longShort->LongShort.latestMarket;
+
+      Chai.expectRevert(
+        ~transaction=
+          longShort->LongShort.initializeMarket(
+            ~marketIndex=latestMarket,
+            ~kInitialMultiplier=CONSTANTS.tenToThe18,
+            ~kPeriod=CONSTANTS.oneBn,
+            ~unstakeFee_e18=Ethers.BigNumber.fromUnsafe("5000000000000000"), // 0.5% or 50 basis points
+            ~initialMarketSeedForEachMarketSide=CONSTANTS.oneBn,
+            ~balanceIncentiveCurve_exponent=bnFromInt(5),
+            ~balanceIncentiveCurve_equilibriumOffset=bnFromInt(0),
+            ~marketTreasurySplitGradient_e18=bnFromInt(1),
+          ),
+        ~reason="Insufficient market seed",
+      );
+    });
 
     it(
       "Shouldn't allow creation of a market with the a yield manager already in use",

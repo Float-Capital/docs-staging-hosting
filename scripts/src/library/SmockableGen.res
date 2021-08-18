@@ -138,51 +138,6 @@ let getCallsArrayContent: functionDef => string = fnType => {
           })`
 }
 
-/*
-
-type pushUpdatedMarketPricesToUpdateFloatIssuanceCalculationsCall = {
-  marketIndex: int,
-  marketUpdateIndex: Ethers.BigNumber.t,
-  longPrice: Ethers.BigNumber.t,
-  shortPrice: Ethers.BigNumber.t,
-  longValue: Ethers.BigNumber.t,
-  shortValue: Ethers.BigNumber.t,
-}
-
-@send @scope(("to", "have", "been"))
-external toHaveBeenCalledWith: (
-  expectation,
-  int,
-  Ethers.BigNumber.t,
-  Ethers.BigNumber.t,
-  Ethers.BigNumber.t,
-  Ethers.BigNumber.t,
-  Ethers.BigNumber.t,
-) => unit = "calledWith"
-let pushUpdatedMarketPricesToUpdateFloatIssuanceCalculationsCallCheck = (
-  _r,
-  {
-    marketIndex,
-    marketUpdateIndex,
-    longPrice,
-    shortPrice,
-    longValue,
-    shortValue,
-  }: pushUpdatedMarketPricesToUpdateFloatIssuanceCalculationsCall,
-) => {
-  let function = %raw("_r.pushUpdatedMarketPricesToUpdateFloatIssuanceCalculations")
-  expect(function)->toHaveBeenCalledWith(
-    marketIndex,
-    marketUpdateIndex,
-    longPrice,
-    shortPrice,
-    longValue,
-    shortValue,
-  )
-}
-
-*/
-
 let getCallsInternal: functionDef => string = fnType => {
   let (fnCallType, fnName) = getCallsHelper(fnType)
   Js.log(fnType)
@@ -194,9 +149,6 @@ let getCallsInternal: functionDef => string = fnType => {
           fnType.parameters->identifiersToTuple,
         )
       : ("", "")
-  /*
-expect(myFake.myFunction).to.have.been.calledWith(123, true, "abcd");
-*/
   `
 @send @scope(("to", "have", "been"))
 external ${fnName}CalledWith: (
@@ -204,25 +156,20 @@ external ${fnName}CalledWith: (
   ${fnType->parametersTypeList}
 ) => unit = "calledWith"
 
-let ${fnName}CallCheck = (
-  ${parameters}) => {
-    checkForExceptions(~functionName="${fnType.name}")
-        internalRef.contents
-        ->Option.map(_r => {
-  let function = %raw("_r.${fnName}Mock")
+@get external ${fnName}FunctionFromInstance: t => string = "${fnName}Mock"
 
-  expect(function)->${fnName}CalledWith${argument}})
-}
-  let ${fnName}Old: unit => array<
-  ${fnCallType}> = () => {
+let ${fnName}Function = () => {
       checkForExceptions(~functionName="${fnType.name}")
-        internalRef.contents
-        ->Option.map(_r => {
-          let array = %raw("_r.${fnType.name}Mock.calls")
-          ${fnType->getCallsArrayContent}
-        })
-  ->Option.getExn
-  }
+      internalRef.contents
+        ->Option.map(contract => {
+
+    contract->${fnName}FunctionFromInstance
+  })
+}
+
+let ${fnName}CallCheck = (
+  ${parameters}) => 
+    expect(${fnName}Function())->${fnName}CalledWith${argument}
   `
 }
 
@@ -250,13 +197,13 @@ external ${fnName}CalledWith: (
   ${fnType->parametersTypeList}
 ) => unit = "calledWith"
 
-let ${fnName}CallCheck = (
-  _r,
-  ${parameters}) => {
-  let function = %raw("_r.${fnName}")
+@get external ${fnName}Function: t => string = "${fnName}"
 
-  expect(function)->${fnName}CalledWith${argument}
-  }
+let ${fnName}CallCheck = (
+  contract,
+  ${parameters}) => {
+  expect(contract->${fnName}Function)->${fnName}CalledWith${argument}
+}
   `
 }
 
@@ -418,7 +365,9 @@ let internalModule = (functionsAndModifiers, ~contractName) =>
   `
 
 let externalModule = (functions, ~contractName) => {
-  `%%raw(\`
+  `open SmockGeneral
+
+%%raw(\`
 const { expect, use } = require("chai");
 use(require('@defi-wonderland/smock').smock.matchers);
 \`)
@@ -428,9 +377,6 @@ type t = {address: Ethers.ethAddress}
 @module("@defi-wonderland/smock") @scope("smock") external makeRaw: string => Js.Promise.t<t> = "fake"
 let make = () => makeRaw("${contractName}")
 
-type expectation
-@val
-external expect: 'a => expectation = "expect"
 
 let uninitializedValue: t = None->Obj.magic
 

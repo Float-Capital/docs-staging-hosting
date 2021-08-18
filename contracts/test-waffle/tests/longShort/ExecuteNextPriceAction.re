@@ -1,6 +1,7 @@
 open LetOps;
 open Mocha;
 open Globals;
+open SmockGeneral;
 
 let testUnit =
     (
@@ -70,11 +71,12 @@ let testUnit =
           it("should not call any functions or change any state", () => {
             let%Await _ = executeOutstandingNextPriceMintsTx.contents;
             ();
-            //TODO: check no calls!!
-            // let transferCallCheck =
-            //   (isLong ? longSynthSmocked : shortSynthSmocked).contents
-            //   ->SyntheticTokenSmocked.transferCallCheck;
-            // Chai.recordArrayDeepEqualFlat(transferCallCheck, [||]);
+
+            expect(
+              (isLong ? longSynthSmocked : shortSynthSmocked).contents
+              ->SyntheticTokenSmocked.transferFunction,
+            )
+            ->toHaveCallCount(0);
           });
 
           it(
@@ -221,12 +223,11 @@ let testUnit =
           });
           it("should not call any functions or change any state", () => {
             let%Await _ = executeOutstandingNextPriceRedeemsTx.contents;
-            ();
-            // let transferCallCheck =
-            //   yieldManagerSmocked.contents
-            //   ->YieldManagerMockSmocked.transferPaymentTokensToUserCallCheck;
-            // Chai.recordArrayDeepEqualFlat(transferCallCheck, [||]);
-            // TODO: not called check
+            expect(
+              yieldManagerSmocked.contents
+              ->YieldManagerMockSmocked.transferPaymentTokensToUserFunction,
+            )
+            ->toHaveCallCount(0);
           });
 
           it(
@@ -385,11 +386,12 @@ let testUnit =
           });
           it("should not call any functions or change any state", () => {
             let%Await _ = executeOutstandingNextPriceRedeemsTx.contents;
-            ();
-            // let transferCallCheck =
-            //   (isShiftFromLong ? shortSynthSmocked : longSynthSmocked).contents
-            //   ->SyntheticTokenSmocked.transferCallCheck;
-            // Chai.recordArrayDeepEqualFlat(transferCallCheck, [||]);
+
+            expect(
+              (isShiftFromLong ? shortSynthSmocked : longSynthSmocked).contents
+              ->SyntheticTokenSmocked.transferFunction,
+            )
+            ->toHaveCallCount(0);
           });
 
           it(

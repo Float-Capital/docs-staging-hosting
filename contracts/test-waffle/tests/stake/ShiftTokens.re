@@ -1,6 +1,7 @@
 open Globals;
 open LetOps;
 open Mocha;
+open SmockGeneral;
 
 let testUnit =
     (
@@ -120,9 +121,10 @@ let testUnit =
               ),
           );
         ();
-        // let mintAccumulatedFloatCallCheck =
-        //   StakerSmocked.InternalMock._mintAccumulatedFloatAndExecuteOutstandingShiftsCallCheck();
-        // mintAccumulatedFloatCallCheck->Chai.recordArrayDeepEqualFlat([||]);
+        expect(
+          StakerSmocked.InternalMock._mintAccumulatedFloatAndExecuteOutstandingShiftsFunction(),
+        )
+        ->toHaveCallCount(0);
       },
     );
     it(
@@ -145,9 +147,11 @@ let testUnit =
               ),
           );
         ();
-        // let mintAccumulatedFloatCallCheck =
-        //   StakerSmocked.InternalMock._mintAccumulatedFloatAndExecuteOutstandingShiftsCallCheck();
-        // mintAccumulatedFloatCallCheck->Chai.recordArrayDeepEqualFlat([||]);
+
+        expect(
+          StakerSmocked.InternalMock._mintAccumulatedFloatAndExecuteOutstandingShiftsFunction(),
+        )
+        ->toHaveCallCount(0);
       },
     );
 
@@ -170,10 +174,11 @@ let testUnit =
                 amountSyntheticTokensToShiftBeforeValue,
               ),
           );
-        ();
-        // let mintAccumulatedFloatCallCheck =
-        //   StakerSmocked.InternalMock._mintAccumulatedFloatAndExecuteOutstandingShiftsCallCheck();
-        // mintAccumulatedFloatCallCheck->Chai.recordArrayDeepEqualFlat([||]);
+
+        expect(
+          StakerSmocked.InternalMock._mintAccumulatedFloatAndExecuteOutstandingShiftsFunction(),
+        )
+        ->toHaveCallCount(0);
       },
     );
 

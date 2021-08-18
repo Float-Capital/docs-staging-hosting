@@ -1,6 +1,7 @@
 open Mocha;
 open Globals;
 open LetOps;
+open SmockGeneral;
 
 let testUnit =
     (
@@ -366,10 +367,10 @@ let testUnit =
               })
           });
           it("should NOT call the burn function.", () => {
-            // let burnCallCheck =
-            //   syntheticTokenRef.contents->SyntheticTokenSmocked.burnCallCheck;
-            // Chai.recordArrayDeepEqualFlat(burnCallCheck, [||]);
-            ()
+            expect(
+              syntheticTokenRef.contents->SyntheticTokenSmocked.burnFunction,
+            )
+            ->toHaveCallCount(0)
           });
         });
         describe("changeInSyntheticTokensTotalSupply < 0", () => {
@@ -387,10 +388,10 @@ let testUnit =
           it(
             "should NOT call the mint function on the correct synthetic token.",
             () => {
-            // let mintCallCheck =
-            //   syntheticTokenRef.contents->SyntheticTokenSmocked.mintCallCheck;
-            // Chai.recordArrayDeepEqualFlat(mintCallCheck, [||]);
-            ()
+            expect(
+              syntheticTokenRef.contents->SyntheticTokenSmocked.mintFunction,
+            )
+            ->toHaveCallCount(0)
           });
           it(
             "should call the burn function on the correct synthetic token with correct arguments.",
@@ -413,12 +414,14 @@ let testUnit =
                 ~changeInSyntheticTokensTotalSupply,
               );
             ();
-            // let mintCallCheck =
-            //   syntheticTokenRef.contents->SyntheticTokenSmocked.mintCallCheck;
-            // let burnCallCheck =
-            //   syntheticTokenRef.contents->SyntheticTokenSmocked.burnCallCheck;
-            // Chai.recordArrayDeepEqualFlat(mintCallCheck, [||]);
-            // Chai.recordArrayDeepEqualFlat(burnCallCheck, [||]);
+            expect(
+              syntheticTokenRef.contents->SyntheticTokenSmocked.mintFunction,
+            )
+            ->toHaveCallCount(0);
+            expect(
+              syntheticTokenRef.contents->SyntheticTokenSmocked.burnFunction,
+            )
+            ->toHaveCallCount(0);
           })
         });
       };
@@ -468,13 +471,13 @@ let testUnit =
               amount: totalPaymentTokenValueChangeForMarket,
             })
         });
-        it("should NOT call the removePaymentTokenFromMarket function.", () => {
-          // let burnCallCheck =
-          //   yieldManagerRef.contents
-          //   ->YieldManagerMockSmocked.removePaymentTokenFromMarketCallCheck;
-          // Chai.recordArrayDeepEqualFlat(burnCallCheck, [||]);
-          ()
-        });
+        it("should NOT call the removePaymentTokenFromMarket function.", () =>
+          expect(
+            yieldManagerRef.contents
+            ->YieldManagerMockSmocked.removePaymentTokenFromMarketFunction,
+          )
+          ->toHaveCallCount(0)
+        );
       });
       describe("totalPaymentTokenValueChangeForMarket < 0", () => {
         let totalPaymentTokenValueChangeForMarket =
@@ -489,13 +492,13 @@ let testUnit =
         });
         it(
           "should NOT call the depositPaymentToken function on the correct synthetic token.",
-          () => {
-          // let mintCallCheck =
-          //   yieldManagerRef.contents
-          //   ->YieldManagerMockSmocked.depositPaymentTokenCallCheck;
-          // Chai.recordArrayDeepEqualFlat(mintCallCheck, [||]);
-          ()
-        });
+          () =>
+          expect(
+            yieldManagerRef.contents
+            ->YieldManagerMockSmocked.depositPaymentTokenFunction,
+          )
+          ->toHaveCallCount(0)
+        );
         it(
           "should call the removePaymentTokenFromMarket function on the correct synthetic token with correct arguments.",
           () => {
@@ -518,14 +521,17 @@ let testUnit =
                 ~totalPaymentTokenValueChangeForMarket,
               );
             ();
-            // let mintCallCheck =
-            //   yieldManagerRef.contents
-            //   ->YieldManagerMockSmocked.depositPaymentTokenCallCheck;
-            // let burnCallCheck =
-            //   yieldManagerRef.contents
-            //   ->YieldManagerMockSmocked.removePaymentTokenFromMarketCallCheck;
-            // Chai.recordArrayDeepEqualFlat(mintCallCheck, [||]);
-            // Chai.recordArrayDeepEqualFlat(burnCallCheck, [||]);
+
+            expect(
+              yieldManagerRef.contents
+              ->YieldManagerMockSmocked.depositPaymentTokenFunction,
+            )
+            ->toHaveCallCount(0);
+            expect(
+              yieldManagerRef.contents
+              ->YieldManagerMockSmocked.removePaymentTokenFromMarketFunction,
+            )
+            ->toHaveCallCount(0);
           },
         )
       });

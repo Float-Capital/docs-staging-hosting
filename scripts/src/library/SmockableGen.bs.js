@@ -137,16 +137,15 @@ function getCallsArrayContent(fnType) {
 function getCallsInternal(fnType) {
   var match = getCallsHelper(fnType);
   var fnName = match[1];
-  var fnCallType = match[0];
   console.log(fnType);
   var match$1 = fnType.parameters.length >= 1 ? [
-      parametersToDestructuredRecord(fnType) + ": " + fnCallType,
+      parametersToDestructuredRecord(fnType) + ": " + match[0],
       identifiersToTuple(fnType.parameters)
     ] : [
       "",
       ""
     ];
-  return "\n@send @scope((\"to\", \"have\", \"been\"))\nexternal " + fnName + "CalledWith: (\n  expectation,\n  " + parametersTypeList(fnType) + "\n) => unit = \"calledWith\"\n\nlet " + fnName + "CallCheck = (\n  " + match$1[0] + ") => {\n    checkForExceptions(~functionName=\"" + fnType.name + "\")\n        internalRef.contents\n        ->Option.map(_r => {\n  let function = %raw(\"_r." + fnName + "Mock\")\n\n  expect(function)->" + fnName + "CalledWith" + match$1[1] + "})\n}\n  let " + fnName + "Old: unit => array<\n  " + fnCallType + "> = () => {\n      checkForExceptions(~functionName=\"" + fnType.name + "\")\n        internalRef.contents\n        ->Option.map(_r => {\n          let array = %raw(\"_r." + fnType.name + "Mock.calls\")\n          " + getCallsArrayContent(fnType) + "\n        })\n  ->Option.getExn\n  }\n  ";
+  return "\n@send @scope((\"to\", \"have\", \"been\"))\nexternal " + fnName + "CalledWith: (\n  expectation,\n  " + parametersTypeList(fnType) + "\n) => unit = \"calledWith\"\n\n@get external " + fnName + "FunctionFromInstance: t => string = \"" + fnName + "Mock\"\n\nlet " + fnName + "Function = () => {\n      checkForExceptions(~functionName=\"" + fnType.name + "\")\n      internalRef.contents\n        ->Option.map(contract => {\n\n    contract->" + fnName + "FunctionFromInstance\n  })\n}\n\nlet " + fnName + "CallCheck = (\n  " + match$1[0] + ") => \n    expect(" + fnName + "Function())->" + fnName + "CalledWith" + match$1[1] + "\n  ";
 }
 
 function getCallsExternal(fnType) {
@@ -161,7 +160,7 @@ function getCallsExternal(fnType) {
       "",
       ""
     ];
-  return "\n  let " + fnName + "Old: t => array<\n  " + fnCallType + "> = _r => {\n        let array = %raw(\"_r." + fnType.name + ".calls\")\n        " + getCallsArrayContent(fnType) + "\n  }\n\n@send @scope((\"to\", \"have\", \"been\"))\nexternal " + fnName + "CalledWith: (\n  expectation,\n  " + parametersTypeList(fnType) + "\n) => unit = \"calledWith\"\n\nlet " + fnName + "CallCheck = (\n  _r,\n  " + match$1[0] + ") => {\n  let function = %raw(\"_r." + fnName + "\")\n\n  expect(function)->" + fnName + "CalledWith" + match$1[1] + "\n  }\n  ";
+  return "\n  let " + fnName + "Old: t => array<\n  " + fnCallType + "> = _r => {\n        let array = %raw(\"_r." + fnType.name + ".calls\")\n        " + getCallsArrayContent(fnType) + "\n  }\n\n@send @scope((\"to\", \"have\", \"been\"))\nexternal " + fnName + "CalledWith: (\n  expectation,\n  " + parametersTypeList(fnType) + "\n) => unit = \"calledWith\"\n\n@get external " + fnName + "Function: t => string = \"" + fnName + "\"\n\nlet " + fnName + "CallCheck = (\n  contract,\n  " + match$1[0] + ") => {\n  expect(contract->" + fnName + "Function)->" + fnName + "CalledWith" + match$1[1] + "\n}\n  ";
 }
 
 function getRescriptParamsForReturn(params) {
@@ -222,7 +221,7 @@ function internalModule(functionsAndModifiers, contractName) {
 }
 
 function externalModule(functions, contractName) {
-  return "%%raw(`\nconst { expect, use } = require(\"chai\");\nuse(require('@defi-wonderland/smock').smock.matchers);\n`)\n\ntype t = {address: Ethers.ethAddress}\n\n@module(\"@defi-wonderland/smock\") @scope(\"smock\") external makeRaw: string => Js.Promise.t<t> = \"fake\"\nlet make = () => makeRaw(\"" + contractName + "\")\n\ntype expectation\n@val\nexternal expect: 'a => expectation = \"expect\"\n\nlet uninitializedValue: t = None->Obj.magic\n\n  " + Globals.reduceStrArr(Belt_Array.map(functions, (function (f) {
+  return "open SmockGeneral\n\n%%raw(`\nconst { expect, use } = require(\"chai\");\nuse(require('@defi-wonderland/smock').smock.matchers);\n`)\n\ntype t = {address: Ethers.ethAddress}\n\n@module(\"@defi-wonderland/smock\") @scope(\"smock\") external makeRaw: string => Js.Promise.t<t> = \"fake\"\nlet make = () => makeRaw(\"" + contractName + "\")\n\n\nlet uninitializedValue: t = None->Obj.magic\n\n  " + Globals.reduceStrArr(Belt_Array.map(functions, (function (f) {
                     return getMockToReturnExternal(f) + "\n" + paramTypeForCalls(f) + "\n" + getCallsExternal(f) + "\n" + getMockToRevertExternal(f);
                   }))) + "\n";
 }
