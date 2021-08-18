@@ -32,6 +32,10 @@ function topupBalanceIfLow(from, to_) {
               }));
 }
 
+function updateSystemState(longShort, admin, marketIndex) {
+  return longShort.connect(admin).updateSystemState(marketIndex);
+}
+
 function mintAndApprove(paymentToken, amount, user, approvedAddress) {
   return LetOps.AwaitThen.let_(paymentToken.mint(user.address, amount), (function (param) {
                 return paymentToken.connect(user).approve(approvedAddress, amount);
@@ -74,7 +78,7 @@ function setOracleManagerPrice(longShort, marketIndex, admin) {
 function redeemShortNextPriceWithSystemUpdate(amount, marketIndex, longShort, user, admin) {
   return LetOps.AwaitThen.let_(longShort.connect(user).redeemShortNextPrice(marketIndex, amount), (function (param) {
                 return LetOps.AwaitThen.let_(setOracleManagerPrice(longShort, marketIndex, admin), (function (param) {
-                              return longShort.updateSystemState(marketIndex);
+                              return updateSystemState(longShort, admin, marketIndex);
                             }));
               }));
 }
@@ -99,7 +103,7 @@ function mintLongNextPriceWithSystemUpdate(amount, marketIndex, paymentToken, lo
   return LetOps.AwaitThen.let_(mintAndApprove(paymentToken, amount, user, longShort.address), (function (param) {
                 return LetOps.AwaitThen.let_(longShort.connect(user).mintLongNextPrice(marketIndex, amount), (function (param) {
                               return LetOps.AwaitThen.let_(setOracleManagerPrice(longShort, marketIndex, admin), (function (param) {
-                                            return longShort.updateSystemState(marketIndex);
+                                            return updateSystemState(longShort, admin, marketIndex);
                                           }));
                             }));
               }));
@@ -109,7 +113,7 @@ function mintShortNextPriceWithSystemUpdate(amount, marketIndex, paymentToken, l
   return LetOps.AwaitThen.let_(mintAndApprove(paymentToken, amount, user, longShort.address), (function (param) {
                 return LetOps.AwaitThen.let_(longShort.connect(user).mintShortNextPrice(marketIndex, amount), (function (param) {
                               return LetOps.AwaitThen.let_(setOracleManagerPrice(longShort, marketIndex, admin), (function (param) {
-                                            return longShort.updateSystemState(marketIndex);
+                                            return updateSystemState(longShort, admin, marketIndex);
                                           }));
                             }));
               }));
@@ -120,14 +124,14 @@ function deployTestMarket(syntheticName, syntheticSymbol, longShortInstance, tre
                 return LetOps.AwaitThen.let_(YieldManagerMock.make(longShortInstance.address, treasuryInstance.address, paymentToken.address), (function (yieldManager) {
                               return LetOps.AwaitThen.let_(paymentToken.MINTER_ROLE(), (function (mintRole) {
                                             return LetOps.AwaitThen.let_(paymentToken.grantRole(mintRole, yieldManager.address), (function (param) {
-                                                          return LetOps.AwaitThen.let_(longShortInstance.createNewSyntheticMarket(syntheticName, syntheticSymbol, paymentToken.address, oracleManager.address, yieldManager.address), (function (param) {
+                                                          return LetOps.AwaitThen.let_(longShortInstance.connect(admin).createNewSyntheticMarket(syntheticName, syntheticSymbol, paymentToken.address, oracleManager.address, yieldManager.address), (function (param) {
                                                                         return LetOps.AwaitThen.let_(longShortInstance.latestMarket(), (function (latestMarket) {
                                                                                       var kInitialMultiplier = Globals.bnFromString("5000000000000000000");
                                                                                       var kPeriod = Globals.bnFromInt(864000);
                                                                                       return LetOps.AwaitThen.let_(mintAndApprove(paymentToken, Globals.bnFromString("2000000000000000000"), admin, longShortInstance.address), (function (param) {
                                                                                                     var unstakeFee_e18 = Globals.bnFromString("5000000000000000");
                                                                                                     var initialMarketSeedForEachMarketSide = Globals.bnFromString("1000000000000000000");
-                                                                                                    return longShortInstance.initializeMarket(latestMarket, kInitialMultiplier, kPeriod, unstakeFee_e18, initialMarketSeedForEachMarketSide, Globals.bnFromInt(5), Globals.bnFromInt(0), Globals.bnFromInt(1));
+                                                                                                    return longShortInstance.connect(admin).initializeMarket(latestMarket, kInitialMultiplier, kPeriod, unstakeFee_e18, initialMarketSeedForEachMarketSide, Globals.bnFromInt(5), Globals.bnFromInt(0), Globals.bnFromInt(1));
                                                                                                   }));
                                                                                     }));
                                                                       }));
@@ -140,6 +144,7 @@ function deployTestMarket(syntheticName, syntheticSymbol, longShortInstance, tre
 exports.minSenderBalance = minSenderBalance;
 exports.minRecieverBalance = minRecieverBalance;
 exports.topupBalanceIfLow = topupBalanceIfLow;
+exports.updateSystemState = updateSystemState;
 exports.mintAndApprove = mintAndApprove;
 exports.stakeSynthLong = stakeSynthLong;
 exports.executeOnMarkets = executeOnMarkets;

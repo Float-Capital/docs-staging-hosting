@@ -25,7 +25,7 @@ function BridgeToPolygon(Props) {
                     rel: "noopener noreferrer",
                     target: "_"
                   }, React.createElement("div", {
-                        className: "p-2 rounded-lg flex flex-row bg-light-gold bg-opacity-75 hover:bg-opacity-100 custom-cursor shadow-xl hover:shadow-sm"
+                        className: "p-2 rounded-lg flex flex-row bg-white bg-opacity-75 hover:bg-opacity-100 custom-cursor shadow-xl hover:shadow-sm"
                       }, React.createElement("img", {
                             className: "h-5 pr-1 custom-cursor",
                             src: CONSTANTS.daiDisplayToken.iconUrl

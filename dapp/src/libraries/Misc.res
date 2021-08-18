@@ -51,6 +51,34 @@ module Time = {
       Some(() => Js.Global.clearInterval(id))
     }, [delay])
   }
+
+  @ocaml.doc(`Runs a callback on an interval predictably with a limit.`)
+  let useIntervalFixed = (callback: unit => unit, ~delay, ~numIterations) => {
+    let savedCallback: React.ref<unit => unit> = React.useRef(callback)
+    let idRef: React.ref<Js.Global.intervalId> = React.useRef(None->Obj.magic)
+    let iterationCounter: React.ref<int> = React.useRef(0)
+
+    // Remember the latest callback so that is persists between renders
+    React.useEffect1(() => {
+      savedCallback.current = callback
+      None
+    }, [callback])
+
+    // Set up the interval.
+    React.useEffect2(() => {
+      iterationCounter.current = 0
+      let id = Js.Global.setInterval(() => {
+        if iterationCounter.current < numIterations {
+          iterationCounter.current = iterationCounter.current + 1
+          savedCallback.current()
+        } else {
+          Js.Global.clearInterval(idRef.current)
+        }
+      }, delay)
+      idRef.current = id
+      Some(() => Js.Global.clearInterval(id))
+    }, (delay, numIterations))
+  }
 }
 
 module NumberFormat = {

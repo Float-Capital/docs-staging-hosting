@@ -17,6 +17,7 @@ function runTestTransactions(param) {
                 return LetOps.AwaitThen.let_(DeployHelpers.topupBalanceIfLow(admin, user1), (function (param) {
                               return LetOps.AwaitThen.let_(DeployHelpers.topupBalanceIfLow(admin, user2), (function (param) {
                                             return LetOps.AwaitThen.let_(DeployHelpers.topupBalanceIfLow(admin, user3), (function (param) {
+                                                          console.log("deploying markets");
                                                           return LetOps.AwaitThen.let_(DeployHelpers.deployTestMarket("Eth Market", "FL_ETH", longShort, treasury, admin, "networkName", paymentToken), (function (param) {
                                                                         return LetOps.AwaitThen.let_(DeployHelpers.deployTestMarket("The Flippening", "FL_FLIP", longShort, treasury, admin, "networkName", paymentToken), (function (param) {
                                                                                       return LetOps.AwaitThen.let_(DeployHelpers.deployTestMarket("Doge Market", "FL_DOGE", longShort, treasury, admin, "networkName", paymentToken), (function (param) {
@@ -35,7 +36,7 @@ function runTestTransactions(param) {
                                                                                                                       })), (function (param) {
                                                                                                                     console.log("Executing update system state");
                                                                                                                     return DeployHelpers.executeOnMarkets(initialMarkets, (function (__x) {
-                                                                                                                                  return longShort.updateSystemState(__x);
+                                                                                                                                  return DeployHelpers.updateSystemState(longShort, admin, __x);
                                                                                                                                 }));
                                                                                                                   }));
                                                                                                     };

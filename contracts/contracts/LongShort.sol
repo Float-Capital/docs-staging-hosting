@@ -4,6 +4,7 @@ pragma solidity 0.8.3;
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 import "./interfaces/ITokenFactory.sol";
 import "./interfaces/ISyntheticToken.sol";
@@ -23,6 +24,9 @@ import "./interfaces/IOracleManager.sol";
 /// It is merely for convenince when unit testing.
 /// @custom:auditors This contract balances long and short sides.
 contract LongShort is ILongShort, Initializable {
+  //Using Open Zeppelin safe transfer library for token transfers
+  using SafeERC20 for IERC20;
+
   /*╔═════════════════════════════╗
     ║          VARIABLES          ║
     ╚═════════════════════════════╝*/
@@ -822,12 +826,10 @@ contract LongShort is ILongShort, Initializable {
     internal
     virtual
   {
-    require(
-      IERC20(paymentTokens[marketIndex]).transferFrom(
-        msg.sender,
-        yieldManagers[marketIndex],
-        amount
-      )
+    IERC20(paymentTokens[marketIndex]).safeTransferFrom(
+      msg.sender,
+      yieldManagers[marketIndex],
+      amount
     );
   }
 
