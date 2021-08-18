@@ -289,7 +289,7 @@ let deployAYieldManager = (~longShort: Ethers.ethAddress) => {
       ~treasury=CONSTANTS.zeroAddress,
       ~paymentToken=paymentToken.address,
       ~aToken=CONSTANTS.zeroAddress,
-      ~lendingPool=randomAddress(),
+      ~lendingPoolAddressesProvider=randomAddress(),
       ~aaveIncentivesController=randomAddress(),
       ~aaveReferralCode=0,
     )
@@ -308,7 +308,7 @@ let initializeLongShortUnit = () => {
         ~treasury=CONSTANTS.zeroAddress,
         ~paymentToken=paymentToken.address,
         ~aToken=CONSTANTS.zeroAddress,
-        ~lendingPool=randomAddress(),
+        ~lendingPoolAddressesProvider=randomAddress(),
         ~aaveIncentivesController=randomAddress(),
         ~aaveReferralCode=0,
       ),
