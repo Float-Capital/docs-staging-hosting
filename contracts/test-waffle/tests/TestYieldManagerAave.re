@@ -15,14 +15,14 @@ describe("Float System", () => {
 
     let longShortAddress = Ethers.Wallet.createRandom().address;
 
-    let%Await lendingPoolSmocked = LendingPoolAaveMockSmocked.make();
-
     let%Await paymentTokenSmocked = ERC20MockSmocked.make();
 
     let%Await aTokenSmocked = ERC20MockSmocked.make();
 
     let%Await aaveIncentivesControllerSmocked =
       AaveIncentivesControllerMockSmocked.make();
+    let%Await lendingPoolAddressesProviderSmocked =
+      LendingPoolAddressesProviderMockSmocked.make();
 
     let%Await yieldManagerAave =
       YieldManagerAave.make(
@@ -30,7 +30,8 @@ describe("Float System", () => {
         ~treasury=treasury.address,
         ~paymentToken=paymentTokenSmocked.address,
         ~aToken=aTokenSmocked.address,
-        ~lendingPool=lendingPoolSmocked.address,
+        ~lendingPoolAddressesProvider=
+          lendingPoolAddressesProviderSmocked.address,
         ~aaveIncentivesController=aaveIncentivesControllerSmocked.address,
         ~aaveReferralCode=6543,
       );

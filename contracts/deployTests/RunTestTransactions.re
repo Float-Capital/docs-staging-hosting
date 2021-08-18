@@ -1,6 +1,5 @@
 open LetOps;
 open DeployHelpers;
-open ContractHelpers;
 open Globals;
 
 type allContracts = {
@@ -11,7 +10,7 @@ type allContracts = {
   syntheticToken: SyntheticToken.t,
 };
 
-let runTestTransactions = ({staker, longShort, treasury, paymentToken}) => {
+let runTestTransactions = ({longShort, treasury, paymentToken}) => {
   let%Await loadedAccounts = Ethers.getSigners();
 
   let admin = loadedAccounts->Array.getUnsafe(1);
@@ -22,6 +21,7 @@ let runTestTransactions = ({staker, longShort, treasury, paymentToken}) => {
   let%AwaitThen _ = DeployHelpers.topupBalanceIfLow(~from=admin, ~to_=user1);
   let%AwaitThen _ = DeployHelpers.topupBalanceIfLow(~from=admin, ~to_=user2);
   let%AwaitThen _ = DeployHelpers.topupBalanceIfLow(~from=admin, ~to_=user3);
+  Js.log("deploying markets");
 
   let%AwaitThen _ =
     deployTestMarket(
@@ -30,7 +30,6 @@ let runTestTransactions = ({staker, longShort, treasury, paymentToken}) => {
       ~longShortInstance=longShort,
       ~treasuryInstance=treasury,
       ~admin,
-      ~networkName="networkName",
       ~paymentToken: ERC20Mock.t,
     );
 
@@ -41,7 +40,6 @@ let runTestTransactions = ({staker, longShort, treasury, paymentToken}) => {
       ~longShortInstance=longShort,
       ~treasuryInstance=treasury,
       ~admin,
-      ~networkName="networkName",
       ~paymentToken: ERC20Mock.t,
     );
 
@@ -52,7 +50,6 @@ let runTestTransactions = ({staker, longShort, treasury, paymentToken}) => {
       ~longShortInstance=longShort,
       ~treasuryInstance=treasury,
       ~admin,
-      ~networkName="networkName",
       ~paymentToken: ERC20Mock.t,
     );
   let initialMarkets = [|1, 2, 3|];
@@ -62,12 +59,21 @@ let runTestTransactions = ({staker, longShort, treasury, paymentToken}) => {
   let redeemShortAmount = shortMintAmount->div(bnFromInt(2));
   let longStakeAmount = bnFromInt(1);
 
-  Js.log("running update system state");
-  let%AwaitThen _ =
+  let priceAndStateUpdate = () => {
+    let%AwaitThen _ =
+      executeOnMarkets(
+        initialMarkets,
+        setOracleManagerPrice(~longShort, ~marketIndex=_, ~admin),
+      );
+
+    Js.log("Executing update system state");
+
     executeOnMarkets(
       initialMarkets,
-      LongShort.updateSystemState(longShort, ~marketIndex=_),
+      updateSystemState(~longShort, ~admin, ~marketIndex=_),
     );
+  };
+
   Js.log("Executing Long Mints");
   let%AwaitThen _ =
     executeOnMarkets(
@@ -109,18 +115,35 @@ let runTestTransactions = ({staker, longShort, treasury, paymentToken}) => {
       ),
     );
 
+  let%AwaitThen _ = priceAndStateUpdate();
+
   let%AwaitThen _ =
     executeOnMarkets(
       initialMarkets,
-      setOracleManagerPrice(~longShort, ~marketIndex=_, ~admin),
+      mintLongNextPriceWithSystemUpdate(
+        ~amount=longMintAmount,
+        ~marketIndex=_,
+        ~paymentToken,
+        ~longShort,
+        ~user=user1,
+        ~admin,
+      ),
     );
 
-  Js.log("Executing update system state");
   let%AwaitThen _ =
     executeOnMarkets(
       initialMarkets,
-      LongShort.updateSystemState(longShort, ~marketIndex=_),
+      shiftFromShortNextPriceWithSystemUpdate(
+        ~amount=redeemShortAmount,
+        ~marketIndex=_,
+        ~longShort,
+        ~user=user1,
+        ~admin,
+      ),
     );
+
+  let%AwaitThen _ = priceAndStateUpdate();
+
   Js.log("Staking long position");
   let%AwaitThen _ =
     executeOnMarkets(
@@ -132,6 +155,8 @@ let runTestTransactions = ({staker, longShort, treasury, paymentToken}) => {
         ~user=user1,
       ),
     );
+
+  let%AwaitThen _ = priceAndStateUpdate();
 
   JsPromise.resolve();
 };

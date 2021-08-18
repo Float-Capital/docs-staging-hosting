@@ -182,7 +182,6 @@ let initialize = (~admin: Ethers.Wallet.t, ~exposeInternals: bool) => {
         treasury->Treasury_v0.initialize(~admin=admin.address),
         longShort->LongShort.initialize(
           ~admin=admin.address,
-          ~treasury=treasury.address,
           ~tokenFactory=tokenFactory.address,
           ~staker=staker.address,
         ),
@@ -259,14 +258,14 @@ type longShortUnitTestContracts = {
   oracleManagerSmocked: OracleManagerMockSmocked.t,
 }
 
-let deployAYieldManager = (~longShort: Ethers.ethAddress) => {
+let deployAYieldManager = (~longShort: Ethers.ethAddress, ~lendingPoolAddressesProvider) => {
   ERC20Mock.make(~name="Pay Token 1", ~symbol="PT1")->JsPromise.then(paymentToken =>
     YieldManagerAave.make(
       ~longShort,
       ~treasury=CONSTANTS.zeroAddress,
       ~paymentToken=paymentToken.address,
       ~aToken=CONSTANTS.zeroAddress,
-      ~lendingPool=randomAddress(),
+      ~lendingPoolAddressesProvider,
       ~aaveIncentivesController=randomAddress(),
       ~aaveReferralCode=0,
     )

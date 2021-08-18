@@ -33,8 +33,6 @@ contract YieldManagerMock is IYieldManager {
   uint256 public yieldRate; // pcnt per sec
   uint256 public lastSettled; // secs after epoch
 
-  event ClaimAaveRewardTokenToTreasury(uint256 amount);
-
   ////////////////////////////////////
   /////////// MODIFIERS //////////////
   ////////////////////////////////////

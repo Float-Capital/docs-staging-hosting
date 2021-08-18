@@ -38,7 +38,7 @@ dataSources:
           handler: handleExecuteNextPriceRedeemSettlementUser
         - event: ExecuteNextPriceSettlementsUser(address,uint32)
           handler: handleExecuteNextPriceSettlementsUser
-        - event: LongShortV1(address,address,address,address)
+        - event: LongShortV1(address,address,address)
           handler: handleLongShortV1
         - event: NewMarketLaunchedAndSeeded(uint32,uint256)
           handler: handleNewMarketLaunchedAndSeeded
@@ -49,8 +49,8 @@ dataSources:
         - event: NextPriceSyntheticPositionShift(uint32,bool,uint256,address,uint256)
           handler: handleNextPriceSyntheticPositionShift
         - event: OracleUpdated(uint32,address,address)
-          handler: handleMarketOracleUpdated
-        - event: SyntheticMarketCreated(uint32,address,address,address,uint256,string,string,address,address)
+          handler: handleOracleUpdated
+        - event: SyntheticMarketCreated(uint32,address,address,address,int256,string,string,address,address)
           handler: handleSyntheticMarketCreated
         - event: SystemStateUpdated(uint32,uint256,int256,uint256,uint256,uint256,uint256)
           handler: handleSystemStateUpdated

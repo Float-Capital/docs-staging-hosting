@@ -32,7 +32,7 @@
     "generate-contract-interfaces": "yarn compile && node ../scripts/src/AbiInterfaceGen.bs.js && rescript format -all",
     "generate-test-contracts": "rm -f contracts/testing/generated/* && yarn compile --force --quiet && node ../scripts/src/MockablesGen.bs.js && yarn format-contracts && rescript format -all",
     "generate-all": "yarn generate-test-contracts && yarn compile && node ../scripts/src/AbiInterfaceGen.bs.js && yarn res:build;",
-    "deploy": "hardhat run scripts/deploy.js"
+    "deploy": "hardhat deploy"
   },
   "dependencies": {
     "@chainlink/contracts": "^0.1.7",

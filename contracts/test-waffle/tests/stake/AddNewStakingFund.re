@@ -12,7 +12,6 @@ let test =
     let marketIndex = 1;
     let sampleLongAddress = Helpers.randomAddress();
     let sampleShortAddress = Helpers.randomAddress();
-    let sampleMockAddress = Helpers.randomAddress();
     let kInitialMultiplier = Helpers.randomInteger();
     let kPeriod = Helpers.randomInteger();
     let unstakeFee_e18 = Helpers.randomInteger();
@@ -33,13 +32,7 @@ let test =
       let longShortAddress = (accounts^)->Array.getUnsafe(5);
       let%AwaitThen _ =
         contracts^.staker
-        ->Staker.Exposed.setAddNewStakingFundParams(
-            ~marketIndex=1,
-            ~longToken=sampleLongAddress,
-            ~shortToken=sampleShortAddress,
-            ~mockAddress=sampleMockAddress,
-            ~longShortAddress=longShortAddress.address,
-          );
+        ->Staker.Exposed.setLongShort(~longShort=longShortAddress.address);
 
       let%AwaitThen {timestamp} = Helpers.getBlock();
       timestampRef := timestamp;

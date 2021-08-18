@@ -10,54 +10,6 @@ let test =
   let marketIndex = 2;
   let period = Helpers.randomInteger();
 
-  describe("changeMarketLaunchIncentiveParameters (external)", () => {
-    let initialMultiplier = Helpers.randomInteger();
-
-    let setup = () => {
-      let%AwaitThen _ = contracts^.staker->StakerSmocked.InternalMock.setup;
-
-      let%AwaitThen _ =
-        contracts^.staker
-        ->StakerSmocked.InternalMock.setupFunctionForUnitTesting(
-            ~functionName="changeMarketLaunchIncentiveParameters",
-          );
-
-      contracts^.staker
-      ->Staker.Exposed.changeMarketLaunchIncentiveParameters(
-          ~marketIndex,
-          ~period,
-          ~initialMultiplier,
-        );
-    };
-
-    before_each(() => setup());
-
-    it_skip("calls the onlyAdminModifier", () => {
-      // StakerSmocked.InternalMock.onlyAdminCallCheck()
-      // ->Array.length
-      // ->Chai.intEqual(1)
-      ()
-    });
-
-    it(
-      "calls _changeMarketLaunchIncentiveParameters with correct arguments", () => {
-      StakerSmocked.InternalMock._changeMarketLaunchIncentiveParametersCallCheck({
-        marketIndex,
-        period,
-        initialMultiplier,
-      })
-    });
-
-    it("emits MarketLaunchIncentiveParametersChanges event", () => {
-      Chai.callEmitEvents(
-        ~call=setup(),
-        ~contract=contracts^.staker->Obj.magic,
-        ~eventName="MarketLaunchIncentiveParametersChanges",
-      )
-      ->Chai.withArgs3(marketIndex, period, initialMultiplier)
-    });
-  });
-
   describe("_changeMarketLaunchIncentiveParameters (internal)", () => {
     let initialMultiplierFine =
       Helpers.randomInteger()->Ethers.BigNumber.mul(CONSTANTS.tenToThe18);

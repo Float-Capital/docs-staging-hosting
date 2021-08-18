@@ -65,6 +65,9 @@ module.exports = {
     hardhat: {
       allowUnlimitedContractSize: true,
     },
+    ganache: {
+      url: "http://localhost:8545",
+    },
     mumbai: {
       chainId: 80001,
       url: mumbaiProviderUrl || "https://rpc-mumbai.maticvigil.com/v1",
@@ -80,6 +83,18 @@ module.exports = {
     },
     admin: {
       default: 1,
+    },
+    user1: {
+      default: 2,
+    },
+    user2: {
+      default: 3,
+    },
+    user3: {
+      default: 4,
+    },
+    user4: {
+      default: 5,
     },
   },
   gasReporter: {
@@ -114,6 +129,7 @@ module.exports = {
       ":OracleManagerChainlink$",
       ":OracleManagerMock$",
       ":LendingPoolAaveMock$",
+      ":LendingPoolAddressesProviderMock$",
       ":AaveIncentivesControllerMock$",
       "Mockable$",
     ],
