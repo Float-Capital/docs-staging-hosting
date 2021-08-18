@@ -8,8 +8,18 @@ import {
   UsersCurrentNextPriceAction,
 } from "../../../generated/schema";
 import { Address, BigInt, Bytes, ethereum, log } from "@graphprotocol/graph-ts";
-import { ACTION_MINT, MARKET_SIDE_LONG, ZERO } from "../../CONSTANTS";
+import {
+  ACTION_MINT,
+  ACTION_SHIFT,
+  MARKET_SIDE_LONG,
+  ZERO,
+} from "../../CONSTANTS";
 import { getUser } from "../globalStateManager";
+import {
+  getOrInitializeBatchedNextPriceExec,
+  getOrInitializeUserNextPriceAction,
+  getUserNextPriceAction,
+} from "../../generated/EntityHelpers";
 
 function generateUserNextPriceActionId(
   userAddress: Bytes,
@@ -60,7 +70,7 @@ export function getUsersCurrentNextPriceAction(
     ]);
   }
 
-  return getUserNextPriceActionById(usersCurrentNextPriceAction.currentAction);
+  return getUserNextPriceAction(usersCurrentNextPriceAction.currentAction);
 }
 
 function generateUserNextPriceActionComponentId(
@@ -97,22 +107,15 @@ export function createOrUpdateBatchedNextPriceExec(
     marketIndex,
     updateIndex
   );
-  let batchedNextPriceExec = BatchedNextPriceExec.load(batchedNextPriceExecId);
-  if (batchedNextPriceExec == null) {
+  let entityFetchResult = getOrInitializeBatchedNextPriceExec(
+    batchedNextPriceExecId
+  );
+  let batchedNextPriceExec = entityFetchResult.entity;
+  if (entityFetchResult.wasCreated == null) {
     batchedNextPriceExec = new BatchedNextPriceExec(batchedNextPriceExecId);
 
     batchedNextPriceExec.updateIndex = updateIndex;
     batchedNextPriceExec.marketIndex = marketIndex;
-    batchedNextPriceExec.amountPaymentTokenForDepositLong = ZERO;
-    batchedNextPriceExec.amountPaymentTokenForDepositShort = ZERO;
-    batchedNextPriceExec.amountSynthTokenForWithdrawalLong = ZERO;
-    batchedNextPriceExec.amountSynthTokenForWithdrawalShort = ZERO;
-    batchedNextPriceExec.mintPriceSnapshotLong = ZERO;
-    batchedNextPriceExec.mintPriceSnapshotShort = ZERO;
-    batchedNextPriceExec.redeemPriceSnapshotLong = ZERO;
-    batchedNextPriceExec.redeemPriceSnapshotShort = ZERO;
-    batchedNextPriceExec.executedTimestamp = ZERO;
-    batchedNextPriceExec.linkedUserNextPriceActions = [];
     batchedNextPriceExec.save();
 
     // TODO: move this externally to its own getter (avoid even a remote change of race conditions)
@@ -204,20 +207,6 @@ export function doesBatchExist(
   return batchedNextPriceExec != null;
 }
 
-export function getUserNextPriceActionById(
-  userNextPriceActionId: string
-): UserNextPriceAction {
-  let userNextPriceAction = UserNextPriceAction.load(userNextPriceActionId);
-  if (userNextPriceAction == null) {
-    log.warning(
-      "error: UserNextPriceAction doesn't exist, make sure `createOrUpdateUserNextPriceAction` has already been executed. entityId: {}",
-      [userNextPriceActionId]
-    );
-  }
-
-  return userNextPriceAction as UserNextPriceAction;
-}
-
 export function createUserNextPriceActionComponent(
   user: User,
   syntheticMarket: SyntheticMarket,
@@ -290,22 +279,13 @@ export function createOrUpdateUserNextPriceAction(
     marketIndex,
     updateIndex
   );
-  let userNextPriceAction = UserNextPriceAction.load(userNextPriceActionId);
-
-  if (userNextPriceAction == null) {
-    userNextPriceAction = new UserNextPriceAction(userNextPriceActionId);
-
+  let result = getOrInitializeUserNextPriceAction(userNextPriceActionId);
+  let userNextPriceAction = result.entity;
+  if (result.wasCreated) {
     userNextPriceAction.updateIndex = updateIndex;
     userNextPriceAction.marketIndex = marketIndex;
     userNextPriceAction.user = user.id;
-    userNextPriceAction.amountPaymentTokenForDepositLong = ZERO;
-    userNextPriceAction.amountPaymentTokenForDepositShort = ZERO;
-    userNextPriceAction.amountSynthTokenForWithdrawalLong = ZERO;
-    userNextPriceAction.amountSynthTokenForWithdrawalShort = ZERO;
-    userNextPriceAction.confirmedTimestamp = ZERO;
     userNextPriceAction.associatedBatch = associatedBatch;
-    userNextPriceAction.settledTimestamp = ZERO;
-    userNextPriceAction.nextPriceActionComponents = [];
 
     userNextPriceAction.save();
 
@@ -346,6 +326,16 @@ export function createOrUpdateUserNextPriceAction(
       );
     } else {
       userNextPriceAction.amountPaymentTokenForDepositShort = userNextPriceAction.amountPaymentTokenForDepositShort.plus(
+        amount
+      );
+    }
+  } else if (actionType == ACTION_SHIFT) {
+    if (isLong == MARKET_SIDE_LONG) {
+      userNextPriceAction.amountSynthTokenForShiftFromLong = userNextPriceAction.amountSynthTokenForShiftFromLong.plus(
+        amount
+      );
+    } else {
+      userNextPriceAction.amountSynthTokenForShiftFromShort = userNextPriceAction.amountSynthTokenForShiftFromShort.plus(
         amount
       );
     }

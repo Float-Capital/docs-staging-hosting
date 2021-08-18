@@ -53,10 +53,8 @@ contract TokenFactory is ITokenFactory {
     uint32 marketIndex,
     bool isLong
   ) external override onlyLongShort returns (address syntheticToken) {
-    address _syntheticToken = address(
+    syntheticToken = address(
       new SyntheticToken(syntheticName, syntheticSymbol, longShort, staker, marketIndex, isLong)
     );
-
-    syntheticToken = _syntheticToken;
   }
 }

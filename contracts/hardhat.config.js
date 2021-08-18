@@ -65,6 +65,9 @@ module.exports = {
     hardhat: {
       allowUnlimitedContractSize: true,
     },
+    ganache: {
+      url: "http://localhost:8545",
+    },
     mumbai: {
       chainId: 80001,
       url: mumbaiProviderUrl || "https://rpc-mumbai.maticvigil.com/v1",

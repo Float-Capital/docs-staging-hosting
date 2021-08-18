@@ -83,6 +83,22 @@ function redeemShortNextPriceWithSystemUpdate(amount, marketIndex, longShort, us
               }));
 }
 
+function shiftFromShortNextPriceWithSystemUpdate(amount, marketIndex, longShort, user, admin) {
+  return LetOps.AwaitThen.let_(longShort.connect(user).shiftPositionFromShortNextPrice(marketIndex, amount), (function (param) {
+                return LetOps.AwaitThen.let_(setOracleManagerPrice(longShort, marketIndex, admin), (function (param) {
+                              return longShort.updateSystemState(marketIndex);
+                            }));
+              }));
+}
+
+function shiftFromLongNextPriceWithSystemUpdate(amount, marketIndex, longShort, user, admin) {
+  return LetOps.AwaitThen.let_(longShort.connect(user).shiftPositionFromLongNextPrice(marketIndex, amount), (function (param) {
+                return LetOps.AwaitThen.let_(setOracleManagerPrice(longShort, marketIndex, admin), (function (param) {
+                              return longShort.updateSystemState(marketIndex);
+                            }));
+              }));
+}
+
 function mintLongNextPriceWithSystemUpdate(amount, marketIndex, paymentToken, longShort, user, admin) {
   return LetOps.AwaitThen.let_(mintAndApprove(paymentToken, amount, user, longShort.address), (function (param) {
                 return LetOps.AwaitThen.let_(longShort.connect(user).mintLongNextPrice(marketIndex, amount), (function (param) {
@@ -134,6 +150,8 @@ exports.stakeSynthLong = stakeSynthLong;
 exports.executeOnMarkets = executeOnMarkets;
 exports.setOracleManagerPrice = setOracleManagerPrice;
 exports.redeemShortNextPriceWithSystemUpdate = redeemShortNextPriceWithSystemUpdate;
+exports.shiftFromShortNextPriceWithSystemUpdate = shiftFromShortNextPriceWithSystemUpdate;
+exports.shiftFromLongNextPriceWithSystemUpdate = shiftFromLongNextPriceWithSystemUpdate;
 exports.mintLongNextPriceWithSystemUpdate = mintLongNextPriceWithSystemUpdate;
 exports.mintShortNextPriceWithSystemUpdate = mintShortNextPriceWithSystemUpdate;
 exports.deployTestMarket = deployTestMarket;

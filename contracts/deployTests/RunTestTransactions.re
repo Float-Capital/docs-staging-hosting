@@ -59,12 +59,21 @@ let runTestTransactions = ({longShort, treasury, paymentToken}) => {
   let redeemShortAmount = shortMintAmount->div(bnFromInt(2));
   let longStakeAmount = bnFromInt(1);
 
-  Js.log("running update system state");
-  let%AwaitThen _ =
+  let priceAndStateUpdate = () => {
+    let%AwaitThen _ =
+      executeOnMarkets(
+        initialMarkets,
+        setOracleManagerPrice(~longShort, ~marketIndex=_, ~admin),
+      );
+
+    Js.log("Executing update system state");
+
     executeOnMarkets(
       initialMarkets,
       updateSystemState(~longShort, ~admin, ~marketIndex=_),
     );
+  };
+
   Js.log("Executing Long Mints");
   let%AwaitThen _ =
     executeOnMarkets(
@@ -106,18 +115,35 @@ let runTestTransactions = ({longShort, treasury, paymentToken}) => {
       ),
     );
 
+  let%AwaitThen _ = priceAndStateUpdate();
+
   let%AwaitThen _ =
     executeOnMarkets(
       initialMarkets,
-      setOracleManagerPrice(~longShort, ~marketIndex=_, ~admin),
+      mintLongNextPriceWithSystemUpdate(
+        ~amount=longMintAmount,
+        ~marketIndex=_,
+        ~paymentToken,
+        ~longShort,
+        ~user=user1,
+        ~admin,
+      ),
     );
 
-  Js.log("Executing update system state");
   let%AwaitThen _ =
     executeOnMarkets(
       initialMarkets,
-      updateSystemState(~longShort, ~admin, ~marketIndex=_),
+      shiftFromShortNextPriceWithSystemUpdate(
+        ~amount=redeemShortAmount,
+        ~marketIndex=_,
+        ~longShort,
+        ~user=user1,
+        ~admin,
+      ),
     );
+
+  let%AwaitThen _ = priceAndStateUpdate();
+
   Js.log("Staking long position");
   let%AwaitThen _ =
     executeOnMarkets(
@@ -129,6 +155,8 @@ let runTestTransactions = ({longShort, treasury, paymentToken}) => {
         ~user=user1,
       ),
     );
+
+  let%AwaitThen _ = priceAndStateUpdate();
 
   JsPromise.resolve();
 };
