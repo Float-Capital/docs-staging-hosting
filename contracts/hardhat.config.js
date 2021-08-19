@@ -127,6 +127,7 @@ module.exports = {
       ":Treasury_v0$",
       ":OracleManager$",
       ":OracleManagerChainlink$",
+      ":OracleManagerChainlinkTestnet$",
       ":OracleManagerMock$",
       ":LendingPoolAaveMock$",
       ":LendingPoolAddressesProviderMock$",

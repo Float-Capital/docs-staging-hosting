@@ -54,13 +54,9 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
   ///////////////////////////
   //Initialize the contracts/
   ///////////////////////////
-  await longShort.initialize(
-    admin,
-    tokenFactory.address,
-    staker.address
-  );
+  await longShort.initialize(admin, tokenFactory.address, staker.address);
 
-  await floatToken.initialize("Float token", "FLOAT TOKEN", staker.address);
+  await floatToken.initialize("Float", "FLT", staker.address);
 
   await staker.initialize(
     admin,
@@ -72,12 +68,17 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
   );
 
   console.log("before test txs");
-  await runTestTransactions({
-    staker,
-    longShort: longShort.connect(admin),
-    paymentToken,
-    treasury,
-  });
+  if (networkName == "mumbai") {
+    console.log("mumbai test transactions");
+  } else if (networkName == "hardhat" || networkName == "ganache") {
+    console.log("mumbai test transactions");
+    await runTestTransactions({
+      staker,
+      longShort: longShort.connect(admin),
+      paymentToken,
+      treasury,
+    });
+  }
   console.log("after test txs");
 };
 module.exports.tags = ["all", "setup"];
