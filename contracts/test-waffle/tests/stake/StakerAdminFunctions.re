@@ -234,6 +234,7 @@ let testUnit =
       let marketIndex = 23;
       let startingTestExponent = bnFromInt(1);
       let updatedExponent = bnFromInt(2);
+      let safeExponentBitShifting = bnFromInt(50);
 
       let txPromiseRef: ref(JsPromise.t(ContractHelpers.transaction)) =
         ref(()->JsPromise.resolve->Obj.magic);
@@ -255,7 +256,7 @@ let testUnit =
               ~marketIndex,
               ~balanceIncentiveCurve_exponent=startingTestExponent,
               ~balanceIncentiveCurve_equilibriumOffset=zeroBn,
-              ~safeExponentBitShifting=bnFromInt(50),
+              ~safeExponentBitShifting,
             );
         txPromiseRef.contents;
       });
@@ -267,7 +268,7 @@ let testUnit =
               ~marketIndex,
               ~balanceIncentiveCurve_exponent=updatedExponent,
               ~balanceIncentiveCurve_equilibriumOffset=zeroBn,
-              ~safeExponentBitShifting=bnFromInt(50),
+              ~safeExponentBitShifting,
             );
         StakerSmocked.InternalMock.onlyAdminModifierLogicCallCheck();
       });
@@ -279,19 +280,23 @@ let testUnit =
           marketIndex,
           balanceIncentiveCurve_exponent: updatedExponent,
           balanceIncentiveCurve_equilibriumOffset: zeroBn,
-          safeExponentBitShifting: bnFromInt(50),
+          safeExponentBitShifting,
         })
       );
 
       it(
-        "should emit BalanceIncentiveExponentUpdated with correct arguments",
-        () => {
+        "should emit BalanceIncentiveParamsUpdated with correct arguments", () => {
         Chai.callEmitEvents(
           ~call=txPromiseRef^,
           ~contract=contracts.contents.staker->Obj.magic,
-          ~eventName="BalanceIncentiveExponentUpdated",
+          ~eventName="BalanceIncentiveParamsUpdated",
         )
-        ->Chai.withArgs2(marketIndex, startingTestExponent)
+        ->Chai.withArgs4(
+            marketIndex,
+            startingTestExponent,
+            zeroBn,
+            safeExponentBitShifting,
+          )
       });
 
       it("should only allow (0 < new exponent)", () => {
@@ -306,7 +311,7 @@ let testUnit =
                 ~marketIndex,
                 ~balanceIncentiveCurve_exponent=newExponentOutOfBoundsLowSide,
                 ~balanceIncentiveCurve_equilibriumOffset=zeroBn,
-                ~safeExponentBitShifting=bnFromInt(50),
+                ~safeExponentBitShifting,
               ),
           ~reason="",
         );
@@ -331,7 +336,7 @@ let testUnit =
                   ~marketIndex,
                   ~balanceIncentiveCurve_exponent,
                   ~balanceIncentiveCurve_equilibriumOffset=newOffsetOutOfBoundsHighSide,
-                  ~safeExponentBitShifting=bnFromInt(50),
+                  ~safeExponentBitShifting,
                 ),
             ~reason="",
           );
@@ -345,7 +350,7 @@ let testUnit =
                   ~marketIndex,
                   ~balanceIncentiveCurve_exponent,
                   ~balanceIncentiveCurve_equilibriumOffset=newOffsetOutOfBoundsLowSide,
-                  ~safeExponentBitShifting=bnFromInt(50),
+                  ~safeExponentBitShifting,
                 ),
             ~reason="",
           );
@@ -363,7 +368,7 @@ let testUnit =
               ~marketIndex,
               ~balanceIncentiveCurve_exponent=newExponent,
               ~balanceIncentiveCurve_equilibriumOffset=zeroBn,
-              ~safeExponentBitShifting=bnFromInt(50),
+              ~safeExponentBitShifting,
             );
 
         let%Await exponentAfterCall =
