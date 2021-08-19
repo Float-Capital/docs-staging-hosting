@@ -140,7 +140,6 @@ let getCallsArrayContent: functionDef => string = fnType => {
 
 let getCallsInternal: functionDef => string = fnType => {
   let (fnCallType, fnName) = getCallsHelper(fnType)
-  Js.log(fnType)
 
   let (parameters, argument) =
     fnType.parameters->Array.length >= 1
@@ -175,7 +174,6 @@ let ${fnName}CallCheck = (
 
 let getCallsExternal: functionDef => string = fnType => {
   let (fnCallType, fnName) = getCallsHelper(fnType)
-  Js.log(fnType)
 
   let (parameters, argument) =
     fnType.parameters->Array.length >= 1
