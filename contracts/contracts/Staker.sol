@@ -85,15 +85,6 @@ contract Staker is IStaker, Initializable {
     _;
   }
 
-  function onlyValidMarketModifierLogic(uint32 marketIndex) internal virtual {
-    require(address(syntheticTokens[marketIndex][true]) != address(0), "not valid market");
-  }
-
-  modifier onlyValidMarket(uint32 marketIndex) {
-    onlyValidMarketModifierLogic(marketIndex);
-    _;
-  }
-
   function onlyLongShortModifierLogic() internal virtual {
     require(msg.sender == address(longShort), "not LongShort");
   }
@@ -204,18 +195,6 @@ contract Staker is IStaker, Initializable {
     emit StakeWithdrawalFeeUpdated(marketIndex, newMarketUnstakeFee_e18);
   }
 
-  /// @dev Logic for changeMarketLaunchIncentiveParameters
-  function _changeMarketLaunchIncentiveParameters(
-    uint32 marketIndex,
-    uint256 period,
-    uint256 initialMultiplier
-  ) internal virtual {
-    require(initialMultiplier >= 1e18, "marketLaunchIncentiveMultiplier must be >= 1e18");
-
-    marketLaunchIncentive_period[marketIndex] = period;
-    marketLaunchIncentive_multipliers[marketIndex] = initialMultiplier;
-  }
-
   /// @dev Logic for changeBalanceIncentiveExponent
   function _changeBalanceIncentiveExponent(
     uint32 marketIndex,
@@ -312,7 +291,10 @@ contract Staker is IStaker, Initializable {
 
     _changeBalanceIncentiveExponent(marketIndex, _balanceIncentiveCurve_exponent);
     _changeBalanceIncentiveEquilibriumOffset(marketIndex, _balanceIncentiveCurve_equilibriumOffset);
-    _changeMarketLaunchIncentiveParameters(marketIndex, kPeriod, kInitialMultiplier);
+
+    require(kInitialMultiplier >= 1e18, "marketLaunchIncentiveMultiplier must be >= 1e18");
+    marketLaunchIncentive_period[marketIndex] = kPeriod;
+    marketLaunchIncentive_multipliers[marketIndex] = kInitialMultiplier;
 
     _changeUnstakeFee(marketIndex, unstakeFee_e18);
 
@@ -554,14 +536,18 @@ contract Staker is IStaker, Initializable {
       );
 
     // Set cumulative 'r' value on new accumulativeIssuancePerStakedSynthSnapshot.
-    accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][marketUpdateIndex]
+
+    AccumulativeIssuancePerStakedSynthSnapshot
+      storage accumulativeFloatPerSyntheticTokenSnapshot = accumulativeFloatPerSyntheticTokenSnapshots[
+        marketIndex
+      ][marketUpdateIndex];
+    accumulativeFloatPerSyntheticTokenSnapshot
       .accumulativeFloatPerSyntheticToken_long = newLongAccumulativeValue;
-    accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][marketUpdateIndex]
+    accumulativeFloatPerSyntheticTokenSnapshot
       .accumulativeFloatPerSyntheticToken_short = newShortAccumulativeValue;
 
     // Set timestamp on new accumulativeIssuancePerStakedSynthSnapshot.
-    accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][marketUpdateIndex].timestamp = block
-      .timestamp;
+    accumulativeFloatPerSyntheticTokenSnapshot.timestamp = block.timestamp;
 
     // Update latest index to point to new accumulativeIssuancePerStakedSynthSnapshot.
     latestRewardIndex[marketIndex] = marketUpdateIndex;

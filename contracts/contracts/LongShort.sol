@@ -104,13 +104,12 @@ contract LongShort is ILongShort, Initializable {
     _;
   }
 
-  modifier executeOutstandingNextPriceSettlements(address user, uint32 marketIndex) {
-    _executeOutstandingNextPriceSettlements(user, marketIndex);
-    _;
-  }
-
-  modifier updateSystemStateMarket(uint32 marketIndex) {
+  modifier updateSystemStateMarketAndExecuteOutstandingNextPriceSettlements(
+    address user,
+    uint32 marketIndex
+  ) {
     _updateSystemStateInternal(marketIndex);
+    _executeOutstandingNextPriceSettlements(user, marketIndex);
     _;
   }
 
@@ -771,8 +770,7 @@ contract LongShort is ILongShort, Initializable {
   )
     internal
     virtual
-    updateSystemStateMarket(marketIndex)
-    executeOutstandingNextPriceSettlements(msg.sender, marketIndex)
+    updateSystemStateMarketAndExecuteOutstandingNextPriceSettlements(msg.sender, marketIndex)
   {
     _transferPaymentTokensFromUserToYieldManager(marketIndex, amount);
 
@@ -814,8 +812,7 @@ contract LongShort is ILongShort, Initializable {
   )
     internal
     virtual
-    updateSystemStateMarket(marketIndex)
-    executeOutstandingNextPriceSettlements(msg.sender, marketIndex)
+    updateSystemStateMarketAndExecuteOutstandingNextPriceSettlements(msg.sender, marketIndex)
   {
     ISyntheticToken(syntheticTokens[marketIndex][isLong]).transferFrom(
       msg.sender,
@@ -863,8 +860,7 @@ contract LongShort is ILongShort, Initializable {
     public
     virtual
     override
-    updateSystemStateMarket(marketIndex)
-    executeOutstandingNextPriceSettlements(msg.sender, marketIndex)
+    updateSystemStateMarketAndExecuteOutstandingNextPriceSettlements(msg.sender, marketIndex)
   {
     require(
       ISyntheticToken(syntheticTokens[marketIndex][isShiftFromLong]).transferFrom(
