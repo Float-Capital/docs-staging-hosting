@@ -2,6 +2,7 @@ open Globals;
 open LetOps;
 open StakerHelpers;
 open Mocha;
+open SmockGeneral;
 
 let test =
     (
@@ -55,19 +56,15 @@ let test =
     });
 
     it_skip("calls the onlyLongShortModifier", () => {
-      // StakerSmocked.InternalMock.onlyFloatCalls()
-      // ->Array.length
-      // ->Chai.intEqual(1)
-      ()
+      expect(StakerSmocked.InternalMock.onlyLongShortModifierLogicFunction())
+      ->toHaveCallCount(0)
     });
 
     it("calls _changeUnstakeFee with correct arguments", () => {
-      StakerSmocked.InternalMock._changeUnstakeFeeCalls()
-      ->Array.getUnsafe(0)
-      ->Chai.recordEqualFlat({
-          marketIndex,
-          newMarketUnstakeFee_e18: unstakeFee_e18,
-        })
+      StakerSmocked.InternalMock._changeUnstakeFeeCallCheck({
+        marketIndex,
+        newMarketUnstakeFee_e18: unstakeFee_e18,
+      })
     });
 
     it("mutates accumulativeFloatPerSyntheticTokenSnapshots", () => {

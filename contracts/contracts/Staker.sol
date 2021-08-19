@@ -353,7 +353,7 @@ contract Staker is IStaker, Initializable {
     assert(kInitialMultiplier >= 1e18);
 
     uint256 initialTimestamp = accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][0]
-    .timestamp;
+      .timestamp;
 
     if (block.timestamp - initialTimestamp <= kPeriod) {
       return
@@ -499,9 +499,9 @@ contract Staker is IStaker, Initializable {
     // Compute new cumulative 'r' value total.
     return (
       accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][previousMarketUpdateIndex]
-      .accumulativeFloatPerSyntheticToken_long + (timeDelta * longFloatPerSecond),
+        .accumulativeFloatPerSyntheticToken_long + (timeDelta * longFloatPerSecond),
       accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][previousMarketUpdateIndex]
-      .accumulativeFloatPerSyntheticToken_short + (timeDelta * shortFloatPerSecond)
+        .accumulativeFloatPerSyntheticToken_short + (timeDelta * shortFloatPerSecond)
     );
   }
 
@@ -527,23 +527,24 @@ contract Staker is IStaker, Initializable {
       uint256 newLongAccumulativeValue,
       uint256 newShortAccumulativeValue
     ) = _calculateNewCumulativeIssuancePerStakedSynth(
-      marketIndex,
-      marketUpdateIndex - 1,
-      longPrice,
-      shortPrice,
-      longValue,
-      shortValue
-    );
+        marketIndex,
+        marketUpdateIndex - 1,
+        longPrice,
+        shortPrice,
+        longValue,
+        shortValue
+      );
 
     // Set cumulative 'r' value on new accumulativeIssuancePerStakedSynthSnapshot.
 
-
-      AccumulativeIssuancePerStakedSynthSnapshot storage accumulativeFloatPerSyntheticTokenSnapshot
-     = accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][marketUpdateIndex];
+    AccumulativeIssuancePerStakedSynthSnapshot
+      storage accumulativeFloatPerSyntheticTokenSnapshot = accumulativeFloatPerSyntheticTokenSnapshots[
+        marketIndex
+      ][marketUpdateIndex];
     accumulativeFloatPerSyntheticTokenSnapshot
-    .accumulativeFloatPerSyntheticToken_long = newLongAccumulativeValue;
+      .accumulativeFloatPerSyntheticToken_long = newLongAccumulativeValue;
     accumulativeFloatPerSyntheticTokenSnapshot
-    .accumulativeFloatPerSyntheticToken_short = newShortAccumulativeValue;
+      .accumulativeFloatPerSyntheticToken_short = newShortAccumulativeValue;
 
     // Set timestamp on new accumulativeIssuancePerStakedSynthSnapshot.
     accumulativeFloatPerSyntheticTokenSnapshot.timestamp = block.timestamp;
@@ -574,20 +575,18 @@ contract Staker is IStaker, Initializable {
     if (amountStakedLong > 0) {
       uint256 accumDeltaLong = accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][
         rewardIndexTo
-      ]
-      .accumulativeFloatPerSyntheticToken_long -
+      ].accumulativeFloatPerSyntheticToken_long -
         accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][rewardIndexFrom]
-        .accumulativeFloatPerSyntheticToken_long;
+          .accumulativeFloatPerSyntheticToken_long;
       floatReward += (accumDeltaLong * amountStakedLong) / FLOAT_ISSUANCE_FIXED_DECIMAL;
     }
 
     if (amountStakedShort > 0) {
       uint256 accumDeltaShort = accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][
         rewardIndexTo
-      ]
-      .accumulativeFloatPerSyntheticToken_short -
+      ].accumulativeFloatPerSyntheticToken_short -
         accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][rewardIndexFrom]
-        .accumulativeFloatPerSyntheticToken_short;
+          .accumulativeFloatPerSyntheticToken_short;
       floatReward += (accumDeltaShort * amountStakedShort) / FLOAT_ISSUANCE_FIXED_DECIMAL;
     }
   }
@@ -631,9 +630,9 @@ contract Staker is IStaker, Initializable {
 
       // Update the users balances
 
-
-        uint256 amountToShiftAwayFromCurrentSide
-       = userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[marketIndex][true][user];
+      uint256 amountToShiftAwayFromCurrentSide = userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[
+          marketIndex
+        ][true][user];
       // Handle shifts from LONG side:
       if (amountToShiftAwayFromCurrentSide > 0) {
         amountStakedShort += ILongShort(longShort).getAmountSyntheticTokenToMintOnTargetSide(

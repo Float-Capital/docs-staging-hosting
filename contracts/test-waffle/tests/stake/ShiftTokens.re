@@ -1,6 +1,7 @@
 open Globals;
 open LetOps;
 open Mocha;
+open SmockGeneral;
 
 let testUnit =
     (
@@ -95,12 +96,10 @@ let testUnit =
               ),
           );
 
-        let mintAccumulatedFloatCalls =
-          StakerSmocked.InternalMock._updateUsersStakedPosition_mintAccumulatedFloatAndExecuteOutstandingShiftsCalls();
-
-        mintAccumulatedFloatCalls->Chai.recordArrayDeepEqualFlat([|
-          {marketIndex, user},
-        |]);
+        StakerSmocked.InternalMock._updateUsersStakedPosition_mintAccumulatedFloatAndExecuteOutstandingShiftsCallCheck({
+          marketIndex,
+          user,
+        });
       },
     );
 
@@ -121,11 +120,11 @@ let testUnit =
                 amountSyntheticTokensToShiftBeforeValue,
               ),
           );
-
-        let mintAccumulatedFloatCalls =
-          StakerSmocked.InternalMock._mintAccumulatedFloatAndExecuteOutstandingShiftsCalls();
-
-        mintAccumulatedFloatCalls->Chai.recordArrayDeepEqualFlat([||]);
+        ();
+        expect(
+          StakerSmocked.InternalMock._mintAccumulatedFloatAndExecuteOutstandingShiftsFunction(),
+        )
+        ->toHaveCallCount(0);
       },
     );
     it(
@@ -147,11 +146,12 @@ let testUnit =
                 amountSyntheticTokensToShiftBeforeValue,
               ),
           );
+        ();
 
-        let mintAccumulatedFloatCalls =
-          StakerSmocked.InternalMock._mintAccumulatedFloatAndExecuteOutstandingShiftsCalls();
-
-        mintAccumulatedFloatCalls->Chai.recordArrayDeepEqualFlat([||]);
+        expect(
+          StakerSmocked.InternalMock._mintAccumulatedFloatAndExecuteOutstandingShiftsFunction(),
+        )
+        ->toHaveCallCount(0);
       },
     );
 
@@ -175,10 +175,10 @@ let testUnit =
               ),
           );
 
-        let mintAccumulatedFloatCalls =
-          StakerSmocked.InternalMock._mintAccumulatedFloatAndExecuteOutstandingShiftsCalls();
-
-        mintAccumulatedFloatCalls->Chai.recordArrayDeepEqualFlat([||]);
+        expect(
+          StakerSmocked.InternalMock._mintAccumulatedFloatAndExecuteOutstandingShiftsFunction(),
+        )
+        ->toHaveCallCount(0);
       },
     );
 
@@ -237,12 +237,11 @@ let testUnit =
                 ),
             );
 
-          let shiftPositionNextPriceCalls =
-            longShortSmocked->LongShortSmocked.shiftPositionNextPriceCalls;
-
-          shiftPositionNextPriceCalls->Chai.recordArrayDeepEqualFlat([|
-            {marketIndex, amountSyntheticTokensToShift, isShiftFromLong},
-          |]);
+          longShortSmocked->LongShortSmocked.shiftPositionNextPriceCallCheck({
+            marketIndex,
+            amountSyntheticTokensToShift,
+            isShiftFromLong,
+          });
         },
       );
       it(
