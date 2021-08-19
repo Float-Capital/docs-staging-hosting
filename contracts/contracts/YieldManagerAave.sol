@@ -90,7 +90,7 @@ contract YieldManagerAave is IYieldManager, Initializable, UUPSUpgradeable {
     address _aaveIncentivesController,
     uint16 _aaveReferralCode,
     address _admin
-  ) external virtual initializer {
+  ) external initializer {
     longShort = _longShort;
     treasury = _treasury;
     admin = _admin;

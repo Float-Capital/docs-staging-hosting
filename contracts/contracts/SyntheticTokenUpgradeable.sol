@@ -14,7 +14,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 /**
-@title SyntheticToken
+@title SyntheticTokenUpgradeable
 @notice An ERC20 token that tracks or inversely tracks the price of an
         underlying asset with floating exposure.
 @dev Logic for price tracking contained in LongShort.sol. 
@@ -80,6 +80,8 @@ contract SyntheticTokenUpgradeable is
   /// @dev Can only be called by the current admin.
   function _authorizeUpgrade(address newImplementation) internal override onlyRole(UPGRADER_ROLE) {}
 
+  // TODO - look at some way of not duplicating implementation logic between this and SyntheticToken.sol
+
   /// @notice Allows users to stake their synthetic tokens to earn Float.
   /// @dev Core staking logic contained in Staker.sol
   /// @param amount Amount to stake in wei.
@@ -94,8 +96,6 @@ contract SyntheticTokenUpgradeable is
   /*╔══════════════════════════════════════════════════════╗
     ║    FUNCTIONS INHERITED BY ERC20PresetMinterPauser    ║
     ╚══════════════════════════════════════════════════════╝*/
-
-  // TODO - look at some way of not duplicating this logic between this and SyntheticToken.sol
 
   function totalSupply()
     public
