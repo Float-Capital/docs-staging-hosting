@@ -191,7 +191,7 @@ let testIntegration =
       );
     });
 
-    it_only(
+    it(
       "Shouldn't allow initialization with less than 1 eth units of payment token",
       () => {
         let {longShort, markets} = contracts.contents;

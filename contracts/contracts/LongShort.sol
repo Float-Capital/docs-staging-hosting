@@ -5,6 +5,7 @@ pragma solidity 0.8.3;
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 import "./interfaces/ITokenFactory.sol";
 import "./interfaces/ISyntheticToken.sol";
@@ -23,7 +24,7 @@ import "./interfaces/IOracleManager.sol";
 /// @dev All functions in this file are currently `virtual`. This is NOT to encourage inheritance.
 /// It is merely for convenince when unit testing.
 /// @custom:auditors This contract balances long and short sides.
-contract LongShort is ILongShort, Initializable {
+contract LongShort is ILongShort, Initializable, UUPSUpgradeable {
   //Using Open Zeppelin safe transfer library for token transfers
   using SafeERC20 for IERC20;
 
@@ -141,6 +142,10 @@ contract LongShort is ILongShort, Initializable {
     ║       ADMIN       ║
     ╚═══════════════════╝*/
 
+  /// @notice Authorizes an upgrade to a new address.
+  /// @dev Can only be called by the current admin.
+  function _authorizeUpgrade(address) internal override adminOnly {}
+
   /// @notice Changes the admin address for this contract.
   /// @dev Can only be called by the current admin.
   /// @param _admin Address of the new admin.
@@ -212,6 +217,59 @@ contract LongShort is ILongShort, Initializable {
       marketIndex,
       false
     );
+
+    // Initial market state.
+    paymentTokens[marketIndex] = _paymentToken;
+    yieldManagers[marketIndex] = _yieldManager;
+    oracleManagers[marketIndex] = _oracleManager;
+    assetPrice[marketIndex] = IOracleManager(oracleManagers[marketIndex]).updatePrice();
+
+    emit SyntheticMarketCreated(
+      marketIndex,
+      syntheticTokens[marketIndex][true],
+      syntheticTokens[marketIndex][false],
+      _paymentToken,
+      assetPrice[marketIndex],
+      syntheticName,
+      syntheticSymbol,
+      _oracleManager,
+      _yieldManager
+    );
+  }
+
+  /// @notice Creates an entirely new long/short market tracking an underlying oracle price.
+  ///  Doesn't use the token factory.
+  /// @dev This does not make the market active.
+  /// The `initializeMarket` function was split out separately to this function to reduce costs.
+  /// @param syntheticName Name of the synthetic asset
+  /// @param syntheticSymbol Symbol for the synthetic asset
+  /// @param _longToken Address for the long token.
+  /// @param _shortToken Address for the short token.
+  /// @param _paymentToken The address of the erc20 token used to buy this synthetic asset
+  /// this will likely always be DAI
+  /// @param _oracleManager The address of the oracle manager that provides the price feed for this market
+  /// @param _yieldManager The contract that manages depositing the paymentToken into a yield bearing protocol
+  function createNewSyntheticMarketUpgradeable(
+    string calldata syntheticName,
+    string calldata syntheticSymbol,
+    address _longToken,
+    address _shortToken,
+    address _paymentToken,
+    address _oracleManager,
+    address _yieldManager
+  ) external adminOnly {
+    // TODO unit test.
+
+    uint32 marketIndex = ++latestMarket;
+
+    // Ensure new markets don't use the same yield manager
+    IYieldManager(_yieldManager).initializeForMarket();
+
+    // Assign new synthetic long token.
+    syntheticTokens[marketIndex][true] = _longToken;
+
+    // Assign new synthetic short token.
+    syntheticTokens[marketIndex][false] = _shortToken;
 
     // Initial market state.
     paymentTokens[marketIndex] = _paymentToken;

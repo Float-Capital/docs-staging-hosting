@@ -39,8 +39,9 @@ describe("Float System", () => {
       );
 
     let%Await yieldManagerAave =
-      YieldManagerAave.make(
-        ~longShort=longShortAddress,
+      YieldManagerAave.make();
+
+    let%Await _ = yieldManagerAave->YieldManagerAave.initialize(~longShort=longShortAddress,
         ~treasury=treasury.address,
         ~paymentToken=paymentTokenSmocked.address,
         ~aToken=aTokenSmocked.address,
@@ -48,7 +49,7 @@ describe("Float System", () => {
           lendingPoolAddressesProviderSmocked.address,
         ~aaveIncentivesController=aaveIncentivesControllerSmocked.address,
         ~aaveReferralCode=6543,
-      );
+        ~admin=CONSTANTS.zeroAddress);
 
     contracts :=
       {

@@ -3,13 +3,14 @@
 pragma solidity 0.8.3;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/presets/ERC20PresetMinterPauserUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 import "./interfaces/IFloatToken.sol";
 import "./interfaces/ILongShort.sol";
 import "./interfaces/IStaker.sol";
 import "./interfaces/ISyntheticToken.sol";
 
-contract Staker is IStaker, Initializable {
+contract Staker is IStaker, Initializable, UUPSUpgradeable {
   /*╔═════════════════════════════╗
     ║          VARIABLES          ║
     ╚═════════════════════════════╝*/
@@ -169,6 +170,10 @@ contract Staker is IStaker, Initializable {
     admin = _admin;
     emit ChangeAdmin(_admin);
   }
+
+  /// @notice Authorizes an upgrade to a new address.
+  /// @dev Can only be called by the current admin.
+  function _authorizeUpgrade(address) internal override onlyAdmin {}
 
   /// @dev Logic for changeFloatPercentage
   function _changeFloatPercentage(uint256 newFloatPercentage) internal virtual {
