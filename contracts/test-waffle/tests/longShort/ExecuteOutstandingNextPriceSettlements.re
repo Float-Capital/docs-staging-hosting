@@ -1,6 +1,7 @@
 open LetOps;
 open Mocha;
 open Globals;
+open SmockGeneral;
 
 let testUnit =
     (
@@ -125,19 +126,14 @@ let testUnit =
               ~userNextPrice_currentUpdateIndex=bnFromInt(0),
               ~marketUpdateIndex=defaultMarketUpdateIndex,
             );
-          ();
-          // let executeOutstandingNextPriceMintsCallCheck =
-          //   LongShortSmocked.InternalMock._executeOutstandingNextPriceMintsCallCheck();
-          // let executeOutstandingNextPriceRedeemCallCheck =
-          //   LongShortSmocked.InternalMock._executeOutstandingNextPriceRedeemsCallCheck();
-          // Chai.intEqual(
-          //   executeOutstandingNextPriceMintsCallCheck->Array.length,
-          //   0,
-          // );
-          // Chai.intEqual(
-          //   executeOutstandingNextPriceRedeemCallCheck->Array.length,
-          //   0,
-          // );
+          expect(
+            LongShortSmocked.InternalMock._executeOutstandingNextPriceMintsFunction(),
+          )
+          ->toHaveCallCount(0);
+          expect(
+            LongShortSmocked.InternalMock._executeOutstandingNextPriceRedeemsFunction(),
+          )
+          ->toHaveCallCount(0);
         },
       );
 
@@ -166,19 +162,14 @@ let testUnit =
               ~marketUpdateIndex=
                 defaultuserNextPrice_currentUpdateIndex->sub(oneBn),
             );
-          ();
-          // let executeOutstandingNextPriceMintsCallCheck =
-          //   LongShortSmocked.InternalMock._executeOutstandingNextPriceMintsCallCheck();
-          // let executeOutstandingNextPriceRedeemCallCheck =
-          //   LongShortSmocked.InternalMock._executeOutstandingNextPriceRedeemsCallCheck();
-          // Chai.intEqual(
-          //   executeOutstandingNextPriceMintsCallCheck->Array.length,
-          //   0,
-          // );
-          // Chai.intEqual(
-          //   executeOutstandingNextPriceRedeemCallCheck->Array.length,
-          //   0,
-          // );
+          expect(
+            LongShortSmocked.InternalMock._executeOutstandingNextPriceMintsFunction(),
+          )
+          ->toHaveCallCount(0);
+          expect(
+            LongShortSmocked.InternalMock._executeOutstandingNextPriceRedeemsFunction(),
+          )
+          ->toHaveCallCount(0);
         },
       );
     });

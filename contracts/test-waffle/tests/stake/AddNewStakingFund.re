@@ -2,6 +2,7 @@ open Globals;
 open LetOps;
 open StakerHelpers;
 open Mocha;
+open SmockGeneral;
 
 let test =
     (
@@ -55,10 +56,8 @@ let test =
     });
 
     it_skip("calls the onlyLongShortModifier", () => {
-      // StakerSmocked.InternalMock.onlyFloatCallCheck()
-      // ->Array.length
-      // ->Chai.intEqual(1)
-      ()
+      expect(StakerSmocked.InternalMock.onlyLongShortModifierLogicFunction())
+      ->toHaveCallCount(0)
     });
 
     it(

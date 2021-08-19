@@ -2,6 +2,7 @@ open Globals;
 open LetOps;
 open StakerHelpers;
 open Mocha;
+open SmockGeneral;
 
 let test =
     (
@@ -140,10 +141,10 @@ let test =
       );
 
       it("doesn't call mintAccumulatedFloat", () => {
-        // StakerSmocked.InternalMock._mintAccumulatedFloatAndExecuteOutstandingShiftsCallCheck()
-        // ->Array.length
-        // ->Chai.intEqual(0)
-        ()
+        expect(
+          StakerSmocked.InternalMock._mintAccumulatedFloatAndExecuteOutstandingShiftsFunction(),
+        )
+        ->toHaveCallCount(0)
       });
     });
 
@@ -155,10 +156,10 @@ let test =
       );
 
       it("doesn't call mintAccumulatedFloat", () => {
-        // StakerSmocked.InternalMock._mintAccumulatedFloatAndExecuteOutstandingShiftsCallCheck()
-        // ->Array.length
-        // ->Chai.intEqual(0)
-        ()
+        expect(
+          StakerSmocked.InternalMock._mintAccumulatedFloatAndExecuteOutstandingShiftsFunction(),
+        )
+        ->toHaveCallCount(0)
       });
     });
   });

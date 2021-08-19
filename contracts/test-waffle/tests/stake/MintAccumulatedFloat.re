@@ -2,6 +2,7 @@ open Globals;
 open LetOps;
 open StakerHelpers;
 open Mocha;
+open SmockGeneral;
 
 let test =
     (
@@ -103,13 +104,10 @@ let test =
         })
       );
 
-      it("doesn't call mintFloat", ()
-        // StakerSmocked.InternalMock._mintFloatCallCheck()
-        // ->Array.length
-        // ->Chai.intEqual(0)
-        =>
-          ()
-        );
+      it("doesn't call mintFloat", () =>
+        expect(StakerSmocked.InternalMock._mintFloatFunction())
+        ->toHaveCallCount(0)
+      );
 
       it("doesn't mutate userIndexOfLastClaimed", () => {
         let%Await lastClaimed =

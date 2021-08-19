@@ -2,6 +2,7 @@ open Globals;
 open LetOps;
 open StakerHelpers;
 open Mocha;
+open SmockGeneral;
 
 let makeIterator = anyArray => {
   let indexRef = ref(0);
@@ -175,12 +176,10 @@ let test =
       });
 
       // doesn't do a lot of other stuff as well but unwieldy to test
-      it("doesn't mint float", () => {
-        // StakerSmocked.InternalMock._mintFloatCallCheck()
-        // ->Array.length
-        // ->Chai.intEqual(0)
-        ()
-      });
+      it("doesn't mint float", () =>
+        expect(StakerSmocked.InternalMock._mintFloatFunction())
+        ->toHaveCallCount(0)
+      );
     });
   });
 };

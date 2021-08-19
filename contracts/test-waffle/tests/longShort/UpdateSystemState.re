@@ -1,6 +1,7 @@
 open LetOps;
 open Mocha;
 open Globals;
+open SmockGeneral;
 
 let randomValueChange = tokenAmount => {
   tokenAmount
@@ -147,30 +148,12 @@ let testUnit =
 
       let assertNoUpdateStateOrNonOracleCallCheck = (~checkNoStakerCalls) => {
         if (checkNoStakerCalls) {
-          // TODO: this code was unimplemented anyway
-          // staker.contents
-          // ->StakerSmocked.pushUpdatedMarketPricesToUpdateFloatIssuanceCalculationsCallCheck;
-          ()
+          expect(
+            staker.contents
+            ->StakerSmocked.pushUpdatedMarketPricesToUpdateFloatIssuanceCalculationsFunction,
+          )
+          ->toHaveCallCount(0);
         };
-
-        // let numberOfClaimAndAdjustCallCheck =
-        //   LongShortSmocked.InternalMock._claimAndDistributeYieldThenRebalanceMarketCallCheck()
-        //   ->Array.length;
-        // let numberOfGetTokenPriceCallCheck =
-        //   LongShortSmocked.InternalMock._getSyntheticTokenPriceCallCheck()
-        //   ->Array.length;
-        // let numberOfOutstandingSettlementCallCheck =
-        //   LongShortSmocked.InternalMock._batchConfirmOutstandingPendingActionsCallCheck()
-        //   ->Array.length;
-
-        // let numberOfTotalSupplyLongCallCheck =
-        //   longSynth.contents
-        //   ->SyntheticTokenSmocked.totalSupplyCallCheck
-        //   ->Array.length;
-        // let numberOfTotalSupplyShortCallCheck =
-        //   shortSynth.contents
-        //   ->SyntheticTokenSmocked.totalSupplyCallCheck
-        //   ->Array.length;
 
         let%AwaitThen updateIndex =
           contracts.contents.longShort
@@ -199,11 +182,23 @@ let testUnit =
         Chai.bnEqual(updateIndex, latestUpdateIndexForMarket);
         Chai.bnEqual(newLongPrice, oldLongPrice);
         Chai.bnEqual(newShortPrice, oldShortPrice);
-        // Chai.intEqual(numberOfClaimAndAdjustCallCheck, 0);
-        // Chai.intEqual(numberOfGetTokenPriceCallCheck, 0);
-        // Chai.intEqual(numberOfTotalSupplyLongCallCheck, 0);
-        // Chai.intEqual(numberOfTotalSupplyShortCallCheck, 0);
-        // Chai.intEqual(numberOfOutstandingSettlementCallCheck, 0);
+
+        expect(
+          LongShortSmocked.InternalMock._claimAndDistributeYieldThenRebalanceMarketFunction(),
+        )
+        ->toHaveCallCount(0);
+        expect(
+          LongShortSmocked.InternalMock._getSyntheticTokenPriceFunction(),
+        )
+        ->toHaveCallCount(0);
+        expect(
+          LongShortSmocked.InternalMock._batchConfirmOutstandingPendingActionsFunction(),
+        )
+        ->toHaveCallCount(0);
+        expect(longSynth.contents->SyntheticTokenSmocked.totalSupplyFunction)
+        ->toHaveCallCount(0);
+        expect(shortSynth.contents->SyntheticTokenSmocked.totalSupplyFunction)
+        ->toHaveCallCount(0);
       };
 
       it(

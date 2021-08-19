@@ -12,7 +12,7 @@ let testUnit =
     let marketIndex = Helpers.randomJsInteger();
     let randomAddress1 = Helpers.randomAddress();
 
-    describe("changeAdmin", () => {
+    describe_only("changeAdmin", () => {
       let txPromiseRef: ref(JsPromise.t(ContractHelpers.transaction)) =
         ref(()->JsPromise.resolve->Obj.magic);
 
