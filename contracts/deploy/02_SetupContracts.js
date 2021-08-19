@@ -1,4 +1,7 @@
 const { runTestTransactions } = require("../DeployTests/RunTestTransactions");
+const {
+  runMumbaiTransactions,
+} = require("../DeployTests/RunMumbaiTransactions");
 const { ethers, getNamedAccounts } = require("hardhat");
 
 const {
@@ -70,6 +73,12 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
   console.log("before test txs");
   if (networkName == "mumbai") {
     console.log("mumbai test transactions");
+    await runMumbaiTransactions({
+      staker,
+      longShort: longShort.connect(admin),
+      paymentToken,
+      treasury,
+    });
   } else if (networkName == "hardhat" || networkName == "ganache") {
     console.log("mumbai test transactions");
     await runTestTransactions({
