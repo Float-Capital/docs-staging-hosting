@@ -17,7 +17,7 @@ let intEqual: (
   int,
 ) => unit = %raw(`(message, number1, number2) => expect(number1, message).to.equal(number2)`)
 
-let recordEqualFlatLabeled: (~expected: 'a, ~actual: 'a) => unit = (~expected, ~actual) => {
+let recordEqualFlat: ('a, 'a) => unit = (expected, actual) => {
   let a = %raw("(expected, actual) => {
     for(const key of Object.keys(actual)){
       expect(actual[key]).to.equal(expected[key])
@@ -25,8 +25,16 @@ let recordEqualFlatLabeled: (~expected: 'a, ~actual: 'a) => unit = (~expected, ~
   }")
   a(expected, actual)
 }
-
-let recordEqualFlat: ('a, 'a) => unit = (expected, actual) => {
+let recordEqualDeep: (~message: string=?, 'a, 'a) => unit = (~message="", expected, actual) => {
+  let a = %raw("(message, expected, actual) => {
+    for(const key of Object.keys(actual)){
+      expect(actual[key], message + ` at key \"${key}\"`).to.deep.equal(expected[key])
+    }
+  }")
+  a(message, expected, actual)
+}
+/* // Keeping these for reference.
+let recordEqualFlatLabeled: (~expected: 'a, ~actual: 'a) => unit = (~expected, ~actual) => {
   let a = %raw("(expected, actual) => {
     for(const key of Object.keys(actual)){
       expect(actual[key]).to.equal(expected[key])
@@ -44,15 +52,6 @@ let recordArrayEqualFlat: (array<'a>, array<'a>) => unit = (expected, actual) =>
     recordEqualFlat(expectedResult, actual->Array.getUnsafe(i))
   )
 }
-
-let recordEqualDeep: (~message: string=?, 'a, 'a) => unit = (~message="", expected, actual) => {
-  let a = %raw("(message, expected, actual) => {
-    for(const key of Object.keys(actual)){
-      expect(actual[key], message + ` at key \"${key}\"`).to.deep.equal(expected[key])
-    }
-  }")
-  a(message, expected, actual)
-}
 let recordArrayDeepEqualFlat: (~message: string=?, array<'a>, array<'a>) => unit = (
   ~message="record array equality check",
   expected,
@@ -66,7 +65,7 @@ let recordArrayDeepEqualFlat: (~message: string=?, array<'a>, array<'a>) => unit
       actual->Array.getUnsafe(i),
     )
   )
-}
+} */
 
 let addressEqual: (
   ~message: string=?,

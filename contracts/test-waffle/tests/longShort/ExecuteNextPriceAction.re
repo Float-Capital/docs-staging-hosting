@@ -1,6 +1,7 @@
 open LetOps;
 open Mocha;
 open Globals;
+open SmockGeneral;
 
 let testUnit =
     (
@@ -23,11 +24,10 @@ let testUnit =
             ~userNextPrice_currentUpdateIndex,
             ~syntheticToken_priceSnapshot,
           ) => {
-        let {longShort, markets} = contracts.contents;
-        let {longSynth, shortSynth} = markets->Array.getUnsafe(0);
+        let {longShort} = contracts.contents;
         longShortRef := longShort;
-        let%Await smockedLongSynth = SyntheticTokenSmocked.make(longSynth);
-        let%Await smockedShortSynth = SyntheticTokenSmocked.make(shortSynth);
+        let%Await smockedLongSynth = SyntheticTokenSmocked.make();
+        let%Await smockedShortSynth = SyntheticTokenSmocked.make();
 
         smockedLongSynth->SyntheticTokenSmocked.mockTransferToReturn(true);
         smockedShortSynth->SyntheticTokenSmocked.mockTransferToReturn(true);
@@ -70,12 +70,13 @@ let testUnit =
           });
           it("should not call any functions or change any state", () => {
             let%Await _ = executeOutstandingNextPriceMintsTx.contents;
+            ();
 
-            let transferCalls =
+            expect(
               (isLong ? longSynthSmocked : shortSynthSmocked).contents
-              ->SyntheticTokenSmocked.transferCalls;
-
-            Chai.recordArrayDeepEqualFlat(transferCalls, [||]);
+              ->SyntheticTokenSmocked.transferFunction,
+            )
+            ->toHaveCallCount(0);
           });
 
           it(
@@ -117,18 +118,16 @@ let testUnit =
             "should call transfer on the correct amount of synthetic tokens to the user",
             () => {
             let%Await _ = executeOutstandingNextPriceMintsTx.contents;
-            let transferCalls =
-              (isLong ? longSynthSmocked : shortSynthSmocked).contents
-              ->SyntheticTokenSmocked.transferCalls;
             let expectedAmountOfSynthToRecieve =
               Contract.LongShortHelpers.calcAmountSyntheticToken(
                 ~amountPaymentToken=userNextPrice_syntheticToken_redeemAmount,
                 ~price=syntheticToken_priceSnapshot,
               );
-            Chai.recordArrayDeepEqualFlat(
-              transferCalls,
-              [|{recipient: user, amount: expectedAmountOfSynthToRecieve}|],
-            );
+            (isLong ? longSynthSmocked : shortSynthSmocked).contents
+            ->SyntheticTokenSmocked.transferCallCheck({
+                recipient: user,
+                amount: expectedAmountOfSynthToRecieve,
+              });
           });
 
           it(
@@ -184,11 +183,9 @@ let testUnit =
             ~userNextPrice_currentUpdateIndex,
             ~syntheticToken_priceSnapshot,
           ) => {
-        let {longShort, markets} = contracts^;
-        let {yieldManager} = markets->Array.getUnsafe(0);
+        let {longShort} = contracts^;
 
-        let%Await smockedYieldManeger =
-          YieldManagerMockSmocked.make(yieldManager);
+        let%Await smockedYieldManeger = YieldManagerMockSmocked.make();
 
         yieldManagerSmocked := smockedYieldManeger;
 
@@ -226,12 +223,11 @@ let testUnit =
           });
           it("should not call any functions or change any state", () => {
             let%Await _ = executeOutstandingNextPriceRedeemsTx.contents;
-
-            let transferCalls =
+            expect(
               yieldManagerSmocked.contents
-              ->YieldManagerMockSmocked.transferPaymentTokensToUserCalls;
-
-            Chai.recordArrayDeepEqualFlat(transferCalls, [||]);
+              ->YieldManagerMockSmocked.transferPaymentTokensToUserFunction,
+            )
+            ->toHaveCallCount(0);
           });
 
           it(
@@ -274,18 +270,16 @@ let testUnit =
             "should call transfer on the correct amount of Payment Tokens to the user",
             () => {
             let%Await _ = executeOutstandingNextPriceRedeemsTx.contents;
-            let transferCalls =
-              yieldManagerSmocked.contents
-              ->YieldManagerMockSmocked.transferPaymentTokensToUserCalls;
             let expectedAmountOfPaymentTokenToRecieve =
               Contract.LongShortHelpers.calcAmountPaymentToken(
                 ~amountSyntheticToken=userNextPrice_syntheticToken_redeemAmount,
                 ~price=syntheticToken_priceSnapshot,
               );
-            Chai.recordArrayDeepEqualFlat(
-              transferCalls,
-              [|{user, amount: expectedAmountOfPaymentTokenToRecieve}|],
-            );
+            yieldManagerSmocked.contents
+            ->YieldManagerMockSmocked.transferPaymentTokensToUserCallCheck({
+                user,
+                amount: expectedAmountOfPaymentTokenToRecieve,
+              });
           });
 
           it(
@@ -342,11 +336,10 @@ let testUnit =
             ~syntheticToken_priceSnapshotShiftedFrom,
             ~syntheticToken_priceSnapshotShiftedTo,
           ) => {
-        let {longShort, markets} = contracts.contents;
-        let {longSynth, shortSynth} = markets->Array.getUnsafe(0);
+        let {longShort} = contracts.contents;
 
-        let%Await smockedLongSynth = SyntheticTokenSmocked.make(longSynth);
-        let%Await smockedShortSynth = SyntheticTokenSmocked.make(shortSynth);
+        let%Await smockedLongSynth = SyntheticTokenSmocked.make();
+        let%Await smockedShortSynth = SyntheticTokenSmocked.make();
 
         smockedLongSynth->SyntheticTokenSmocked.mockTransferToReturn(true);
         smockedShortSynth->SyntheticTokenSmocked.mockTransferToReturn(true);
@@ -394,11 +387,11 @@ let testUnit =
           it("should not call any functions or change any state", () => {
             let%Await _ = executeOutstandingNextPriceRedeemsTx.contents;
 
-            let transferCalls =
+            expect(
               (isShiftFromLong ? shortSynthSmocked : longSynthSmocked).contents
-              ->SyntheticTokenSmocked.transferCalls;
-
-            Chai.recordArrayDeepEqualFlat(transferCalls, [||]);
+              ->SyntheticTokenSmocked.transferFunction,
+            )
+            ->toHaveCallCount(0);
           });
 
           it(
@@ -445,9 +438,6 @@ let testUnit =
             "should call transfer on the correct amount of Syntetic Tokens to the user",
             () => {
             let%Await _ = executeOutstandingNextPriceRedeemsTx.contents;
-            let transferCalls =
-              (isShiftFromLong ? shortSynthSmocked : longSynthSmocked).contents
-              ->SyntheticTokenSmocked.transferCalls;
 
             let expectedAmountOfPaymentTokenToRecieve =
               Contract.LongShortHelpers.calcAmountPaymentToken(
@@ -460,15 +450,11 @@ let testUnit =
                 ~amountPaymentToken=expectedAmountOfPaymentTokenToRecieve,
                 ~price=syntheticToken_priceSnapshotShiftedTo,
               );
-            Chai.recordArrayDeepEqualFlat(
-              transferCalls,
-              [|
-                {
-                  recipient: user,
-                  amount: expectedAmountOfOtherSyntheticTokenToRecieve,
-                },
-              |],
-            );
+            (isShiftFromLong ? shortSynthSmocked : longSynthSmocked).contents
+            ->SyntheticTokenSmocked.transferCallCheck({
+                recipient: user,
+                amount: expectedAmountOfOtherSyntheticTokenToRecieve,
+              });
           });
 
           it(

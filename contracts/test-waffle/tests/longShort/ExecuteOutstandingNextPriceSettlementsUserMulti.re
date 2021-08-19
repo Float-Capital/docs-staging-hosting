@@ -26,13 +26,25 @@ let testUnit =
               ~marketIndexes,
             );
 
-        LongShortSmocked.InternalMock._executeOutstandingNextPriceSettlementsCalls()
-        ->Chai.recordArrayDeepEqualFlat([|
-            {user, marketIndex: 1},
-            {user, marketIndex: 2},
-            {user, marketIndex: 3},
-            {user, marketIndex: 4},
-          |]);
+        let _ =
+          LongShortSmocked.InternalMock._executeOutstandingNextPriceSettlementsCallCheck({
+            user,
+            marketIndex: 1,
+          });
+        let _ =
+          LongShortSmocked.InternalMock._executeOutstandingNextPriceSettlementsCallCheck({
+            user,
+            marketIndex: 2,
+          });
+        let _ =
+          LongShortSmocked.InternalMock._executeOutstandingNextPriceSettlementsCallCheck({
+            user,
+            marketIndex: 3,
+          });
+        LongShortSmocked.InternalMock._executeOutstandingNextPriceSettlementsCallCheck({
+          user,
+          marketIndex: 4,
+        });
       },
     )
   });
