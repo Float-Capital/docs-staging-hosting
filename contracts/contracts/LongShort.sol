@@ -238,7 +238,7 @@ contract LongShort is ILongShort, Initializable, UUPSUpgradeable {
   }
 
   /// @notice Creates an entirely new long/short market tracking an underlying oracle price.
-  ///  Doesn't use the token factory.
+  ///  Uses already created synthetic tokens.
   /// @dev This does not make the market active.
   /// The `initializeMarket` function was split out separately to this function to reduce costs.
   /// @param syntheticName Name of the synthetic asset
@@ -258,8 +258,6 @@ contract LongShort is ILongShort, Initializable, UUPSUpgradeable {
     address _oracleManager,
     address _yieldManager
   ) external adminOnly {
-    // TODO unit test.
-
     uint32 marketIndex = ++latestMarket;
 
     // Ensure new markets don't use the same yield manager
