@@ -1,6 +1,7 @@
 open LetOps;
 open Mocha;
 open Globals;
+open SmockGeneral;
 
 let testUnit =
     (
@@ -51,26 +52,30 @@ let testUnit =
       it(
         "calls nextPriceMint/nextPriceRedeem functions with correct arguments",
         () => {
-        let executeOutstandingNextPriceMintsCalls =
-          LongShortSmocked.InternalMock._executeOutstandingNextPriceMintsCalls();
-        let executeOutstandingNextPriceRedeemCalls =
-          LongShortSmocked.InternalMock._executeOutstandingNextPriceRedeemsCalls();
+        let _ =
+          LongShortSmocked.InternalMock._executeOutstandingNextPriceMintsCallCheck({
+            marketIndex,
+            user,
+            isLong: true,
+          });
+        let _ =
+          LongShortSmocked.InternalMock._executeOutstandingNextPriceMintsCallCheck({
+            marketIndex,
+            user,
+            isLong: false,
+          });
 
-        Chai.intEqual(executeOutstandingNextPriceMintsCalls->Array.length, 2);
-        Chai.intEqual(
-          executeOutstandingNextPriceRedeemCalls->Array.length,
-          2,
-        );
-
-        executeOutstandingNextPriceMintsCalls->Chai.recordArrayDeepEqualFlat([|
-          {marketIndex, user, isLong: true},
-          {marketIndex, user, isLong: false},
-        |]);
-
-        executeOutstandingNextPriceRedeemCalls->Chai.recordArrayDeepEqualFlat([|
-          {marketIndex, user, isLong: true},
-          {marketIndex, user, isLong: false},
-        |]);
+        let _ =
+          LongShortSmocked.InternalMock._executeOutstandingNextPriceRedeemsCallCheck({
+            marketIndex,
+            user,
+            isLong: true,
+          });
+        LongShortSmocked.InternalMock._executeOutstandingNextPriceRedeemsCallCheck({
+          marketIndex,
+          user,
+          isLong: false,
+        });
       });
 
       it("sets userNextPrice_currentUpdateIndex[marketIndex][user] to 0", () => {
@@ -121,20 +126,14 @@ let testUnit =
               ~userNextPrice_currentUpdateIndex=bnFromInt(0),
               ~marketUpdateIndex=defaultMarketUpdateIndex,
             );
-
-          let executeOutstandingNextPriceMintsCalls =
-            LongShortSmocked.InternalMock._executeOutstandingNextPriceMintsCalls();
-          let executeOutstandingNextPriceRedeemCalls =
-            LongShortSmocked.InternalMock._executeOutstandingNextPriceRedeemsCalls();
-
-          Chai.intEqual(
-            executeOutstandingNextPriceMintsCalls->Array.length,
-            0,
-          );
-          Chai.intEqual(
-            executeOutstandingNextPriceRedeemCalls->Array.length,
-            0,
-          );
+          expect(
+            LongShortSmocked.InternalMock._executeOutstandingNextPriceMintsFunction(),
+          )
+          ->toHaveCallCount(0);
+          expect(
+            LongShortSmocked.InternalMock._executeOutstandingNextPriceRedeemsFunction(),
+          )
+          ->toHaveCallCount(0);
         },
       );
 
@@ -163,20 +162,14 @@ let testUnit =
               ~marketUpdateIndex=
                 defaultuserNextPrice_currentUpdateIndex->sub(oneBn),
             );
-
-          let executeOutstandingNextPriceMintsCalls =
-            LongShortSmocked.InternalMock._executeOutstandingNextPriceMintsCalls();
-          let executeOutstandingNextPriceRedeemCalls =
-            LongShortSmocked.InternalMock._executeOutstandingNextPriceRedeemsCalls();
-
-          Chai.intEqual(
-            executeOutstandingNextPriceMintsCalls->Array.length,
-            0,
-          );
-          Chai.intEqual(
-            executeOutstandingNextPriceRedeemCalls->Array.length,
-            0,
-          );
+          expect(
+            LongShortSmocked.InternalMock._executeOutstandingNextPriceMintsFunction(),
+          )
+          ->toHaveCallCount(0);
+          expect(
+            LongShortSmocked.InternalMock._executeOutstandingNextPriceRedeemsFunction(),
+          )
+          ->toHaveCallCount(0);
         },
       );
     });

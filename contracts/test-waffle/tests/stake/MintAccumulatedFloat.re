@@ -2,6 +2,7 @@ open Globals;
 open LetOps;
 open StakerHelpers;
 open Mocha;
+open SmockGeneral;
 
 let test =
     (
@@ -53,23 +54,18 @@ let test =
       before_once'(() => setup(~floatToMintLong, ~floatToMintShort));
 
       it("calls calculateAccumulatedFloat with correct arguments", () =>
-        StakerSmocked.InternalMock._calculateAccumulatedFloatAndExecuteOutstandingShiftsCalls()
-        ->Array.getExn(0)
-        ->Chai.recordEqualFlat(
-            {
-              {marketIndex, user};
-            },
-          )
+        StakerSmocked.InternalMock._calculateAccumulatedFloatAndExecuteOutstandingShiftsCallCheck({
+          marketIndex,
+          user,
+        })
       );
 
       it("calls mintFloat with correct arguments", () =>
-        StakerSmocked.InternalMock._mintFloatCalls()
-        ->Array.getExn(0)
-        ->Chai.recordEqualFlat({
-            user,
-            floatToMint:
-              floatToMintLong->Ethers.BigNumber.add(floatToMintShort),
-          })
+        StakerSmocked.InternalMock._mintFloatCallCheck({
+          user,
+          floatToMint:
+            floatToMintLong->Ethers.BigNumber.add(floatToMintShort),
+        })
       );
 
       it("emits FloatMinted event", () => {
@@ -102,19 +98,15 @@ let test =
       );
 
       it("calls calculateAccumulatedFloat with correct arguments", () =>
-        StakerSmocked.InternalMock._calculateAccumulatedFloatAndExecuteOutstandingShiftsCalls()
-        ->Array.getExn(0)
-        ->Chai.recordEqualFlat(
-            {
-              {marketIndex, user};
-            },
-          )
+        StakerSmocked.InternalMock._calculateAccumulatedFloatAndExecuteOutstandingShiftsCallCheck({
+          marketIndex,
+          user,
+        })
       );
 
       it("doesn't call mintFloat", () =>
-        StakerSmocked.InternalMock._mintFloatCalls()
-        ->Array.length
-        ->Chai.intEqual(0)
+        expect(StakerSmocked.InternalMock._mintFloatFunction())
+        ->toHaveCallCount(0)
       );
 
       it("doesn't mutate userIndexOfLastClaimed", () => {
