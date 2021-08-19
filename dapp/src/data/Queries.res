@@ -402,6 +402,9 @@ query ($intervalId: String!, $numDataPoints: Int!) @ppxConfig(schema: "graphql_s
       startTimestamp @ppxCustom(module: "Date")
       endPrice
     }
+    latestPriceInterval{
+      endPrice
+    }
   }
 }`)
 

@@ -31,9 +31,14 @@ contract LongShortInternalStateSetters is LongShort {
   }
 
   function setMarketExistsMulti(uint32[] calldata marketIndexes) external {
-    for (uint256 i = 0; i < marketIndexes.length; i++) {
+    uint256 length = marketIndexes.length;
+    for (uint256 i = 0; i < length; i++) {
       marketExists[marketIndexes[i]] = true;
     }
+  }
+
+  function setAssetPrice(uint32 marketIndex, int256 _assetPrice) external {
+    assetPrice[marketIndex] = _assetPrice;
   }
 
   function set_updateSystemStateInternalGlobals(
@@ -41,7 +46,7 @@ contract LongShortInternalStateSetters is LongShort {
     uint256 _latestUpdateIndexForMarket,
     uint256 syntheticTokenPrice_inPaymentTokens_long,
     uint256 syntheticTokenPrice_inPaymentTokens_short,
-    uint256 _assetPrice,
+    int256 _assetPrice,
     uint256 longValue,
     uint256 shortValue,
     address oracleManager,
@@ -75,18 +80,6 @@ contract LongShortInternalStateSetters is LongShort {
 
   function setUseexecuteOutstandingNextPriceSettlementsMock(bool shouldUseMock) public {
     overRideexecuteOutstandingNextPriceSettlements = shouldUseMock;
-  }
-
-  function _executeOutstandingNextPriceSettlementsMock(address _user, uint32 _marketIndex)
-    internal
-  {
-    emit executeOutstandingNextPriceSettlementsMock(_user, _marketIndex);
-  }
-
-  function _executeOutstandingNextPriceSettlementsExposedWithEvent(address user, uint32 marketIndex)
-    external
-  {
-    _executeOutstandingNextPriceSettlements(user, marketIndex);
   }
 
   function setGetUsersConfirmedButNotSettledBalanceGlobals(

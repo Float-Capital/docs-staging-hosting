@@ -66,6 +66,8 @@ type BatchedNextPriceExec @entity {
   amountPaymentTokenForDepositShort: BigInt!
   amountSynthTokenForWithdrawalLong: BigInt!
   amountSynthTokenForWithdrawalShort: BigInt!
+  amountSynthTokenForShiftFromLong: BigInt!
+  amountSynthTokenForShiftFromShort: BigInt!
   mintPriceSnapshotLong: BigInt!
   mintPriceSnapshotShort: BigInt!
   redeemPriceSnapshotLong: BigInt!
@@ -81,6 +83,7 @@ type BatchedNextPriceExec @entity {
 # }
 
 enum NextPriceAction {
+  Shift
   Mint
   Redeem
 }
@@ -112,6 +115,8 @@ type UserNextPriceAction @entity {
   amountPaymentTokenForDepositShort: BigInt!
   amountSynthTokenForWithdrawalLong: BigInt!
   amountSynthTokenForWithdrawalShort: BigInt!
+  amountSynthTokenForShiftFromLong: BigInt!
+  amountSynthTokenForShiftFromShort: BigInt!
   nextPriceActionComponents: [UserNextPriceActionComponent!]!
   # These timestamps will be zero if the user action hasn't been confirmed/settled yet
   confirmedTimestamp: BigInt! # the timestamp the batched settlement occured

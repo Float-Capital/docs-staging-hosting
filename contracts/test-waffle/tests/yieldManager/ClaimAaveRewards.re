@@ -26,7 +26,7 @@ let testUnit =
 
         claimAaveRewardsToTreasuryTxPromise.contents;
       });
-      it("Calls the ClaimAaveRewardTokenToTreasury event", () => {
+      it("CallCheck the ClaimAaveRewardTokenToTreasury event", () => {
         Chai.callEmitEvents(
           ~call=claimAaveRewardsToTreasuryTxPromise.contents,
           ~contract=(contracts.contents)#yieldManagerAave->Obj.magic,
@@ -35,16 +35,14 @@ let testUnit =
         ->Chai.withArgs1(randomRewardAmount)
       });
       it(
-        "it calls getUserUnclaimedRewardsCalls with the correct parameters on the AaveIncentiveController",
+        "it calls getUserUnclaimedRewardsCallCheck with the correct parameters on the AaveIncentiveController",
         () => {
           let aaveIncentivesControllerSmockedContract =
             (contracts.contents)#aaveIncentivesController;
 
-          aaveIncentivesControllerSmockedContract
-          ->AaveIncentivesControllerMockSmocked.getUserUnclaimedRewardsCalls
-          ->Chai.recordArrayDeepEqualFlat([|
-              {user: (contracts.contents)#yieldManagerAave.address},
-            |]);
+          aaveIncentivesControllerSmockedContract->AaveIncentivesControllerMockSmocked.getUserUnclaimedRewardsCallCheck({
+            user: (contracts.contents)#yieldManagerAave.address,
+          });
         },
       );
       it(
@@ -55,15 +53,11 @@ let testUnit =
 
           let treasury = (contracts.contents)#treasury;
 
-          aaveIncentivesControllerSmockedContract
-          ->AaveIncentivesControllerMockSmocked.claimRewardsCalls
-          ->Chai.recordArrayDeepEqualFlat([|
-              {
-                assets: [|(contracts.contents)#aToken.address|],
-                amount: randomRewardAmount,
-                _to: treasury.address,
-              },
-            |]);
+          aaveIncentivesControllerSmockedContract->AaveIncentivesControllerMockSmocked.claimRewardsCallCheck({
+            assets: [|(contracts.contents)#aToken.address|],
+            amount: randomRewardAmount,
+            _to: treasury.address,
+          });
         },
       );
     })

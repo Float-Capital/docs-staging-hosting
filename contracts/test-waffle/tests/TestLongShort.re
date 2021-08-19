@@ -130,35 +130,6 @@ describe("Float System", () => {
         );
       });
     });
-    describe("changeTreasury", () => {
-      let newTreasuryAddress = Ethers.Wallet.createRandom().address;
-
-      it("should allow admin to update the treasury address", () => {
-        let%Await _ =
-          contracts.contents.longShort
-          ->LongShort.changeTreasury(~treasury=newTreasuryAddress);
-
-        let%Await treasuryFromContract =
-          contracts.contents.longShort->LongShort.treasury;
-
-        Chai.addressEqual(
-          ~otherAddress=treasuryFromContract,
-          newTreasuryAddress,
-        );
-      });
-
-      it("shouldn't allow non admin to update the treasury address", () => {
-        let attackerAddress = accounts.contents->Array.getUnsafe(5);
-
-        Chai.expectRevert(
-          ~transaction=
-            contracts.contents.longShort
-            ->ContractHelpers.connect(~address=attackerAddress)
-            ->LongShort.changeTreasury(~treasury=newTreasuryAddress),
-          ~reason="only admin",
-        );
-      });
-    });
     describe("changeMarketTreasurySplitGradient", () => {
       let newGradient = twoBn;
       let marketIndex = 1;
@@ -232,7 +203,10 @@ describe("Float System", () => {
     ShiftNextPrice.testUnit(~contracts, ~accounts);
     ExecuteNextPriceAction.testUnit(~contracts, ~accounts);
     ExecuteOutstandingNextPriceSettlements.testUnit(~contracts, ~accounts);
-    ExecuteOutstandingNextPriceSettlementsUserMulti.testUnit(~contracts, ~accounts);    
+    ExecuteOutstandingNextPriceSettlementsUserMulti.testUnit(
+      ~contracts,
+      ~accounts,
+    );
     RedeemNextPrice.testUnit(~contracts, ~accounts);
     DepositFunds.testUnit(~contracts, ~accounts);
   });

@@ -22,13 +22,13 @@ contract SyntheticToken is ISyntheticToken, ERC20, ERC20Burnable, AccessControl,
   bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
   /// @notice Address of the LongShort contract, a deployed LongShort.sol
-  address public longShort;
+  address public immutable longShort;
   /// @notice Address of the Staker contract, a deployed Staker.sol
-  address public staker;
+  address public immutable staker;
   /// @notice Identifies which market in longShort the token is for.
-  uint32 public marketIndex;
+  uint32 public immutable marketIndex;
   /// @notice Whether the token is a long token or short token for its market.
-  bool public isLong;
+  bool public immutable isLong;
 
   /// @notice Creates an instance of the contract.
   /// @dev Should only be called by TokenFactory.sol for our system.

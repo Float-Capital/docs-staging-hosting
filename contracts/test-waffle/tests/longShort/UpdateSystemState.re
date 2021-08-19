@@ -1,6 +1,7 @@
 open LetOps;
 open Mocha;
 open Globals;
+open SmockGeneral;
 
 let randomValueChange = tokenAmount => {
   tokenAmount
@@ -70,12 +71,9 @@ let testUnit =
           valueChangeShort,
         );
 
-        let%AwaitThen stakerSmocked =
-          StakerSmocked.make(contracts.contents.staker);
+        let%AwaitThen stakerSmocked = StakerSmocked.make();
 
-        let%AwaitThen oracleSmocked =
-          contracts.contents.markets->Array.getExn(1).oracleManager
-          ->OracleManagerMockSmocked.make;
+        let%AwaitThen oracleSmocked = OracleManagerMockSmocked.make();
 
         let _ =
           oracleSmocked->OracleManagerMockSmocked.mockUpdatePriceToReturn(
@@ -85,9 +83,7 @@ let testUnit =
         oracle := oracleSmocked;
         staker := stakerSmocked;
 
-        let%AwaitThen longSynthSmocked =
-          contracts.contents.markets->Array.getExn(1).longSynth
-          ->SyntheticTokenSmocked.make;
+        let%AwaitThen longSynthSmocked = SyntheticTokenSmocked.make();
 
         longSynthSmocked->SyntheticTokenSmocked.mockTotalSupplyToReturn(
           longSynthSupply,
@@ -95,9 +91,7 @@ let testUnit =
 
         longSynth := longSynthSmocked;
 
-        let%AwaitThen shortSynthSmocked =
-          contracts.contents.markets->Array.getExn(1).shortSynth
-          ->SyntheticTokenSmocked.make;
+        let%AwaitThen shortSynthSmocked = SyntheticTokenSmocked.make();
 
         shortSynthSmocked->SyntheticTokenSmocked.mockTotalSupplyToReturn(
           shortSynthSupply,
@@ -152,33 +146,14 @@ let testUnit =
           ~oldShortPrice,
         );
 
-      let assertNoUpdateStateOrNonOracleCalls = (~checkNoStakerCalls) => {
+      let assertNoUpdateStateOrNonOracleCallCheck = (~checkNoStakerCalls) => {
         if (checkNoStakerCalls) {
-          let numberOfStakerCalls =
+          expect(
             staker.contents
-            ->StakerSmocked.pushUpdatedMarketPricesToUpdateFloatIssuanceCalculationsCalls
-            ->Array.length;
-          Chai.intEqual(numberOfStakerCalls, 0);
+            ->StakerSmocked.pushUpdatedMarketPricesToUpdateFloatIssuanceCalculationsFunction,
+          )
+          ->toHaveCallCount(0);
         };
-
-        let numberOfClaimAndAdjustCalls =
-          LongShortSmocked.InternalMock._claimAndDistributeYieldThenRebalanceMarketCalls()
-          ->Array.length;
-        let numberOfGetTokenPriceCalls =
-          LongShortSmocked.InternalMock._getSyntheticTokenPriceCalls()
-          ->Array.length;
-        let numberOfOutstandingSettlementCalls =
-          LongShortSmocked.InternalMock._batchConfirmOutstandingPendingActionsCalls()
-          ->Array.length;
-
-        let numberOfTotalSupplyLongCalls =
-          longSynth.contents
-          ->SyntheticTokenSmocked.totalSupplyCalls
-          ->Array.length;
-        let numberOfTotalSupplyShortCalls =
-          shortSynth.contents
-          ->SyntheticTokenSmocked.totalSupplyCalls
-          ->Array.length;
 
         let%AwaitThen updateIndex =
           contracts.contents.longShort
@@ -208,13 +183,22 @@ let testUnit =
         Chai.bnEqual(newLongPrice, oldLongPrice);
         Chai.bnEqual(newShortPrice, oldShortPrice);
 
-        Chai.intEqual(numberOfClaimAndAdjustCalls, 0);
-        Chai.intEqual(numberOfGetTokenPriceCalls, 0);
-
-        Chai.intEqual(numberOfTotalSupplyLongCalls, 0);
-        Chai.intEqual(numberOfTotalSupplyShortCalls, 0);
-
-        Chai.intEqual(numberOfOutstandingSettlementCalls, 0);
+        expect(
+          LongShortSmocked.InternalMock._claimAndDistributeYieldThenRebalanceMarketFunction(),
+        )
+        ->toHaveCallCount(0);
+        expect(
+          LongShortSmocked.InternalMock._getSyntheticTokenPriceFunction(),
+        )
+        ->toHaveCallCount(0);
+        expect(
+          LongShortSmocked.InternalMock._batchConfirmOutstandingPendingActionsFunction(),
+        )
+        ->toHaveCallCount(0);
+        expect(longSynth.contents->SyntheticTokenSmocked.totalSupplyFunction)
+        ->toHaveCallCount(0);
+        expect(shortSynth.contents->SyntheticTokenSmocked.totalSupplyFunction)
+        ->toHaveCallCount(0);
       };
 
       it(
@@ -225,16 +209,13 @@ let testUnit =
               ~stakerNextPrice_currentUpdateIndex=zeroBn,
             );
 
-          assertNoUpdateStateOrNonOracleCalls(~checkNoStakerCalls=true);
+          assertNoUpdateStateOrNonOracleCallCheck(~checkNoStakerCalls=true);
         },
       );
       it("calls for the latest price from the oracle", () => {
         let%Await _ =
           setupWithoutPriceChange(~stakerNextPrice_currentUpdateIndex=zeroBn);
-        oracle.contents
-        ->OracleManagerMockSmocked.updatePriceCalls
-        ->Array.length
-        ->Chai.intEqual(1);
+        oracle.contents->OracleManagerMockSmocked.updatePriceCallCheck;
       });
 
       describe("There is a price change", () => {
@@ -254,17 +235,14 @@ let testUnit =
                 ~stakerNextPrice_currentUpdateIndex=zeroBn,
               );
             staker.contents
-            ->StakerSmocked.pushUpdatedMarketPricesToUpdateFloatIssuanceCalculationsCalls
-            ->Chai.recordArrayDeepEqualFlat([|
-                {
-                  marketIndex,
-                  marketUpdateIndex: latestUpdateIndexForMarket,
-                  longPrice: oldLongPrice,
-                  shortPrice: oldShortPrice,
-                  longValue: oldLongValue,
-                  shortValue: oldShortValue,
-                },
-              |]);
+            ->StakerSmocked.pushUpdatedMarketPricesToUpdateFloatIssuanceCalculationsCallCheck({
+                marketIndex,
+                marketUpdateIndex: latestUpdateIndexForMarket,
+                longPrice: oldLongPrice,
+                shortPrice: oldShortPrice,
+                longValue: oldLongValue,
+                shortValue: oldShortValue,
+              });
           },
         );
 
@@ -275,10 +253,10 @@ let testUnit =
               setupWithPriceChange(
                 ~stakerNextPrice_currentUpdateIndex=zeroBn,
               );
-            LongShortSmocked.InternalMock._claimAndDistributeYieldThenRebalanceMarketCalls()
-            ->Chai.recordArrayDeepEqualFlat([|
-                {marketIndex, oldAssetPrice, newAssetPrice},
-              |]);
+            LongShortSmocked.InternalMock._claimAndDistributeYieldThenRebalanceMarketCallCheck({
+              marketIndex,
+              newAssetPrice,
+            });
           },
         );
         it(
@@ -286,30 +264,21 @@ let testUnit =
           () => {
           let%Await _ =
             setupWithPriceChange(~stakerNextPrice_currentUpdateIndex=zeroBn);
-          LongShortSmocked.InternalMock._batchConfirmOutstandingPendingActionsCalls()
-          ->Chai.recordArrayDeepEqualFlat([|
-              {
-                marketIndex,
-                syntheticTokenPrice_inPaymentTokens_long:
-                  potentialNewLongPrice.contents,
-                syntheticTokenPrice_inPaymentTokens_short:
-                  potentialNewShortPrice.contents,
-              },
-            |]);
+          LongShortSmocked.InternalMock._batchConfirmOutstandingPendingActionsCallCheck({
+            marketIndex,
+            syntheticTokenPrice_inPaymentTokens_long:
+              potentialNewLongPrice.contents,
+            syntheticTokenPrice_inPaymentTokens_short:
+              potentialNewShortPrice.contents,
+          });
         });
 
         it("should call `totalSupply` on the long and short synth tokens", () => {
           let%Await _ =
             setupWithPriceChange(~stakerNextPrice_currentUpdateIndex=zeroBn);
-          longSynth.contents
-          ->SyntheticTokenSmocked.totalSupplyCalls
-          ->Array.length
-          ->Chai.intEqual(1);
+          longSynth.contents->SyntheticTokenSmocked.totalSupplyCallCheck;
 
-          shortSynth.contents
-          ->SyntheticTokenSmocked.totalSupplyCalls
-          ->Array.length
-          ->Chai.intEqual(1);
+          shortSynth.contents->SyntheticTokenSmocked.totalSupplyCallCheck;
         });
 
         it(
@@ -429,15 +398,12 @@ let testUnit =
         let%Await _ =
           contracts.contents.longShort
           ->LongShort.updateSystemStateMulti(~marketIndexes);
-        LongShortSmocked.InternalMock._updateSystemStateInternalCalls()
-        ->Chai.recordArrayDeepEqualFlat(
-            marketIndexes->Array.map(index => {
-              let record: LongShortSmocked.InternalMock._updateSystemStateInternalCall = {
-                marketIndex: index,
-              };
-              record;
-            }),
-          );
+
+        marketIndexes->Array.map(index => {
+          LongShortSmocked.InternalMock._updateSystemStateInternalCallCheck({
+            marketIndex: index,
+          })
+        });
       })
     });
     describe("updateSystemState", () => {
@@ -460,8 +426,9 @@ let testUnit =
             contracts.contents.longShort
             ->LongShort.updateSystemState(~marketIndex);
 
-          LongShortSmocked.InternalMock._updateSystemStateInternalCalls()
-          ->Chai.recordArrayDeepEqualFlat([|{marketIndex: marketIndex}|]);
+          LongShortSmocked.InternalMock._updateSystemStateInternalCallCheck({
+            marketIndex: marketIndex,
+          });
         },
       )
     });

@@ -63,11 +63,43 @@ function useInterval(callback, delay) {
   
 }
 
+function useIntervalFixed(callback, delay, numIterations) {
+  var savedCallback = React.useRef(callback);
+  var idRef = React.useRef(undefined);
+  var iterationCounter = React.useRef(0);
+  React.useEffect((function () {
+          savedCallback.current = callback;
+          
+        }), [callback]);
+  React.useEffect((function () {
+          iterationCounter.current = 0;
+          var id = setInterval((function (param) {
+                  if (iterationCounter.current < numIterations) {
+                    iterationCounter.current = iterationCounter.current + 1 | 0;
+                    return Curry._1(savedCallback.current, undefined);
+                  } else {
+                    clearInterval(idRef.current);
+                    return ;
+                  }
+                }), delay);
+          idRef.current = id;
+          return (function (param) {
+                    clearInterval(id);
+                    
+                  });
+        }), [
+        delay,
+        numIterations
+      ]);
+  
+}
+
 var Time = {
   getCurrentTimestamp: getCurrentTimestamp,
   useCurrentTime: useCurrentTime,
   useCurrentTimeBN: useCurrentTimeBN,
-  useInterval: useInterval
+  useInterval: useInterval,
+  useIntervalFixed: useIntervalFixed
 };
 
 function format(__x) {

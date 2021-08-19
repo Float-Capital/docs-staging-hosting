@@ -9,6 +9,10 @@
     {
       "dir": "test-waffle",
       "subdirs": true
+    },
+    {
+      "dir": "deployTests",
+      "subdirs": true
     }
   ],
   "package-specs": {

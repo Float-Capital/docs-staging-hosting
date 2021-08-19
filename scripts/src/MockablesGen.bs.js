@@ -35,6 +35,7 @@ var abisToMockExternally = [
   "OracleManagerChainlink",
   "OracleManagerMock",
   "LendingPoolAaveMock",
+  "LendingPoolAddressesProviderMock",
   "AaveIncentivesControllerMock"
 ];
 

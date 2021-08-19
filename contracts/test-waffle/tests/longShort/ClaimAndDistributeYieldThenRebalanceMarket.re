@@ -23,11 +23,16 @@ let testUnit =
     });
 
     let setup = (~newAssetPrice) => {
+      let%AwaitThen _ =
+        contracts.contents.longShort
+        ->LongShort.Exposed.setAssetPrice(
+            ~marketIndex,
+            ~assetPrice=oldAssetPrice,
+          );
       contracts.contents.longShort
       ->LongShort.Exposed._claimAndDistributeYieldThenRebalanceMarketExposedCall(
           ~marketIndex,
           ~newAssetPrice,
-          ~oldAssetPrice,
         );
     };
 
@@ -98,27 +103,21 @@ let testUnit =
           setup(~newAssetPrice);
         });
         it("calls _getYieldSplit with correct parameters", () => {
-          LongShortSmocked.InternalMock._getYieldSplitCalls()
-          ->Chai.recordArrayDeepEqualFlat([|
-              {
-                marketIndex,
-                longValue: marketSideValueInPaymentTokenLong,
-                shortValue: marketSideValueInPaymentTokenShort,
-                totalValueLockedInMarket,
-              },
-            |])
+          LongShortSmocked.InternalMock._getYieldSplitCallCheck({
+            marketIndex,
+            longValue: marketSideValueInPaymentTokenLong,
+            shortValue: marketSideValueInPaymentTokenShort,
+            totalValueLockedInMarket,
+          })
         });
         it(
           "gets the treasuryYieldPercent from _getYieldSplit and calls distributeYieldForTreasuryAndReturnMarketAllocation on the yieldManager with correct amount",
           () => {
           contracts.contents.yieldManagerSmocked
-          ->YieldManagerAaveSmocked.distributeYieldForTreasuryAndReturnMarketAllocationCalls
-          ->Chai.recordArrayDeepEqualFlat([|
-              {
-                totalValueRealizedForMarket: totalValueLockedInMarket,
-                treasuryYieldPercent_e18,
-              },
-            |])
+          ->YieldManagerAaveSmocked.distributeYieldForTreasuryAndReturnMarketAllocationCallCheck({
+              totalValueRealizedForMarket: totalValueLockedInMarket,
+              treasuryYieldPercent_e18,
+            })
         });
       });
 

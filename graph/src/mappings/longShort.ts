@@ -1,5 +1,5 @@
 // NOTE: this line has to be commented out for deployments, see: https://github.com/LimeChain/matchstick/issues/102
-export { runTests } from "../tests/longShort.test";
+// export { runTests } from "../tests/longShort.test";
 
 import {
   LongShortV1,
@@ -63,13 +63,13 @@ import {
   ACTION_MINT,
   ACTION_REDEEM,
   TEN_TO_THE_18,
+  ACTION_SHIFT,
 } from "../CONSTANTS";
 import {
   createOrUpdateUserNextPriceAction,
   createUserNextPriceActionComponent,
   createOrUpdateBatchedNextPriceExec,
   getBatchedNextPriceExec,
-  getUserNextPriceActionById,
   getUsersCurrentNextPriceAction,
   doesBatchExist,
 } from "../utils/nextPrice";
@@ -82,6 +82,9 @@ import {
   getOrInitializeSystemState,
   getSystemState,
   getSyntheticMarket,
+  getUserNextPriceActionComponent,
+  getUserNextPriceAction,
+  getPaymentToken,
 } from "../generated/EntityHelpers";
 
 export function handleLongShortV1(event: LongShortV1): void {
@@ -90,7 +93,6 @@ export function handleLongShortV1(event: LongShortV1): void {
   let admin = event.params.admin;
   let tokenFactoryParam = event.params.tokenFactory;
   // TODO: do something with the treasury - not recorded at the moment!
-  let treasury = event.params.treasury;
   let tokenFactoryString = tokenFactoryParam.toHex();
   let stakerParam = event.params.staker;
   let stakerString = stakerParam.toHex();
@@ -126,9 +128,9 @@ export function handleLongShortV1(event: LongShortV1): void {
   saveEventToStateChange(
     event,
     "LongShortV1",
-    [admin.toHex(), treasury.toHex(), tokenFactoryString, stakerString],
-    ["admin", "treasury", "tokenFactory", "staker"],
-    ["address", "address", "address", "address"],
+    [admin.toHex(), tokenFactoryString, stakerString],
+    ["admin", "tokenFactory", "staker"],
+    ["address", "address", "address"],
     [],
     []
   );
@@ -204,6 +206,7 @@ export function handleSystemStateUpdated(event: SystemStateUpdated): void {
       updateIndex
     );
 
+    // TODO: combine these into two values:
     batchedNextPriceExec.mintPriceSnapshotLong = longTokenPrice;
     batchedNextPriceExec.mintPriceSnapshotShort = shortTokenPrice;
     batchedNextPriceExec.redeemPriceSnapshotLong = longTokenPrice;
@@ -218,9 +221,7 @@ export function handleSystemStateUpdated(event: SystemStateUpdated): void {
     for (let i = 0; i < numberOfUsersInBatch; ++i) {
       let userNextPriceActionId: string = linkedUserNextPriceActions[i];
 
-      let userNextPriceAction = getUserNextPriceActionById(
-        userNextPriceActionId
-      );
+      let userNextPriceAction = getUserNextPriceAction(userNextPriceActionId);
       userNextPriceAction.confirmedTimestamp = event.block.timestamp;
       userNextPriceAction.save();
 
@@ -243,6 +244,34 @@ export function handleSystemStateUpdated(event: SystemStateUpdated): void {
         .times(TEN_TO_THE_18)
         .div(shortTokenPrice);
 
+      let tokensShiftedToLong = userNextPriceAction.amountSynthTokenForShiftFromShort
+        .times(shortTokenPrice)
+        .div(longTokenPrice);
+      let tokensShiftedToShort = userNextPriceAction.amountPaymentTokenForDepositShort
+        .times(longTokenPrice)
+        .div(shortTokenPrice);
+
+      if (tokensShiftedToLong.gt(ZERO)) {
+        // TODO: save this to the users shift history
+        updateUserBalance(
+          longTokenId,
+          user,
+          tokensShiftedToLong,
+          true,
+          timestamp
+        );
+      }
+
+      if (tokensShiftedToShort.gt(ZERO)) {
+        // TODO: save this to the users shift history
+        updateUserBalance(
+          shortTokenId,
+          user,
+          tokensShiftedToShort,
+          true,
+          timestamp
+        );
+      }
       if (tokensMintedLong.gt(ZERO)) {
         increaseUserMints(user, syntheticTokenLong, tokensMintedLong);
         updateUserBalance(longTokenId, user, tokensMintedLong, true, timestamp);
@@ -465,7 +494,7 @@ export function handleSyntheticMarketCreated(
   );
 }
 
-export function handleMarketOracleUpdated(event: OracleUpdated): void {
+export function handleOracleUpdated(event: OracleUpdated): void {
   let marketIndex = event.params.marketIndex;
   let oldOracleAddress = event.params.oldOracleAddress;
   let newOracleAddress = event.params.newOracleAddress;
@@ -515,13 +544,7 @@ export function handleNextPriceDeposit(event: NextPriceDeposit): void {
   userNextPriceAction.save();
   batchedNextPriceExec.save();
 
-  let paymentToken = PaymentToken.load(syntheticMarket.paymentToken);
-  if (paymentToken == null) {
-    log.critical(
-      "paymentToken is undefined when it shouldn't be, entity id: {}",
-      [syntheticMarket.paymentToken]
-    );
-  }
+  let paymentToken = getPaymentToken(syntheticMarket.paymentToken);
 
   decreaseOrCreateUserApprovals(
     userAddress,
@@ -722,16 +745,48 @@ export function handleExecuteNextPriceMintSettlementUser(
 export function handleNextPriceSyntheticPositionShift(
   event: NextPriceSyntheticPositionShift
 ): void {
+  let synthShifted = event.params.synthShifted;
+  let marketIndex = event.params.marketIndex;
+  let oracleUpdateIndex = event.params.oracleUpdateIndex;
+  let isLong = event.params.isShiftFromLong;
+  let userAddress = event.params.user;
+
+  let user = getOrCreateUser(userAddress, event);
+  let syntheticMarket = getSyntheticMarket(marketIndex.toString());
+
+  let userNextPriceActionComponent = createUserNextPriceActionComponent(
+    user,
+    syntheticMarket,
+    oracleUpdateIndex,
+    synthShifted,
+    ACTION_SHIFT,
+    isLong,
+    event
+  );
+
+  let batchedNextPriceExec = createOrUpdateBatchedNextPriceExec(
+    userNextPriceActionComponent
+  );
+  let userNextPriceAction = createOrUpdateUserNextPriceAction(
+    userNextPriceActionComponent,
+    syntheticMarket,
+    user
+  );
+  userNextPriceAction.confirmedTimestamp = event.block.timestamp;
+
+  userNextPriceAction.save();
+  batchedNextPriceExec.save();
+
   // TODO Add functionality.
   saveEventToStateChange(
     event,
     "NextPriceSyntheticPositionShift",
     [
-      event.params.marketIndex.toString(),
-      event.params.isShiftFromLong ? "true" : "false",
-      event.params.synthShifted.toString(),
-      event.params.user.toHex(),
-      event.params.oracleUpdateIndex.toString(),
+      marketIndex.toString(),
+      isLong ? "true" : "false",
+      synthShifted.toString(),
+      userAddress.toHex(),
+      oracleUpdateIndex.toString(),
     ],
     [
       "marketIndex",
@@ -749,15 +804,38 @@ export function handleNextPriceSyntheticPositionShift(
 export function handleExecuteNextPriceMarketSideShiftSettlementUser(
   event: ExecuteNextPriceMarketSideShiftSettlementUser
 ): void {
+  let marketIndex = event.params.marketIndex;
+  let userAddress = event.params.user;
+  let isLong = event.params.isShiftFromLong;
+  let amount = event.params.amount;
+
+  let synthTokenRecieved = getSyntheticTokenByMarketIdAndTokenType(
+    marketIndex,
+    !isLong
+  );
+
+  let user = getUser(userAddress);
+
+  // reverse double counting of tokenBalances from synth token TransferEvent
+  updateUserBalance(
+    synthTokenRecieved.id,
+    user,
+    amount,
+    false,
+    event.block.timestamp
+  );
+
+  user.save();
+
   // TODO Add functionality.
   saveEventToStateChange(
     event,
     "ExecuteNextPriceMarketSideShiftSettlementUser",
     [
-      event.params.user.toHex(),
-      event.params.marketIndex.toString(),
-      event.params.isShiftFromLong ? "true" : "false",
-      event.params.amount.toString(),
+      userAddress.toHex(),
+      marketIndex.toString(),
+      isLong ? "true" : "false",
+      amount.toString(),
     ],
     ["user", "marketIndex", "isShiftFromLong", "amount"],
     ["address", "uint32", "bool", "uint256"],

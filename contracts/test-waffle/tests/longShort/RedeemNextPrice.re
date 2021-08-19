@@ -169,12 +169,11 @@ let testUnit =
           contracts.contents.longShort
           ->LongShort.redeemLongNextPrice(~marketIndex, ~tokens_redeem);
 
-        let redeemNextPriceCalls =
-          LongShortSmocked.InternalMock._redeemNextPriceCalls();
-
-        redeemNextPriceCalls->Chai.recordArrayDeepEqualFlat([|
-          {marketIndex, tokens_redeem, isLong: true},
-        |]);
+        LongShortSmocked.InternalMock._redeemNextPriceCallCheck({
+          marketIndex,
+          tokens_redeem,
+          isLong: true,
+        });
       })
     });
 
@@ -192,12 +191,11 @@ let testUnit =
           contracts.contents.longShort
           ->LongShort.redeemShortNextPrice(~marketIndex, ~tokens_redeem);
 
-        let redeemNextPriceCalls =
-          LongShortSmocked.InternalMock._redeemNextPriceCalls();
-
-        redeemNextPriceCalls->Chai.recordArrayDeepEqualFlat([|
-          {marketIndex, tokens_redeem, isLong: false},
-        |]);
+        LongShortSmocked.InternalMock._redeemNextPriceCallCheck({
+          marketIndex,
+          tokens_redeem,
+          isLong: false,
+        });
       })
     });
   });
@@ -209,8 +207,7 @@ let testUnit =
     let smockedSyntheticToken = ref(SyntheticTokenSmocked.uninitializedValue);
 
     let setup = (~isLong, ~testWallet: Ethers.walletType) => {
-      let {longSynth} = contracts.contents.markets->Array.getUnsafe(0);
-      let%AwaitThen longSynthSmocked = longSynth->SyntheticTokenSmocked.make;
+      let%AwaitThen longSynthSmocked = SyntheticTokenSmocked.make();
       longSynthSmocked->SyntheticTokenSmocked.mockTransferFromToReturn(true);
       smockedSyntheticToken := longSynthSmocked;
 
@@ -249,12 +246,10 @@ let testUnit =
 
         let%Await _ = setup(~isLong, ~testWallet);
 
-        let executeOutstandingNextPriceSettlementsCalls =
-          LongShortSmocked.InternalMock._executeOutstandingNextPriceSettlementsCalls();
-
-        executeOutstandingNextPriceSettlementsCalls->Chai.recordArrayDeepEqualFlat([|
-          {user: testWallet.address, marketIndex},
-        |]);
+        LongShortSmocked.InternalMock._executeOutstandingNextPriceSettlementsCallCheck({
+          user: testWallet.address,
+          marketIndex,
+        });
       });
 
       it("emits the NextPriceRedeem event", () => {
@@ -281,17 +276,12 @@ let testUnit =
 
         let%Await _ = setup(~isLong, ~testWallet);
 
-        let transferFromCalls =
-          smockedSyntheticToken.contents
-          ->SyntheticTokenSmocked.transferFromCalls;
-
-        transferFromCalls->Chai.recordArrayDeepEqualFlat([|
-          {
+        smockedSyntheticToken.contents
+        ->SyntheticTokenSmocked.transferFromCallCheck({
             sender: testWallet.address,
             recipient: contracts.contents.longShort.address,
             amount,
-          },
-        |]);
+          });
       });
 
       it("updates the correct state variables with correct values", () => {

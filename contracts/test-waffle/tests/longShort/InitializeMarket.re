@@ -16,7 +16,7 @@ let testUnit =
     let setup = (~marketIndex, ~marketIndexValue, ~latestMarket) => {
       let {longShort} = contracts^;
       longShortRef := longShort;
-      let%Await smocked = StakerSmocked.make(contracts^.staker);
+      let%Await smocked = StakerSmocked.make();
       stakerSmockedRef := smocked;
       let%Await _ = (longShortRef^)->LongShortSmocked.InternalMock.setup;
       let%Await _ =
@@ -56,12 +56,8 @@ let testUnit =
               ~marketTreasurySplitGradient_e18=bnFromInt(1),
             );
 
-        let stakerCalls =
-          (stakerSmockedRef^)->StakerSmocked.addNewStakingFundCalls;
-
-        Chai.recordEqualFlatLabeled(
-          ~expected=stakerCalls->Array.getExn(0),
-          ~actual={
+        (stakerSmockedRef^)
+        ->StakerSmocked.addNewStakingFundCallCheck({
             kInitialMultiplier:
               Ethers.BigNumber.fromUnsafe("60000000000000000"),
             marketIndex: 1,
@@ -71,23 +67,16 @@ let testUnit =
             unstakeFee_e18: Ethers.BigNumber.fromUnsafe("5000000000000000"), // 0.5% or 50 basis points
             balanceIncentiveCurve_exponent: bnFromInt(5),
             balanceIncentiveCurve_equilibriumOffset: bnFromInt(0),
-          },
-        );
-
-        let seedMarketInitiallyCalls =
-          LongShortSmocked.InternalMock._seedMarketInitiallyCalls();
-
-        Chai.recordEqualFlatLabeled(
-          ~actual={
-            marketIndex: 1,
-            initialMarketSeedForEachMarketSide: CONSTANTS.tenToThe18,
-          },
-          ~expected=seedMarketInitiallyCalls->Array.getExn(0),
-        );
+          });
 
         let%Await isMarket = (longShortRef^)->LongShort.marketExists(1);
 
         Chai.boolEqual(isMarket, true);
+
+        LongShortSmocked.InternalMock._seedMarketInitiallyCallCheck({
+          marketIndex: 1,
+          initialMarketSeedForEachMarketSide: CONSTANTS.tenToThe18,
+        });
       },
     );
     it("reverts if market exists", () => {
@@ -197,9 +186,19 @@ let testIntegration =
       let {longShort, markets} = contracts.contents;
       let {paymentToken, oracleManager} = markets->Array.getUnsafe(0);
 
+      let%Await lendingPoolAddressesProviderSmocked =
+        LendingPoolAddressesProviderMockSmocked.make();
+      lendingPoolAddressesProviderSmocked->LendingPoolAddressesProviderMockSmocked.mockGetLendingPoolToReturn(
+        Helpers.randomAddress(),
+      );
+
       //Can't deploy a market with the same yield manager as another market
       let%Await newYieldManager =
-        Helpers.deployAYieldManager(~longShort=longShort.address);
+        Helpers.deployAYieldManager(
+          ~longShort=longShort.address,
+          ~lendingPoolAddressesProvider=
+            lendingPoolAddressesProviderSmocked.address,
+        );
 
       let%Await _ =
         longShort->LongShort.createNewSyntheticMarket(

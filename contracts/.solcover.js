@@ -51,6 +51,7 @@ module.exports = {
     "mocks/AggregatorV3Mock.sol",
     "mocks/ERC20Mock.sol",
     "mocks/LendingPoolAaveMock.sol",
+    "mocks/LendingPoolAddressesProviderMock.sol",
 
     "oracles/OracleManagerBand.sol",
     "oracles/OracleManagerChainlink.sol",

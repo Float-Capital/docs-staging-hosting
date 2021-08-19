@@ -63,60 +63,6 @@ contract Staker is IStaker, Initializable {
   mapping(uint32 => mapping(bool => mapping(address => uint256)))
     public userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom;
 
-  /*╔════════════════════════════╗
-    ║           EVENTS           ║
-    ╚════════════════════════════╝*/
-
-  event StakerV1(
-    address admin,
-    address floatTreasury,
-    address floatCapital,
-    address floatToken,
-    uint256 floatPercentage
-  );
-
-  event MarketAddedToStaker(
-    uint32 marketIndex,
-    uint256 exitFee_e18,
-    uint256 period,
-    uint256 multiplier,
-    uint256 balanceIncentiveExponent,
-    int256 balanceIncentiveEquilibriumOffset
-  );
-
-  event AccumulativeIssuancePerStakedSynthSnapshotCreated(
-    uint32 marketIndex,
-    uint256 accumulativeFloatIssuanceSnapshotIndex,
-    uint256 accumulativeLong,
-    uint256 accumulativeShort
-  );
-
-  event StakeAdded(address user, address token, uint256 amount, uint256 lastMintIndex);
-
-  event StakeWithdrawn(address user, address token, uint256 amount);
-
-  // Note: the `amountFloatMinted` isn't strictly needed by the graph, but it is good to add it to validate calculations are accurate.
-  event FloatMinted(address user, uint32 marketIndex, uint256 amountFloatMinted);
-
-  event MarketLaunchIncentiveParametersChanges(
-    uint32 marketIndex,
-    uint256 period,
-    uint256 multiplier
-  );
-
-  event StakeWithdrawalFeeUpdated(uint32 marketIndex, uint256 stakeWithdralFee);
-
-  event BalanceIncentiveExponentUpdated(uint32 marketIndex, uint256 balanceIncentiveExponent);
-
-  event BalanceIncentiveEquilibriumOffsetUpdated(
-    uint32 marketIndex,
-    int256 balanceIncentiveEquilibriumOffset
-  );
-
-  event FloatPercentageUpdated(uint256 floatPercentage);
-
-  event ChangeAdmin(address newAdmin);
-
   /*╔═════════════════════════════╗
     ║          MODIFIERS          ║
     ╚═════════════════════════════╝*/
@@ -270,22 +216,6 @@ contract Staker is IStaker, Initializable {
     marketLaunchIncentive_multipliers[marketIndex] = initialMultiplier;
   }
 
-  /**
-  @notice Changes the market launch incentive parameters for a market
-  @param marketIndex Identifies the market.
-  @param period The new period for which float token generation should be boosted.
-  @param initialMultiplier The new multiplier on Float generation.
-  */
-  function changeMarketLaunchIncentiveParameters(
-    uint32 marketIndex,
-    uint256 period,
-    uint256 initialMultiplier
-  ) external onlyAdmin {
-    _changeMarketLaunchIncentiveParameters(marketIndex, period, initialMultiplier);
-
-    emit MarketLaunchIncentiveParametersChanges(marketIndex, period, initialMultiplier);
-  }
-
   /// @dev Logic for changeBalanceIncentiveExponent
   function _changeBalanceIncentiveExponent(
     uint32 marketIndex,
@@ -376,10 +306,6 @@ contract Staker is IStaker, Initializable {
     marketIndexOfToken[shortToken] = marketIndex;
 
     accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][0].timestamp = block.timestamp;
-    accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][0]
-    .accumulativeFloatPerSyntheticToken_long = 0;
-    accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][0]
-    .accumulativeFloatPerSyntheticToken_short = 0;
 
     syntheticTokens[marketIndex][true] = longToken;
     syntheticTokens[marketIndex][false] = shortToken;
@@ -445,7 +371,7 @@ contract Staker is IStaker, Initializable {
     assert(kInitialMultiplier >= 1e18);
 
     uint256 initialTimestamp = accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][0]
-    .timestamp;
+      .timestamp;
 
     if (block.timestamp - initialTimestamp <= kPeriod) {
       return
@@ -462,7 +388,8 @@ contract Staker is IStaker, Initializable {
   a fixed decimal scale of 1e42 (!!!) for numerical stability. The return
   values are float per second per synthetic token (hence the requirement
   to multiply by price)
-  @dev to see below math in latex form see TODO add link
+  @dev to see below math in latex form see:
+  https://ipfs.io/ipfs/QmRWbr8P1F588XqRTzm7wCsRPu8DcDVPWGriBach4f22Fq/staker-fps.pdf
   to interact with the equations see https://www.desmos.com/calculator/optkaxyihr
   @param marketIndex The market referred to.
   @param longPrice Price of the synthetic long token in units of payment token
@@ -590,9 +517,9 @@ contract Staker is IStaker, Initializable {
     // Compute new cumulative 'r' value total.
     return (
       accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][previousMarketUpdateIndex]
-      .accumulativeFloatPerSyntheticToken_long + (timeDelta * longFloatPerSecond),
+        .accumulativeFloatPerSyntheticToken_long + (timeDelta * longFloatPerSecond),
       accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][previousMarketUpdateIndex]
-      .accumulativeFloatPerSyntheticToken_short + (timeDelta * shortFloatPerSecond)
+        .accumulativeFloatPerSyntheticToken_short + (timeDelta * shortFloatPerSecond)
     );
   }
 
@@ -618,23 +545,23 @@ contract Staker is IStaker, Initializable {
       uint256 newLongAccumulativeValue,
       uint256 newShortAccumulativeValue
     ) = _calculateNewCumulativeIssuancePerStakedSynth(
-      marketIndex,
-      marketUpdateIndex - 1,
-      longPrice,
-      shortPrice,
-      longValue,
-      shortValue
-    );
+        marketIndex,
+        marketUpdateIndex - 1,
+        longPrice,
+        shortPrice,
+        longValue,
+        shortValue
+      );
 
     // Set cumulative 'r' value on new accumulativeIssuancePerStakedSynthSnapshot.
     accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][marketUpdateIndex]
-    .accumulativeFloatPerSyntheticToken_long = newLongAccumulativeValue;
+      .accumulativeFloatPerSyntheticToken_long = newLongAccumulativeValue;
     accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][marketUpdateIndex]
-    .accumulativeFloatPerSyntheticToken_short = newShortAccumulativeValue;
+      .accumulativeFloatPerSyntheticToken_short = newShortAccumulativeValue;
 
     // Set timestamp on new accumulativeIssuancePerStakedSynthSnapshot.
     accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][marketUpdateIndex].timestamp = block
-    .timestamp;
+      .timestamp;
 
     // Update latest index to point to new accumulativeIssuancePerStakedSynthSnapshot.
     latestRewardIndex[marketIndex] = marketUpdateIndex;
@@ -662,20 +589,18 @@ contract Staker is IStaker, Initializable {
     if (amountStakedLong > 0) {
       uint256 accumDeltaLong = accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][
         rewardIndexTo
-      ]
-      .accumulativeFloatPerSyntheticToken_long -
+      ].accumulativeFloatPerSyntheticToken_long -
         accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][rewardIndexFrom]
-        .accumulativeFloatPerSyntheticToken_long;
+          .accumulativeFloatPerSyntheticToken_long;
       floatReward += (accumDeltaLong * amountStakedLong) / FLOAT_ISSUANCE_FIXED_DECIMAL;
     }
 
     if (amountStakedShort > 0) {
       uint256 accumDeltaShort = accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][
         rewardIndexTo
-      ]
-      .accumulativeFloatPerSyntheticToken_short -
+      ].accumulativeFloatPerSyntheticToken_short -
         accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][rewardIndexFrom]
-        .accumulativeFloatPerSyntheticToken_short;
+          .accumulativeFloatPerSyntheticToken_short;
       floatReward += (accumDeltaShort * amountStakedShort) / FLOAT_ISSUANCE_FIXED_DECIMAL;
     }
   }
@@ -699,14 +624,16 @@ contract Staker is IStaker, Initializable {
 
     uint256 usersLastRewardIndex = userIndexOfLastClaimedReward[marketIndex][user];
 
+    uint256 currentRewardIndex = latestRewardIndex[marketIndex];
+
     // Don't do the calculation and return zero immediately if there is no change
-    if (usersLastRewardIndex == latestRewardIndex[marketIndex]) {
+    if (usersLastRewardIndex == currentRewardIndex) {
       return 0;
     }
 
     uint256 usersShiftIndex = userNextPrice_stakedSyntheticTokenShiftIndex[marketIndex][user];
     // if there is a change in the users tokens held due to a token shift (or possibly another action in the future)
-    if (usersShiftIndex > 0 && usersShiftIndex <= latestRewardIndex[marketIndex]) {
+    if (usersShiftIndex > 0 && usersShiftIndex <= currentRewardIndex) {
       floatReward = _calculateAccumulatedFloatInRange(
         marketIndex,
         amountStakedLong,
@@ -716,31 +643,36 @@ contract Staker is IStaker, Initializable {
       );
 
       // Update the users balances
-      if (userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[marketIndex][true][user] > 0) {
+
+      uint256 amountToShiftAwayFromCurrentSide = userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[
+          marketIndex
+        ][true][user];
+      // Handle shifts from LONG side:
+      if (amountToShiftAwayFromCurrentSide > 0) {
         amountStakedShort += ILongShort(longShort).getAmountSyntheticTokenToMintOnTargetSide(
           marketIndex,
-          userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[marketIndex][true][user],
+          amountToShiftAwayFromCurrentSide,
           true,
           usersShiftIndex
         );
 
-        amountStakedLong -= userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[marketIndex][
-          true
-        ][user];
+        amountStakedLong -= amountToShiftAwayFromCurrentSide;
         userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[marketIndex][true][user] = 0;
       }
 
-      if (userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[marketIndex][false][user] > 0) {
+      amountToShiftAwayFromCurrentSide = userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[
+        marketIndex
+      ][false][user];
+      // Handle shifts from SHORT side:
+      if (amountToShiftAwayFromCurrentSide > 0) {
         amountStakedLong += ILongShort(longShort).getAmountSyntheticTokenToMintOnTargetSide(
           marketIndex,
-          userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[marketIndex][false][user],
+          amountToShiftAwayFromCurrentSide,
           false,
           usersShiftIndex
         );
 
-        amountStakedShort -= userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[marketIndex][
-          false
-        ][user];
+        amountStakedShort -= amountToShiftAwayFromCurrentSide;
         userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[marketIndex][false][user] = 0;
       }
 
@@ -753,7 +685,7 @@ contract Staker is IStaker, Initializable {
         amountStakedLong,
         amountStakedShort,
         usersShiftIndex,
-        latestRewardIndex[marketIndex]
+        currentRewardIndex
       );
 
       userNextPrice_stakedSyntheticTokenShiftIndex[marketIndex][user] = 0;
@@ -763,7 +695,7 @@ contract Staker is IStaker, Initializable {
         amountStakedLong,
         amountStakedShort,
         usersLastRewardIndex,
-        latestRewardIndex[marketIndex]
+        currentRewardIndex
       );
     }
   }
@@ -809,7 +741,8 @@ contract Staker is IStaker, Initializable {
     address user
   ) internal virtual {
     uint256 floatTotal = 0;
-    for (uint256 i = 0; i < marketIndexes.length; i++) {
+    uint256 length = marketIndexes.length;
+    for (uint256 i = 0; i < length; i++) {
       uint256 floatToMint = _calculateAccumulatedFloatAndExecuteOutstandingShifts(
         marketIndexes[i],
         user
