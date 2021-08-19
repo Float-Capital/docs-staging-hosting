@@ -56,23 +56,24 @@ let testUnit =
         it("calls transfer on the synthetic token with correct args", () => {
           let fees = amountWithdrawn->mul(fees)->div(tenToThe18);
           contracts.contents.syntheticTokenSmocked
-          ->SyntheticTokenSmocked.transferCalls
-          ->Chai.recordArrayDeepEqualFlat([|
-              {recipient: treasury, amount: fees},
-              {
-                recipient: userWallet.contents.address,
-                amount: amountWithdrawn->sub(fees),
-              },
-            |]);
+          ->SyntheticTokenSmocked.transferCallCheck({
+              recipient: treasury,
+              amount: fees,
+            });
+          contracts.contents.syntheticTokenSmocked
+          ->SyntheticTokenSmocked.transferCallCheck({
+              recipient: userWallet.contents.address,
+              amount: amountWithdrawn->sub(fees),
+            });
         });
 
         it(
           "calls _mintAccumulatedFloatAndExecuteOutstandingShifts with correct args",
           () => {
-          StakerSmocked.InternalMock._mintAccumulatedFloatAndExecuteOutstandingShiftsCalls()
-          ->Chai.recordArrayDeepEqualFlat([|
-              {user: userWallet.contents.address, marketIndex},
-            |])
+          StakerSmocked.InternalMock._mintAccumulatedFloatAndExecuteOutstandingShiftsCallCheck({
+            user: userWallet.contents.address,
+            marketIndex,
+          })
         });
 
         it("mutates userAmountStaked", () => {
@@ -136,14 +137,16 @@ let testUnit =
 
       it("calls updateSystemState on longShort with correct args", () => {
         contracts.contents.longShortSmocked
-        ->LongShortSmocked.updateSystemStateCalls
-        ->Chai.recordArrayDeepEqualFlat([|{marketIndex: marketIndex}|])
+        ->LongShortSmocked.updateSystemStateCallCheck({
+            marketIndex: marketIndex,
+          })
       });
       it("calls _withdraw with correct args", () =>
-        StakerSmocked.InternalMock._withdrawCalls()
-        ->Chai.recordArrayDeepEqualFlat([|
-            {marketIndex, token, amount: amountWithdrawn},
-          |])
+        StakerSmocked.InternalMock._withdrawCallCheck({
+          marketIndex,
+          token,
+          amount: amountWithdrawn,
+        })
       );
 
       it("should not allow shifts > userAmountStaked", () => {
@@ -208,14 +211,16 @@ let testUnit =
 
       it("calls updateSystemState on longShort with correct args", () => {
         contracts.contents.longShortSmocked
-        ->LongShortSmocked.updateSystemStateCalls
-        ->Chai.recordArrayDeepEqualFlat([|{marketIndex: marketIndex}|])
+        ->LongShortSmocked.updateSystemStateCallCheck({
+            marketIndex: marketIndex,
+          })
       });
       it("calls _withdraw with correct args", () =>
-        StakerSmocked.InternalMock._withdrawCalls()
-        ->Chai.recordArrayDeepEqualFlat([|
-            {marketIndex, token, amount: amountStaked},
-          |])
+        StakerSmocked.InternalMock._withdrawCallCheck({
+          marketIndex,
+          token,
+          amount: amountStaked,
+        })
       );
     });
   });

@@ -62,10 +62,22 @@ function paramName(index, name) {
   }
 }
 
+function parametersToDestructuredRecord(fnType) {
+  return "{\n" + Globals.reduceStrArr(Belt_Array.mapWithIndex(fnType.parameters, (function (i, param) {
+                    return "\n     " + paramName(i, param.name) + ",\n    ";
+                  }))) + "}";
+}
+
 function parametersToRecordType(fnType, recordName) {
   return "\n  type " + recordName + " = {\n" + Globals.reduceStrArr(Belt_Array.mapWithIndex(fnType.parameters, (function (i, param) {
                     return "\n     " + paramName(i, param.name) + " : " + solASTTypeToRescriptType(param.type_) + ",\n    ";
                   }))) + "}\n\n  ";
+}
+
+function parametersTypeList(fnType) {
+  return Globals.reduceStrArr(Belt_Array.map(fnType.parameters, (function (param) {
+                    return "\n     " + solASTTypeToRescriptType(param.type_) + ",\n    ";
+                  })));
 }
 
 function callTypeName(name) {
@@ -105,7 +117,7 @@ function getRescriptParamsForCalls(params) {
 function getCallsHelper(fnType) {
   return [
           Globals.lowerCaseFirstLetter(fnType.name) + "Call",
-          Globals.lowerCaseFirstLetter(fnType.name) + "Calls"
+          Globals.lowerCaseFirstLetter(fnType.name)
         ];
 }
 
@@ -124,12 +136,31 @@ function getCallsArrayContent(fnType) {
 
 function getCallsInternal(fnType) {
   var match = getCallsHelper(fnType);
-  return "\n  let " + match[1] + ": unit => array<\n  " + match[0] + "> = () => {\n      checkForExceptions(~functionName=\"" + fnType.name + "\")\n        internalRef.contents\n        ->Option.map(_r => {\n          let array = %raw(\"_r.smocked." + fnType.name + "Mock.calls\")\n          " + getCallsArrayContent(fnType) + "\n        })\n  ->Option.getExn\n  }\n  ";
+  var fnName = match[1];
+  console.log(fnType);
+  var match$1 = fnType.parameters.length >= 1 ? [
+      parametersToDestructuredRecord(fnType) + ": " + match[0],
+      identifiersToTuple(fnType.parameters)
+    ] : [
+      "",
+      ""
+    ];
+  return "\n@send @scope((\"to\", \"have\", \"been\"))\nexternal " + fnName + "CalledWith: (\n  expectation,\n  " + parametersTypeList(fnType) + "\n) => unit = \"calledWith\"\n\n@get external " + fnName + "FunctionFromInstance: t => string = \"" + fnName + "Mock\"\n\nlet " + fnName + "Function = () => {\n      checkForExceptions(~functionName=\"" + fnType.name + "\")\n      internalRef.contents\n        ->Option.map(contract => {\n\n    contract->" + fnName + "FunctionFromInstance\n  })\n}\n\nlet " + fnName + "CallCheck = (\n  " + match$1[0] + ") => \n    expect(" + fnName + "Function())->" + fnName + "CalledWith" + match$1[1] + "\n  ";
 }
 
 function getCallsExternal(fnType) {
   var match = getCallsHelper(fnType);
-  return "\n  let " + match[1] + ": t => array<\n  " + match[0] + "> = _r => {\n        let array = %raw(\"_r.smocked." + fnType.name + ".calls\")\n        " + getCallsArrayContent(fnType) + "\n  }\n  ";
+  var fnName = match[1];
+  var fnCallType = match[0];
+  console.log(fnType);
+  var match$1 = fnType.parameters.length >= 1 ? [
+      parametersToDestructuredRecord(fnType) + ": " + fnCallType,
+      identifiersToTuple(fnType.parameters)
+    ] : [
+      "",
+      ""
+    ];
+  return "\n  let " + fnName + "Old: t => array<\n  " + fnCallType + "> = _r => {\n        let array = %raw(\"_r." + fnType.name + ".calls\")\n        " + getCallsArrayContent(fnType) + "\n  }\n\n@send @scope((\"to\", \"have\", \"been\"))\nexternal " + fnName + "CalledWith: (\n  expectation,\n  " + parametersTypeList(fnType) + "\n) => unit = \"calledWith\"\n\n@get external " + fnName + "Function: t => string = \"" + fnName + "\"\n\nlet " + fnName + "CallCheck = (\n  contract,\n  " + match$1[0] + ") => {\n  expect(contract->" + fnName + "Function)->" + fnName + "CalledWith" + match$1[1] + "\n}\n  ";
 }
 
 function getRescriptParamsForReturn(params) {
@@ -161,36 +192,36 @@ function rescriptReturnAnnotation(params, context) {
 function getMockToReturnInternal(fn) {
   var params = getRescriptParamsForReturn(fn.returnValues);
   if (fn.returnValues.length !== 0) {
-    return "\n  @send @scope((\"smocked\", \"" + fn.name + "Mock\", \"will\", \"return\"))\n  external " + fn.name + "MockReturnRaw: (t, (" + basicReturn(fn.returnValues) + ")) => unit = \"with\"\n\n  let mock" + uppercaseFirstLetter(fn.name) + "ToReturn: " + rescriptReturnAnnotation(fn.returnValues, /* Internal */1) + " = (" + params + ") => {\n    checkForExceptions(~functionName=\"" + fn.name + "\")\n    let _ = internalRef.contents->Option.map(smockedContract => smockedContract->" + fn.name + "MockReturnRaw((" + params + ")))\n  }\n  ";
+    return "\n  @send @scope(\"" + fn.name + "Mock\")\n  external " + fn.name + "MockReturnRaw: (t, (" + basicReturn(fn.returnValues) + ")) => unit = \"returns\"\n\n  let mock" + uppercaseFirstLetter(fn.name) + "ToReturn: " + rescriptReturnAnnotation(fn.returnValues, /* Internal */1) + " = (" + params + ") => {\n    checkForExceptions(~functionName=\"" + fn.name + "\")\n    let _ = internalRef.contents->Option.map(smockedContract => smockedContract->" + fn.name + "MockReturnRaw((" + params + ")))\n  }\n  ";
   } else {
     return "";
   }
 }
 
 function getMockToRevertInternal(fn) {
-  return "\n  @send @scope((\"smocked\", \"" + fn.name + "Mock\", \"will\", \"revert\"))\n  external " + fn.name + "MockRevertRaw: (t, ~errorString: string) => unit = \"with\"\n\n  @send @scope((\"smocked\", \"" + fn.name + "Mock\", \"will\"))\n  external " + fn.name + "MockRevertNoReasonRaw: t => unit = \"revert\"\n\n  let mock" + uppercaseFirstLetter(fn.name) + "ToRevert = (~errorString) => {\n    checkForExceptions(~functionName=\"" + fn.name + "\")\n    let _ = internalRef.contents->Option.map(" + fn.name + "MockRevertRaw(~errorString))\n  }\n  let mock" + uppercaseFirstLetter(fn.name) + "ToRevertNoReason = () => {\n    checkForExceptions(~functionName=\"" + fn.name + "\")\n    let _ = internalRef.contents->Option.map(" + fn.name + "MockRevertNoReasonRaw)\n  }\n  ";
+  return "\n  @send @scope(\"" + fn.name + "Mock\")\n  external " + fn.name + "MockRevertRaw: (t, ~errorString: string) => unit = \"reverts\"\n\n  @send @scope(\"" + fn.name + "Mock\")\n  external " + fn.name + "MockRevertNoReasonRaw: t => unit = \"reverts\"\n\n  let mock" + uppercaseFirstLetter(fn.name) + "ToRevert = (~errorString) => {\n    checkForExceptions(~functionName=\"" + fn.name + "\")\n    let _ = internalRef.contents->Option.map(" + fn.name + "MockRevertRaw(~errorString))\n  }\n  let mock" + uppercaseFirstLetter(fn.name) + "ToRevertNoReason = () => {\n    checkForExceptions(~functionName=\"" + fn.name + "\")\n    let _ = internalRef.contents->Option.map(" + fn.name + "MockRevertNoReasonRaw)\n  }\n  ";
 }
 
 function getMockToReturnExternal(fn) {
   if (fn.returnValues.length !== 0) {
-    return " \n      @send @scope((\"smocked\", \"" + fn.name + "\", \"will\", \"return\"))\n      external mock" + uppercaseFirstLetter(fn.name) + "ToReturn: (t, (" + basicReturn(fn.returnValues) + ")) => unit = \"with\"\n    ";
+    return " \n      @send @scope(\"" + fn.name + "\")\n      external mock" + uppercaseFirstLetter(fn.name) + "ToReturn: (t, (" + basicReturn(fn.returnValues) + ")) => unit = \"returns\"\n    ";
   } else {
     return "";
   }
 }
 
 function getMockToRevertExternal(fn) {
-  return "\n      @send @scope((\"smocked\", \"" + fn.name + "\", \"will\", \"revert\"))\n      external mock" + uppercaseFirstLetter(fn.name) + "ToRevert: (t, ~errorString: string) => unit = \"with\"\n\n      @send @scope((\"smocked\", \"" + fn.name + "\", \"will\"))\n      external mock" + uppercaseFirstLetter(fn.name) + "ToRevertNoReason: t => unit = \"revert\"\n  ";
+  return "\n      @send @scope(\"" + fn.name + "\")\n      external mock" + uppercaseFirstLetter(fn.name) + "ToRevert: (t, ~errorString: string) => unit = \"returns\"\n\n      @send @scope(\"" + fn.name + "\")\n      external mock" + uppercaseFirstLetter(fn.name) + "ToRevertNoReason: t => unit = \"reverts\"\n  ";
 }
 
 function internalModule(functionsAndModifiers, contractName) {
-  return "module InternalMock = {\n  let mockContractName = \"" + contractName + "ForInternalMocking\"\n  type t = {address: Ethers.ethAddress}\n\n  let internalRef: ref<option<t>> = ref(None)\n\n  let functionToNotMock: ref<string> = ref(\"\")\n\n  @module(\"@eth-optimism/smock\") external smock: 'a => Js.Promise.t<t> = \"smockit\"\n\n  let setup: " + contractName + ".t => JsPromise.t<ContractHelpers.transaction> = contract => {\n    ContractHelpers.deployContract0(mockContractName)\n    ->JsPromise.then(a => {\n      smock(a)\n    })\n    ->JsPromise.then(b => {\n      internalRef := Some(b)\n      contract->" + contractName + ".Exposed.setMocker(~mocker=(b->Obj.magic).address)\n    })\n  }\n\n  let setFunctionForUnitTesting = (contract, ~functionName) => {\n    functionToNotMock := functionName\n    contract->" + contractName + ".Exposed.setFunctionToNotMock(~functionToNotMock=functionName)\n  }\n\n  let setupFunctionForUnitTesting = (contract, ~functionName) => {\n    ContractHelpers.deployContract0(mockContractName)\n    ->JsPromise.then(a => {\n      smock(a)\n    })\n    ->JsPromise.then(b => {\n      internalRef := Some(b)\n      [\n        contract->" + contractName + ".Exposed.setMocker(~mocker=(b->Obj.magic).address),\n        contract->" + contractName + ".Exposed.setFunctionToNotMock(~functionToNotMock=functionName),\n      ]->JsPromise.all\n    })\n  }\n\n  exception MockingAFunctionThatYouShouldntBe\n\n  exception HaventSetupInternalMockingFor" + contractName + "\n\n  let checkForExceptions = (~functionName) => {\n    if functionToNotMock.contents == functionName {\n      raise(MockingAFunctionThatYouShouldntBe)\n    }\n    if internalRef.contents == None {\n      raise(HaventSetupInternalMockingFor" + contractName + ")\n    }\n  }\n\n  " + Globals.reduceStrArr(Belt_Array.map(functionsAndModifiers, (function (f) {
+  return "module InternalMock = {\n  let mockContractName = \"" + contractName + "ForInternalMocking\"\n  type t = {address: Ethers.ethAddress}\n\n  let internalRef: ref<option<t>> = ref(None)\n\n  let functionToNotMock: ref<string> = ref(\"\")\n\n  @module(\"@defi-wonderland/smock\") @scope(\"smock\") external smock: string => Js.Promise.t<t> = \"fake\"\n\n  let setup: " + contractName + ".t => JsPromise.t<ContractHelpers.transaction> = contract => {\n    smock(mockContractName)\n    ->JsPromise.then(b => {\n      internalRef := Some(b)\n      contract->" + contractName + ".Exposed.setMocker(~mocker=(b->Obj.magic).address)\n    })\n  }\n\n  let setFunctionForUnitTesting = (contract, ~functionName) => {\n    functionToNotMock := functionName\n    contract->" + contractName + ".Exposed.setFunctionToNotMock(~functionToNotMock=functionName)\n  }\n\n  let setupFunctionForUnitTesting = (contract, ~functionName) => {\n    smock(mockContractName)\n    ->JsPromise.then(b => {\n      internalRef := Some(b)\n      [\n        contract->" + contractName + ".Exposed.setMocker(~mocker=(b->Obj.magic).address),\n        contract->" + contractName + ".Exposed.setFunctionToNotMock(~functionToNotMock=functionName),\n      ]->JsPromise.all\n    })\n  }\n\n  exception MockingAFunctionThatYouShouldntBe\n\n  exception HaventSetupInternalMockingFor" + contractName + "\n\n  let checkForExceptions = (~functionName) => {\n    if functionToNotMock.contents == functionName {\n      raise(MockingAFunctionThatYouShouldntBe)\n    }\n    if internalRef.contents == None {\n      raise(HaventSetupInternalMockingFor" + contractName + ")\n    }\n  }\n\n  " + Globals.reduceStrArr(Belt_Array.map(functionsAndModifiers, (function (f) {
                     return getMockToReturnInternal(f) + "\n" + paramTypeForCalls(f) + "\n" + getCallsInternal(f) + "\n" + getMockToRevertInternal(f);
                   }))) + "\n  }\n  ";
 }
 
 function externalModule(functions, contractName) {
-  return "type t = {address: Ethers.ethAddress}\n\n@module(\"@eth-optimism/smock\") external make: " + contractName + ".t => Js.Promise.t<t> = \"smockit\"\n\nlet uninitializedValue: t = None->Obj.magic\n\n  " + Globals.reduceStrArr(Belt_Array.map(functions, (function (f) {
+  return "open SmockGeneral\n\n%%raw(`\nconst { expect, use } = require(\"chai\");\nuse(require('@defi-wonderland/smock').smock.matchers);\n`)\n\ntype t = {address: Ethers.ethAddress}\n\n@module(\"@defi-wonderland/smock\") @scope(\"smock\") external makeRaw: string => Js.Promise.t<t> = \"fake\"\nlet make = () => makeRaw(\"" + contractName + "\")\n\n\nlet uninitializedValue: t = None->Obj.magic\n\n  " + Globals.reduceStrArr(Belt_Array.map(functions, (function (f) {
                     return getMockToReturnExternal(f) + "\n" + paramTypeForCalls(f) + "\n" + getCallsExternal(f) + "\n" + getMockToRevertExternal(f);
                   }))) + "\n";
 }
@@ -222,7 +253,9 @@ exports.uppercaseFirstLetter = uppercaseFirstLetter;
 exports.solASTTypeToRescriptType = solASTTypeToRescriptType;
 exports.defaultParamName = defaultParamName;
 exports.paramName = paramName;
+exports.parametersToDestructuredRecord = parametersToDestructuredRecord;
 exports.parametersToRecordType = parametersToRecordType;
+exports.parametersTypeList = parametersTypeList;
 exports.callTypeName = callTypeName;
 exports.paramTypeForCalls = paramTypeForCalls;
 exports.solParamsToToRecordWithSameNames = solParamsToToRecordWithSameNames;

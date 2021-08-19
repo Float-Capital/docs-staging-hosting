@@ -445,9 +445,9 @@ let test =
             ~shortValue=randomValueLocked2->bnFromInt->mul(tenToThe18),
           );
 
-      let call =
-        StakerSmocked.InternalMock._getKValueCalls()->Array.getUnsafe(0);
-      call->Chai.recordEqualFlat({marketIndex: marketIndex});
+      StakerSmocked.InternalMock._getKValueCallCheck(
+        {marketIndex: marketIndex}: StakerSmocked.InternalMock._getKValueCall,
+      );
     });
   });
 };

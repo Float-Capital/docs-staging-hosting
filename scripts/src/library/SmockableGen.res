@@ -49,6 +49,17 @@ let defaultParamName = index => "param" ++ index->Int.toString
 let paramName = (index, name) =>
   name != "" ? name->formatKeywords->lowerCaseFirstLetter : index->defaultParamName
 
+let parametersToDestructuredRecord: functionDef => string = fnType =>
+  `{
+` ++
+  fnType.parameters
+  ->Array.mapWithIndex((i, param) => {
+    `
+     ${paramName(i, param.name)},
+    `
+  })
+  ->reduceStrArr ++ `}`
+
 let parametersToRecordType: (functionDef, string) => string = (fnType, recordName) =>
   `
   type ${recordName} = {
@@ -62,6 +73,15 @@ let parametersToRecordType: (functionDef, string) => string = (fnType, recordNam
   ->reduceStrArr ++ `}
 
   `
+
+let parametersTypeList: functionDef => string = fnType =>
+  fnType.parameters
+  ->Array.map(param => {
+    `
+     ${param.type_->solASTTypeToRescriptType},
+    `
+  })
+  ->reduceStrArr
 
 let callTypeName = name => name->lowerCaseFirstLetter ++ "Call"
 let paramTypeForCalls: functionDef => string = def => {
@@ -99,7 +119,7 @@ let getRescriptParamsForCalls: array<parameters> => string = params =>
 
 let getCallsHelper: functionDef => (string, string) = fnType => (
   fnType.name->callTypeName,
-  fnType.name->lowerCaseFirstLetter ++ "Calls",
+  fnType.name->lowerCaseFirstLetter,
 )
 
 let getCallsArrayContent: functionDef => string = fnType => {
@@ -120,29 +140,70 @@ let getCallsArrayContent: functionDef => string = fnType => {
 
 let getCallsInternal: functionDef => string = fnType => {
   let (fnCallType, fnName) = getCallsHelper(fnType)
+  Js.log(fnType)
 
+  let (parameters, argument) =
+    fnType.parameters->Array.length >= 1
+      ? (
+          `${fnType->parametersToDestructuredRecord}: ${fnCallType}`,
+          fnType.parameters->identifiersToTuple,
+        )
+      : ("", "")
   `
-  let ${fnName}: unit => array<
-  ${fnCallType}> = () => {
+@send @scope(("to", "have", "been"))
+external ${fnName}CalledWith: (
+  expectation,
+  ${fnType->parametersTypeList}
+) => unit = "calledWith"
+
+@get external ${fnName}FunctionFromInstance: t => string = "${fnName}Mock"
+
+let ${fnName}Function = () => {
       checkForExceptions(~functionName="${fnType.name}")
-        internalRef.contents
-        ->Option.map(_r => {
-          let array = %raw("_r.smocked.${fnType.name}Mock.calls")
-          ${fnType->getCallsArrayContent}
-        })
-  ->Option.getExn
-  }
+      internalRef.contents
+        ->Option.map(contract => {
+
+    contract->${fnName}FunctionFromInstance
+  })
+}
+
+let ${fnName}CallCheck = (
+  ${parameters}) => 
+    expect(${fnName}Function())->${fnName}CalledWith${argument}
   `
 }
 
 let getCallsExternal: functionDef => string = fnType => {
   let (fnCallType, fnName) = getCallsHelper(fnType)
+  Js.log(fnType)
+
+  let (parameters, argument) =
+    fnType.parameters->Array.length >= 1
+      ? (
+          `${fnType->parametersToDestructuredRecord}: ${fnCallType}`,
+          fnType.parameters->identifiersToTuple,
+        )
+      : ("", "")
   `
-  let ${fnName}: t => array<
+  let ${fnName}Old: t => array<
   ${fnCallType}> = _r => {
-        let array = %raw("_r.smocked.${fnType.name}.calls")
+        let array = %raw("_r.${fnType.name}.calls")
         ${fnType->getCallsArrayContent}
   }
+
+@send @scope(("to", "have", "been"))
+external ${fnName}CalledWith: (
+  expectation,
+  ${fnType->parametersTypeList}
+) => unit = "calledWith"
+
+@get external ${fnName}Function: t => string = "${fnName}"
+
+let ${fnName}CallCheck = (
+  contract,
+  ${parameters}) => {
+  expect(contract->${fnName}Function)->${fnName}CalledWith${argument}
+}
   `
 }
 
@@ -186,8 +247,8 @@ let getMockToReturnInternal: functionDef => string = fn => {
 
   if fn.returnValues->Array.length > 0 {
     `
-  @send @scope(("smocked", "${fn.name}Mock", "will", "return"))
-  external ${fn.name}MockReturnRaw: (t, (${fn.returnValues->basicReturn})) => unit = "with"
+  @send @scope("${fn.name}Mock")
+  external ${fn.name}MockReturnRaw: (t, (${fn.returnValues->basicReturn})) => unit = "returns"
 
   let mock${fn.name->uppercaseFirstLetter}ToReturn: ${fn.returnValues->rescriptReturnAnnotation(
         ~context=Internal,
@@ -203,11 +264,11 @@ let getMockToReturnInternal: functionDef => string = fn => {
 
 let getMockToRevertInternal: functionDef => string = fn => {
   `
-  @send @scope(("smocked", "${fn.name}Mock", "will", "revert"))
-  external ${fn.name}MockRevertRaw: (t, ~errorString: string) => unit = "with"
+  @send @scope("${fn.name}Mock")
+  external ${fn.name}MockRevertRaw: (t, ~errorString: string) => unit = "reverts"
 
-  @send @scope(("smocked", "${fn.name}Mock", "will"))
-  external ${fn.name}MockRevertNoReasonRaw: t => unit = "revert"
+  @send @scope("${fn.name}Mock")
+  external ${fn.name}MockRevertNoReasonRaw: t => unit = "reverts"
 
   let mock${fn.name->uppercaseFirstLetter}ToRevert = (~errorString) => {
     checkForExceptions(~functionName="${fn.name}")
@@ -223,8 +284,8 @@ let getMockToRevertInternal: functionDef => string = fn => {
 let getMockToReturnExternal: functionDef => string = fn => {
   if fn.returnValues->Array.length > 0 {
     ` 
-      @send @scope(("smocked", "${fn.name}", "will", "return"))
-      external mock${fn.name->uppercaseFirstLetter}ToReturn: (t, (${fn.returnValues->basicReturn})) => unit = "with"
+      @send @scope("${fn.name}")
+      external mock${fn.name->uppercaseFirstLetter}ToReturn: (t, (${fn.returnValues->basicReturn})) => unit = "returns"
     `
   } else {
     ""
@@ -233,11 +294,11 @@ let getMockToReturnExternal: functionDef => string = fn => {
 
 let getMockToRevertExternal: functionDef => string = fn => {
   `
-      @send @scope(("smocked", "${fn.name}", "will", "revert"))
-      external mock${fn.name->uppercaseFirstLetter}ToRevert: (t, ~errorString: string) => unit = "with"
+      @send @scope("${fn.name}")
+      external mock${fn.name->uppercaseFirstLetter}ToRevert: (t, ~errorString: string) => unit = "returns"
 
-      @send @scope(("smocked", "${fn.name}", "will"))
-      external mock${fn.name->uppercaseFirstLetter}ToRevertNoReason: t => unit = "revert"
+      @send @scope("${fn.name}")
+      external mock${fn.name->uppercaseFirstLetter}ToRevertNoReason: t => unit = "reverts"
   `
 }
 
@@ -250,13 +311,10 @@ let internalModule = (functionsAndModifiers, ~contractName) =>
 
   let functionToNotMock: ref<string> = ref("")
 
-  @module("@eth-optimism/smock") external smock: 'a => Js.Promise.t<t> = "smockit"
+  @module("@defi-wonderland/smock") @scope("smock") external smock: string => Js.Promise.t<t> = "fake"
 
   let setup: ${contractName}.t => JsPromise.t<ContractHelpers.transaction> = contract => {
-    ContractHelpers.deployContract0(mockContractName)
-    ->JsPromise.then(a => {
-      smock(a)
-    })
+    smock(mockContractName)
     ->JsPromise.then(b => {
       internalRef := Some(b)
       contract->${contractName}.Exposed.setMocker(~mocker=(b->Obj.magic).address)
@@ -269,10 +327,7 @@ let internalModule = (functionsAndModifiers, ~contractName) =>
   }
 
   let setupFunctionForUnitTesting = (contract, ~functionName) => {
-    ContractHelpers.deployContract0(mockContractName)
-    ->JsPromise.then(a => {
-      smock(a)
-    })
+    smock(mockContractName)
     ->JsPromise.then(b => {
       internalRef := Some(b)
       [
@@ -310,9 +365,18 @@ let internalModule = (functionsAndModifiers, ~contractName) =>
   `
 
 let externalModule = (functions, ~contractName) => {
-  `type t = {address: Ethers.ethAddress}
+  `open SmockGeneral
 
-@module("@eth-optimism/smock") external make: ${contractName}.t => Js.Promise.t<t> = "smockit"
+%%raw(\`
+const { expect, use } = require("chai");
+use(require('@defi-wonderland/smock').smock.matchers);
+\`)
+
+type t = {address: Ethers.ethAddress}
+
+@module("@defi-wonderland/smock") @scope("smock") external makeRaw: string => Js.Promise.t<t> = "fake"
+let make = () => makeRaw("${contractName}")
+
 
 let uninitializedValue: t = None->Obj.magic
 
