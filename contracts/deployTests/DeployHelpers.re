@@ -96,7 +96,9 @@ let shiftFromShortNextPriceWithSystemUpdate =
         ~amountSyntheticTokensToShift=amount,
       );
   let%AwaitThen _ = setOracleManagerPrice(~longShort, ~marketIndex, ~admin);
-  longShort->LongShort.updateSystemState(~marketIndex);
+  longShort
+  ->ContractHelpers.connect(~address=admin)
+  ->LongShort.updateSystemState(~marketIndex);
 };
 let shiftFromLongNextPriceWithSystemUpdate =
     (~amount, ~marketIndex, ~longShort, ~user, ~admin) => {
