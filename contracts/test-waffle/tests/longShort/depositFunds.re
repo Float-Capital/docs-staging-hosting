@@ -46,15 +46,13 @@ let testUnit =
       it("calls paymentToken.transferFrom with correct arguments", () => {
         let testWallet = accounts.contents->Array.getUnsafe(1);
         let%Await _ = setup(~testWallet);
-        ();
-        // TODO
-        // TODO!
-        // paymentTokenSmocked.contents
-        // ->ERC20MockSmocked.transferFromCallCheck({
-        //     sender: testWallet.address,
-        //     recipient: testYieldManager,
-        //     amount,
-        //   });
+
+        paymentTokenSmocked.contents
+        ->ERC20MockSmocked.transferFromCallCheck({
+            sender: testWallet.address,
+            recipient: testYieldManager,
+            amount,
+          });
       });
     });
   });

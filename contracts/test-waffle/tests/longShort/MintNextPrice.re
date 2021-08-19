@@ -141,12 +141,12 @@ let testUnit =
         let%Await _ =
           contracts.contents.longShort
           ->LongShort.mintLongNextPrice(~marketIndex, ~amount);
-        ();
-        // let mintNextPriceCallCheck =
-        //   LongShortSmocked.InternalMock._mintNextPriceCallCheck();
-        // mintNextPriceCallCheck->Chai.recordArrayDeepEqualFlat([|
-        //   {marketIndex, amount, isLong: true},
-        // |]);
+
+        LongShortSmocked.InternalMock._mintNextPriceCallCheck({
+          marketIndex,
+          amount,
+          isLong: true,
+        });
       })
     });
 
