@@ -82,6 +82,11 @@ interface ILongShort {
 
   event ExecuteNextPriceSettlementsUser(address user, uint32 marketIndex);
 
+  function marketSideValueInPaymentToken(uint32 marketIndex, bool isLong)
+    external
+    view
+    returns (uint256 marketSideValueInPaymentToken);
+
   function updateSystemState(uint32 marketIndex) external;
 
   function updateSystemStateMulti(uint32[] calldata marketIndex) external;

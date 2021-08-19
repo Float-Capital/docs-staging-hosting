@@ -236,7 +236,7 @@ let testUnit =
       });
     });
 
-    describe("changeBalanceIncentiveExponent", () => {
+    describe("changeBalanceIncentiveParameters", () => {
       let marketIndex = 23;
       let startingTestExponent = bnFromInt(1);
       let updatedExponent = bnFromInt(2);
@@ -247,7 +247,7 @@ let testUnit =
       before_once'(() => {
         let%Await _ =
           deployAndSetupStakerToUnitTest(
-            ~functionName="changeBalanceIncentiveExponent",
+            ~functionName="changeBalanceIncentiveParameters",
             ~contracts,
             ~accounts,
           );
@@ -257,9 +257,11 @@ let testUnit =
         txPromiseRef :=
           contracts.contents.staker
           ->ContractHelpers.connect(~address=stakerAddress)
-          ->Staker.changeBalanceIncentiveExponent(
+          ->Staker.changeBalanceIncentiveParameters(
               ~marketIndex,
               ~balanceIncentiveCurve_exponent=startingTestExponent,
+              ~balanceIncentiveCurve_equilibriumOffset=zeroBn,
+              ~safeExponentBitShifting=bnFromInt(50),
             );
         txPromiseRef.contents;
       });
@@ -267,9 +269,11 @@ let testUnit =
       it("should call the onlyAdmin Modifier", () => {
         let%Await _ =
           contracts.contents.staker
-          ->Staker.changeBalanceIncentiveExponent(
+          ->Staker.changeBalanceIncentiveParameters(
               ~marketIndex,
               ~balanceIncentiveCurve_exponent=updatedExponent,
+              ~balanceIncentiveCurve_equilibriumOffset=zeroBn,
+              ~safeExponentBitShifting=bnFromInt(50),
             );
         StakerSmocked.InternalMock.onlyAdminModifierLogicCalls()
         ->Array.length
@@ -279,11 +283,13 @@ let testUnit =
       it(
         "should call _changeBalanceIncentiveExponent with correct arguments",
         () => {
-        StakerSmocked.InternalMock._changeBalanceIncentiveExponentCalls()
+        StakerSmocked.InternalMock._changeBalanceIncentiveParametersCalls()
         ->Array.getUnsafe(0)
         ->Chai.recordEqualFlat({
             marketIndex,
             balanceIncentiveCurve_exponent: updatedExponent,
+            balanceIncentiveCurve_equilibriumOffset: zeroBn,
+            safeExponentBitShifting: bnFromInt(50),
           })
       });
 
@@ -298,22 +304,9 @@ let testUnit =
         ->Chai.withArgs2(marketIndex, startingTestExponent)
       });
 
-      it("should only allow (0 < new exponent < 6 percent)", () => {
+      it("should only allow (0 < new exponent)", () => {
         let adminWallet = accounts.contents->Array.getUnsafe(0);
-        let newExponentOutOfBoundsHighSide = bnFromInt(6);
         let newExponentOutOfBoundsLowSide = bnFromInt(0);
-
-        let%Await _ =
-          Chai.expectRevert(
-            ~transaction=
-              contracts.contents.staker
-              ->ContractHelpers.connect(~address=adminWallet)
-              ->Staker.Exposed._changeBalanceIncentiveExponentExposed(
-                  ~marketIndex,
-                  ~balanceIncentiveCurve_exponent=newExponentOutOfBoundsHighSide,
-                ),
-            ~reason="",
-          );
 
         Chai.expectRevert(
           ~transaction=
