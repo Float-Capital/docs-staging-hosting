@@ -86,7 +86,7 @@ function redeemShortNextPriceWithSystemUpdate(amount, marketIndex, longShort, us
 function shiftFromShortNextPriceWithSystemUpdate(amount, marketIndex, longShort, user, admin) {
   return LetOps.AwaitThen.let_(longShort.connect(user).shiftPositionFromShortNextPrice(marketIndex, amount), (function (param) {
                 return LetOps.AwaitThen.let_(setOracleManagerPrice(longShort, marketIndex, admin), (function (param) {
-                              return longShort.updateSystemState(marketIndex);
+                              return longShort.connect(admin).updateSystemState(marketIndex);
                             }));
               }));
 }

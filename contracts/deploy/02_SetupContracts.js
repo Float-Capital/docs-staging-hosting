@@ -1,4 +1,4 @@
-const { runTestTransactions } = require("../DeployTests/RunTestTransactions");
+const { runTestTransactions } = require("../deployTests/RunTestTransactions.js");
 const { ethers, getNamedAccounts } = require("hardhat");
 
 const {
