@@ -9,6 +9,7 @@ var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var SyntheticToken = require("../test-waffle/library/contracts/SyntheticToken.js");
 var YieldManagerMock = require("../test-waffle/library/contracts/YieldManagerMock.js");
 var OracleManagerMock = require("../test-waffle/library/contracts/OracleManagerMock.js");
+var OracleManagerChainlink = require("../test-waffle/library/contracts/OracleManagerChainlink.js");
 
 var minSenderBalance = Globals.bnFromString("50000000000000000");
 
@@ -142,8 +143,7 @@ function deployTestMarket(syntheticName, syntheticSymbol, longShortInstance, tre
 }
 
 function deployMumbaiMarket(syntheticName, syntheticSymbol, longShortInstance, treasuryInstance, admin, paymentToken, oraclePriceFeedAddress) {
-  console.log(oraclePriceFeedAddress);
-  return LetOps.AwaitThen.let_(OracleManagerMock.make(admin.address), (function (oracleManager) {
+  return LetOps.AwaitThen.let_(OracleManagerChainlink.make(admin.address, oraclePriceFeedAddress), (function (oracleManager) {
                 return LetOps.AwaitThen.let_(YieldManagerMock.make(longShortInstance.address, treasuryInstance.address, paymentToken.address), (function (yieldManager) {
                               return LetOps.AwaitThen.let_(paymentToken.MINTER_ROLE(), (function (mintRole) {
                                             return LetOps.AwaitThen.let_(paymentToken.grantRole(mintRole, yieldManager.address), (function (param) {

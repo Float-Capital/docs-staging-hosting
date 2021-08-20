@@ -238,8 +238,11 @@ let deployMumbaiMarket =
       ~paymentToken: ERC20Mock.t,
       ~oraclePriceFeedAddress: Ethers.ethAddress,
     ) => {
-  Js.log(oraclePriceFeedAddress);
-  let%AwaitThen oracleManager = OracleManagerMock.make(~admin=admin.address);
+  let%AwaitThen oracleManager =
+    OracleManagerChainlink.make(
+      ~admin=admin.address,
+      ~chainLinkOracle=oraclePriceFeedAddress,
+    );
 
   let%AwaitThen yieldManager =
     YieldManagerMock.make(

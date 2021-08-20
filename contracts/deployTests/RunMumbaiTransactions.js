@@ -3,8 +3,8 @@
 
 var LetOps = require("../test-waffle/library/LetOps.js");
 var Globals = require("../test-waffle/library/Globals.js");
-var CONSTANTS = require("../test-waffle/CONSTANTS.js");
 var DeployHelpers = require("./DeployHelpers.js");
+var ChainlinkOracleAddresses = require("./addresses/ChainlinkOracleAddresses.js");
 
 function runMumbaiTransactions(param) {
   var treasury = param.treasury;
@@ -19,9 +19,9 @@ function runMumbaiTransactions(param) {
                               return LetOps.AwaitThen.let_(DeployHelpers.topupBalanceIfLow(admin, user2), (function (param) {
                                             return LetOps.AwaitThen.let_(DeployHelpers.topupBalanceIfLow(admin, user3), (function (param) {
                                                           console.log("deploying markets");
-                                                          return LetOps.AwaitThen.let_(DeployHelpers.deployMumbaiMarket("The Flippening", "FL_FLIP", longShort, treasury, admin, paymentToken, CONSTANTS.zeroAddress), (function (param) {
-                                                                        return LetOps.AwaitThen.let_(DeployHelpers.deployMumbaiMarket("Doge Market", "FL_DOGE", longShort, treasury, admin, paymentToken, CONSTANTS.zeroAddress), (function (param) {
-                                                                                      return LetOps.AwaitThen.let_(DeployHelpers.deployMumbaiMarket("Eth Market", "FL_ETH", longShort, treasury, admin, paymentToken, CONSTANTS.zeroAddress), (function (param) {
+                                                          return LetOps.AwaitThen.let_(DeployHelpers.deployMumbaiMarket("ETH Market", "FL_ETH", longShort, treasury, admin, paymentToken, ChainlinkOracleAddresses.Mumbai.ethOracleChainlink), (function (param) {
+                                                                        return LetOps.AwaitThen.let_(DeployHelpers.deployMumbaiMarket("MATIC Market", "FL_MATIC", longShort, treasury, admin, paymentToken, ChainlinkOracleAddresses.Mumbai.maticOracleChainlink), (function (param) {
+                                                                                      return LetOps.AwaitThen.let_(DeployHelpers.deployMumbaiMarket("BTC Market", "FL_BTC", longShort, treasury, admin, paymentToken, ChainlinkOracleAddresses.Mumbai.btcOracleChainlink), (function (param) {
                                                                                                     var initialMarkets = [
                                                                                                       1,
                                                                                                       2,

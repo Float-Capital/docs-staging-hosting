@@ -25,35 +25,35 @@ let runMumbaiTransactions = ({longShort, treasury, paymentToken}) => {
 
   let%AwaitThen _ =
     deployMumbaiMarket(
-      ~syntheticName="The Flippening",
-      ~syntheticSymbol="FL_FLIP",
-      ~longShortInstance=longShort,
-      ~treasuryInstance=treasury,
-      ~admin,
-      ~paymentToken: ERC20Mock.t,
-      ~oraclePriceFeedAddress=CONSTANTS.zeroAddress,
-    );
-
-  let%AwaitThen _ =
-    deployMumbaiMarket(
-      ~syntheticName="Doge Market",
-      ~syntheticSymbol="FL_DOGE",
-      ~longShortInstance=longShort,
-      ~treasuryInstance=treasury,
-      ~admin,
-      ~paymentToken: ERC20Mock.t,
-      ~oraclePriceFeedAddress=CONSTANTS.zeroAddress,
-    );
-
-  let%AwaitThen _ =
-    deployMumbaiMarket(
-      ~syntheticName="Eth Market",
+      ~syntheticName="ETH Market",
       ~syntheticSymbol="FL_ETH",
       ~longShortInstance=longShort,
       ~treasuryInstance=treasury,
       ~admin,
       ~paymentToken: ERC20Mock.t,
-      ~oraclePriceFeedAddress=CONSTANTS.zeroAddress,
+      ~oraclePriceFeedAddress=ChainlinkOracleAddresses.Mumbai.ethOracleChainlink,
+    );
+
+  let%AwaitThen _ =
+    deployMumbaiMarket(
+      ~syntheticName="MATIC Market",
+      ~syntheticSymbol="FL_MATIC",
+      ~longShortInstance=longShort,
+      ~treasuryInstance=treasury,
+      ~admin,
+      ~paymentToken: ERC20Mock.t,
+      ~oraclePriceFeedAddress=ChainlinkOracleAddresses.Mumbai.maticOracleChainlink,
+    );
+
+  let%AwaitThen _ =
+    deployMumbaiMarket(
+      ~syntheticName="BTC Market",
+      ~syntheticSymbol="FL_BTC",
+      ~longShortInstance=longShort,
+      ~treasuryInstance=treasury,
+      ~admin,
+      ~paymentToken: ERC20Mock.t,
+      ~oraclePriceFeedAddress=ChainlinkOracleAddresses.Mumbai.btcOracleChainlink,
     );
 
   let initialMarkets = [|1, 2, 3|];
