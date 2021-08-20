@@ -23,6 +23,7 @@ let topupBalanceIfLow = (~from: Wallet.t, ~to_: Wallet.t) => {
     ();
   };
 };
+
 let updateSystemState = (~longShort, ~admin, ~marketIndex) => {
   longShort
   ->ContractHelpers.connect(~address=admin)

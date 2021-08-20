@@ -17,7 +17,7 @@ const {
   etherscanApiKey,
   polygonscanApiKey,
   mumbaiProviderUrl,
-} = require("./secretsManager.example.js");
+} = require("./secretsManager.js");
 
 let runCoverage =
   !process.env.DONT_RUN_REPORT_SUMMARY ||
@@ -69,9 +69,15 @@ module.exports = {
       url: "http://localhost:8545",
     },
     mumbai: {
-      chainId: 80001,
-      url: mumbaiProviderUrl || "https://rpc-mumbai.maticvigil.com/v1",
+      url: "http://localhost:8545",
     },
+    // mumbai: {
+    //   chainId: 80001,
+    //   url: mumbaiProviderUrl || "https://rpc-mumbai.maticvigil.com/v1",
+    //   accounts: {
+    //     mnemonic: mnemonic,
+    //   },
+    // },
   },
   paths: {
     tests: isWaffleTest ? "./test-waffle" : "./test",
