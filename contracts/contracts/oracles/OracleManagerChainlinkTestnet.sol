@@ -21,11 +21,10 @@ contract OracleManagerChainlinkTestnet is OracleManagerChainlink {
     maxUpdateIntervalSeconds = newMaxUpdateIntervalSeconds;
   }
 
-  function _updatePrice() internal override returns (int256) {
-    int256 previousPrice = indexPrice;
-    int256 latestPrice = super._updatePrice();
+  function updatePrice() external override returns (int256) {
+    int256 latestPrice = super._getLatestPrice();
 
-    if (previousPrice != latestPrice || lastUpdate + maxUpdateIntervalSeconds < block.timestamp) {
+    if (lastUpdate + maxUpdateIntervalSeconds < block.timestamp) {
       forcedPriceAdjustment = (forcedPriceAdjustment + 1) % 2;
       lastUpdate = block.timestamp;
     }
