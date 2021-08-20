@@ -1,6 +1,7 @@
 const { BN } = require("@openzeppelin/test-helpers");
 const { current } = require("@openzeppelin/test-helpers/src/balance");
 const ether = require("@openzeppelin/test-helpers/src/ether");
+const { deployProxy } = require("@openzeppelin/truffle-upgrades");
 
 const Dai = artifacts.require("Dai");
 const LongShort = artifacts.require("LongShort");
@@ -10,13 +11,17 @@ const SyntheticToken = artifacts.require("SyntheticToken");
 const YieldManagerMock = artifacts.require("YieldManagerMock");
 const OracleManagerMock = artifacts.require("OracleManagerMock");
 const YieldManagerAave = artifacts.require("YieldManagerAave");
+const SyntheticTokenUpgradeable = artifacts.require(
+  "SyntheticTokenUpgradeable"
+);
 const OracleManagerEthKillerChainlinkTestnet = artifacts.require(
   "OracleManagerEthKillerChainlinkTestnet"
 );
 
 const mumbaiDaiAddress = "0x001B3B4d0F3714Ca98ba10F6042DaEbF0B1B7b6F";
 
-const aavePoolAddressProviderMumbai = "0x178113104fEcbcD7fF8669a0150721e231F0FD4B";
+const aavePoolAddressProviderMumbai =
+  "0x178113104fEcbcD7fF8669a0150721e231F0FD4B";
 const mumbaiADai = "0x639cB7b21ee2161DF9c882483C9D55c90c20Ca3e";
 const mumbaiAaveIncentivesController =
   "0xd41aE58e803Edf4304334acCE4DC4Ec34a63C644";
@@ -46,7 +51,8 @@ const deployTestMarket = async (
   treasuryInstance,
   admin,
   networkName,
-  paymentToken
+  paymentToken,
+  staker
 ) => {
   console.log("Deploying test Market", syntheticName, syntheticSymbol);
 
@@ -68,14 +74,21 @@ const deployTestMarket = async (
   let yieldManager;
   let fundTokenAddress;
   if (networkName == "mumbai") {
-    yieldManager = await YieldManagerAave.new(
+    // untested
+    yieldManager = await deployProxy(YieldManagerAave, [admin], {
+      initializer: false,
+      kind: "uups",
+    });
+
+    await yieldManager.initialize(
       longShortInstance.address,
       treasuryInstance.address,
       mumbaiDaiAddress,
       mumbaiADai,
       aavePoolAddressProviderMumbai,
       mumbaiAaveIncentivesController,
-      0
+      0,
+      admin
     );
     fundTokenAddress = mumbaiDaiAddress;
   } else {
@@ -91,9 +104,42 @@ const deployTestMarket = async (
     await paymentToken.grantRole(mintRole, yieldManager.address);
   }
 
-  await longShortInstance.createNewSyntheticMarket(
+  const latestMarket = (await longShortInstance.latestMarket()).toNumber();
+  const marketIndex = latestMarket + 1;
+
+  const synthLong = await deployProxy(SyntheticTokenUpgradeable, [admin], {
+    initializer: false,
+    kind: "uups",
+  });
+
+  await synthLong.initialize(
+    "Float Up " + syntheticName,
+    "fu" + syntheticSymbol,
+    longShortInstance.address,
+    staker.address,
+    marketIndex,
+    true
+  );
+
+  const synthShort = await deployProxy(SyntheticTokenUpgradeable, [admin], {
+    initializer: false,
+    kind: "uups",
+  });
+
+  await synthShort.initialize(
+    "Float Down " + syntheticName,
+    "fd" + syntheticSymbol,
+    longShortInstance.address,
+    staker.address,
+    marketIndex,
+    false
+  );
+
+  await longShortInstance.createNewSyntheticMarketUpgradeable(
     syntheticName,
     syntheticSymbol,
+    synthLong.address,
+    synthShort.address,
     fundTokenAddress,
     oracleManager.address,
     yieldManager.address
@@ -277,7 +323,8 @@ module.exports = async function (deployer, network, accounts) {
     treasury,
     admin,
     network,
-    token
+    token,
+    staker
   );
 
   await deployTestMarket(
@@ -287,7 +334,8 @@ module.exports = async function (deployer, network, accounts) {
     treasury,
     admin,
     network,
-    token
+    token,
+    staker
   );
 
   await deployTestMarket(
@@ -297,7 +345,8 @@ module.exports = async function (deployer, network, accounts) {
     treasury,
     admin,
     network,
-    token
+    token,
+    staker
   );
 
   const currentMarketIndex = (await longShort.latestMarket()).toNumber();
