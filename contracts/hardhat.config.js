@@ -8,6 +8,14 @@ require("@nomiclabs/hardhat-ethers");
 
 require("hardhat-docgen");
 
+let config;
+try {
+  config = require("./secretsManager.js");
+} catch (e) {
+  console.error("You are using the example secrets manager, please copy this file if you want to use it")
+  config = require("./secretsManager.example.js");
+}
+
 const {
   mnemonic,
   mainnetProviderUrl,
@@ -17,7 +25,7 @@ const {
   etherscanApiKey,
   polygonscanApiKey,
   mumbaiProviderUrl,
-} = require("./secretsManager.js");
+} = config;
 
 let runCoverage =
   !process.env.DONT_RUN_REPORT_SUMMARY ||
@@ -69,15 +77,9 @@ module.exports = {
       url: "http://localhost:8545",
     },
     mumbai: {
-      url: "http://localhost:8545",
+      chainId: 80001,
+      url: mumbaiProviderUrl || "https://rpc-mumbai.maticvigil.com/v1",
     },
-    // mumbai: {
-    //   chainId: 80001,
-    //   url: mumbaiProviderUrl || "https://rpc-mumbai.maticvigil.com/v1",
-    //   accounts: {
-    //     mnemonic: mnemonic,
-    //   },
-    // },
   },
   paths: {
     tests: isWaffleTest ? "./test-waffle" : "./test",
