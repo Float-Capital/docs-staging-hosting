@@ -142,12 +142,11 @@ let testUnit =
           contracts.contents.longShort
           ->LongShort.mintLongNextPrice(~marketIndex, ~amount);
 
-        let mintNextPriceCalls =
-          LongShortSmocked.InternalMock._mintNextPriceCalls();
-
-        mintNextPriceCalls->Chai.recordArrayDeepEqualFlat([|
-          {marketIndex, amount, isLong: true},
-        |]);
+        LongShortSmocked.InternalMock._mintNextPriceCallCheck({
+          marketIndex,
+          amount,
+          isLong: true,
+        });
       })
     });
 
@@ -165,12 +164,14 @@ let testUnit =
           contracts.contents.longShort
           ->LongShort.mintShortNextPrice(~marketIndex, ~amount);
 
-        let mintNextPriceCalls =
-          LongShortSmocked.InternalMock._mintNextPriceCalls();
+        // let mintNextPriceCallCheck =
+        //   LongShortSmocked.InternalMock._mintNextPriceCallCheck();
 
-        mintNextPriceCalls->Chai.recordArrayDeepEqualFlat([|
-          {marketIndex, amount, isLong: false},
-        |]);
+        LongShortSmocked.InternalMock._mintNextPriceCallCheck({
+          marketIndex,
+          amount,
+          isLong: false,
+        });
       })
     });
   });
@@ -214,12 +215,10 @@ let testUnit =
 
         let%Await _ = setup(~isLong, ~testWallet);
 
-        let executeOutstandingNextPriceSettlementsCalls =
-          LongShortSmocked.InternalMock._executeOutstandingNextPriceSettlementsCalls();
-
-        executeOutstandingNextPriceSettlementsCalls->Chai.recordArrayDeepEqualFlat([|
-          {user: testWallet.address, marketIndex},
-        |]);
+        LongShortSmocked.InternalMock._executeOutstandingNextPriceSettlementsCallCheck({
+          user: testWallet.address,
+          marketIndex,
+        });
       });
 
       it("emits the NextPriceDeposit event", () => {
@@ -244,12 +243,10 @@ let testUnit =
 
         let%Await _ = setup(~isLong, ~testWallet);
 
-        let depositFundsCalls =
-          LongShortSmocked.InternalMock._transferPaymentTokensFromUserToYieldManagerCalls();
-
-        depositFundsCalls->Chai.recordArrayDeepEqualFlat([|
-          {marketIndex, amount},
-        |]);
+        LongShortSmocked.InternalMock._transferPaymentTokensFromUserToYieldManagerCallCheck({
+          marketIndex,
+          amount,
+        });
       });
 
       it("updates the correct state variables with correct values", () => {

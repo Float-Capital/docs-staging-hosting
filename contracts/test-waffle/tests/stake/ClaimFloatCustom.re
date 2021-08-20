@@ -25,22 +25,19 @@ let testUnit =
 
   let commonTestsBetween_claimFloatCustomANDclaimFloatCustomFor = (~getUser) => {
     it("calls LongShort.updateSystemStateMulti for the markets", () => {
-      let updateSystemStateMultiCalls =
-        contracts.contents.longShortSmocked
-        ->LongShortSmocked.updateSystemStateMultiCalls;
-
-      updateSystemStateMultiCalls->Chai.recordArrayDeepEqualFlat([|
-        {marketIndexes: marketIndices},
-      |]);
+      contracts.contents.longShortSmocked
+      ->LongShortSmocked.updateSystemStateMultiCallCheck({
+          marketIndexes: marketIndices,
+        })
     });
 
-    it("calls _mintAccumulatedFloatAndExecuteOutstandingShiftsMulti with the correct arguments", () => {
-      let mintAccumulatedFloatMultiCalls =
-        StakerSmocked.InternalMock._mintAccumulatedFloatAndExecuteOutstandingShiftsMultiCalls();
-      ();
-      mintAccumulatedFloatMultiCalls->Chai.recordArrayDeepEqualFlat([|
-        {marketIndexes: marketIndices, user: getUser()},
-      |]);
+    it(
+      "calls _mintAccumulatedFloatAndExecuteOutstandingShiftsMulti with the correct arguments",
+      () => {
+      StakerSmocked.InternalMock._mintAccumulatedFloatAndExecuteOutstandingShiftsMultiCallCheck({
+        marketIndexes: marketIndices,
+        user: getUser(),
+      })
     });
   };
 

@@ -68,9 +68,7 @@ let testUnit =
               ~shortValue,
             );
 
-        StakerSmocked.InternalMock.onlyLongShortModifierLogicCalls()
-        ->Array.length
-        ->Chai.intEqual(1);
+        StakerSmocked.InternalMock.onlyLongShortModifierLogicCallCheck();
       })
     );
 
@@ -115,17 +113,14 @@ let testUnit =
         "calls calculateNewCumulativeIssuancePerStakedSynth with correct arguments",
         () => {
         let%Await _ = txReference.contents;
-        StakerSmocked.InternalMock._calculateNewCumulativeIssuancePerStakedSynthCalls()
-        ->Chai.recordArrayDeepEqualFlat([|
-            {
-              marketIndex,
-              previousMarketUpdateIndex: marketUpdateIndex->sub(oneBn),
-              longPrice,
-              shortPrice,
-              longValue,
-              shortValue,
-            },
-          |]);
+        StakerSmocked.InternalMock._calculateNewCumulativeIssuancePerStakedSynthCallCheck({
+          marketIndex,
+          previousMarketUpdateIndex: marketUpdateIndex->sub(oneBn),
+          longPrice,
+          shortPrice,
+          longValue,
+          shortValue,
+        });
       });
       it("sets the latestRewardIndex correctly", () => {
         let%Await latestRewardIndex =

@@ -137,7 +137,6 @@ describe("Float System", () => {
           );
         contracts := deployedContracts;
       });
-      ChangeMarketLaunchIncentiveParameters.test(~contracts, ~accounts);
       AddNewStakingFund.test(~contracts, ~accounts);
       GetKValue.test(~contracts, ~accounts);
       CalculateFloatPerSecond.test(~contracts, ~accounts);

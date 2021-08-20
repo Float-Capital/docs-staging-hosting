@@ -15,32 +15,19 @@ describe("Float System", () => {
 
     let longShortAddress = Ethers.Wallet.createRandom().address;
 
-    let%Await lendingPoolMock = LendingPoolAaveMock.make();
-    let%Await lendingPoolSmocked =
-      LendingPoolAaveMockSmocked.make(lendingPoolMock);
+    let%Await paymentTokenSmocked = ERC20MockSmocked.make();
 
-    let%Await paymentTokenMock =
-      ERC20Mock.make(~name="Payment Token Mock", ~symbol="PaymentToken");
-    let%Await paymentTokenSmocked = ERC20MockSmocked.make(paymentTokenMock);
+    let%Await aTokenSmocked = ERC20MockSmocked.make();
 
-    let%Await aTokenMock =
-      ERC20Mock.make(~name="Test APaymentToken", ~symbol="APaymentToken");
-    let%Await aTokenSmocked = ERC20MockSmocked.make(aTokenMock);
-
-    let%Await aaveIncentivesControllerMock =
-      AaveIncentivesControllerMock.make();
     let%Await aaveIncentivesControllerSmocked =
-      AaveIncentivesControllerMockSmocked.make(aaveIncentivesControllerMock);
-    let%Await lendingPoolAddressesProviderMock =
-      LendingPoolAddressesProviderMock.make();
+      AaveIncentivesControllerMockSmocked.make();
     let%Await lendingPoolAddressesProviderSmocked =
-      LendingPoolAddressesProviderMockSmocked.make(
-        lendingPoolAddressesProviderMock,
-      );
+      LendingPoolAddressesProviderMockSmocked.make();
 
     let%Await yieldManagerAave =
-      YieldManagerAave.make(
-        ~longShort=longShortAddress,
+      YieldManagerAave.make();
+
+    let%Await _ = yieldManagerAave->YieldManagerAave.initialize(~longShort=longShortAddress,
         ~treasury=treasury.address,
         ~paymentToken=paymentTokenSmocked.address,
         ~aToken=aTokenSmocked.address,
@@ -48,7 +35,7 @@ describe("Float System", () => {
           lendingPoolAddressesProviderSmocked.address,
         ~aaveIncentivesController=aaveIncentivesControllerSmocked.address,
         ~aaveReferralCode=6543,
-      );
+        ~admin=CONSTANTS.zeroAddress);
 
     contracts :=
       {

@@ -99,9 +99,9 @@ let test =
       );
 
       it("calls getMarketLaunchIncentiveParameters with correct arguments", () => {
-        StakerSmocked.InternalMock._getMarketLaunchIncentiveParametersCalls()
-        ->Array.getExn(0)
-        ->Chai.recordEqualFlat({marketIndex: marketIndex})
+        StakerSmocked.InternalMock._getMarketLaunchIncentiveParametersCallCheck({
+          marketIndex: marketIndex,
+        })
       });
     });
   });

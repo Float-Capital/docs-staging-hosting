@@ -103,27 +103,20 @@ let test =
     );
 
     it("calls calculateFloatPerSecond with correct arguments", () => {
-      let call =
-        StakerSmocked.InternalMock._calculateFloatPerSecondCalls()
-        ->Array.getExn(0);
-
-      call->Chai.recordEqualFlat({
+      StakerSmocked.InternalMock._calculateFloatPerSecondCallCheck({
         marketIndex,
         longPrice,
         shortPrice,
         longValue,
         shortValue,
-      });
+      })
     });
 
     it("calls calculateTimeDelta with correct arguments", () => {
-      let call =
-        StakerSmocked.InternalMock._calculateTimeDeltaFromLastAccumulativeIssuancePerStakedSynthSnapshotCalls()
-        ->Array.getUnsafe(0);
-      call->Chai.recordEqualFlat({
+      StakerSmocked.InternalMock._calculateTimeDeltaFromLastAccumulativeIssuancePerStakedSynthSnapshotCallCheck({
         marketIndex,
         previousMarketUpdateIndex: latestRewardIndexForMarket,
-      });
+      })
     });
   });
 };

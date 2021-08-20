@@ -1,7 +1,7 @@
-const { runTestTransactions } = require("../DeployTests/RunTestTransactions");
+const { runTestTransactions } = require("../deployTests/RunTestTransactions");
 const {
   runMumbaiTransactions,
-} = require("../DeployTests/RunMumbaiTransactions");
+} = require("../deployTests/RunMumbaiTransactions");
 const { ethers, getNamedAccounts } = require("hardhat");
 
 const {

@@ -12,7 +12,8 @@ let test =
   let tenToThe14 = tenToThe18->div(bnFromInt(10000)); // 0.01 %
   let tenToThe16 = tenToThe18->div(bnFromInt(100)); // 1 %
 
-  let (kVal, longPrice, shortPrice) = Helpers.Tuple.make3(Helpers.randomTokenAmount);
+  let (kVal, longPrice, shortPrice) =
+    Helpers.Tuple.make3(Helpers.randomTokenAmount);
   let (randomValueLocked1, randomValueLocked2) =
     Helpers.Tuple.make2(() => Helpers.randomJsInteger() / 10 + 1);
 
@@ -443,9 +444,9 @@ let test =
             ~shortValue=randomValueLocked2->bnFromInt->mul(tenToThe18),
           );
 
-      let call =
-        StakerSmocked.InternalMock._getKValueCalls()->Array.getUnsafe(0);
-      call->Chai.recordEqualFlat({marketIndex: marketIndex});
+      StakerSmocked.InternalMock._getKValueCallCheck(
+        {marketIndex: marketIndex}: StakerSmocked.InternalMock._getKValueCall,
+      );
     });
   });
 };
