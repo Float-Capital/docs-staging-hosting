@@ -33,16 +33,16 @@ contract StakerInternalStateSetters is Staker {
     syntheticTokens[marketIndex][false] = shortToken;
 
     accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][newLatestRewardIndex]
-      .accumulativeFloatPerSyntheticToken_long = accumulativeFloatPerTokenLatestLong;
+    .accumulativeFloatPerSyntheticToken_long = accumulativeFloatPerTokenLatestLong;
 
     accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][usersLatestClaimedReward]
-      .accumulativeFloatPerSyntheticToken_long = accumulativeFloatPerTokenUserLong;
+    .accumulativeFloatPerSyntheticToken_long = accumulativeFloatPerTokenUserLong;
 
     accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][newLatestRewardIndex]
-      .accumulativeFloatPerSyntheticToken_short = accumulativeFloatPerTokenLatestShort;
+    .accumulativeFloatPerSyntheticToken_short = accumulativeFloatPerTokenLatestShort;
 
     accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][usersLatestClaimedReward]
-      .accumulativeFloatPerSyntheticToken_short = accumulativeFloatPerTokenUserShort;
+    .accumulativeFloatPerSyntheticToken_short = accumulativeFloatPerTokenUserShort;
 
     userAmountStaked[longToken][user] = newUserAmountStakedLong;
     userAmountStaked[shortToken][user] = newUserAmountStakedShort;
@@ -58,13 +58,13 @@ contract StakerInternalStateSetters is Staker {
     uint256 syntheticRewardFromShortToken
   ) public {
     accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][rewardIndexTo]
-      .accumulativeFloatPerSyntheticToken_long = syntheticRewardToLongToken;
+    .accumulativeFloatPerSyntheticToken_long = syntheticRewardToLongToken;
     accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][rewardIndexTo]
-      .accumulativeFloatPerSyntheticToken_short = syntheticRewardToShortToken;
+    .accumulativeFloatPerSyntheticToken_short = syntheticRewardToShortToken;
     accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][rewardIndexFrom]
-      .accumulativeFloatPerSyntheticToken_long = syntheticRewardFromLongToken;
+    .accumulativeFloatPerSyntheticToken_long = syntheticRewardFromLongToken;
     accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][rewardIndexFrom]
-      .accumulativeFloatPerSyntheticToken_short = syntheticRewardFromShortToken;
+    .accumulativeFloatPerSyntheticToken_short = syntheticRewardFromShortToken;
   }
 
   function setShiftParams(
@@ -161,7 +161,7 @@ contract StakerInternalStateSetters is Staker {
     uint256 timestamp
   ) external {
     accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][latestRewardIndexForMarket]
-      .timestamp = timestamp;
+    .timestamp = timestamp;
   }
 
   function setCalculateNewCumulativeRateParams(
@@ -172,10 +172,10 @@ contract StakerInternalStateSetters is Staker {
   ) external {
     latestRewardIndex[marketIndex] = latestRewardIndexForMarket;
     accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][latestRewardIndex[marketIndex]]
-      .accumulativeFloatPerSyntheticToken_long = accumFloatLong;
+    .accumulativeFloatPerSyntheticToken_long = accumFloatLong;
 
     accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][latestRewardIndex[marketIndex]]
-      .accumulativeFloatPerSyntheticToken_short = accumFloatShort;
+    .accumulativeFloatPerSyntheticToken_short = accumFloatShort;
   }
 
   function setSetRewardObjectsParams(uint32 marketIndex, uint256 latestRewardIndexForMarket)

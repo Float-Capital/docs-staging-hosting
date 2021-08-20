@@ -45,3 +45,5 @@ test-waffle/library/smock/*
 contracts/testing/generated/*
 
 contract-docs
+
+deployments

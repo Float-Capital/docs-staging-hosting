@@ -528,9 +528,9 @@ contract LongShort is ILongShort, Initializable, UUPSUpgradeable {
         );
       }
 
-      uint256 amountSyntheticTokensToBeShiftedAwayFromOriginSide = userNextPrice_syntheticToken_toShiftAwayFrom_marketSide[
-          marketIndex
-        ][!isLong][user];
+
+        uint256 amountSyntheticTokensToBeShiftedAwayFromOriginSide
+       = userNextPrice_syntheticToken_toShiftAwayFrom_marketSide[marketIndex][!isLong][user];
 
       if (amountSyntheticTokensToBeShiftedAwayFromOriginSide > 0) {
         uint256 syntheticTokenPriceOnOriginSide = syntheticToken_priceSnapshot[marketIndex][
@@ -631,10 +631,10 @@ contract LongShort is ILongShort, Initializable, UUPSUpgradeable {
     );
 
     uint256 marketAmount = IYieldManager(yieldManagers[marketIndex])
-      .distributeYieldForTreasuryAndReturnMarketAllocation(
-        totalValueLockedInMarket,
-        treasuryYieldPercent_e18
-      );
+    .distributeYieldForTreasuryAndReturnMarketAllocation(
+      totalValueLockedInMarket,
+      treasuryYieldPercent_e18
+    );
 
     if (marketAmount > 0) {
       if (isLongSideUnderbalanced) {
@@ -749,10 +749,10 @@ contract LongShort is ILongShort, Initializable, UUPSUpgradeable {
         int256 long_changeInMarketValue_inPaymentToken,
         int256 short_changeInMarketValue_inPaymentToken
       ) = _batchConfirmOutstandingPendingActions(
-          marketIndex,
-          syntheticTokenPrice_inPaymentTokens_long,
-          syntheticTokenPrice_inPaymentTokens_short
-        );
+        marketIndex,
+        syntheticTokenPrice_inPaymentTokens_long,
+        syntheticTokenPrice_inPaymentTokens_short
+      );
 
       newLongPoolValue = uint256(
         int256(newLongPoolValue) + long_changeInMarketValue_inPaymentToken
@@ -1049,9 +1049,9 @@ contract LongShort is ILongShort, Initializable, UUPSUpgradeable {
     address user,
     bool isShiftFromLong
   ) internal virtual {
-    uint256 syntheticToken_toShiftAwayFrom_marketSide = userNextPrice_syntheticToken_toShiftAwayFrom_marketSide[
-        marketIndex
-      ][isShiftFromLong][user];
+
+      uint256 syntheticToken_toShiftAwayFrom_marketSide
+     = userNextPrice_syntheticToken_toShiftAwayFrom_marketSide[marketIndex][isShiftFromLong][user];
     if (syntheticToken_toShiftAwayFrom_marketSide > 0) {
       uint256 syntheticToken_toShiftTowardsTargetSide = getAmountSyntheticTokenToMintOnTargetSide(
         marketIndex,

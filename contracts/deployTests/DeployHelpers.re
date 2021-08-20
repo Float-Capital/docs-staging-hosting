@@ -23,6 +23,7 @@ let topupBalanceIfLow = (~from: Wallet.t, ~to_: Wallet.t) => {
     ();
   };
 };
+
 let updateSystemState = (~longShort, ~admin, ~marketIndex) => {
   longShort
   ->ContractHelpers.connect(~address=admin)
@@ -173,6 +174,78 @@ let deployTestMarket =
       ~paymentToken: ERC20Mock.t,
     ) => {
   let%AwaitThen oracleManager = OracleManagerMock.make(~admin=admin.address);
+
+  let%AwaitThen yieldManager =
+    YieldManagerMock.make(
+      ~longShort=longShortInstance.address,
+      ~treasury=treasuryInstance.address,
+      ~token=paymentToken.address,
+    );
+
+  let%AwaitThen mintRole = paymentToken->ERC20Mock.mINTER_ROLE;
+
+  let%AwaitThen _ =
+    paymentToken->ERC20Mock.grantRole(
+      ~role=mintRole,
+      ~account=yieldManager.address,
+    );
+
+  let%AwaitThen _ =
+    longShortInstance
+    ->ContractHelpers.connect(~address=admin)
+    ->LongShort.createNewSyntheticMarket(
+        ~syntheticName,
+        ~syntheticSymbol,
+        ~paymentToken=paymentToken.address,
+        ~oracleManager=oracleManager.address,
+        ~yieldManager=yieldManager.address,
+      );
+
+  let%AwaitThen latestMarket = longShortInstance->LongShort.latestMarket;
+  let kInitialMultiplier = bnFromString("5000000000000000000"); // 5x
+  let kPeriod = bnFromInt(864000); // 10 days
+
+  let%AwaitThen _ =
+    mintAndApprove(
+      ~paymentToken,
+      ~amount=bnFromString("2000000000000000000"),
+      ~user=admin,
+      ~approvedAddress=longShortInstance.address,
+    );
+
+  let unstakeFee_e18 = bnFromString("5000000000000000"); // 50 basis point unstake fee
+  let initialMarketSeedForEachMarketSide =
+    bnFromString("1000000000000000000");
+
+  longShortInstance
+  ->ContractHelpers.connect(~address=admin)
+  ->LongShort.initializeMarket(
+      ~marketIndex=latestMarket,
+      ~kInitialMultiplier,
+      ~kPeriod,
+      ~unstakeFee_e18, // 50 basis point unstake fee
+      ~initialMarketSeedForEachMarketSide,
+      ~balanceIncentiveCurve_exponent=bnFromInt(5),
+      ~balanceIncentiveCurve_equilibriumOffset=bnFromInt(0),
+      ~marketTreasurySplitGradient_e18=bnFromInt(1),
+    );
+};
+
+let deployMumbaiMarket =
+    (
+      ~syntheticName,
+      ~syntheticSymbol,
+      ~longShortInstance: LongShort.t,
+      ~treasuryInstance: Treasury_v0.t,
+      ~admin,
+      ~paymentToken: ERC20Mock.t,
+      ~oraclePriceFeedAddress: Ethers.ethAddress,
+    ) => {
+  let%AwaitThen oracleManager =
+    OracleManagerChainlink.make(
+      ~admin=admin.address,
+      ~chainLinkOracle=oraclePriceFeedAddress,
+    );
 
   let%AwaitThen yieldManager =
     YieldManagerMock.make(
