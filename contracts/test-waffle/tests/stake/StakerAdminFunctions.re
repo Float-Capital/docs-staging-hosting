@@ -1,11 +1,10 @@
 open Globals;
 open LetOps;
-open StakerHelpers;
 open Mocha;
 
 let testUnit =
     (
-      ~contracts: ref(Helpers.coreContracts),
+      ~contracts: ref(Helpers.stakerUnitTestContracts),
       ~accounts: ref(array(Ethers.Wallet.t)),
     ) => {
   describe("Staker Admin Functions", () => {
@@ -18,11 +17,10 @@ let testUnit =
 
       before_once'(() => {
         let%Await _ =
-          deployAndSetupStakerToUnitTest(
-            ~functionName="changeAdmin",
-            ~contracts,
-            ~accounts,
-          );
+          contracts.contents.staker
+          ->StakerSmocked.InternalMock.setupFunctionForUnitTesting(
+              ~functionName="changeAdmin",
+            );
 
         txPromiseRef :=
           contracts.contents.staker->Staker.changeAdmin(~admin=randomAddress1);
@@ -70,11 +68,10 @@ let testUnit =
 
       before_once'(() => {
         let%Await _ =
-          deployAndSetupStakerToUnitTest(
-            ~functionName="changeFloatPercentage",
-            ~contracts,
-            ~accounts,
-          );
+          contracts.contents.staker
+          ->StakerSmocked.InternalMock.setupFunctionForUnitTesting(
+              ~functionName="changeFloatPercentage",
+            );
 
         txPromiseRef :=
           contracts.contents.staker
@@ -161,11 +158,10 @@ let testUnit =
 
       before_once'(() => {
         let%Await _ =
-          deployAndSetupStakerToUnitTest(
-            ~functionName="changeUnstakeFee",
-            ~contracts,
-            ~accounts,
-          );
+          contracts.contents.staker
+          ->StakerSmocked.InternalMock.setupFunctionForUnitTesting(
+              ~functionName="changeUnstakeFee",
+            );
 
         txPromiseRef :=
           contracts.contents.staker
@@ -241,11 +237,10 @@ let testUnit =
 
       before_once'(() => {
         let%Await _ =
-          deployAndSetupStakerToUnitTest(
-            ~functionName="changeBalanceIncentiveParameters",
-            ~contracts,
-            ~accounts,
-          );
+          contracts.contents.staker
+          ->StakerSmocked.InternalMock.setupFunctionForUnitTesting(
+              ~functionName="changeBalanceIncentiveParameters",
+            );
 
         let stakerAddress = accounts.contents->Array.getUnsafe(5);
 
@@ -360,6 +355,12 @@ let testUnit =
       it("should update incentive exponent correctly", () => {
         let adminWallet = accounts.contents->Array.getUnsafe(0);
         let newExponent = bnFromInt(4);
+
+        let _ =
+          contracts.contents.longShortSmocked
+          ->LongShortSmocked.mockMarketSideValueInPaymentTokenToReturn(
+              CONSTANTS.tenToThe18,
+            );
 
         let%Await _ =
           contracts.contents.staker
