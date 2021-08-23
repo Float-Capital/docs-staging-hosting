@@ -8,9 +8,8 @@ import {
   MarketAddedToStaker,
   StakeWithdrawalFeeUpdated,
   FloatPercentageUpdated,
-  BalanceIncentiveEquilibriumOffsetUpdated,
-  BalanceIncentiveExponentUpdated,
   ChangeAdmin,
+  BalanceIncentiveParamsUpdated,
 } from "../../generated/Staker/Staker";
 import { erc20 } from "../../generated/templates";
 import {
@@ -506,42 +505,32 @@ export function handleFloatPercentageUpdated(
     []
   );
 }
-
-/*
-  event StakeWithdrawalFeeUpdated(uint32 marketIndex, uint256 stakeWithdralFee);
-  event BalanceIncentiveExponentUpdated(uint32 marketIndex, uint256 balanceIncentiveExponent);
-*/
-export function handleBalanceIncentiveEquilibriumOffsetUpdated(
-  event: BalanceIncentiveEquilibriumOffsetUpdated
-): void {
-  // TODO: update value in the graph!
-  let marketIndex = event.params.marketIndex;
-  let balanceIncentiveEquilibriumOffset =
-    event.params.balanceIncentiveEquilibriumOffset;
-
-  saveEventToStateChange(
-    event,
-    "BalanceIncentiveEquilibriumOffsetUpdated",
-    [marketIndex.toString(), balanceIncentiveEquilibriumOffset.toString()],
-    ["marketIndex", "balanceIncentiveEquilibriumOffset"],
-    ["uint32", "int256"],
-    [],
-    []
-  );
-}
-export function handleBalanceIncentiveExponentUpdated(
-  event: BalanceIncentiveExponentUpdated
+export function handleBalanceIncentiveParamsUpdated(
+  event: BalanceIncentiveParamsUpdated
 ): void {
   // TODO: update value in the graph!
   let marketIndex = event.params.marketIndex;
   let balanceIncentiveExponent = event.params.balanceIncentiveExponent;
+  let balanceIncentiveCurve_equilibriumOffset =
+    event.params.balanceIncentiveCurve_equilibriumOffset;
+  let safeExponentBitShifting = event.params.safeExponentBitShifting;
 
   saveEventToStateChange(
     event,
     "BalanceIncentiveExponentUpdated",
-    [marketIndex.toString(), balanceIncentiveExponent.toString()],
-    ["marketIndex", "balanceIncentiveExponent"],
-    ["uint32", "uint256"],
+    [
+      marketIndex.toString(),
+      balanceIncentiveExponent.toString(),
+      balanceIncentiveCurve_equilibriumOffset.toString(),
+      safeExponentBitShifting.toString(),
+    ],
+    [
+      "marketIndex",
+      "balanceIncentiveExponent",
+      "balanceIncentiveCurve_equilibriumOffset",
+      "safeExponentBitShifting",
+    ],
+    ["uint32", "uint256", "int256", "uint256"],
     [],
     []
   );
