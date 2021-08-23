@@ -21,7 +21,12 @@ import {
   Stake,
   AccumulativeFloatIssuanceSnapshot,
 } from "../../generated/schema";
-import { log, DataSourceContext, Address } from "@graphprotocol/graph-ts";
+import {
+  log,
+  DataSourceContext,
+  Address,
+  BigInt,
+} from "@graphprotocol/graph-ts";
 import {
   bigIntArrayToStringArray,
   saveEventToStateChange,
@@ -42,7 +47,13 @@ import {
   getStake,
 } from "../generated/EntityHelpers";
 
-import { ZERO, ONE, GLOBAL_STATE_ID, TEN_TO_THE_18 } from "../CONSTANTS";
+import {
+  ZERO,
+  ONE,
+  GLOBAL_STATE_ID,
+  TEN_TO_THE_18,
+  FLOAT_ISSUANCE_FIXED_DECIMAL,
+} from "../CONSTANTS";
 
 export function handleStakerV1(event: StakerV1): void {
   let floatAddress = event.params.floatToken;
@@ -414,117 +425,69 @@ function calculateAccumulatedFloatAndExecuteOutstandingShifts(
   syntheticShort: SyntheticToken,
   user: Address
 ): FloatMintedBreakdown {
+  // TODO: handle case where user has pending token shifts! #
+
   let currentStakeLong = CurrentStake.load(
     syntheticLong.tokenAddress.toHex() + user.toHex() + "currentStake"
   );
-  let amountStakedLong;
+  let amountFromLongStake = ZERO;
   if (currentStakeLong != null) {
     let longStake = getStake(currentStakeLong.currentStake);
-  }
-  // uint256 amountStakedShort = userAmountStaked[shortToken][user];
+    let lastUserMintState = getAccumulativeFloatIssuanceSnapshot(
+      currentStakeLong.lastMintState
+    );
+    let lastMarketMintState = getAccumulativeFloatIssuanceSnapshot(
+      syntheticMarket.latestAccumulativeFloatIssuanceSnapshot
+    );
+    let amountStakedLong = longStake.amount;
 
+    if (amountStakedLong.gt(ZERO)) {
+      let accumDeltaLong = lastMarketMintState.accumulativeFloatPerTokenLong.minus(
+        lastUserMintState.accumulativeFloatPerTokenLong
+      );
+      amountFromLongStake = accumDeltaLong
+        .times(amountStakedLong)
+        .div(FLOAT_ISSUANCE_FIXED_DECIMAL);
+    }
+  }
+  let currentStakeShort = CurrentStake.load(
+    syntheticShort.tokenAddress.toHex() + user.toHex() + "currentStake"
+  );
+
+  let amountFromShortStake = ZERO;
+  if (currentStakeShort != null) {
+    let longStake = getStake(currentStakeShort.currentStake);
+    let lastUserMintState = getAccumulativeFloatIssuanceSnapshot(
+      currentStakeShort.lastMintState
+    );
+    let lastMarketMintState = getAccumulativeFloatIssuanceSnapshot(
+      syntheticMarket.latestAccumulativeFloatIssuanceSnapshot
+    );
+    let amountStakedShort = longStake.amount;
+
+    if (amountStakedShort.gt(ZERO)) {
+      let accumDeltaShort = lastMarketMintState.accumulativeFloatPerTokenShort.minus(
+        lastUserMintState.accumulativeFloatPerTokenShort
+      );
+      amountFromShortStake = accumDeltaShort
+        .times(amountStakedShort)
+        .div(FLOAT_ISSUANCE_FIXED_DECIMAL);
+    }
+  }
   return {
-    amountFromLongStake: TEN_TO_THE_18,
-    amountFromShortStake: TEN_TO_THE_18,
+    amountFromShortStake,
+    amountFromShortStake,
   };
 }
-/*
-function _calculateAccumulatedFloatAndExecuteOutstandingShifts(uint32 marketIndex, address user)
-  internal
-  virtual
-  returns (uint256 floatReward)
-{
-  address longToken = syntheticTokens[marketIndex][true];
-  address shortToken = syntheticTokens[marketIndex][false];
 
-
-  uint256 usersLastRewardIndex = userIndexOfLastClaimedReward[marketIndex][user];
-
-  uint256 currentRewardIndex = latestRewardIndex[marketIndex];
-
-  // Don't do the calculation and return zero immediately if there is no change
-  if (usersLastRewardIndex == currentRewardIndex) {
-    return 0;
-  }
-
-  uint256 usersShiftIndex = userNextPrice_stakedSyntheticTokenShiftIndex[marketIndex][user];
-  // if there is a change in the users tokens held due to a token shift (or possibly another action in the future)
-  if (usersShiftIndex > 0 && usersShiftIndex <= currentRewardIndex) {
-    floatReward = _calculateAccumulatedFloatInRange(
-      marketIndex,
-      amountStakedLong,
-      amountStakedShort,
-      usersLastRewardIndex,
-      usersShiftIndex
-    );
-
-    // Update the users balances
-
-    uint256 amountToShiftAwayFromCurrentSide = userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[
-        marketIndex
-      ][true][user];
-    // Handle shifts from LONG side:
-    if (amountToShiftAwayFromCurrentSide > 0) {
-      amountStakedShort += ILongShort(longShort).getAmountSyntheticTokenToMintOnTargetSide(
-        marketIndex,
-        amountToShiftAwayFromCurrentSide,
-        true,
-        usersShiftIndex
-      );
-
-      amountStakedLong -= amountToShiftAwayFromCurrentSide;
-      userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[marketIndex][true][user] = 0;
-    }
-
-    amountToShiftAwayFromCurrentSide = userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[
-      marketIndex
-    ][false][user];
-    // Handle shifts from SHORT side:
-    if (amountToShiftAwayFromCurrentSide > 0) {
-      amountStakedLong += ILongShort(longShort).getAmountSyntheticTokenToMintOnTargetSide(
-        marketIndex,
-        amountToShiftAwayFromCurrentSide,
-        false,
-        usersShiftIndex
-      );
-
-      amountStakedShort -= amountToShiftAwayFromCurrentSide;
-      userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[marketIndex][false][user] = 0;
-    }
-
-    // Save the users updated staked amounts
-    userAmountStaked[longToken][user] = amountStakedLong;
-    userAmountStaked[shortToken][user] = amountStakedShort;
-
-    floatReward += _calculateAccumulatedFloatInRange(
-      marketIndex,
-      amountStakedLong,
-      amountStakedShort,
-      usersShiftIndex,
-      currentRewardIndex
-    );
-
-    userNextPrice_stakedSyntheticTokenShiftIndex[marketIndex][user] = 0;
-  } else {
-    floatReward = _calculateAccumulatedFloatInRange(
-      marketIndex,
-      amountStakedLong,
-      amountStakedShort,
-      usersLastRewardIndex,
-      currentRewardIndex
-    );
-  }
-}
-*/
 export function handleFloatMinted(event: FloatMinted): void {
   let userAddress = event.params.user;
   let userAddressString = userAddress.toHex();
   let marketIndex = event.params.marketIndex;
   let marketIndexId = marketIndex.toString();
-  // TODO: Need to calculate these values correctly.
-  let amountLong = TEN_TO_THE_18;
-  let amountShort = TEN_TO_THE_18;
-  let expectedTotalAmount = amountLong.plus(amountShort);
+  // // TODO: Need to calculate these values correctly.
+  // let amountLong = TEN_TO_THE_18;
+  // let amountShort = TEN_TO_THE_18;
   let amountFloatMinted = event.params.amountFloatMinted;
   /// TODO: assert that `amountFloatMinted` == `expectedTotalAmount (will fail until amountLong and amountShort calculations are fixed of course!!!)
 
@@ -541,6 +504,23 @@ export function handleFloatMinted(event: FloatMinted): void {
     amountFloatMinted
   );
   user.totalMintedFloat = user.totalMintedFloat.plus(amountFloatMinted);
+
+  let fltBreakdown = calculateAccumulatedFloatAndExecuteOutstandingShifts(
+    syntheticMarket,
+    syntheticLong,
+    syntheticShort,
+    userAddress
+  );
+  let amountLong = fltBreakdown.amountFromLongStake;
+  let amountShort = fltBreakdown.amountFromShortStake;
+  let expectedTotalAmount = amountLong.plus(amountShort);
+
+  if (expectedTotalAmount.notEqual(amountFloatMinted)) {
+    log.critical(
+      "Float issuance breakdown is incorrect. This is either a bug in the contracts or in the graph (more likely the graph).",
+      []
+    );
+  }
 
   let changedStakesArray: Array<string> = [];
   if (amountLong.gt(ZERO)) {
