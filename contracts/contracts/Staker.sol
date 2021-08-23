@@ -10,6 +10,8 @@ import "./interfaces/ILongShort.sol";
 import "./interfaces/IStaker.sol";
 import "./interfaces/ISyntheticToken.sol";
 
+import "hardhat/console.sol";
+
 contract Staker is IStaker, Initializable, UUPSUpgradeable {
   /*╔═════════════════════════════╗
     ║          VARIABLES          ║

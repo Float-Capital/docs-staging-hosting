@@ -351,6 +351,8 @@ contract LongShort is ILongShort, Initializable, UUPSUpgradeable {
     // Set this value to one initially - 0 is a null value and thus potentially bug prone.
     marketUpdateIndex[marketIndex] = 1;
 
+    _seedMarketInitially(initialMarketSeedForEachMarketSide, marketIndex);
+
     // Add new staker funds with fresh synthetic tokens.
     IStaker(staker).addNewStakingFund(
       marketIndex,
@@ -362,8 +364,6 @@ contract LongShort is ILongShort, Initializable, UUPSUpgradeable {
       balanceIncentiveCurve_exponent,
       balanceIncentiveCurve_equilibriumOffset
     );
-
-    _seedMarketInitially(initialMarketSeedForEachMarketSide, marketIndex);
   }
 
   /*╔══════════════════════════════╗
