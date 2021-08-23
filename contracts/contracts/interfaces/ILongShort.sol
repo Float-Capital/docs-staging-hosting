@@ -82,6 +82,16 @@ interface ILongShort {
 
   event ExecuteNextPriceSettlementsUser(address user, uint32 marketIndex);
 
+  function syntheticTokens(uint32, bool) external view returns (address);
+
+  function marketUpdateIndex(uint32) external view returns (uint256);
+
+  function syntheticToken_priceSnapshot(
+    uint32,
+    bool,
+    uint256
+  ) external view returns (uint256);
+
   function updateSystemState(uint32 marketIndex) external;
 
   function updateSystemStateMulti(uint32[] calldata marketIndex) external;
@@ -113,7 +123,7 @@ interface ILongShort {
     uint256 priceSnapshotIndex
   ) external view returns (uint256 amountSynthShiftedToOtherSide);
 
-  function mintLongNextPrice(uint32 marketIndex, uint256 amount) external virtual;
+  function mintLongNextPrice(uint32 marketIndex, uint256 amount) external;
 
-  function mintShortNextPrice(uint32 marketIndex, uint256 amount) external virtual;
+  function mintShortNextPrice(uint32 marketIndex, uint256 amount) external;
 }

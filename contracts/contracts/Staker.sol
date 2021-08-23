@@ -53,7 +53,7 @@ contract Staker is IStaker, Initializable {
 
   /* ══════ User specific ══════ */
   mapping(uint32 => mapping(address => uint256)) public userIndexOfLastClaimedReward;
-  mapping(address => mapping(address => uint256)) public userAmountStaked;
+  mapping(address => mapping(address => uint256)) public override userAmountStaked;
 
   /* ══════ Token shift management specific ══════ */
   /// @dev marketIndex => usersAddress => stakerTokenShiftIndex
@@ -837,6 +837,7 @@ contract Staker is IStaker, Initializable {
   )
     external
     virtual
+    override
     updateUsersStakedPosition_mintAccumulatedFloatAndExecuteOutstandingShifts(
       marketIndex,
       msg.sender

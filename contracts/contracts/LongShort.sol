@@ -53,19 +53,20 @@ contract LongShort is ILongShort, Initializable {
   /* ══════ Market specific ══════ */
   mapping(uint32 => bool) public marketExists;
   mapping(uint32 => int256) public assetPrice;
-  mapping(uint32 => uint256) public marketUpdateIndex;
+  mapping(uint32 => uint256) public override marketUpdateIndex;
   mapping(uint32 => address) public paymentTokens;
   mapping(uint32 => address) public yieldManagers;
   mapping(uint32 => address) public oracleManagers;
   mapping(uint32 => uint256) public marketTreasurySplitGradient_e18;
 
   /* ══════ Market + position (long/short) specific ══════ */
-  mapping(uint32 => mapping(bool => address)) public syntheticTokens;
+  mapping(uint32 => mapping(bool => address)) public override syntheticTokens;
   mapping(uint32 => mapping(bool => uint256)) public marketSideValueInPaymentToken;
 
   /// @notice synthetic token prices of a given market of a (long/short) at every previous price update
   mapping(uint32 => mapping(bool => mapping(uint256 => uint256)))
-    public syntheticToken_priceSnapshot;
+    public
+    override syntheticToken_priceSnapshot;
 
   mapping(uint32 => mapping(bool => uint256)) public batched_amountPaymentToken_deposit;
   mapping(uint32 => mapping(bool => uint256)) public batched_amountSyntheticToken_redeem;
