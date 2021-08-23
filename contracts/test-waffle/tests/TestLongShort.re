@@ -228,6 +228,7 @@ describe("Float System", () => {
         ~contracts,
         ~accounts,
       )
+      CreateNewSyntheticMarket.testUnit(~contracts, ~accounts);
     });
   });
 });

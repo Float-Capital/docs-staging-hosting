@@ -3,13 +3,14 @@
 pragma solidity 0.8.3;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/presets/ERC20PresetMinterPauserUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 import "./interfaces/IFloatToken.sol";
 import "./interfaces/ILongShort.sol";
 import "./interfaces/IStaker.sol";
 import "./interfaces/ISyntheticToken.sol";
 
-contract Staker is IStaker, Initializable {
+contract Staker is IStaker, Initializable, UUPSUpgradeable {
   /*╔═════════════════════════════╗
     ║          VARIABLES          ║
     ╚═════════════════════════════╝*/
@@ -79,15 +80,6 @@ contract Staker is IStaker, Initializable {
 
   modifier onlyValidSynthetic(address _synth) {
     onlyValidSyntheticModifierLogic(_synth);
-    _;
-  }
-
-  function onlyValidMarketModifierLogic(uint32 marketIndex) internal virtual {
-    require(address(syntheticTokens[marketIndex][true]) != address(0), "not valid market");
-  }
-
-  modifier onlyValidMarket(uint32 marketIndex) {
-    onlyValidMarketModifierLogic(marketIndex);
     _;
   }
 
@@ -167,6 +159,10 @@ contract Staker is IStaker, Initializable {
     emit ChangeAdmin(_admin);
   }
 
+  /// @notice Authorizes an upgrade to a new address.
+  /// @dev Can only be called by the current admin.
+  function _authorizeUpgrade(address) internal override onlyAdmin {}
+
   /// @dev Logic for changeFloatPercentage
   function _changeFloatPercentage(uint256 newFloatPercentage) internal virtual {
     require(newFloatPercentage <= 1e18 && newFloatPercentage > 0); // less than or equal to 100% and greater than 0%
@@ -201,18 +197,6 @@ contract Staker is IStaker, Initializable {
     emit StakeWithdrawalFeeUpdated(marketIndex, newMarketUnstakeFee_e18);
   }
 
-  /// @dev Logic for changeMarketLaunchIncentiveParameters
-  function _changeMarketLaunchIncentiveParameters(
-    uint32 marketIndex,
-    uint256 period,
-    uint256 initialMultiplier
-  ) internal virtual {
-    require(initialMultiplier >= 1e18, "marketLaunchIncentiveMultiplier must be >= 1e18");
-
-    marketLaunchIncentive_period[marketIndex] = period;
-    marketLaunchIncentive_multipliers[marketIndex] = initialMultiplier;
-  }
-
   /// @dev Logic for changeBalanceIncentiveExponent
   function _changeBalanceIncentiveParameters(
     uint32 marketIndex,
@@ -234,6 +218,11 @@ contract Staker is IStaker, Initializable {
 
     // SafeMATH will revert here if this value is too big.
     (((totalLocked * 500) >> _safeExponentBitShifting)**_balanceIncentiveCurve_exponent);
+    // Required to ensure at least 3 digits of precision.
+    require(
+      totalLocked >> _safeExponentBitShifting > 100,
+      "bit shifting too lange for total locked"
+    );
 
     balanceIncentiveCurve_exponent[marketIndex] = _balanceIncentiveCurve_exponent;
     balanceIncentiveCurve_equilibriumOffset[marketIndex] = _balanceIncentiveCurve_equilibriumOffset;
@@ -293,6 +282,8 @@ contract Staker is IStaker, Initializable {
     uint256 _balanceIncentiveCurve_exponent,
     int256 _balanceIncentiveCurve_equilibriumOffset
   ) external override onlyLongShort {
+    require(kInitialMultiplier >= 1e18, "kInitialMultiplier must be >= 1e18");
+
     // a safe initial default value
     uint256 initialSafeExponentBitShifting = 50;
 
@@ -303,14 +294,15 @@ contract Staker is IStaker, Initializable {
 
     syntheticTokens[marketIndex][true] = longToken;
     syntheticTokens[marketIndex][false] = shortToken;
-
     _changeBalanceIncentiveParameters(
       marketIndex,
       _balanceIncentiveCurve_exponent,
       _balanceIncentiveCurve_equilibriumOffset,
       initialSafeExponentBitShifting
     );
-    _changeMarketLaunchIncentiveParameters(marketIndex, kPeriod, kInitialMultiplier);
+
+    marketLaunchIncentive_period[marketIndex] = kPeriod;
+    marketLaunchIncentive_multipliers[marketIndex] = kInitialMultiplier;
 
     _changeUnstakeFee(marketIndex, unstakeFee_e18);
 
@@ -555,14 +547,18 @@ contract Staker is IStaker, Initializable {
       );
 
     // Set cumulative 'r' value on new accumulativeIssuancePerStakedSynthSnapshot.
-    accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][marketUpdateIndex]
+
+    AccumulativeIssuancePerStakedSynthSnapshot
+      storage accumulativeFloatPerSyntheticTokenSnapshot = accumulativeFloatPerSyntheticTokenSnapshots[
+        marketIndex
+      ][marketUpdateIndex];
+    accumulativeFloatPerSyntheticTokenSnapshot
       .accumulativeFloatPerSyntheticToken_long = newLongAccumulativeValue;
-    accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][marketUpdateIndex]
+    accumulativeFloatPerSyntheticTokenSnapshot
       .accumulativeFloatPerSyntheticToken_short = newShortAccumulativeValue;
 
     // Set timestamp on new accumulativeIssuancePerStakedSynthSnapshot.
-    accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][marketUpdateIndex].timestamp = block
-      .timestamp;
+    accumulativeFloatPerSyntheticTokenSnapshot.timestamp = block.timestamp;
 
     // Update latest index to point to new accumulativeIssuancePerStakedSynthSnapshot.
     latestRewardIndex[marketIndex] = marketUpdateIndex;

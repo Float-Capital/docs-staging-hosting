@@ -11,7 +11,6 @@ import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 contract OracleManagerChainlink is IOracleManager {
   // Admin addresses.
   address public admin;
-
   // Global state.
   AggregatorV3Interface public chainlinkOracle;
   uint8 public oracleDecimals;
@@ -54,7 +53,7 @@ contract OracleManagerChainlink is IOracleManager {
     return _getLatestPrice();
   }
 
-  function updatePrice() external override returns (int256) {
+  function updatePrice() external virtual override returns (int256) {
     return _getLatestPrice();
   }
 }

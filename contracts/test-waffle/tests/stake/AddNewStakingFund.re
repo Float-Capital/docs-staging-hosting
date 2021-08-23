@@ -13,7 +13,8 @@ let test =
     let marketIndex = 1;
     let sampleLongAddress = Helpers.randomAddress();
     let sampleShortAddress = Helpers.randomAddress();
-    let kInitialMultiplier = Helpers.randomInteger();
+    let kInitialMultiplier =
+      CONSTANTS.tenToThe18->add(Helpers.randomInteger());
     let kPeriod = Helpers.randomInteger();
     let unstakeFee_e18 = Helpers.randomInteger();
 
@@ -51,8 +52,7 @@ let test =
             ~balanceIncentiveCurve_equilibriumOffset=bnFromInt(0),
           );
       promiseRef := promise;
-      let%Await _ = promise;
-      ();
+      promise;
     });
 
     it_skip("calls the onlyLongShortModifier", () => {
@@ -60,20 +60,12 @@ let test =
       ->toHaveCallCount(0)
     });
 
-    it(
-      "calls _changeMarketLaunchIncentiveParameters with correct arguments", () => {
-      StakerSmocked.InternalMock._changeMarketLaunchIncentiveParametersCallCheck({
-        marketIndex,
-        period: kPeriod,
-        initialMultiplier: kInitialMultiplier,
-      })
-    });
-
     it("calls _changeUnstakeFee with correct arguments", () => {
+      Js.log(9);
       StakerSmocked.InternalMock._changeUnstakeFeeCallCheck({
         marketIndex,
         newMarketUnstakeFee_e18: unstakeFee_e18,
-      })
+      });
     });
 
     it("mutates accumulativeFloatPerSyntheticTokenSnapshots", () => {

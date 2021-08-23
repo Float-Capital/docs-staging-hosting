@@ -260,14 +260,19 @@ type longShortUnitTestContracts = {
 
 let deployAYieldManager = (~longShort: Ethers.ethAddress, ~lendingPoolAddressesProvider) => {
   ERC20Mock.make(~name="Pay Token 1", ~symbol="PT1")->JsPromise.then(paymentToken =>
-    YieldManagerAave.make(
-      ~longShort,
-      ~treasury=CONSTANTS.zeroAddress,
-      ~paymentToken=paymentToken.address,
-      ~aToken=CONSTANTS.zeroAddress,
-      ~lendingPoolAddressesProvider,
-      ~aaveIncentivesController=randomAddress(),
-      ~aaveReferralCode=0,
+    YieldManagerAave.make()->JsPromise.then(manager =>
+      manager
+      ->YieldManagerAave.initialize(
+        ~longShort,
+        ~treasury=CONSTANTS.zeroAddress,
+        ~paymentToken=paymentToken.address,
+        ~aToken=CONSTANTS.zeroAddress,
+        ~lendingPoolAddressesProvider,
+        ~aaveIncentivesController=randomAddress(),
+        ~aaveReferralCode=0,
+        ~admin=CONSTANTS.zeroAddress,
+      )
+      ->JsPromise.map(_ => manager)
     )
   )
 }
