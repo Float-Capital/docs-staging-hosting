@@ -62,7 +62,8 @@ let test =
       balanceIncentiveCurve_exponent := balanceIncentiveCurve_exponentFetched;
 
       let%Await safeExponentBitShiftingFetched =
-        contracts.contents.staker->Staker.safeExponentBitShifting;
+        contracts.contents.staker
+        ->Staker.safeExponentBitShifting(marketIndex);
       safeExponentBitShifting := safeExponentBitShiftingFetched;
 
       StakerSmocked.InternalMock.mock_getKValueToReturn(kVal);

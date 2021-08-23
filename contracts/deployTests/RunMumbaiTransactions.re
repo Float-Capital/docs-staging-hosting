@@ -18,7 +18,6 @@ let runMumbaiTransactions = ({longShort, treasury, paymentToken}) => {
   let user2 = loadedAccounts->Array.getUnsafe(3);
   let user3 = loadedAccounts->Array.getUnsafe(4);
 
-  Js.log("here 1");
   let%AwaitThen _ = DeployHelpers.topupBalanceIfLow(~from=admin, ~to_=user1);
   let%AwaitThen _ = DeployHelpers.topupBalanceIfLow(~from=admin, ~to_=user2);
   let%AwaitThen _ = DeployHelpers.topupBalanceIfLow(~from=admin, ~to_=user3);
@@ -34,7 +33,6 @@ let runMumbaiTransactions = ({longShort, treasury, paymentToken}) => {
       ~paymentToken: ERC20Mock.t,
       ~oraclePriceFeedAddress=ChainlinkOracleAddresses.Mumbai.ethOracleChainlink,
     );
-  Js.log("here 2");
 
   let%AwaitThen _ =
     deployMumbaiMarket(
