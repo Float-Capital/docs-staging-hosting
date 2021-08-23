@@ -25,6 +25,7 @@ module.exports = async function (deployer, networkName, accounts) {
   }
 
   const admin = accounts[0];
+  console.log("using admin", admin);
 
   // No contract migrations for testing.
   if (networkName === "test") {
@@ -68,11 +69,15 @@ module.exports = async function (deployer, networkName, accounts) {
   await deployer.deploy(TokenFactory, longShort.address, {
     from: admin,
   });
+  console.log("1")
   let tokenFactory = await TokenFactory.deployed();
+  console.log("2")
+
 
   await longShort.initialize(admin, tokenFactory.address, staker.address, {
     from: admin,
   });
+  console.log("3")
 
   await floatToken.initialize("Float token", "FLOAT TOKEN", staker.address, {
     from: admin,
@@ -91,64 +96,64 @@ module.exports = async function (deployer, networkName, accounts) {
     }
   );
 
-  if (networkName == "mumbai") {
-    const adminInstance = await getAdminInstance();
+  // if (networkName == "mumbai") {
+  //   const adminInstance = await getAdminInstance();
 
-    // untested
-    console.log(`To verify all these contracts run the following:
-    
-    \`truffle run verify TokenFactory FloatToken@${await adminInstance.getProxyImplementation(
-      floatToken.address
-    )} Treasury_v0@${await adminInstance.getProxyImplementation(
-      treasury.address
-    )} FloatCapital_v0@${await adminInstance.getProxyImplementation(
-      floatCapital.address
-    )} Staker@${await adminInstance.getProxyImplementation(
-      staker.address
-    )} LongShort@${await adminInstance.getProxyImplementation(
-      longShort.address
-    )} --network mumbai\``);
+  //   // untested
+  //   console.log(`To verify all these contracts run the following:
 
-    /**
-     * KEEP THESE FOR REFERENCE - shows how to verify contracts in tenderly automatically using ethers:
-     * 
-  const hardhat = require("hardhat")
-  const contracts = [
-    {
-      name: "TokenFactory",
-      address: (await TokenFactory.deployed()).address
-    },
-    {
-      name: "FloatToken",
-      address: (await FloatToken.deployed()).address
-    },
-    {
-      name: "Treasury_v0",
-      address: await adminInstance.getProxyImplementation(
-        (await Treasury.deployed()).address
-      )
-    },
-    {
-      name: "LongShort",
-      address: await adminInstance.getProxyImplementation(
-        (await LongShort.deployed()).address
-      )
-    },
-    {
-      name: "FloatCapital_v0",
-      address: await adminInstance.getProxyImplementation(
-        (await FloatCapital.deployed()).address
-      )
-    },
-    {
-      name: "Staker",
-      address: await adminInstance.getProxyImplementation(
-        (await Staker.deployed()).address
-      )
-    }
-  ]
- 
-  await hardhat.tenderly.verify(...contracts)
-     */
-  }
+  //   \`truffle run verify TokenFactory FloatToken@${await adminInstance.getProxyImplementation(
+  //     floatToken.address
+  //   )} Treasury_v0@${await adminInstance.getProxyImplementation(
+  //     treasury.address
+  //   )} FloatCapital_v0@${await adminInstance.getProxyImplementation(
+  //     floatCapital.address
+  //   )} Staker@${await adminInstance.getProxyImplementation(
+  //     staker.address
+  //   )} LongShort@${await adminInstance.getProxyImplementation(
+  //     longShort.address
+  //   )} --network mumbai\``);
+
+  //   /**
+  //    * KEEP THESE FOR REFERENCE - shows how to verify contracts in tenderly automatically using ethers:
+  //    * 
+  // const hardhat = require("hardhat")
+  // const contracts = [
+  //   {
+  //     name: "TokenFactory",
+  //     address: (await TokenFactory.deployed()).address
+  //   },
+  //   {
+  //     name: "FloatToken",
+  //     address: (await FloatToken.deployed()).address
+  //   },
+  //   {
+  //     name: "Treasury_v0",
+  //     address: await adminInstance.getProxyImplementation(
+  //       (await Treasury.deployed()).address
+  //     )
+  //   },
+  //   {
+  //     name: "LongShort",
+  //     address: await adminInstance.getProxyImplementation(
+  //       (await LongShort.deployed()).address
+  //     )
+  //   },
+  //   {
+  //     name: "FloatCapital_v0",
+  //     address: await adminInstance.getProxyImplementation(
+  //       (await FloatCapital.deployed()).address
+  //     )
+  //   },
+  //   {
+  //     name: "Staker",
+  //     address: await adminInstance.getProxyImplementation(
+  //       (await Staker.deployed()).address
+  //     )
+  //   }
+  // ]
+
+  // await hardhat.tenderly.verify(...contracts)
+  //    */
+  // }
 };
