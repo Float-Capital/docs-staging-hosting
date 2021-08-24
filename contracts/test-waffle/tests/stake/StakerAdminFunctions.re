@@ -9,7 +9,6 @@ let testUnit =
     ) => {
   describe("Staker Admin Functions", () => {
     let marketIndex = Helpers.randomJsInteger();
-<<<<<<< HEAD
     // let randomAddress1 = Helpers.randomAddress();
 
     // describe("changeAdmin", () => {
@@ -61,58 +60,6 @@ let testUnit =
     //     );
     //   });
     // });
-=======
-    let randomAddress1 = Helpers.randomAddress();
-
-    describe("changeAdmin", () => {
-      let txPromiseRef: ref(JsPromise.t(ContractHelpers.transaction)) =
-        ref(()->JsPromise.resolve->Obj.magic);
-
-      before_once'(() => {
-        let%Await _ =
-          contracts.contents.staker
-          ->StakerSmocked.InternalMock.setupFunctionForUnitTesting(
-              ~functionName="changeAdmin",
-            );
-
-        txPromiseRef :=
-          contracts.contents.staker->Staker.changeAdmin(~admin=randomAddress1);
-        txPromiseRef.contents;
-      });
-
-      it("should call the onlyAdmin modifier", () => {
-        StakerSmocked.InternalMock.onlyAdminModifierLogicCallCheck()
-      });
-
-      it("emits ChangeAdmin with correct argument", () => {
-        Chai.callEmitEvents(
-          ~call=txPromiseRef.contents,
-          ~contract=contracts.contents.staker->Obj.magic,
-          ~eventName="ChangeAdmin",
-        )
-        ->Chai.withArgs2(randomAddress1)
-      });
-
-      it("should allow admin to change admin correctly", () => {
-        let newAdmin = Helpers.randomAddress();
-        let currentAdmin = accounts.contents->Array.getUnsafe(0);
-
-        let%Await _ =
-          contracts.contents.staker
-          ->ContractHelpers.connect(~address=currentAdmin)
-          ->Staker.changeAdmin(~admin=newAdmin);
-
-        let%Await updatedAdmin =
-          contracts.contents.staker->Staker.Exposed.admin;
-
-        Chai.addressEqual(
-          updatedAdmin,
-          ~otherAddress=newAdmin,
-          ~message="staker admin is not newAdmin",
-        );
-      });
-    });
->>>>>>> dev
 
     describe("changeFloatPercentage", () => {
       let newFloatPerc = bnFromString("42000000000000000");
