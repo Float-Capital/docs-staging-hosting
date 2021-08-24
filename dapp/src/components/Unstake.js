@@ -10,7 +10,6 @@ var Button = require("./UI/Base/Button.js");
 var Config = require("../config/Config.js");
 var Ethers = require("../ethereum/Ethers.js");
 var Loader = require("./UI/Base/Loader.js");
-var Ethers$1 = require("ethers");
 var Queries = require("../data/Queries.js");
 var Contracts = require("../ethereum/Contracts.js");
 var DataHooks = require("../data/DataHooks.js");
@@ -409,6 +408,10 @@ var StakeForm = {
   useForm: useForm
 };
 
+function toNumber(prim) {
+  return prim.toNumber();
+}
+
 function Unstake$UnstakeTxStatusModal(Props) {
   var txStateUnstake = Props.txStateUnstake;
   var resetFormButton = Props.resetFormButton;
@@ -514,13 +517,16 @@ var StakeFormInput = {
 };
 
 function Unstake$ConnectedStakeForm(Props) {
-  var tokenId = Props.tokenId;
   var signer = Props.signer;
-  var synthetic = Props.synthetic;
-  var match = ContractActions.useContractFunction(signer);
-  var setTxState = match[2];
-  var txState = match[1];
-  var contractExecutionHandler = match[0];
+  var param = Props.synthetic;
+  var match = param.syntheticMarket;
+  var marketIndex = match.marketIndex;
+  var tokenType = param.tokenType;
+  var tokenId = param.id;
+  var match$1 = ContractActions.useContractFunction(signer);
+  var setTxState = match$1[2];
+  var txState = match$1[1];
+  var contractExecutionHandler = match$1[0];
   var user = RootProvider.useCurrentUserExn(undefined);
   var optTokenBalance = Belt_Option.flatMap(DataHooks.Util.graphResponseToOption(DataHooks.useStakesForUser(Ethers.Utils.ethAdrToLowerStr(user))), (function (a) {
           return Belt_Option.flatMap(Belt_Array.get(Belt_Array.keep(a, (function (param) {
@@ -533,11 +539,12 @@ function Unstake$ConnectedStakeForm(Props) {
         amount: ""
       }, (function (param, _form) {
           var amount = param.amount;
-          var arg = Ethers$1.utils.getAddress(tokenId);
+          var arg = marketIndex.toNumber();
+          var arg$1 = tokenType === "Long";
           return Curry._2(contractExecutionHandler, (function (param) {
                         return Contracts.Staker.make(Config.staker, param);
                       }), (function (param) {
-                        return param.withdraw(arg, amount);
+                        return param.withdraw(arg, arg$1, amount);
                       }));
         }));
   var toastDispatch = React.useContext(ToastProvider.DispatchToastContext.context);
@@ -606,13 +613,13 @@ function Unstake$ConnectedStakeForm(Props) {
                 children: "Reset & Unstake Again"
               });
   };
-  var match$1 = form.amountResult;
-  var formAmount = match$1 !== undefined && match$1.TAG === /* Ok */0 ? Caml_option.some(match$1._0) : undefined;
-  var defaultButtonText = "Unstake " + synthetic.tokenType + " " + synthetic.syntheticMarket.name;
-  var match$2;
+  var match$2 = form.amountResult;
+  var formAmount = match$2 !== undefined && match$2.TAG === /* Ok */0 ? Caml_option.some(match$2._0) : undefined;
+  var defaultButtonText = "Unstake " + tokenType + " " + match.name;
+  var match$3;
   if (formAmount !== undefined && optTokenBalance !== undefined) {
     var greaterThanBalance = Caml_option.valFromOption(formAmount).gt(Caml_option.valFromOption(optTokenBalance));
-    match$2 = greaterThanBalance ? [
+    match$3 = greaterThanBalance ? [
         "Amount is greater than your balance",
         "Insufficient balance",
         true
@@ -622,7 +629,7 @@ function Unstake$ConnectedStakeForm(Props) {
         form.submitting || !Curry._1(form.valid, undefined)
       ];
   } else {
-    match$2 = [
+    match$3 = [
       undefined,
       defaultButtonText,
       true
@@ -654,8 +661,8 @@ function Unstake$ConnectedStakeForm(Props) {
                     txStateUnstake: txState,
                     resetFormButton: resetFormButton
                   }),
-              buttonDisabled: match$2[2],
-              buttonText: match$2[1]
+              buttonDisabled: match$3[2],
+              buttonText: match$3[1]
             });
 }
 
@@ -703,7 +710,6 @@ function Unstake(Props) {
   if (synthetic !== undefined) {
     if (optSigner !== undefined) {
       return React.createElement(Unstake$ConnectedStakeForm, {
-                  tokenId: tokenId,
                   signer: optSigner,
                   synthetic: synthetic
                 });
@@ -729,6 +735,7 @@ function Unstake(Props) {
 var make = Unstake;
 
 exports.StakeForm = StakeForm;
+exports.toNumber = toNumber;
 exports.UnstakeTxStatusModal = UnstakeTxStatusModal;
 exports.StakeFormInput = StakeFormInput;
 exports.ConnectedStakeForm = ConnectedStakeForm;
