@@ -37,22 +37,6 @@ let testUnit =
       })
     });
 
-    describe("onlyValidMarketModifierLogic", () => {
-      it("reverts if market invalid (i.e. still has the zero address)", () => {
-        let randomWallet = accounts.contents->Array.getUnsafe(2);
-
-        Chai.expectRevert(
-          ~transaction=
-            contracts.contents.staker
-            ->ContractHelpers.connect(~address=randomWallet)
-            ->Staker.Exposed.onlyValidMarketModifierLogicExposed(
-                ~marketIndex=0,
-              ),
-          ~reason="not valid market",
-        );
-      })
-    });
-
     describe("onlyLongShortModifierLogic", () => {
       it("reverts if caller is not LongShort", () => {
         let randomWallet = accounts.contents->Array.getUnsafe(3);

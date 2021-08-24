@@ -32,8 +32,7 @@ let test =
 
       floatCapitalAddressRef := contracts^.floatCapital_v0.address;
 
-      let%AwaitThen floatTokenSmocked =
-        FloatTokenSmocked.make(contracts^.floatToken);
+      let%AwaitThen floatTokenSmocked = FloatTokenSmocked.make();
 
       floatTokenSmockedRef := floatTokenSmocked;
 
@@ -48,18 +47,14 @@ let test =
 
     it("calls mint on floatToken for user for amount floatToMint", () =>
       (floatTokenSmockedRef^)
-      ->FloatTokenSmocked.mintCalls
-      ->Array.getExn(0)
-      ->Chai.recordEqualFlat({_to: user, amount: floatToMint})
+      ->FloatTokenSmocked.mintCallCheck({_to: user, amount: floatToMint})
     );
 
     it(
       "calls mint on floatTokens for floatCapital for amount (floatToMint * floatPercentage) / 1e18",
       () =>
       (floatTokenSmockedRef^)
-      ->FloatTokenSmocked.mintCalls
-      ->Array.getExn(1)
-      ->Chai.recordEqualFlat({
+      ->FloatTokenSmocked.mintCallCheck({
           _to: floatCapitalAddressRef^,
           amount:
             floatToMint

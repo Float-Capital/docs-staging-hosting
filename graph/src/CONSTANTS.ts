@@ -24,6 +24,9 @@ export let THREE_DAYS_IN_SECONDS = BigInt.fromI32(259200);
 export let ONE_WEEK_IN_SECONDS = BigInt.fromI32(604800);
 export let TWO_WEEKS_IN_SECONDS = BigInt.fromI32(1209600);
 export let ONE_MONTH_IN_SECONDS = BigInt.fromI32(2628029); // Assuming a month has ~30.417 days in it on average
+export let FLOAT_ISSUANCE_FIXED_DECIMAL = BigInt.fromString(
+  "1000000000000000000000000000000000000000000"
+);
 
 export let PRICE_HISTORY_INTERVALS: BigInt[] = [
   FIVE_MINUTES_IN_SECONDS,
@@ -38,5 +41,6 @@ export let PRICE_HISTORY_INTERVALS: BigInt[] = [
 
 export let MARKET_SIDE_LONG: string = "Long";
 export let MARKET_SIDE_SHORT: string = "Short";
+export let ACTION_SHIFT: string = "Shift";
 export let ACTION_MINT: string = "Mint";
 export let ACTION_REDEEM: string = "Redeem";

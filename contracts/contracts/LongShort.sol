@@ -5,6 +5,7 @@ pragma solidity 0.8.3;
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 import "./interfaces/ITokenFactory.sol";
 import "./interfaces/ISyntheticToken.sol";
@@ -23,8 +24,7 @@ import "./interfaces/IOracleManager.sol";
 /// @dev All functions in this file are currently `virtual`. This is NOT to encourage inheritance.
 /// It is merely for convenince when unit testing.
 /// @custom:auditors This contract balances long and short sides.
-contract LongShort is ILongShort, Initializable {
-
+contract LongShort is ILongShort, Initializable, UUPSUpgradeable {
   //Using Open Zeppelin safe transfer library for token transfers
   using SafeERC20 for IERC20;
 
@@ -45,7 +45,6 @@ contract LongShort is ILongShort, Initializable {
 
   /* ══════ Global state ══════ */
   address public admin;
-  address public treasury;
   uint32 public latestMarket;
 
   address public staker;
@@ -54,7 +53,7 @@ contract LongShort is ILongShort, Initializable {
 
   /* ══════ Market specific ══════ */
   mapping(uint32 => bool) public marketExists;
-  mapping(uint32 => uint256) public assetPrice;
+  mapping(uint32 => int256) public assetPrice;
   mapping(uint32 => uint256) public marketUpdateIndex;
   mapping(uint32 => address) public paymentTokens;
   mapping(uint32 => address) public yieldManagers;
@@ -63,7 +62,7 @@ contract LongShort is ILongShort, Initializable {
 
   /* ══════ Market + position (long/short) specific ══════ */
   mapping(uint32 => mapping(bool => address)) public syntheticTokens;
-  mapping(uint32 => mapping(bool => uint256)) public marketSideValueInPaymentToken;
+  mapping(uint32 => mapping(bool => uint256)) public override marketSideValueInPaymentToken;
 
   /// @notice synthetic token prices of a given market of a (long/short) at every previous price update
   mapping(uint32 => mapping(bool => mapping(uint256 => uint256)))
@@ -83,85 +82,6 @@ contract LongShort is ILongShort, Initializable {
     public userNextPrice_syntheticToken_redeemAmount;
   mapping(uint32 => mapping(bool => mapping(address => uint256)))
     public userNextPrice_syntheticToken_toShiftAwayFrom_marketSide;
-
-  /*╔════════════════════════════╗
-    ║           EVENTS           ║
-    ╚════════════════════════════╝*/
-
-  event LongShortV1(address admin, address treasury, address tokenFactory, address staker);
-
-  event SystemStateUpdated(
-    uint32 marketIndex,
-    uint256 updateIndex,
-    int256 underlyingAssetPrice,
-    uint256 longValue,
-    uint256 shortValue,
-    uint256 longPrice,
-    uint256 shortPrice
-  );
-
-  event SyntheticMarketCreated(
-    uint32 marketIndex,
-    address longTokenAddress,
-    address shortTokenAddress,
-    address paymentToken,
-    uint256 initialAssetPrice,
-    string name,
-    string symbol,
-    address oracleAddress,
-    address yieldManagerAddress
-  );
-
-  event NextPriceRedeem(
-    uint32 marketIndex,
-    bool isLong,
-    uint256 synthRedeemed,
-    address user,
-    uint256 oracleUpdateIndex
-  );
-
-  event NextPriceSyntheticPositionShift(
-    uint32 marketIndex,
-    bool isShiftFromLong,
-    uint256 synthShifted,
-    address user,
-    uint256 oracleUpdateIndex
-  );
-
-  event NextPriceDeposit(
-    uint32 marketIndex,
-    bool isLong,
-    uint256 depositAdded,
-    address user,
-    uint256 oracleUpdateIndex
-  );
-
-  event OracleUpdated(uint32 marketIndex, address oldOracleAddress, address newOracleAddress);
-
-  event NewMarketLaunchedAndSeeded(uint32 marketIndex, uint256 initialSeed);
-
-  event ExecuteNextPriceMintSettlementUser(
-    address user,
-    uint32 marketIndex,
-    bool isLong,
-    uint256 amount
-  );
-
-  event ExecuteNextPriceRedeemSettlementUser(
-    address user,
-    uint32 marketIndex,
-    bool isLong,
-    uint256 amount
-  );
-
-  event ExecuteNextPriceMarketSideShiftSettlementUser(
-    address user,
-    uint32 marketIndex,
-    bool isShiftFromLong,
-    uint256 amount
-  );
-
-  event ExecuteNextPriceSettlementsUser(address user, uint32 marketIndex);
 
   /*╔═════════════════════════════╗
     ║          MODIFIERS          ║
@@ -185,13 +105,12 @@ contract LongShort is ILongShort, Initializable {
     _;
   }
 
-  modifier executeOutstandingNextPriceSettlements(address user, uint32 marketIndex) {
-    _executeOutstandingNextPriceSettlements(user, marketIndex);
-    _;
-  }
-
-  modifier updateSystemStateMarket(uint32 marketIndex) {
+  modifier updateSystemStateMarketAndExecuteOutstandingNextPriceSettlements(
+    address user,
+    uint32 marketIndex
+  ) {
     _updateSystemStateInternal(marketIndex);
+    _executeOutstandingNextPriceSettlements(user, marketIndex);
     _;
   }
 
@@ -202,12 +121,10 @@ contract LongShort is ILongShort, Initializable {
   /// @notice Initializes the contract.
   /// @dev Calls OpenZeppelin's initializer modifier.
   /// @param _admin Address of the admin role.
-  /// @param _treasury Address of the treasury.
   /// @param _tokenFactory Address of the contract which creates synthetic asset tokens.
   /// @param _staker Address of the contract which handles synthetic asset stakes.
   function initialize(
     address _admin,
-    address _treasury,
     address _tokenFactory,
     address _staker
   ) external virtual initializer {
@@ -219,16 +136,19 @@ contract LongShort is ILongShort, Initializable {
     );
 
     admin = _admin;
-    treasury = _treasury;
     tokenFactory = _tokenFactory;
     staker = _staker;
 
-    emit LongShortV1(_admin, _treasury, _tokenFactory, _staker);
+    emit LongShortV1(_admin, _tokenFactory, _staker);
   }
 
   /*╔═══════════════════╗
     ║       ADMIN       ║
     ╚═══════════════════╝*/
+
+  /// @notice Authorizes an upgrade to a new address.
+  /// @dev Can only be called by the current admin.
+  function _authorizeUpgrade(address) internal override adminOnly {}
 
   /// @notice Changes the admin address for this contract.
   /// @dev Can only be called by the current admin.
@@ -239,13 +159,6 @@ contract LongShort is ILongShort, Initializable {
     );
 
     admin = _admin;
-  }
-
-  /// @notice Changes the treasury contract address for this contract.
-  /// @dev Can only be called by the current admin.
-  /// @param _treasury Address of the treasury contract
-  function changeTreasury(address _treasury) external adminOnly {
-    treasury = _treasury;
   }
 
   /// @notice Update oracle for a market
@@ -297,6 +210,7 @@ contract LongShort is ILongShort, Initializable {
     );
 
     uint32 marketIndex = ++latestMarket;
+    address _staker = staker;
 
     // Ensure new markets don't use the same yield manager
     IYieldManager(_yieldManager).initializeForMarket();
@@ -305,7 +219,7 @@ contract LongShort is ILongShort, Initializable {
     syntheticTokens[marketIndex][true] = ITokenFactory(tokenFactory).createSyntheticToken(
       string(abi.encodePacked("Float Up ", syntheticName)),
       string(abi.encodePacked("fu", syntheticSymbol)),
-      staker,
+      _staker,
       marketIndex,
       true
     );
@@ -314,7 +228,7 @@ contract LongShort is ILongShort, Initializable {
     syntheticTokens[marketIndex][false] = ITokenFactory(tokenFactory).createSyntheticToken(
       string(abi.encodePacked("Float Down ", syntheticName)),
       string(abi.encodePacked("fd", syntheticSymbol)),
-      staker,
+      _staker,
       marketIndex,
       false
     );
@@ -323,7 +237,58 @@ contract LongShort is ILongShort, Initializable {
     paymentTokens[marketIndex] = _paymentToken;
     yieldManagers[marketIndex] = _yieldManager;
     oracleManagers[marketIndex] = _oracleManager;
-    assetPrice[marketIndex] = uint256(IOracleManager(oracleManagers[marketIndex]).updatePrice());
+    assetPrice[marketIndex] = IOracleManager(oracleManagers[marketIndex]).updatePrice();
+
+    emit SyntheticMarketCreated(
+      marketIndex,
+      syntheticTokens[marketIndex][true],
+      syntheticTokens[marketIndex][false],
+      _paymentToken,
+      assetPrice[marketIndex],
+      syntheticName,
+      syntheticSymbol,
+      _oracleManager,
+      _yieldManager
+    );
+  }
+
+  /// @notice Creates an entirely new long/short market tracking an underlying oracle price.
+  ///  Uses already created synthetic tokens.
+  /// @dev This does not make the market active.
+  /// The `initializeMarket` function was split out separately to this function to reduce costs.
+  /// @param syntheticName Name of the synthetic asset
+  /// @param syntheticSymbol Symbol for the synthetic asset
+  /// @param _longToken Address for the long token.
+  /// @param _shortToken Address for the short token.
+  /// @param _paymentToken The address of the erc20 token used to buy this synthetic asset
+  /// this will likely always be DAI
+  /// @param _oracleManager The address of the oracle manager that provides the price feed for this market
+  /// @param _yieldManager The contract that manages depositing the paymentToken into a yield bearing protocol
+  function createNewSyntheticMarketUpgradeable(
+    string calldata syntheticName,
+    string calldata syntheticSymbol,
+    address _longToken,
+    address _shortToken,
+    address _paymentToken,
+    address _oracleManager,
+    address _yieldManager
+  ) external adminOnly {
+    uint32 marketIndex = ++latestMarket;
+
+    // Ensure new markets don't use the same yield manager
+    IYieldManager(_yieldManager).initializeForMarket();
+
+    // Assign new synthetic long token.
+    syntheticTokens[marketIndex][true] = _longToken;
+
+    // Assign new synthetic short token.
+    syntheticTokens[marketIndex][false] = _shortToken;
+
+    // Initial market state.
+    paymentTokens[marketIndex] = _paymentToken;
+    yieldManagers[marketIndex] = _yieldManager;
+    oracleManagers[marketIndex] = _oracleManager;
+    assetPrice[marketIndex] = IOracleManager(oracleManagers[marketIndex]).updatePrice();
 
     emit SyntheticMarketCreated(
       marketIndex,
@@ -410,6 +375,8 @@ contract LongShort is ILongShort, Initializable {
     // Set this value to one initially - 0 is a null value and thus potentially bug prone.
     marketUpdateIndex[marketIndex] = 1;
 
+    _seedMarketInitially(initialMarketSeedForEachMarketSide, marketIndex);
+
     // Add new staker funds with fresh synthetic tokens.
     IStaker(staker).addNewStakingFund(
       marketIndex,
@@ -421,8 +388,6 @@ contract LongShort is ILongShort, Initializable {
       balanceIncentiveCurve_exponent,
       balanceIncentiveCurve_equilibriumOffset
     );
-
-    _seedMarketInitially(initialMarketSeedForEachMarketSide, marketIndex);
   }
 
   /*╔══════════════════════════════╗
@@ -587,9 +552,9 @@ contract LongShort is ILongShort, Initializable {
         );
       }
 
-
-        uint256 amountSyntheticTokensToBeShiftedAwayFromOriginSide
-       = userNextPrice_syntheticToken_toShiftAwayFrom_marketSide[marketIndex][!isLong][user];
+      uint256 amountSyntheticTokensToBeShiftedAwayFromOriginSide = userNextPrice_syntheticToken_toShiftAwayFrom_marketSide[
+          marketIndex
+        ][!isLong][user];
 
       if (amountSyntheticTokensToBeShiftedAwayFromOriginSide > 0) {
         uint256 syntheticTokenPriceOnOriginSide = syntheticToken_priceSnapshot[marketIndex][
@@ -630,24 +595,28 @@ contract LongShort is ILongShort, Initializable {
     isLongSideUnderbalanced = longValue < shortValue;
     uint256 imbalance;
 
-    if (isLongSideUnderbalanced) {
-      imbalance = shortValue - longValue;
-    } else {
-      imbalance = longValue - shortValue;
+    unchecked {
+      if (isLongSideUnderbalanced) {
+        imbalance = shortValue - longValue;
+      } else {
+        imbalance = longValue - shortValue;
+      }
     }
 
     // marketTreasurySplitGradient_e18 may be adjusted to ensure yield is given
     // to the market at a desired rate e.g. if a market tends to become imbalanced
     // frequently then the gradient can be increased to funnel yield to the market
     // quicker.
-    // See this equation in latex: https://gateway.pinata.cloud/ipfs/QmXsW4cHtxpJ5BFwRcMSUw7s5G11Qkte13NTEfPLTKEx4x
+    // See this equation in latex: https://ipfs.io/ipfs/QmXsW4cHtxpJ5BFwRcMSUw7s5G11Qkte13NTEfPLTKEx4x
     // Interact with this equation: https://www.desmos.com/calculator/pnl43tfv5b
     uint256 marketPercentCalculated_e18 = (imbalance *
       marketTreasurySplitGradient_e18[marketIndex]) / totalValueLockedInMarket;
 
     uint256 marketPercent_e18 = _getMin(marketPercentCalculated_e18, 1e18);
 
-    treasuryYieldPercent_e18 = 1e18 - marketPercent_e18;
+    unchecked {
+      treasuryYieldPercent_e18 = 1e18 - marketPercent_e18;
+    }
   }
 
   /*╔══════════════════════════════╗
@@ -672,7 +641,7 @@ contract LongShort is ILongShort, Initializable {
     virtual
     returns (uint256 longValue, uint256 shortValue)
   {
-    int256 oldAssetPrice = int256(assetPrice[marketIndex]);
+    int256 oldAssetPrice = assetPrice[marketIndex];
     // Claiming and distributing the yield
     longValue = marketSideValueInPaymentToken[marketIndex][true];
     shortValue = marketSideValueInPaymentToken[marketIndex][false];
@@ -686,10 +655,10 @@ contract LongShort is ILongShort, Initializable {
     );
 
     uint256 marketAmount = IYieldManager(yieldManagers[marketIndex])
-    .distributeYieldForTreasuryAndReturnMarketAllocation(
-      totalValueLockedInMarket,
-      treasuryYieldPercent_e18
-    );
+      .distributeYieldForTreasuryAndReturnMarketAllocation(
+        totalValueLockedInMarket,
+        treasuryYieldPercent_e18
+      );
 
     if (marketAmount > 0) {
       if (isLongSideUnderbalanced) {
@@ -708,7 +677,7 @@ contract LongShort is ILongShort, Initializable {
     // $50 * 10% = $5 gained for short side and conversely $5 lost for long side.
     int256 underbalancedSideValue = int256(_getMin(longValue, shortValue));
 
-    // See this equation in latex: https://gateway.pinata.cloud/ipfs/QmPeJ3SZdn1GfxqCD4GDYyWTJGPMSHkjPJaxrzk2qTTPSE
+    // See this equation in latex: https://ipfs.io/ipfs/QmPeJ3SZdn1GfxqCD4GDYyWTJGPMSHkjPJaxrzk2qTTPSE
     // Interact with this equation: https://www.desmos.com/calculator/t8gr6j5vsq
     int256 valueChange = ((newAssetPrice - oldAssetPrice) * underbalancedSideValue) / oldAssetPrice;
 
@@ -752,7 +721,7 @@ contract LongShort is ILongShort, Initializable {
 
     uint256 currentMarketIndex = marketUpdateIndex[marketIndex];
 
-    bool assetPriceHasChanged = int256(assetPrice[marketIndex]) != newAssetPrice;
+    bool assetPriceHasChanged = assetPrice[marketIndex] != newAssetPrice;
 
     if (assetPriceHasChanged) {
       uint256 syntheticTokenPrice_inPaymentTokens_long = syntheticToken_priceSnapshot[marketIndex][
@@ -787,7 +756,7 @@ contract LongShort is ILongShort, Initializable {
         ISyntheticToken(syntheticTokens[marketIndex][false]).totalSupply()
       );
 
-      assetPrice[marketIndex] = uint256(newAssetPrice);
+      assetPrice[marketIndex] = newAssetPrice;
 
       currentMarketIndex++;
       marketUpdateIndex[marketIndex] = currentMarketIndex;
@@ -804,10 +773,10 @@ contract LongShort is ILongShort, Initializable {
         int256 long_changeInMarketValue_inPaymentToken,
         int256 short_changeInMarketValue_inPaymentToken
       ) = _batchConfirmOutstandingPendingActions(
-        marketIndex,
-        syntheticTokenPrice_inPaymentTokens_long,
-        syntheticTokenPrice_inPaymentTokens_short
-      );
+          marketIndex,
+          syntheticTokenPrice_inPaymentTokens_long,
+          syntheticTokenPrice_inPaymentTokens_short
+        );
 
       newLongPoolValue = uint256(
         int256(newLongPoolValue) + long_changeInMarketValue_inPaymentToken
@@ -839,7 +808,8 @@ contract LongShort is ILongShort, Initializable {
   /// @notice Updates the state of multiples markets to account for their latest oracle price updates.
   /// @param marketIndexes An array of int32s which uniquely identify markets.
   function updateSystemStateMulti(uint32[] calldata marketIndexes) external override {
-    for (uint256 i = 0; i < marketIndexes.length; i++) {
+    uint256 length = marketIndexes.length;
+    for (uint256 i = 0; i < length; i++) {
       _updateSystemStateInternal(marketIndexes[i]);
     }
   }
@@ -857,11 +827,11 @@ contract LongShort is ILongShort, Initializable {
     internal
     virtual
   {
-      IERC20(paymentTokens[marketIndex]).safeTransferFrom(
-        msg.sender,
-        yieldManagers[marketIndex],
-        amount
-      );
+    IERC20(paymentTokens[marketIndex]).safeTransferFrom(
+      msg.sender,
+      yieldManagers[marketIndex],
+      amount
+    );
   }
 
   /*╔═══════════════════════════╗
@@ -880,22 +850,16 @@ contract LongShort is ILongShort, Initializable {
   )
     internal
     virtual
-    updateSystemStateMarket(marketIndex)
-    executeOutstandingNextPriceSettlements(msg.sender, marketIndex)
+    updateSystemStateMarketAndExecuteOutstandingNextPriceSettlements(msg.sender, marketIndex)
   {
     _transferPaymentTokensFromUserToYieldManager(marketIndex, amount);
 
     batched_amountPaymentToken_deposit[marketIndex][isLong] += amount;
     userNextPrice_paymentToken_depositAmount[marketIndex][isLong][msg.sender] += amount;
-    userNextPrice_currentUpdateIndex[marketIndex][msg.sender] = marketUpdateIndex[marketIndex] + 1;
+    uint256 nextUpdateIndex = marketUpdateIndex[marketIndex] + 1;
+    userNextPrice_currentUpdateIndex[marketIndex][msg.sender] = nextUpdateIndex;
 
-    emit NextPriceDeposit(
-      marketIndex,
-      isLong,
-      amount,
-      msg.sender,
-      marketUpdateIndex[marketIndex] + 1
-    );
+    emit NextPriceDeposit(marketIndex, isLong, amount, msg.sender, nextUpdateIndex);
   }
 
   /// @notice Allows users to mint long synthetic assets for a market. To prevent front-running these mints are executed on the next price update from the oracle.
@@ -928,8 +892,7 @@ contract LongShort is ILongShort, Initializable {
   )
     internal
     virtual
-    updateSystemStateMarket(marketIndex)
-    executeOutstandingNextPriceSettlements(msg.sender, marketIndex)
+    updateSystemStateMarketAndExecuteOutstandingNextPriceSettlements(msg.sender, marketIndex)
   {
     ISyntheticToken(syntheticTokens[marketIndex][isLong]).transferFrom(
       msg.sender,
@@ -938,17 +901,12 @@ contract LongShort is ILongShort, Initializable {
     );
 
     userNextPrice_syntheticToken_redeemAmount[marketIndex][isLong][msg.sender] += tokens_redeem;
-    userNextPrice_currentUpdateIndex[marketIndex][msg.sender] = marketUpdateIndex[marketIndex] + 1;
+    uint256 nextUpdateIndex = marketUpdateIndex[marketIndex] + 1;
+    userNextPrice_currentUpdateIndex[marketIndex][msg.sender] = nextUpdateIndex;
 
     batched_amountSyntheticToken_redeem[marketIndex][isLong] += tokens_redeem;
 
-    emit NextPriceRedeem(
-      marketIndex,
-      isLong,
-      tokens_redeem,
-      msg.sender,
-      marketUpdateIndex[marketIndex] + 1
-    );
+    emit NextPriceRedeem(marketIndex, isLong, tokens_redeem, msg.sender, nextUpdateIndex);
   }
 
   /// @notice  Allows users to redeem long synthetic assets for a market. To prevent front-running these redeems are executed on the next price update from the oracle.
@@ -982,8 +940,7 @@ contract LongShort is ILongShort, Initializable {
     public
     virtual
     override
-    updateSystemStateMarket(marketIndex)
-    executeOutstandingNextPriceSettlements(msg.sender, marketIndex)
+    updateSystemStateMarketAndExecuteOutstandingNextPriceSettlements(msg.sender, marketIndex)
   {
     require(
       ISyntheticToken(syntheticTokens[marketIndex][isShiftFromLong]).transferFrom(
@@ -996,7 +953,8 @@ contract LongShort is ILongShort, Initializable {
     userNextPrice_syntheticToken_toShiftAwayFrom_marketSide[marketIndex][isShiftFromLong][
       msg.sender
     ] += amountSyntheticTokensToShift;
-    userNextPrice_currentUpdateIndex[marketIndex][msg.sender] = marketUpdateIndex[marketIndex] + 1;
+    uint256 nextUpdateIndex = marketUpdateIndex[marketIndex] + 1;
+    userNextPrice_currentUpdateIndex[marketIndex][msg.sender] = nextUpdateIndex;
 
     batched_amountSyntheticToken_toShiftAwayFrom_marketSide[marketIndex][
       isShiftFromLong
@@ -1007,7 +965,7 @@ contract LongShort is ILongShort, Initializable {
       isShiftFromLong,
       amountSyntheticTokensToShift,
       msg.sender,
-      marketUpdateIndex[marketIndex] + 1
+      nextUpdateIndex
     );
   }
 
@@ -1115,9 +1073,9 @@ contract LongShort is ILongShort, Initializable {
     address user,
     bool isShiftFromLong
   ) internal virtual {
-
-      uint256 syntheticToken_toShiftAwayFrom_marketSide
-     = userNextPrice_syntheticToken_toShiftAwayFrom_marketSide[marketIndex][isShiftFromLong][user];
+    uint256 syntheticToken_toShiftAwayFrom_marketSide = userNextPrice_syntheticToken_toShiftAwayFrom_marketSide[
+        marketIndex
+      ][isShiftFromLong][user];
     if (syntheticToken_toShiftAwayFrom_marketSide > 0) {
       uint256 syntheticToken_toShiftTowardsTargetSide = getAmountSyntheticTokenToMintOnTargetSide(
         marketIndex,
@@ -1186,7 +1144,8 @@ contract LongShort is ILongShort, Initializable {
     address user,
     uint32[] memory marketIndexes
   ) external {
-    for (uint256 i = 0; i < marketIndexes.length; i++) {
+    uint256 length = marketIndexes.length;
+    for (uint256 i = 0; i < length; i++) {
       _executeOutstandingNextPriceSettlements(user, marketIndexes[i]);
     }
   }

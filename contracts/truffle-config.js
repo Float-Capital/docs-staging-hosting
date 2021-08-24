@@ -8,6 +8,7 @@ const {
   goerliProviderUrl,
   etherscanApiKey,
   polygonscanApiKey,
+  mumbaiAlchemyUrl,
 } = require("./secretsManager.js");
 
 const blockchainNodeHost = process.env.BLOCKCHAIN_NODE_HOST || "localhost";
@@ -60,8 +61,10 @@ module.exports = {
       // provider: lazyCreateNetwork(
       //   "https://rpc-mumbai.maticvigil.com/v1/d68927e8a4cc85eb49e23c93e63f3b018a90efc0"
       // ),
-      // provider: lazyCreateNetwork("https://matic-mumbai.chainstacklabs.com"),
-      provider: lazyCreateNetwork("https://matic-testnet-archive-rpc.bwarelabs.com"),
+      provider: lazyCreateNetwork("https://matic-mumbai.chainstacklabs.com"),
+      // provider: lazyCreateNetwork(
+      //   "https://matic-testnet-archive-rpc.bwarelabs.com"
+      // ),
       gasPrice: 1000000000, // 1 gwei
       skipDryRun: true,
     },

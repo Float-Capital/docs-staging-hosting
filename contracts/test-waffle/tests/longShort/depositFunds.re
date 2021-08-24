@@ -15,16 +15,13 @@ let testUnit =
       let testYieldManager = Helpers.randomAddress();
 
       let setup = (~testWallet: Ethers.walletType) => {
-        let {paymentToken} = contracts.contents.markets->Array.getUnsafe(0);
-
         let%Await _ =
           contracts.contents.longShort
           ->LongShortSmocked.InternalMock.setupFunctionForUnitTesting(
               ~functionName="_transferPaymentTokensFromUserToYieldManager",
             );
 
-        let%AwaitThen smockedPaymentToken =
-          ERC20MockSmocked.make(paymentToken);
+        let%AwaitThen smockedPaymentToken = ERC20MockSmocked.make();
         smockedPaymentToken->ERC20MockSmocked.mockTransferFromToReturn(true);
         paymentTokenSmocked := smockedPaymentToken;
 
@@ -50,12 +47,12 @@ let testUnit =
         let testWallet = accounts.contents->Array.getUnsafe(1);
         let%Await _ = setup(~testWallet);
 
-        let transferFromCalls =
-          paymentTokenSmocked.contents->ERC20MockSmocked.transferFromCalls;
-
-        transferFromCalls->Chai.recordArrayDeepEqualFlat([|
-          {sender: testWallet.address, recipient: testYieldManager, amount},
-        |]);
+        paymentTokenSmocked.contents
+        ->ERC20MockSmocked.transferFromCallCheck({
+            sender: testWallet.address,
+            recipient: testYieldManager,
+            amount,
+          });
       });
     });
   });

@@ -34,6 +34,20 @@ module.exports = {
       width: {
         "1/8": "12%",
         "1/10": "10%",
+        "9/10": "90%",
+        "price-width": "12rem",
+        "mint-width": "38rem",
+      },
+      height: {
+        "80-percent-screen": "80vh",
+        "price-height": "8rem",
+      },
+      boxShadow: {
+        "inner-card": "inset 1px 1px 2px 0 rgba(0, 0, 0, 0.3)",
+        "outer-card": "2px 2px 2px 0 rgba(0, 0, 0, 0.3)",
+      },
+      scale: {
+        102: "1.02",
       },
     },
     /* Most of the time we customize the font-sizes,
@@ -145,7 +159,7 @@ module.exports = {
       alphbeta: ["alphbeta"],
       vt323: ["vt323"],
       arimo: ["arimo"],
-      default: ["menlo", "sans-serif"],
+      default: ["menlo", "'Roboto Mono'", "sans-serif"],
     },
   },
   variants: {

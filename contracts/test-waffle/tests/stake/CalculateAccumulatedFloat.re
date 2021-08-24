@@ -12,7 +12,7 @@ let makeIterator = anyArray => {
 };
 
 let smockedCalculateAccumulatedFloatInRangeMultiBinding = [%raw
-  {|(_r, arr) => _r.smocked._calculateAccumulatedFloatInRangeMock.will.return.with(makeIterator(arr))|}
+  {|(_r, arr) => _r._calculateAccumulatedFloatInRangeMock.returns(makeIterator(arr))|}
 ];
 
 // TODO: now that `_calculateAccumulatedFloatInRange` is unit tested, simplify these tests and use mocks correctly (this is a bit of an integration test)
@@ -178,7 +178,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
       let smockedLongShort = ref(LongShortSmocked.uninitializedValue);
 
       let setup = (~isShiftFromLong) => {
-        let {staker, longShort} = contracts.contents;
+        let {staker} = contracts.contents;
 
         let%AwaitThen _ = staker->StakerSmocked.InternalMock.setup;
 
@@ -211,7 +211,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
             ~userNextPrice_stakedSyntheticTokenShiftIndex,
             ~latestRewardIndex,
           );
-        let%AwaitThen longShortSmocked = longShort->LongShortSmocked.make;
+        let%AwaitThen longShortSmocked = LongShortSmocked.make();
         let%AwaitThen _ =
           staker->Staker.Exposed.setLongShort(
             ~longShort=longShortSmocked.address,
@@ -251,56 +251,41 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
           () => {
           let%Await _ = setup(~isShiftFromLong);
 
-          let calculateAccumulatedFloatInRangeCalls =
-            StakerSmocked.InternalMock._calculateAccumulatedFloatInRangeCalls();
-
           let stakeIncreasedSide =
             amountStakedBothSidesInitially->add(amountOfStakeShifted);
           let stakeDecreasedSide =
             amountStakedBothSidesInitially->sub(amountToShift);
 
-          Chai.recordArrayDeepEqualFlat(
-            calculateAccumulatedFloatInRangeCalls,
-            [|
-              {
-                marketIndex,
-                amountStakedLong: amountStakedBothSidesInitially,
-                amountStakedShort: amountStakedBothSidesInitially,
-                rewardIndexFrom: usersLatestClaimedReward,
-                rewardIndexTo: userNextPrice_stakedSyntheticTokenShiftIndex,
-              },
-              {
-                marketIndex,
-                amountStakedLong:
-                  isShiftFromLong ? stakeDecreasedSide : stakeIncreasedSide,
-                amountStakedShort:
-                  isShiftFromLong ? stakeIncreasedSide : stakeDecreasedSide,
-                rewardIndexFrom: userNextPrice_stakedSyntheticTokenShiftIndex,
-                rewardIndexTo: latestRewardIndex,
-              },
-            |],
-          );
+          let _ =
+            StakerSmocked.InternalMock._calculateAccumulatedFloatInRangeCallCheck({
+              marketIndex,
+              amountStakedLong: amountStakedBothSidesInitially,
+              amountStakedShort: amountStakedBothSidesInitially,
+              rewardIndexFrom: usersLatestClaimedReward,
+              rewardIndexTo: userNextPrice_stakedSyntheticTokenShiftIndex,
+            });
+          StakerSmocked.InternalMock._calculateAccumulatedFloatInRangeCallCheck({
+            marketIndex,
+            amountStakedLong:
+              isShiftFromLong ? stakeDecreasedSide : stakeIncreasedSide,
+            amountStakedShort:
+              isShiftFromLong ? stakeIncreasedSide : stakeDecreasedSide,
+            rewardIndexFrom: userNextPrice_stakedSyntheticTokenShiftIndex,
+            rewardIndexTo: latestRewardIndex,
+          });
         });
         it(
-          "it should call LongShort.getAmountSyntheticTokenToMintOnTargetSideCalls with the correct parameters",
+          "it should call LongShort.getAmountSyntheticTokenToMintOnTargetSideCallCheck with the correct parameters",
           () => {
             let%Await _ = setup(~isShiftFromLong);
 
-            let getAmountSyntheticTokenToMintOnTargetSideCalls =
-              smockedLongShort.contents
-              ->LongShortSmocked.getAmountSyntheticTokenToMintOnTargetSideCalls;
-
-            Chai.recordArrayDeepEqualFlat(
-              getAmountSyntheticTokenToMintOnTargetSideCalls,
-              [|
-                {
-                  marketIndex,
-                  amountSyntheticToken_redeemOnOriginSide: amountToShift,
-                  isShiftFromLong,
-                  priceSnapshotIndex: userNextPrice_stakedSyntheticTokenShiftIndex,
-                },
-              |],
-            );
+            smockedLongShort.contents
+            ->LongShortSmocked.getAmountSyntheticTokenToMintOnTargetSideCallCheck({
+                marketIndex,
+                amountSyntheticToken_redeemOnOriginSide: amountToShift,
+                isShiftFromLong,
+                priceSnapshotIndex: userNextPrice_stakedSyntheticTokenShiftIndex,
+              });
           },
         );
         it(

@@ -13,7 +13,6 @@ import "./interfaces/ILongShort.sol";
 
 /** @title ILO Contract */
 contract ILO is Initializable, UUPSUpgradeable, AccessControlUpgradeable {
-
   //Using Open Zeppelin safe transfer library for token transfers
   using SafeERC20 for IERC20;
 

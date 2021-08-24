@@ -4,6 +4,8 @@ pragma solidity 0.8.3;
 
 /// @notice Manages yield accumulation for the LongShort contract. Each market is deployed with its own yield manager to simplify the bookkeeping, as different markets may share a payment token and yield pool.
 abstract contract IYieldManager {
+  event ClaimAaveRewardTokenToTreasury(uint256 amount);
+
   event YieldDistributed(uint256 unrealizedYield, uint256 treasuryYieldPercent_e18);
 
   /// @dev This is purely saving some gas, but the subgraph will know how much is due for the treasury at all times - no need to include in event.

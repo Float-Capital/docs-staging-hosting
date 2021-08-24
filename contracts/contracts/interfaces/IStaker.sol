@@ -3,6 +3,61 @@
 pragma solidity 0.8.3;
 
 interface IStaker {
+  /*╔════════════════════════════╗
+    ║           EVENTS           ║
+    ╚════════════════════════════╝*/
+
+  event StakerV1(
+    address admin,
+    address floatTreasury,
+    address floatCapital,
+    address floatToken,
+    uint256 floatPercentage
+  );
+
+  event MarketAddedToStaker(
+    uint32 marketIndex,
+    uint256 exitFee_e18,
+    uint256 period,
+    uint256 multiplier,
+    uint256 balanceIncentiveExponent,
+    int256 balanceIncentiveEquilibriumOffset,
+    uint256 safeExponentBitShifting
+  );
+
+  event AccumulativeIssuancePerStakedSynthSnapshotCreated(
+    uint32 marketIndex,
+    uint256 accumulativeFloatIssuanceSnapshotIndex,
+    uint256 accumulativeLong,
+    uint256 accumulativeShort
+  );
+
+  event StakeAdded(address user, address token, uint256 amount, uint256 lastMintIndex);
+
+  event StakeWithdrawn(address user, address token, uint256 amount);
+
+  // Note: the `amountFloatMinted` isn't strictly needed by the graph, but it is good to add it to validate calculations are accurate.
+  event FloatMinted(address user, uint32 marketIndex, uint256 amountFloatMinted);
+
+  event MarketLaunchIncentiveParametersChanges(
+    uint32 marketIndex,
+    uint256 period,
+    uint256 multiplier
+  );
+
+  event StakeWithdrawalFeeUpdated(uint32 marketIndex, uint256 stakeWithdralFee);
+
+  event BalanceIncentiveParamsUpdated(
+    uint32 marketIndex,
+    uint256 balanceIncentiveExponent,
+    int256 balanceIncentiveCurve_equilibriumOffset,
+    uint256 safeExponentBitShifting
+  );
+
+  event FloatPercentageUpdated(uint256 floatPercentage);
+
+  event ChangeAdmin(address newAdmin);
+
   function addNewStakingFund(
     uint32 marketIndex,
     address longTokenAddress,

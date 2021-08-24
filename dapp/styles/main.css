@@ -9,6 +9,29 @@ html {
   scroll-behavior: smooth;
 }
 
+
+@import url("https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap");
+
+.shine {
+  background: linear-gradient(
+    -45deg,
+    rgba(255, 255, 255, 0.55) 25%,
+    rgba(255, 255, 255, 0.85) 35%,
+    rgba(255, 255, 255, 0.55) 63%
+  );
+  background-size: 400% 100% !important;
+  animation: placeholder-active 1.15s ease;
+}
+
+
+@keyframes placeholder-active {
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0 50%;
+  }
+}
 #app,
 .island {
   /* It is possible to make this a utility (https://tailwindcss.com/docs/plugins#adding-utilities)
