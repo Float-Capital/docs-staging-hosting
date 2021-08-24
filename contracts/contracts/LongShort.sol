@@ -211,6 +211,13 @@ contract LongShort is ILongShort, Initializable {
     address _tokenFactory,
     address _staker
   ) external virtual initializer {
+    require(
+      _admin != address(0) &&
+      _treasury != address(0) &&
+      _tokenFactory != address(0) &&
+      _staker != address(0)
+    );
+
     admin = _admin;
     treasury = _treasury;
     tokenFactory = _tokenFactory;
@@ -227,6 +234,10 @@ contract LongShort is ILongShort, Initializable {
   /// @dev Can only be called by the current admin.
   /// @param _admin Address of the new admin.
   function changeAdmin(address _admin) external adminOnly {
+    require(
+      _admin != address(0)
+    );
+
     admin = _admin;
   }
 
@@ -278,6 +289,13 @@ contract LongShort is ILongShort, Initializable {
     address _oracleManager,
     address _yieldManager
   ) external adminOnly {
+
+    require(
+      _paymentToken != address(0) &&
+      _oracleManager != address(0) &&
+      _yieldManager != address(0) 
+    );
+
     uint32 marketIndex = ++latestMarket;
 
     // Ensure new markets don't use the same yield manager
@@ -374,6 +392,16 @@ contract LongShort is ILongShort, Initializable {
     int256 balanceIncentiveCurve_equilibriumOffset,
     uint256 _marketTreasurySplitGradient_e18
   ) external adminOnly {
+    require(
+      kInitialMultiplier != 0 &&
+      kPeriod != 0 &&
+      unstakeFee_e18 != 0 &&
+      initialMarketSeedForEachMarketSide != 0 &&
+      balanceIncentiveCurve_exponent != 0 &&
+      balanceIncentiveCurve_equilibriumOffset != 0 &&
+      _marketTreasurySplitGradient_e18 != 0
+    );
+    
     require(!marketExists[marketIndex], "already initialized");
     require(marketIndex <= latestMarket, "index too high");
 
