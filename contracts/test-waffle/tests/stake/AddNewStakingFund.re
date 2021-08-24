@@ -2,6 +2,7 @@ open Globals;
 open LetOps;
 open StakerHelpers;
 open Mocha;
+open SmockGeneral;
 
 let test =
     (
@@ -12,7 +13,8 @@ let test =
     let marketIndex = 1;
     let sampleLongAddress = Helpers.randomAddress();
     let sampleShortAddress = Helpers.randomAddress();
-    let kInitialMultiplier = Helpers.randomInteger();
+    let kInitialMultiplier =
+      CONSTANTS.tenToThe18->add(Helpers.randomInteger());
     let kPeriod = Helpers.randomInteger();
     let unstakeFee_e18 = Helpers.randomInteger();
 
@@ -50,35 +52,20 @@ let test =
             ~balanceIncentiveCurve_equilibriumOffset=bnFromInt(0),
           );
       promiseRef := promise;
-      let%Await _ = promise;
-      ();
+      promise;
     });
 
     it_skip("calls the onlyLongShortModifier", () => {
-      // StakerSmocked.InternalMock.onlyFloatCalls()
-      // ->Array.length
-      // ->Chai.intEqual(1)
-      ()
-    });
-
-    it(
-      "calls _changeMarketLaunchIncentiveParameters with correct arguments", () => {
-      StakerSmocked.InternalMock._changeMarketLaunchIncentiveParametersCalls()
-      ->Array.getUnsafe(0)
-      ->Chai.recordEqualFlat({
-          marketIndex,
-          period: kPeriod,
-          initialMultiplier: kInitialMultiplier,
-        })
+      expect(StakerSmocked.InternalMock.onlyLongShortModifierLogicFunction())
+      ->toHaveCallCount(0)
     });
 
     it("calls _changeUnstakeFee with correct arguments", () => {
-      StakerSmocked.InternalMock._changeUnstakeFeeCalls()
-      ->Array.getUnsafe(0)
-      ->Chai.recordEqualFlat({
-          marketIndex,
-          newMarketUnstakeFee_e18: unstakeFee_e18,
-        })
+      Js.log(9);
+      StakerSmocked.InternalMock._changeUnstakeFeeCallCheck({
+        marketIndex,
+        newMarketUnstakeFee_e18: unstakeFee_e18,
+      });
     });
 
     it("mutates accumulativeFloatPerSyntheticTokenSnapshots", () => {

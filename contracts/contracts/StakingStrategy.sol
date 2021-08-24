@@ -12,7 +12,7 @@ import "./interfaces/IStaker.sol";
 import "./StrategyToken.sol";
 
 /** @title ILO Contract */
-contract ILO is Initializable, UUPSUpgradeable, AccessControlUpgradeable {
+contract StakingStrategy is Initializable, UUPSUpgradeable, AccessControlUpgradeable {
   bytes32 public constant UPGRADER_ROLE = keccak256("UPGRADER_ROLE");
 
   address public longShort;
@@ -59,6 +59,7 @@ contract ILO is Initializable, UUPSUpgradeable, AccessControlUpgradeable {
       longTokenAddress,
       shortTokenAddress
     );
+    //TODO
     //two transfers - can optimise
     ISyntheticToken(longTokenAddress).transferFrom(msg.sender, address(this), amountLong);
     ISyntheticToken(shortTokenAddress).transferFrom(msg.sender, address(this), amountShort);
@@ -70,6 +71,7 @@ contract ILO is Initializable, UUPSUpgradeable, AccessControlUpgradeable {
       longTokenAddress,
       shortTokenAddress
     );
+    //TODO
     //can maybe add this method to longShort contract?
     (uint256 longTokenPrice, uint256 shortTokenPrice) = _getLongAndShortTokenPrice(marketIndex);
 
@@ -81,6 +83,7 @@ contract ILO is Initializable, UUPSUpgradeable, AccessControlUpgradeable {
       longTokenPrice,
       shortTokenPrice
     );
+    //TODO
     //can seperate this into it's own method?
     uint256 shares;
 
@@ -106,7 +109,7 @@ contract ILO is Initializable, UUPSUpgradeable, AccessControlUpgradeable {
     uint32 marketIndex,
     address _longTokenAddress,
     address _shortTokenAddress
-  ) internal returns (uint256, uint256) {
+  ) internal view returns (uint256, uint256) {
     IStaker _staker = IStaker(staker);
     uint256 amountStakedLong = _staker.userAmountStaked(_longTokenAddress, address(this));
     uint256 amountStakedShort = _staker.userAmountStaked(_shortTokenAddress, address(this));
@@ -114,7 +117,7 @@ contract ILO is Initializable, UUPSUpgradeable, AccessControlUpgradeable {
     return (amountStakedLong, amountStakedShort);
   }
 
-  //calculate the shares for the user
+  //TODO calculate the shares for the user
   function _calculateUserShares() internal returns (uint256) {
     // add the logic for share distribution here
   }
@@ -124,7 +127,7 @@ contract ILO is Initializable, UUPSUpgradeable, AccessControlUpgradeable {
     uint32 marketIndex,
     address _longTokenAddress,
     address _shortTokenAddress
-  ) internal returns (uint256) {
+  ) internal view returns (uint256) {
     uint256 marketUpdateIndex = ILongShort(longShort).marketUpdateIndex(marketIndex);
     uint256 longTokenPrice = ILongShort(longShort).syntheticToken_priceSnapshot(
       marketIndex,
@@ -147,6 +150,7 @@ contract ILO is Initializable, UUPSUpgradeable, AccessControlUpgradeable {
 
   function _getLongAndShortTokenPrice(uint32 marketIndex)
     internal
+    view
     returns (uint256 longTokenPrice, uint256 shortTokenPrice)
   {
     uint256 marketUpdateIndex = ILongShort(longShort).marketUpdateIndex(marketIndex);
@@ -198,4 +202,5 @@ contract ILO is Initializable, UUPSUpgradeable, AccessControlUpgradeable {
       );
     }
   }
+  //TODO Add external function to balance position
 }

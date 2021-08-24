@@ -79,13 +79,9 @@ function txStateChangeHelper(
       let user = getOrCreateUser(event.transaction.from, event);
       let globalState = getOrCreateGlobalState();
 
-      user.totalGasUsed = user.totalGasUsed.plus(event.block.gasUsed);
       user.numberOfTransactions = user.numberOfTransactions.plus(ONE);
 
       globalState.totalTxs = globalState.totalTxs.plus(ONE);
-      globalState.totalGasUsed = globalState.totalGasUsed.plus(
-        event.block.gasUsed
-      );
 
       globalState.save();
       user.save();

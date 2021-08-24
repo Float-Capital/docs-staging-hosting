@@ -2,6 +2,7 @@ open Globals;
 open LetOps;
 open StakerHelpers;
 open Mocha;
+open SmockGeneral;
 
 let test =
     (
@@ -35,8 +36,7 @@ let test =
           ~accounts,
         );
 
-      let {longShort} = contracts.contents;
-      let%Await longShortSmocked = longShort->LongShortSmocked.make;
+      let%Await longShortSmocked = LongShortSmocked.make();
       longShortSmockedRef := longShortSmocked;
 
       mockTokenWalletRef := accounts.contents->Array.getExn(6);
@@ -62,7 +62,7 @@ let test =
     };
 
     it_skip("calls onlyValidSynthetic with correct args", () => {
-      // StakerSmocked.InternalMock.onlyValidSyntheticCalls()
+      // StakerSmocked.InternalMock.onlyValidSyntheticCallCheck()
       // ->Array.getExn(0)
       // ->Chai.recordEqualFlat({synth: mockTokenWalletRef.contents.address})
       ()
@@ -77,10 +77,9 @@ let test =
       Js.log(marketIndexForToken);
 
       longShortSmockedRef.contents
-      ->LongShortSmocked.updateSystemStateCalls
-      ->Chai.recordArrayDeepEqualFlat([|
-          {marketIndex: marketIndexForToken},
-        |]);
+      ->LongShortSmocked.updateSystemStateCallCheck({
+          marketIndex: marketIndexForToken,
+        });
     });
 
     describe("case user has outstanding float to be minted", () => {
@@ -92,9 +91,10 @@ let test =
       );
 
       it("calls mintAccumulatedFloat with correct args", () => {
-        StakerSmocked.InternalMock._mintAccumulatedFloatAndExecuteOutstandingShiftsCalls()
-        ->Array.getExn(0)
-        ->Chai.recordEqualFlat({marketIndex: marketIndexForToken, user: from})
+        StakerSmocked.InternalMock._mintAccumulatedFloatAndExecuteOutstandingShiftsCallCheck({
+          marketIndex: marketIndexForToken,
+          user: from,
+        })
       });
       it("mutates userAmountStaked", () => {
         let%Await amountStaked =
@@ -141,9 +141,10 @@ let test =
       );
 
       it("doesn't call mintAccumulatedFloat", () => {
-        StakerSmocked.InternalMock._mintAccumulatedFloatAndExecuteOutstandingShiftsCalls()
-        ->Array.length
-        ->Chai.intEqual(0)
+        expect(
+          StakerSmocked.InternalMock._mintAccumulatedFloatAndExecuteOutstandingShiftsFunction(),
+        )
+        ->toHaveCallCount(0)
       });
     });
 
@@ -155,9 +156,10 @@ let test =
       );
 
       it("doesn't call mintAccumulatedFloat", () => {
-        StakerSmocked.InternalMock._mintAccumulatedFloatAndExecuteOutstandingShiftsCalls()
-        ->Array.length
-        ->Chai.intEqual(0)
+        expect(
+          StakerSmocked.InternalMock._mintAccumulatedFloatAndExecuteOutstandingShiftsFunction(),
+        )
+        ->toHaveCallCount(0)
       });
     });
   });

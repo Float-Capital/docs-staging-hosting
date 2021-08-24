@@ -82,6 +82,10 @@ contract LongShortInternalStateSetters is LongShort {
     overRideexecuteOutstandingNextPriceSettlements = shouldUseMock;
   }
 
+  function setCreateSyntheticMarketUpgradeableGlobals(uint32 _latestMarket) public {
+    latestMarket = _latestMarket;
+  }
+
   function setGetUsersConfirmedButNotSettledBalanceGlobals(
     uint32 marketIndex,
     address user,

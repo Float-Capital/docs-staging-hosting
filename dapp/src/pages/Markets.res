@@ -79,8 +79,14 @@ module PriceCard = {
       <div className="z-10 absolute w-full h-full flex items-center justify-center" onClick />
       <div
         className="pt-2 text-xs font-medium flex-1 md:flex-initial md:w-full flex justify-between">
-        <div className="mx-3"> {market.name->React.string} </div>
-        <div className="mx-3">
+        <div className="mx-3 flex flex-row items-center">
+          <img
+            src={Backend.getMarketInfoUnsafe(market.marketIndex->Ethers.BigNumber.toNumber).icon}
+            className="h-3 mr-1"
+          />
+          {market.name->React.string}
+        </div>
+        <div className="mr-3">
           {switch state {
           | Response({latestPrice}) => `\$${latestPrice}`->React.string
           | _ => React.null
@@ -116,7 +122,13 @@ module Mint = {
     @react.component
     let make = (~market: Queries.SyntheticMarketInfo.t, ~actionOption, ~marketIndex) => {
       <div className="flex justify-between items-center mb-2">
-        <div className="text-xl"> <TypedCharacters str={market.name} /> </div>
+        <div className="text-xl flex flex-row items-center">
+          <img
+            src={Backend.getMarketInfoUnsafe(market.marketIndex->Ethers.BigNumber.toNumber).icon}
+            className="h-6 mr-2"
+          />
+          <TypedCharacters str={market.name} />
+        </div>
         <Next.Link
           href={`/app/markets?marketIndex=${marketIndex->Int.toString}&actionOption=${actionOption}`}>
           <div className="text-xxs hover:underline cursor-pointer">

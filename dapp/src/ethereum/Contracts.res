@@ -58,7 +58,7 @@ module Staker = {
     [
       "function stake(address tokenAddress, uint256 amount)",
       "function stakeAndEarnImmediately(address tokenAddress, uint256 amount)  @1200000",
-      "function withdraw(address tokenAddress, uint256 amount) @5000000",
+      "function withdraw(uint32, bool, uint256 amount) @5000000",
       "function claimFloatCustom(uint32[] calldata marketIndexes) @2000000",
     ]->Ethers.makeAbi
 
@@ -80,7 +80,8 @@ module Staker = {
   @send
   external withdraw: (
     ~contract: t,
-    ~tokenAddress: Ethers.ethAddress,
+    ~marketIndex: int,
+    ~isWithdrawFromLong: bool,
     ~amount: Ethers.BigNumber.t,
   ) => JsPromise.t<Ethers.txSubmitted> = "withdraw"
   @send

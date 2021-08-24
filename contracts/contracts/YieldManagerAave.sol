@@ -4,6 +4,9 @@ pragma solidity 0.8.3;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 import "./interfaces/IYieldManager.sol";
 import "./interfaces/aave/ILendingPool.sol";
@@ -17,29 +20,31 @@ import "./interfaces/aave/IAaveIncentivesController.sol";
   continuously accrues interest based on a lend/borrow liquidity ratio.
   @dev https://docs.aave.com/portal/
   */
-contract YieldManagerAave is IYieldManager {
+contract YieldManagerAave is IYieldManager, Initializable, UUPSUpgradeable {
   /*╔═════════════════════════════╗
     ║          VARIABLES          ║
     ╚═════════════════════════════╝*/
 
+  /// @notice address of the admin for the contract
+  address public admin;
   /// @notice address of longShort contract
-  address public immutable longShort;
+  address public longShort;
   /// @notice address of treasury contract - this is the address that can claim aave incentives rewards
-  address public immutable treasury;
+  address public treasury;
 
   /// @notice boolean to prevent markets using an already initialized market
   bool public isInitialized;
 
   /// @notice The payment token the yield manager supports
   /// @dev DAI token
-  IERC20 public immutable paymentToken;
+  IERC20 public paymentToken;
   /// @notice The token representing the interest accruing payment token position from Aave
   /// @dev ADAI token
-  IERC20Upgradeable public immutable aToken;
+  IERC20Upgradeable public aToken;
   /// @notice The specific Aave lending pool address provider contract
-  ILendingPoolAddressesProvider public immutable lendingPoolAddressesProvider;
+  ILendingPoolAddressesProvider public lendingPoolAddressesProvider;
   /// @notice The specific Aave incentives controller contract
-  IAaveIncentivesController public immutable aaveIncentivesController;
+  IAaveIncentivesController public aaveIncentivesController;
 
   /// @dev An aave specific referralCode that has been a depricated feature. This will be set to 0 for "no referral" at deployment
   uint16 referralCode;
@@ -73,19 +78,22 @@ contract YieldManagerAave is IYieldManager {
     @param _aToken address of the interest accruing token linked to the payment token
     @param _lendingPoolAddressesProvider address of the aave lending pool address provider contract
     @param _aaveReferralCode unique code for aave referrals
+    @param _admin admin for the contract
     @dev referral code will be set to 0, depricated Aave feature
   */
-  constructor(
+  function initialize(
     address _longShort,
     address _treasury,
     address _paymentToken,
     address _aToken,
     address _lendingPoolAddressesProvider,
     address _aaveIncentivesController,
-    uint16 _aaveReferralCode
-  ) {
+    uint16 _aaveReferralCode,
+    address _admin
+  ) external initializer {
     longShort = _longShort;
     treasury = _treasury;
+    admin = _admin;
 
     referralCode = _aaveReferralCode;
 
@@ -104,6 +112,24 @@ contract YieldManagerAave is IYieldManager {
   function updateLatestLendingPoolAddress() external {
     IERC20(paymentToken).approve(lendingPoolAddressesProvider.getLendingPool(), type(uint256).max);
   }
+
+  /*╔════════════════════════════════╗
+    ║    MULTISIG ADMIN FUNCTIONS    ║
+    ╚════════════════════════════════╝*/
+
+  modifier onlyAdmin() {
+    require(msg.sender == admin, "Not admin");
+    _;
+  }
+
+  /// @notice Changes the current admin for the contract.
+  function changeAdmin(address _admin) external onlyAdmin {
+    admin = _admin;
+  }
+
+  /// @notice Authorizes an upgrade to a new address.
+  /// @dev Can only be called by the current admin.
+  function _authorizeUpgrade(address) internal override onlyAdmin {}
 
   /*╔════════════════════════╗
     ║     IMPLEMENTATION     ║

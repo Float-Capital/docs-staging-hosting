@@ -1,4 +1,7 @@
-const { runTestTransactions } = require("../DeployTests/RunTestTransactions");
+const { runTestTransactions } = require("../deployTests/RunTestTransactions");
+const {
+  runMumbaiTransactions,
+} = require("../deployTests/RunMumbaiTransactions");
 const { ethers, getNamedAccounts } = require("hardhat");
 
 const {
@@ -16,18 +19,26 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
   const { deploy, log, get } = deployments;
   const { deployer, admin } = await getNamedAccounts();
 
+  console.log("here 1.1");
   /////////////////////////
   //Retrieve Deployments//
   ////////////////////////
-  const PaymentToken = await deployments.get(COLLATERAL_TOKEN);
+  let paymentTokenAddress;
+  if (network.name == "mumbai") {
+    paymentTokenAddress = "0x001B3B4d0F3714Ca98ba10F6042DaEbF0B1B7b6F";
+  } else if (network.name == "hardhat" || network.name == "ganache") {
+    paymentTokenAddress = (await deployments.get(COLLATERAL_TOKEN)).address;
+  }
   const paymentToken = await ethers.getContractAt(
     COLLATERAL_TOKEN,
-    PaymentToken.address
+    paymentTokenAddress
   );
+  console.log("here 1.2");
 
   const LongShort = await deployments.get(LONGSHORT);
   const longShort = await ethers.getContractAt(LONGSHORT, LongShort.address);
 
+  console.log("here 1.3");
   const Treasury = await deployments.get(TREASURY);
   const treasury = await ethers.getContractAt(TREASURY, Treasury.address);
 
@@ -36,6 +47,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     TOKEN_FACTORY,
     TokenFactory.address
   );
+  console.log("here 1.4");
 
   const Staker = await deployments.get(STAKER);
   const staker = await ethers.getContractAt(STAKER, Staker.address);
@@ -54,13 +66,9 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
   ///////////////////////////
   //Initialize the contracts/
   ///////////////////////////
-  await longShort.initialize(
-    admin,
-    tokenFactory.address,
-    staker.address
-  );
+  await longShort.initialize(admin, tokenFactory.address, staker.address);
 
-  await floatToken.initialize("Float token", "FLOAT TOKEN", staker.address);
+  await floatToken.initialize("Float", "FLT", staker.address);
 
   await staker.initialize(
     admin,
@@ -72,12 +80,23 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
   );
 
   console.log("before test txs");
-  await runTestTransactions({
-    staker,
-    longShort: longShort.connect(admin),
-    paymentToken,
-    treasury,
-  });
+  if (network.name == "mumbai") {
+    console.log("mumbai test transactions");
+    await runMumbaiTransactions({
+      staker,
+      longShort: longShort.connect(admin),
+      paymentToken,
+      treasury,
+    });
+  } else if (network.name == "hardhat" || network.name == "ganache") {
+    console.log("mumbai test transactions");
+    await runTestTransactions({
+      staker,
+      longShort: longShort.connect(admin),
+      paymentToken,
+      treasury,
+    });
+  }
   console.log("after test txs");
 };
 module.exports.tags = ["all", "setup"];

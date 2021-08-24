@@ -92,6 +92,11 @@ interface ILongShort {
     uint256
   ) external view returns (uint256);
 
+  function marketSideValueInPaymentToken(uint32 marketIndex, bool isLong)
+    external
+    view
+    returns (uint256 marketSideValueInPaymentToken);
+
   function updateSystemState(uint32 marketIndex) external;
 
   function updateSystemStateMulti(uint32[] calldata marketIndex) external;

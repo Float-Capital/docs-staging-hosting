@@ -89,7 +89,7 @@ function totalValueCard(totalValueLocked) {
                 }, "$" + Misc.NumberFormat.formatEther(undefined, totalValueLocked)));
 }
 
-function floatProtocolCard(liveSince, totalTxs, totalUsers, totalGasUsed, txHash, numberOfSynths) {
+function floatProtocolCard(liveSince, totalTxs, totalUsers, txHash, numberOfSynths) {
   var dateObj = FromUnixTime(liveSince.toNumber());
   return React.createElement(Masonry.Card.make, {
               children: null
@@ -101,8 +101,7 @@ function floatProtocolCard(liveSince, totalTxs, totalUsers, totalGasUsed, txHash
                     StatsLi.Props.createStatsLiProps(undefined, "📅 Days live:", FormatDistanceToNow(dateObj), undefined, undefined),
                     StatsLi.Props.createStatsLiProps(undefined, "📈 No. txs:", totalTxs.toString(), undefined, undefined),
                     StatsLi.Props.createStatsLiProps(undefined, "👯‍♀️ No. users:", totalUsers.toString(), undefined, undefined),
-                    StatsLi.Props.createStatsLiProps(undefined, "👷‍♀️ No. synths:", numberOfSynths, undefined, undefined),
-                    StatsLi.Props.createStatsLiProps(undefined, "⛽ Gas used:", Misc.NumberFormat.formatInt(totalGasUsed.toString()), undefined, undefined)
+                    StatsLi.Props.createStatsLiProps(undefined, "👷‍♀️ No. synths:", numberOfSynths, undefined, undefined)
                   ]
                 }));
 }
@@ -235,7 +234,7 @@ function Stats(Props) {
             }, totalValueCard(totalValueLocked), React.createElement(Masonry.Container.make, {
                   children: null
                 }, React.createElement(Masonry.Divider.make, {
-                      children: floatProtocolCard($$global.timestampLaunched, $$global.totalTxs, $$global.totalUsers, $$global.totalGasUsed, $$global.txHash, numberOfSynths)
+                      children: floatProtocolCard($$global.timestampLaunched, $$global.totalTxs, $$global.totalUsers, $$global.txHash, numberOfSynths)
                     }), React.createElement(Masonry.Divider.make, {
                       children: null
                     }, syntheticAssetsCard(totalSynthValue), floatTokenCard($$global.totalFloatMinted)), React.createElement(Masonry.Divider.make, {

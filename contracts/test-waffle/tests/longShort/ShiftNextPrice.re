@@ -179,12 +179,11 @@ let testUnit =
               ~amountSyntheticTokensToShift,
             );
 
-        let shiftPositionNextPriceCalls =
-          LongShortSmocked.InternalMock.shiftPositionNextPriceCalls();
-
-        shiftPositionNextPriceCalls->Chai.recordArrayDeepEqualFlat([|
-          {marketIndex, amountSyntheticTokensToShift, isShiftFromLong: true},
-        |]);
+        LongShortSmocked.InternalMock.shiftPositionNextPriceCallCheck({
+          marketIndex,
+          amountSyntheticTokensToShift,
+          isShiftFromLong: true,
+        });
       })
     });
 
@@ -205,12 +204,11 @@ let testUnit =
               ~amountSyntheticTokensToShift,
             );
 
-        let shiftPositionNextPriceCalls =
-          LongShortSmocked.InternalMock.shiftPositionNextPriceCalls();
-
-        shiftPositionNextPriceCalls->Chai.recordArrayDeepEqualFlat([|
-          {marketIndex, amountSyntheticTokensToShift, isShiftFromLong: false},
-        |]);
+        LongShortSmocked.InternalMock.shiftPositionNextPriceCallCheck({
+          marketIndex,
+          amountSyntheticTokensToShift,
+          isShiftFromLong: false,
+        });
       })
     });
   });
@@ -222,10 +220,9 @@ let testUnit =
     let smockedSyntheticToken = ref(SyntheticTokenSmocked.uninitializedValue);
 
     let setup = (~isShiftFromLong, ~testWallet: Ethers.walletType) => {
-      let {longShort, markets} = contracts.contents;
-      let {longSynth} = markets->Array.getUnsafe(0);
+      let {longShort} = contracts.contents;
 
-      let%AwaitThen longSynthSmocked = longSynth->SyntheticTokenSmocked.make;
+      let%AwaitThen longSynthSmocked = SyntheticTokenSmocked.make();
       longSynthSmocked->SyntheticTokenSmocked.mockTransferFromToReturn(true);
       smockedSyntheticToken := longSynthSmocked;
 
@@ -259,14 +256,11 @@ let testUnit =
 
         let%Await _ = setup(~isShiftFromLong, ~testWallet);
 
-        let executeOutstandingNextPriceSettlementsCalls =
-          LongShortSmocked.InternalMock._executeOutstandingNextPriceSettlementsCalls();
-
         // TODO: fix bug in codegen that adds the modifiers to the generated code too (which means this gets called twice - even though it only gets called once!)
-        executeOutstandingNextPriceSettlementsCalls->Chai.recordArrayDeepEqualFlat([|
-          {user: testWallet.address, marketIndex},
-          {user: testWallet.address, marketIndex},
-        |]);
+        LongShortSmocked.InternalMock._executeOutstandingNextPriceSettlementsCallCheck({
+          user: testWallet.address,
+          marketIndex,
+        });
       });
 
       it("emits the NextPriceSyntheticPositionShift event", () => {
@@ -293,17 +287,12 @@ let testUnit =
 
         let%Await _ = setup(~isShiftFromLong, ~testWallet);
 
-        let transferFrom =
-          smockedSyntheticToken.contents
-          ->SyntheticTokenSmocked.transferFromCalls;
-
-        transferFrom->Chai.recordArrayDeepEqualFlat([|
-          {
+        smockedSyntheticToken.contents
+        ->SyntheticTokenSmocked.transferFromCallCheck({
             sender: testWallet.address,
             recipient: contracts.contents.longShort.address,
             amount,
-          },
-        |]);
+          });
       });
 
       it("updates the correct state variables with correct values", () => {

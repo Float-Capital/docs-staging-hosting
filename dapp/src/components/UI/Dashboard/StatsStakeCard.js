@@ -22,7 +22,7 @@ function StatsStakeCard(Props) {
   var rewards = Props.rewards;
   var stakeYield = Props.stakeYield;
   return React.createElement(Link, {
-              href: "/app/stake",
+              href: "/app/stake-markets",
               children: React.createElement("div", {
                     className: "mb-5 flex w-11/12 mx-auto border-2 border-light-purple rounded-lg z-10 shadow cursor-pointer"
                   }, React.createElement("div", {

@@ -8,6 +8,14 @@ require("@nomiclabs/hardhat-ethers");
 
 require("hardhat-docgen");
 
+let config;
+try {
+  config = require("./secretsManager.js");
+} catch (e) {
+  console.error("You are using the example secrets manager, please copy this file if you want to use it")
+  config = require("./secretsManager.example.js");
+}
+
 const {
   mnemonic,
   mainnetProviderUrl,
@@ -17,7 +25,7 @@ const {
   etherscanApiKey,
   polygonscanApiKey,
   mumbaiProviderUrl,
-} = require("./secretsManager.example.js");
+} = config;
 
 let runCoverage =
   !process.env.DONT_RUN_REPORT_SUMMARY ||
@@ -127,6 +135,7 @@ module.exports = {
       ":Treasury_v0$",
       ":OracleManager$",
       ":OracleManagerChainlink$",
+      ":OracleManagerChainlinkTestnet$",
       ":OracleManagerMock$",
       ":LendingPoolAaveMock$",
       ":LendingPoolAddressesProviderMock$",

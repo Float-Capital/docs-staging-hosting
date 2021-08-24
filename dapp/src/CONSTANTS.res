@@ -63,7 +63,7 @@ let oneYearInSecondsMulTenToThe18 =
 /* Currencies */
 type displayToken = {name: string, iconUrl: string}
 
-let daiDisplayToken: displayToken = {name: "DAI", iconUrl: "/icons/dai.svg"}
+let daiDisplayToken: displayToken = {name: "DAI", iconUrl: "/icons/tokens/dai.svg"}
 let polygonDisplayToken: displayToken = {name: "Polygon", iconUrl: "/icons/polygon.png"}
 
 /* Chains */
