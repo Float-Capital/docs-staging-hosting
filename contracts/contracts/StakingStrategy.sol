@@ -54,10 +54,16 @@ contract StakingStrategy is Initializable, UUPSUpgradeable, AccessControlUpgrade
     address longTokenAddress = _longShort.syntheticTokens(marketIndex, true);
     address shortTokenAddress = _longShort.syntheticTokens(marketIndex, false);
 
+    //TODO
+    //can maybe add this method to longShort contract?
+    (uint256 longTokenPrice, uint256 shortTokenPrice) = _getLongAndShortTokenPrice(marketIndex);
+
     uint256 beforeBalanceOfContract = _getContractStakedBalance(
       marketIndex,
       longTokenAddress,
-      shortTokenAddress
+      shortTokenAddress,
+      longTokenPrice,
+      shortTokenPrice
     );
     //TODO
     //two transfers - can optimise
@@ -69,11 +75,10 @@ contract StakingStrategy is Initializable, UUPSUpgradeable, AccessControlUpgrade
     uint256 totalValueStaked = _getContractStakedBalance(
       marketIndex,
       longTokenAddress,
-      shortTokenAddress
+      shortTokenAddress,
+      longTokenPrice,
+      shortTokenPrice
     );
-    //TODO
-    //can maybe add this method to longShort contract?
-    (uint256 longTokenPrice, uint256 shortTokenPrice) = _getLongAndShortTokenPrice(marketIndex);
 
     _performShiftingStrategy(
       marketIndex,
@@ -107,12 +112,12 @@ contract StakingStrategy is Initializable, UUPSUpgradeable, AccessControlUpgrade
   //Retrieves the number of long and short tokens staked by this contract
   function _getTotalLongAndShortTokensStaked(
     uint32 marketIndex,
-    address _longTokenAddress,
-    address _shortTokenAddress
+    address longTokenAddress,
+    address shortTokenAddress
   ) internal view returns (uint256, uint256) {
     IStaker _staker = IStaker(staker);
-    uint256 amountStakedLong = _staker.userAmountStaked(_longTokenAddress, address(this));
-    uint256 amountStakedShort = _staker.userAmountStaked(_shortTokenAddress, address(this));
+    uint256 amountStakedLong = _staker.userAmountStaked(longTokenAddress, address(this));
+    uint256 amountStakedShort = _staker.userAmountStaked(shortTokenAddress, address(this));
 
     return (amountStakedLong, amountStakedShort);
   }
@@ -125,24 +130,16 @@ contract StakingStrategy is Initializable, UUPSUpgradeable, AccessControlUpgrade
   //Gets the $ balance of the staked tokens
   function _getContractStakedBalance(
     uint32 marketIndex,
-    address _longTokenAddress,
-    address _shortTokenAddress
+    address longTokenAddress,
+    address shortTokenAddress,
+    uint256 longTokenPrice,
+    uint256 shortTokenPrice
   ) internal view returns (uint256) {
     uint256 marketUpdateIndex = ILongShort(longShort).marketUpdateIndex(marketIndex);
-    uint256 longTokenPrice = ILongShort(longShort).syntheticToken_priceSnapshot(
-      marketIndex,
-      true,
-      marketUpdateIndex
-    );
-    uint256 shortTokenPrice = ILongShort(longShort).syntheticToken_priceSnapshot(
-      marketIndex,
-      false,
-      marketUpdateIndex
-    );
     (uint256 _amountStakedLong, uint256 _amountStakedShort) = _getTotalLongAndShortTokensStaked(
       marketIndex,
-      _longTokenAddress,
-      _shortTokenAddress
+      longTokenAddress,
+      shortTokenAddress
     );
 
     return (_amountStakedLong * longTokenPrice + _amountStakedShort * shortTokenPrice) / 1e18;
@@ -202,5 +199,29 @@ contract StakingStrategy is Initializable, UUPSUpgradeable, AccessControlUpgrade
       );
     }
   }
-  //TODO Add external function to balance position
+
+  /// @notice Shifts tokens to either the long or the short position for the market to maintain 50/50 split in $ value
+  /// @param marketIndex An uint32 which uniquely identifies a market.
+  function performShiftingStrategy(uint32 marketIndex) external {
+    address longTokenAddress = ILongShort(longShort).syntheticTokens(marketIndex, true);
+    address shortTokenAddress = ILongShort(longShort).syntheticTokens(marketIndex, false);
+    (uint256 longTokenPrice, uint256 shortTokenPrice) = _getLongAndShortTokenPrice(marketIndex);
+
+    uint256 totalValueStaked = _getContractStakedBalance(
+      marketIndex,
+      longTokenAddress,
+      shortTokenAddress,
+      longTokenPrice,
+      shortTokenPrice
+    );
+
+    _performShiftingStrategy(
+      marketIndex,
+      totalValueStaked,
+      longTokenAddress,
+      shortTokenAddress,
+      longTokenPrice,
+      shortTokenPrice
+    );
+  }
 }
