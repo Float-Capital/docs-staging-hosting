@@ -394,11 +394,9 @@ contract LongShort is ILongShort, Initializable {
   ) external adminOnly {
     require(
       kInitialMultiplier != 0 &&
-      kPeriod != 0 &&
       unstakeFee_e18 != 0 &&
       initialMarketSeedForEachMarketSide != 0 &&
       balanceIncentiveCurve_exponent != 0 &&
-      balanceIncentiveCurve_equilibriumOffset != 0 &&
       _marketTreasurySplitGradient_e18 != 0
     );
     
