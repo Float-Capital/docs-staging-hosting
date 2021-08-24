@@ -139,7 +139,6 @@ describe("Float System", () => {
       });
       AddNewStakingFund.test(~contracts, ~accounts);
       GetKValue.test(~contracts, ~accounts);
-      CalculateFloatPerSecond.test(~contracts, ~accounts);
       CalculateNewCumulativeValue.test(~contracts, ~accounts);
       MintFloat.test(~contracts, ~accounts);
       MintAccumulatedFloat.test(~contracts, ~accounts);
@@ -167,6 +166,7 @@ describe("Float System", () => {
       ClaimFloatCustom.testUnit(~contracts, ~accounts);
       AddNewStateForFloatRewards.testUnit(~contracts, ~accounts);
       Withdraw.testUnit(~contracts, ~accounts);
+      CalculateFloatPerSecond.test(~contracts, ~accounts);
     });
   });
 });
