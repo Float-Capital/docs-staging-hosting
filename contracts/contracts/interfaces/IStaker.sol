@@ -58,6 +58,8 @@ interface IStaker {
 
   event ChangeAdmin(address newAdmin);
 
+  function userAmountStaked(address, address) external view returns (uint256);
+
   function addNewStakingFund(
     uint32 marketIndex,
     address longTokenAddress,
@@ -79,4 +81,10 @@ interface IStaker {
   ) external;
 
   function stakeFromUser(address from, uint256 amount) external;
+
+  function shiftTokens(
+    uint256 amountSyntheticTokensToShift,
+    uint32 marketIndex,
+    bool isShiftFromLong
+  ) external;
 }
