@@ -85,8 +85,6 @@ dataSources:
           handler: handleBalanceIncentiveEquilibriumOffsetUpdated
         - event: BalanceIncentiveExponentUpdated(uint32,uint256)
           handler: handleBalanceIncentiveExponentUpdated
-        - event: ChangeAdmin(address)
-          handler: handleChangeAdmin
         - event: FloatMinted(address,uint32,uint256)
           handler: handleFloatMinted
         - event: FloatPercentageUpdated(uint256)

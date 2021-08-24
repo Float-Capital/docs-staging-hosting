@@ -55,8 +55,6 @@ interface IStaker {
 
   event FloatPercentageUpdated(uint256 floatPercentage);
 
-  event ChangeAdmin(address newAdmin);
-
   function addNewStakingFund(
     uint32 marketIndex,
     address longTokenAddress,

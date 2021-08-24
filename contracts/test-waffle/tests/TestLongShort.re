@@ -85,51 +85,51 @@ describe("Float System", () => {
             contracts.contents.longShort
             ->ContractHelpers.connect(~address=attackerAddress)
             ->LongShort.updateMarketOracle(~marketIndex, ~newOracleManager),
-          ~reason="only admin",
+          ~reason=Helpers.adminErrorMessage(~address=attackerAddress.address),
         );
       });
     });
 
-    describe("changeAdmin", () => {
-      it("should allow admin to update the admin address", () => {
-        let originalAdminAddress =
-          accounts.contents->Array.getUnsafe(0).address;
-        let newAdmin = accounts.contents->Array.getUnsafe(5);
-        let newAdminAddress = newAdmin.address;
+    // describe("changeAdmin", () => {
+    //   it("should allow admin to update the admin address", () => {
+    //     let originalAdminAddress =
+    //       accounts.contents->Array.getUnsafe(0).address;
+    //     let newAdmin = accounts.contents->Array.getUnsafe(5);
+    //     let newAdminAddress = newAdmin.address;
 
-        let%Await _ =
-          contracts.contents.longShort
-          ->LongShort.changeAdmin(~admin=newAdminAddress);
+    //     let%Await _ =
+    //       contracts.contents.longShort
+    //       ->LongShort.changeAdmin(~admin=newAdminAddress);
 
-        let%Await adminFromContract =
-          contracts.contents.longShort->LongShort.admin;
+    //     let%Await adminFromContract =
+    //       contracts.contents.longShort->LongShort.admin;
 
-        Chai.addressEqual(
-          ~message="Admin should be updated by 'changeAdmin' function",
-          ~otherAddress=adminFromContract,
-          newAdminAddress,
-        );
+    //     Chai.addressEqual(
+    //       ~message="Admin should be updated by 'changeAdmin' function",
+    //       ~otherAddress=adminFromContract,
+    //       newAdminAddress,
+    //     );
 
-        let%Await _ =
-          contracts.contents.longShort
-          ->ContractHelpers.connect(~address=newAdmin)
-          ->LongShort.changeAdmin(~admin=originalAdminAddress);
-        ();
-      });
+    //     let%Await _ =
+    //       contracts.contents.longShort
+    //       ->ContractHelpers.connect(~address=newAdmin)
+    //       ->LongShort.changeAdmin(~admin=originalAdminAddress);
+    //     ();
+    //   });
 
-      it("shouldn't allow non admin to update the Admin", () => {
-        let attackerAddress = accounts.contents->Array.getUnsafe(5);
-        let newAdminAddress = accounts.contents->Array.getUnsafe(6).address;
+    //   it("shouldn't allow non admin to update the Admin", () => {
+    //     let attackerAddress = accounts.contents->Array.getUnsafe(5);
+    //     let newAdminAddress = accounts.contents->Array.getUnsafe(6).address;
 
-        Chai.expectRevert(
-          ~transaction=
-            contracts.contents.longShort
-            ->ContractHelpers.connect(~address=attackerAddress)
-            ->LongShort.changeAdmin(~admin=newAdminAddress),
-          ~reason="only admin",
-        );
-      });
-    });
+    //     Chai.expectRevert(
+    //       ~transaction=
+    //         contracts.contents.longShort
+    //         ->ContractHelpers.connect(~address=attackerAddress)
+    //         ->LongShort.changeAdmin(~admin=newAdminAddress),
+    //       ~reason="only admin",
+    //     );
+    //   });
+    // });
     describe("changeMarketTreasurySplitGradient", () => {
       let newGradient = twoBn;
       let marketIndex = 1;
@@ -160,7 +160,7 @@ describe("Float System", () => {
                 ~marketIndex,
                 ~marketTreasurySplitGradient_e18=newGradient,
               ),
-          ~reason="only admin",
+          ~reason=Helpers.adminErrorMessage(~address=attackerAddress.address),
         );
       });
     });

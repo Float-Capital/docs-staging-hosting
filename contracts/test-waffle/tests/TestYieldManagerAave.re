@@ -35,7 +35,7 @@ describe("Float System", () => {
           lendingPoolAddressesProviderSmocked.address,
         ~aaveIncentivesController=aaveIncentivesControllerSmocked.address,
         ~aaveReferralCode=6543,
-        ~admin=CONSTANTS.zeroAddress);
+        ~admin=Helpers.randomAddress());
 
     contracts :=
       {

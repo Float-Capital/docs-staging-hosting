@@ -563,16 +563,3 @@ export function handleStakeWithdrawalFeeUpdate(
     []
   );
 }
-
-export function handleChangeAdmin(event: ChangeAdmin): void {
-  // TODO: add functionality
-  saveEventToStateChange(
-    event,
-    "ChangeAdmin",
-    [event.params.newAdmin.toHex()],
-    ["newAdmin"],
-    ["address"],
-    [],
-    []
-  );
-}

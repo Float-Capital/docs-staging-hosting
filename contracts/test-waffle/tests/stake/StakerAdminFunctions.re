@@ -10,57 +10,57 @@ let testUnit =
     ) => {
   describe("Staker Admin Functions", () => {
     let marketIndex = Helpers.randomJsInteger();
-    let randomAddress1 = Helpers.randomAddress();
+    // let randomAddress1 = Helpers.randomAddress();
 
-    describe("changeAdmin", () => {
-      let txPromiseRef: ref(JsPromise.t(ContractHelpers.transaction)) =
-        ref(()->JsPromise.resolve->Obj.magic);
+    // describe("changeAdmin", () => {
+    //   let txPromiseRef: ref(JsPromise.t(ContractHelpers.transaction)) =
+    //     ref(()->JsPromise.resolve->Obj.magic);
 
-      before_once'(() => {
-        let%Await _ =
-          deployAndSetupStakerToUnitTest(
-            ~functionName="changeAdmin",
-            ~contracts,
-            ~accounts,
-          );
+    //   before_once'(() => {
+    //     let%Await _ =
+    //       deployAndSetupStakerToUnitTest(
+    //         ~functionName="changeAdmin",
+    //         ~contracts,
+    //         ~accounts,
+    //       );
 
-        txPromiseRef :=
-          contracts.contents.staker->Staker.changeAdmin(~admin=randomAddress1);
-        txPromiseRef.contents;
-      });
+    //     txPromiseRef :=
+    //       contracts.contents.staker->Staker.changeAdmin(~admin=randomAddress1);
+    //     txPromiseRef.contents;
+    //   });
 
-      it("should call the onlyAdmin modifier", () => {
-        StakerSmocked.InternalMock.onlyAdminModifierLogicCallCheck()
-      });
+    //   it("should call the onlyAdmin modifier", () => {
+    //     StakerSmocked.InternalMock.onlyAdminModifierLogicCallCheck()
+    //   });
 
-      it("emits ChangeAdmin with correct argument", () => {
-        Chai.callEmitEvents(
-          ~call=txPromiseRef.contents,
-          ~contract=contracts.contents.staker->Obj.magic,
-          ~eventName="ChangeAdmin",
-        )
-        ->Chai.withArgs2(randomAddress1)
-      });
+    //   it("emits ChangeAdmin with correct argument", () => {
+    //     Chai.callEmitEvents(
+    //       ~call=txPromiseRef.contents,
+    //       ~contract=contracts.contents.staker->Obj.magic,
+    //       ~eventName="ChangeAdmin",
+    //     )
+    //     ->Chai.withArgs2(randomAddress1)
+    //   });
 
-      it("should allow admin to change admin correctly", () => {
-        let newAdmin = Helpers.randomAddress();
-        let currentAdmin = accounts.contents->Array.getUnsafe(0);
+    //   it("should allow admin to change admin correctly", () => {
+    //     let newAdmin = Helpers.randomAddress();
+    //     let currentAdmin = accounts.contents->Array.getUnsafe(0);
 
-        let%Await _ =
-          contracts.contents.staker
-          ->ContractHelpers.connect(~address=currentAdmin)
-          ->Staker.changeAdmin(~admin=newAdmin);
+    //     let%Await _ =
+    //       contracts.contents.staker
+    //       ->ContractHelpers.connect(~address=currentAdmin)
+    //       ->Staker.changeAdmin(~admin=newAdmin);
 
-        let%Await updatedAdmin =
-          contracts.contents.staker->Staker.Exposed.admin;
+    //     let%Await updatedAdmin =
+    //       contracts.contents.staker->Staker.Exposed.admin;
 
-        Chai.addressEqual(
-          updatedAdmin,
-          ~otherAddress=newAdmin,
-          ~message="staker admin is not newAdmin",
-        );
-      });
-    });
+    //     Chai.addressEqual(
+    //       updatedAdmin,
+    //       ~otherAddress=newAdmin,
+    //       ~message="staker admin is not newAdmin",
+    //     );
+    //   });
+    // });
 
     describe("changeFloatPercentage", () => {
       let newFloatPerc = bnFromString("42000000000000000");
