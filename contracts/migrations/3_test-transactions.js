@@ -14,8 +14,8 @@ const YieldManagerAave = artifacts.require("YieldManagerAave");
 const SyntheticTokenUpgradeable = artifacts.require(
   "SyntheticTokenUpgradeable"
 );
-const OracleManagerEthKillerChainlinkTestnet = artifacts.require(
-  "OracleManagerEthKillerChainlinkTestnet"
+const OracleManagerChainlinkTestnet = artifacts.require(
+  "OracleManagerChainlinkTestnet"
 );
 
 const mumbaiDaiAddress = "0x001B3B4d0F3714Ca98ba10F6042DaEbF0B1B7b6F";
@@ -35,6 +35,8 @@ const testnetChainlinkEthUsdAddress =
   "0x0715A7794a1dc8e42615F059dD6e406A6594651A";
 const testnetChainlinkMaticUsdAddress =
   "0xd0D5e3DB44DE05E9F294BB0a3bEEaF030DE24Ada";
+const testnetChainlinkBtcUsdAddress =
+  "0x007A22900a3B98143368Bd5906f8E17e9867581b";
 
 const mintAndApprove = async (token, amount, user, approvedAddress) => {
   let bnAmount = new BN(amount);
@@ -52,19 +54,18 @@ const deployTestMarket = async (
   admin,
   networkName,
   paymentToken,
-  staker
+  staker,
+  chainlinkOracleAddress
 ) => {
   console.log("Deploying test Market", syntheticName, syntheticSymbol);
 
   // We mock out the oracle manager unless we're on Mumbai testnet.
   let oracleManager;
   if (networkName == "mumbai") {
-    oracleManager = await OracleManagerEthKillerChainlinkTestnet.new(
+    oracleManager = await OracleManagerChainlinkTestnet.new(
       admin,
-      testnetChainlinkDaiUsdAddress,
-      testnetChainlinkEthUsdAddress,
-      testnetChainlinkMaticUsdAddress,
-      60
+      chainlinkOracleAddress,
+      27,
     );
   } else {
     oracleManager = await OracleManagerMock.new(admin);
@@ -317,36 +318,39 @@ module.exports = async function (deployer, network, accounts) {
   console.log("balance topped up :)");
 
   await deployTestMarket(
-    "ETH Killers",
-    "ETHK",
+    "Bitcoin",
+    "BTC",
     longShort,
     treasury,
     admin,
     network,
     token,
-    staker
+    staker,
+    testnetChainlinkBtcUsdAddress
   );
 
   await deployTestMarket(
-    "The Flippening",
-    "EBD",
+    "Ether",
+    "ETH",
     longShort,
     treasury,
     admin,
     network,
     token,
-    staker
+    staker,
+    testnetChainlinkEthUsdAddress
   );
 
   await deployTestMarket(
-    "Doge Market",
-    "FL_DOGE",
+    "Matic",
+    "MATIC",
     longShort,
     treasury,
     admin,
     network,
     token,
-    staker
+    staker,
+    testnetChainlinkMaticUsdAddress
   );
 
   const currentMarketIndex = (await longShort.latestMarket()).toNumber();
@@ -360,7 +364,7 @@ module.exports = async function (deployer, network, accounts) {
     ) {
       verifyString += ` YieldManagerAave@${await longShort.yieldManagers(
         marketIndex
-      )} OracleManagerEthKillerChainlinkTestnetTestnet@${await longShort.oracleManagers(
+      )} OracleManagerChainlinkTestnetTestnet@${await longShort.oracleManagers(
         marketIndex
       )} SyntheticToken@${await longShort.syntheticTokens(
         marketIndex,

@@ -1,4 +1,4 @@
-const { ethers, getNamedAccounts } = require("hardhat");
+const { ethers, upgrades, getNamedAccounts } = require("hardhat");
 const {
   STAKER,
   COLLATERAL_TOKEN,
@@ -28,42 +28,30 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
   console.log("Deploying contracts with the account:", deployer);
   console.log("Admin Account:", admin);
 
-  const treasury = await deploy(TREASURY, {
-    from: deployer,
-    proxy: {
-      execute: {
-        methodName: "initialize",
-        args: [admin],
-      },
-    },
-    log: true,
+  const Treasury = await ethers.getContractFactory(TREASURY);
+
+  const treasury = await upgrades.deployProxy(Treasury, [admin], {
+    kind: "uups",
+    initializer: "initialize",
   });
 
-  const floatCapital = await deploy(FLOAT_CAPITAL, {
-    from: deployer,
-    proxy: {
-      execute: {
-        methodName: "initialize",
-        args: [admin],
-      },
-    },
-    log: true,
+  const FloatCapital = await ethers.getContractFactory(FLOAT_CAPITAL);
+  const floatCapital = await upgrades.deployProxy(FloatCapital, [admin], {
+    kind: "uups",
+    initializer: "initialize",
   });
 
-  const staker = await deploy(STAKER, {
-    from: deployer,
-    log: true,
-    proxy: {
-      initializer: false,
-    },
+  const Staker = await ethers.getContractFactory(STAKER);
+
+  const staker = await upgrades.deployProxy(Staker, [], {
+    kind: "uups",
+    initializer: false,
   });
 
-  const longShort = await deploy(LONGSHORT, {
-    from: deployer,
-    log: true,
-    proxy: {
-      initializer: false,
-    },
+  const LongShort = await ethers.getContractFactory(LONGSHORT);
+  const longShort = await upgrades.deployProxy(LongShort, [], {
+    kind: "uups",
+    initializer: false,
   });
 
   let tokenFactory = await deploy(TOKEN_FACTORY, {
@@ -72,9 +60,10 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     args: [longShort.address],
   });
 
-  let floatToken = await deploy(FLOAT_TOKEN, {
-    from: deployer,
-    log: true,
+  let FloatToken = await ethers.getContractFactory(FLOAT_TOKEN);
+  let floatToken = await upgrades.deployProxy(FloatToken, [], {
+    kind: "uups",
+    initializer: false,
   });
 };
 module.exports.tags = ["all", "contracts"];

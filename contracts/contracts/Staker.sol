@@ -10,6 +10,7 @@ import "./interfaces/IFloatToken.sol";
 import "./interfaces/ILongShort.sol";
 import "./interfaces/IStaker.sol";
 import "./interfaces/ISyntheticToken.sol";
+import "hardhat/console.sol";
 
 contract Staker is IStaker, AccessControlledAndUpgradeable {
   /*╔═════════════════════════════╗
@@ -18,10 +19,6 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
 
   /* ══════ Fixed-precision constants ══════ */
   uint256 public constant FLOAT_ISSUANCE_FIXED_DECIMAL = 1e42;
-  // 2^52 ~= 4.5e15
-  // With an exponent of 5, the largest total liquidity possible in a market (to avoid integer overflow on exponentiation) is ~10^31 DAI decimal units or 10 Trillion DAI (10^13
-  // NOTE: this also means if the total market value is less than 2^52 there will be a division by zero error
-  uint256 public constant safeExponentBitShifting = 52;
 
   /* ══════ Global state ══════ */
   address public floatCapital;
@@ -37,6 +34,7 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
   mapping(uint32 => uint256) public marketUnstakeFee_e18;
   mapping(uint32 => uint256) public balanceIncentiveCurve_exponent;
   mapping(uint32 => int256) public balanceIncentiveCurve_equilibriumOffset;
+  mapping(uint32 => uint256) public safeExponentBitShifting;
 
   mapping(uint32 => mapping(bool => address)) public syntheticTokens;
 
@@ -189,38 +187,11 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
   }
 
   /// @dev Logic for changeBalanceIncentiveExponent
-  function _changeBalanceIncentiveExponent(
+  function _changeBalanceIncentiveParameters(
     uint32 marketIndex,
-    uint256 _balanceIncentiveCurve_exponent
-  ) internal virtual {
-    require(
-      // The exponent has to be less than or equal to 5 in these versions of
-      // the contracts otherwise we risk overflowing the 256 bit integers.
-      _balanceIncentiveCurve_exponent > 0 && _balanceIncentiveCurve_exponent < 6,
-      "balanceIncentiveCurve_exponent out of bounds"
-    );
-
-    balanceIncentiveCurve_exponent[marketIndex] = _balanceIncentiveCurve_exponent;
-  }
-
-  /**
-  @notice Changes the balance incentive exponent for a market
-  @param marketIndex Identifies the market.
-  @param _balanceIncentiveCurve_exponent The new exponent for the curve.
-  */
-  function changeBalanceIncentiveExponent(
-    uint32 marketIndex,
-    uint256 _balanceIncentiveCurve_exponent
-  ) external onlyAdmin {
-    _changeBalanceIncentiveExponent(marketIndex, _balanceIncentiveCurve_exponent);
-
-    emit BalanceIncentiveExponentUpdated(marketIndex, _balanceIncentiveCurve_exponent);
-  }
-
-  /// @dev Logic for changeBalanceIncentiveEquilibriumOffset
-  function _changeBalanceIncentiveEquilibriumOffset(
-    uint32 marketIndex,
-    int256 _balanceIncentiveCurve_equilibriumOffset
+    uint256 _balanceIncentiveCurve_exponent,
+    int256 _balanceIncentiveCurve_equilibriumOffset,
+    uint256 _safeExponentBitShifting
   ) internal virtual {
     // Unreasonable that we would ever shift this more than 90% either way
     require(
@@ -228,24 +199,50 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
         _balanceIncentiveCurve_equilibriumOffset < 9e17,
       "balanceIncentiveCurve_equilibriumOffset out of bounds"
     );
+    require(_balanceIncentiveCurve_exponent > 0, "balanceIncentiveCurve_exponent out of bounds");
+    require(_safeExponentBitShifting < 100, "safeExponentBitShifting out of bounds");
 
+    uint256 totalLocked = ILongShort(longShort).marketSideValueInPaymentToken(marketIndex, true) +
+      ILongShort(longShort).marketSideValueInPaymentToken(marketIndex, false);
+
+    // SafeMATH will revert here if this value is too big.
+    (((totalLocked * 500) >> _safeExponentBitShifting)**_balanceIncentiveCurve_exponent);
+    // Required to ensure at least 3 digits of precision.
+    require(
+      totalLocked >> _safeExponentBitShifting > 100,
+      "bit shifting too lange for total locked"
+    );
+
+    balanceIncentiveCurve_exponent[marketIndex] = _balanceIncentiveCurve_exponent;
     balanceIncentiveCurve_equilibriumOffset[marketIndex] = _balanceIncentiveCurve_equilibriumOffset;
+    safeExponentBitShifting[marketIndex] = _safeExponentBitShifting;
   }
 
   /**
-  @notice Changes the balance incentive curve equilibrium offset for a market
+  @notice Changes the balance incentive exponent for a market
   @param marketIndex Identifies the market.
+  @param _balanceIncentiveCurve_exponent The new exponent for the curve.
   @param _balanceIncentiveCurve_equilibriumOffset The new offset.
+  @param _safeExponentBitShifting The new bitshifting applied to the curve.
   */
-  function changeBalanceIncentiveEquilibriumOffset(
+  function changeBalanceIncentiveParameters(
     uint32 marketIndex,
-    int256 _balanceIncentiveCurve_equilibriumOffset
+    uint256 _balanceIncentiveCurve_exponent,
+    int256 _balanceIncentiveCurve_equilibriumOffset,
+    uint256 _safeExponentBitShifting
   ) external onlyAdmin {
-    _changeBalanceIncentiveEquilibriumOffset(marketIndex, _balanceIncentiveCurve_equilibriumOffset);
-
-    emit BalanceIncentiveEquilibriumOffsetUpdated(
+    _changeBalanceIncentiveParameters(
       marketIndex,
-      _balanceIncentiveCurve_equilibriumOffset
+      _balanceIncentiveCurve_exponent,
+      _balanceIncentiveCurve_equilibriumOffset,
+      _safeExponentBitShifting
+    );
+
+    emit BalanceIncentiveParamsUpdated(
+      marketIndex,
+      _balanceIncentiveCurve_exponent,
+      _balanceIncentiveCurve_equilibriumOffset,
+      _safeExponentBitShifting
     );
   }
 
@@ -274,6 +271,11 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
     uint256 _balanceIncentiveCurve_exponent,
     int256 _balanceIncentiveCurve_equilibriumOffset
   ) external override onlyLongShort {
+    require(kInitialMultiplier >= 1e18, "kInitialMultiplier must be >= 1e18");
+
+    // a safe initial default value
+    uint256 initialSafeExponentBitShifting = 50;
+
     marketIndexOfToken[longToken] = marketIndex;
     marketIndexOfToken[shortToken] = marketIndex;
 
@@ -281,11 +283,13 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
 
     syntheticTokens[marketIndex][true] = longToken;
     syntheticTokens[marketIndex][false] = shortToken;
+    _changeBalanceIncentiveParameters(
+      marketIndex,
+      _balanceIncentiveCurve_exponent,
+      _balanceIncentiveCurve_equilibriumOffset,
+      initialSafeExponentBitShifting
+    );
 
-    _changeBalanceIncentiveExponent(marketIndex, _balanceIncentiveCurve_exponent);
-    _changeBalanceIncentiveEquilibriumOffset(marketIndex, _balanceIncentiveCurve_equilibriumOffset);
-
-    require(kInitialMultiplier >= 1e18, "marketLaunchIncentiveMultiplier must be >= 1e18");
     marketLaunchIncentive_period[marketIndex] = kPeriod;
     marketLaunchIncentive_multipliers[marketIndex] = kInitialMultiplier;
 
@@ -297,7 +301,8 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
       kPeriod,
       kInitialMultiplier,
       _balanceIncentiveCurve_exponent,
-      _balanceIncentiveCurve_equilibriumOffset
+      _balanceIncentiveCurve_equilibriumOffset,
+      initialSafeExponentBitShifting
     );
 
     emit AccumulativeIssuancePerStakedSynthSnapshotCreated(marketIndex, 0, 0, 0);
@@ -392,6 +397,8 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
     int256 equilibriumOffsetMarketScaled = (balanceIncentiveCurve_equilibriumOffset[marketIndex] *
       int256(totalLocked)) / 2e18;
 
+    uint256 safetyBitShifting = safeExponentBitShifting[marketIndex];
+
     // Float is scaled by the percentage of the total market value held in
     // the opposite position. This incentivises users to stake on the
     // weaker position.
@@ -403,9 +410,9 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
       }
 
       uint256 numerator = (uint256(int256(shortValue) - equilibriumOffsetMarketScaled) >>
-        (safeExponentBitShifting - 1))**balanceIncentiveCurve_exponent[marketIndex];
+        (safetyBitShifting - 1))**balanceIncentiveCurve_exponent[marketIndex];
 
-      uint256 denominator = ((totalLocked >> safeExponentBitShifting) **
+      uint256 denominator = ((totalLocked >> safetyBitShifting) **
         balanceIncentiveCurve_exponent[marketIndex]);
 
       // NOTE: `x * 5e17` == `(x * 1e18) / 2`
@@ -424,9 +431,9 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
       }
 
       uint256 numerator = (uint256(int256(longValue) + equilibriumOffsetMarketScaled) >>
-        (safeExponentBitShifting - 1))**balanceIncentiveCurve_exponent[marketIndex];
+        (safetyBitShifting - 1))**balanceIncentiveCurve_exponent[marketIndex];
 
-      uint256 denominator = ((totalLocked >> safeExponentBitShifting) **
+      uint256 denominator = ((totalLocked >> safetyBitShifting) **
         balanceIncentiveCurve_exponent[marketIndex]);
 
       // NOTE: `x * 5e17` == `(x * 1e18) / 2`

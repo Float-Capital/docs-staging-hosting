@@ -90,7 +90,7 @@ var yieldGradientHardcode = tenToThe18;
 
 var daiDisplayToken = {
   name: "DAI",
-  iconUrl: "/icons/dai.svg"
+  iconUrl: "/icons/tokens/dai.svg"
 };
 
 var polygonDisplayToken = {

@@ -9,6 +9,7 @@ var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var SyntheticToken = require("../test-waffle/library/contracts/SyntheticToken.js");
 var YieldManagerMock = require("../test-waffle/library/contracts/YieldManagerMock.js");
 var OracleManagerMock = require("../test-waffle/library/contracts/OracleManagerMock.js");
+var OracleManagerChainlink = require("../test-waffle/library/contracts/OracleManagerChainlink.js");
 
 var minSenderBalance = Globals.bnFromString("50000000000000000");
 
@@ -86,7 +87,7 @@ function redeemShortNextPriceWithSystemUpdate(amount, marketIndex, longShort, us
 function shiftFromShortNextPriceWithSystemUpdate(amount, marketIndex, longShort, user, admin) {
   return LetOps.AwaitThen.let_(longShort.connect(user).shiftPositionFromShortNextPrice(marketIndex, amount), (function (param) {
                 return LetOps.AwaitThen.let_(setOracleManagerPrice(longShort, marketIndex, admin), (function (param) {
-                              return longShort.updateSystemState(marketIndex);
+                              return longShort.connect(admin).updateSystemState(marketIndex);
                             }));
               }));
 }
@@ -141,6 +142,28 @@ function deployTestMarket(syntheticName, syntheticSymbol, longShortInstance, tre
               }));
 }
 
+function deployMumbaiMarket(syntheticName, syntheticSymbol, longShortInstance, treasuryInstance, admin, paymentToken, oraclePriceFeedAddress) {
+  return LetOps.AwaitThen.let_(OracleManagerChainlink.make(admin.address, oraclePriceFeedAddress), (function (oracleManager) {
+                return LetOps.AwaitThen.let_(YieldManagerMock.make(longShortInstance.address, treasuryInstance.address, paymentToken.address), (function (yieldManager) {
+                              return LetOps.AwaitThen.let_(paymentToken.MINTER_ROLE(), (function (mintRole) {
+                                            return LetOps.AwaitThen.let_(paymentToken.grantRole(mintRole, yieldManager.address), (function (param) {
+                                                          return LetOps.AwaitThen.let_(longShortInstance.connect(admin).createNewSyntheticMarket(syntheticName, syntheticSymbol, paymentToken.address, oracleManager.address, yieldManager.address), (function (param) {
+                                                                        return LetOps.AwaitThen.let_(longShortInstance.latestMarket(), (function (latestMarket) {
+                                                                                      var kInitialMultiplier = Globals.bnFromString("5000000000000000000");
+                                                                                      var kPeriod = Globals.bnFromInt(864000);
+                                                                                      return LetOps.AwaitThen.let_(mintAndApprove(paymentToken, Globals.bnFromString("2000000000000000000"), admin, longShortInstance.address), (function (param) {
+                                                                                                    var unstakeFee_e18 = Globals.bnFromString("5000000000000000");
+                                                                                                    var initialMarketSeedForEachMarketSide = Globals.bnFromString("1000000000000000000");
+                                                                                                    return longShortInstance.connect(admin).initializeMarket(latestMarket, kInitialMultiplier, kPeriod, unstakeFee_e18, initialMarketSeedForEachMarketSide, Globals.bnFromInt(5), Globals.bnFromInt(0), Globals.bnFromInt(1));
+                                                                                                  }));
+                                                                                    }));
+                                                                      }));
+                                                        }));
+                                          }));
+                            }));
+              }));
+}
+
 exports.minSenderBalance = minSenderBalance;
 exports.minRecieverBalance = minRecieverBalance;
 exports.topupBalanceIfLow = topupBalanceIfLow;
@@ -155,4 +178,5 @@ exports.shiftFromLongNextPriceWithSystemUpdate = shiftFromLongNextPriceWithSyste
 exports.mintLongNextPriceWithSystemUpdate = mintLongNextPriceWithSystemUpdate;
 exports.mintShortNextPriceWithSystemUpdate = mintShortNextPriceWithSystemUpdate;
 exports.deployTestMarket = deployTestMarket;
+exports.deployMumbaiMarket = deployMumbaiMarket;
 /* minSenderBalance Not a pure module */

@@ -61,7 +61,7 @@ contract LongShort is ILongShort, AccessControlledAndUpgradeable {
 
   /* ══════ Market + position (long/short) specific ══════ */
   mapping(uint32 => mapping(bool => address)) public syntheticTokens;
-  mapping(uint32 => mapping(bool => uint256)) public marketSideValueInPaymentToken;
+  mapping(uint32 => mapping(bool => uint256)) public override marketSideValueInPaymentToken;
 
   /// @notice synthetic token prices of a given market of a (long/short) at every previous price update
   mapping(uint32 => mapping(bool => mapping(uint256 => uint256)))
@@ -340,6 +340,8 @@ contract LongShort is ILongShort, AccessControlledAndUpgradeable {
     // Set this value to one initially - 0 is a null value and thus potentially bug prone.
     marketUpdateIndex[marketIndex] = 1;
 
+    _seedMarketInitially(initialMarketSeedForEachMarketSide, marketIndex);
+
     // Add new staker funds with fresh synthetic tokens.
     IStaker(staker).addNewStakingFund(
       marketIndex,
@@ -351,8 +353,6 @@ contract LongShort is ILongShort, AccessControlledAndUpgradeable {
       balanceIncentiveCurve_exponent,
       balanceIncentiveCurve_equilibriumOffset
     );
-
-    _seedMarketInitially(initialMarketSeedForEachMarketSide, marketIndex);
   }
 
   /*╔══════════════════════════════╗

@@ -11,6 +11,7 @@ var Ethers = require("../ethereum/Ethers.js");
 var Loader = require("../components/UI/Base/Loader.js");
 var Market = require("../components/Markets/Market.js");
 var $$String = require("rescript/lib/js/string.js");
+var Backend = require("../mockBackend/Backend.js");
 var Js_dict = require("rescript/lib/js/js_dict.js");
 var Queries = require("../data/Queries.js");
 var Belt_Int = require("rescript/lib/js/belt_Int.js");
@@ -192,9 +193,12 @@ function Markets$PriceCard(Props) {
                 }), React.createElement("div", {
                   className: "pt-2 text-xs font-medium flex-1 md:flex-initial md:w-full flex justify-between"
                 }, React.createElement("div", {
-                      className: "mx-3"
-                    }, market.name), React.createElement("div", {
-                      className: "mx-3"
+                      className: "mx-3 flex flex-row items-center"
+                    }, React.createElement("img", {
+                          className: "h-3 mr-1",
+                          src: Backend.getMarketInfoUnsafe(market.marketIndex.toNumber()).icon
+                        }), market.name), React.createElement("div", {
+                      className: "mr-3"
                     }, tmp)), React.createElement("div", {
                   className: "flex items-center justify-center px-4 py-2 md:px-4 md:py-4 flex-1"
                 }, tmp$1));
@@ -231,8 +235,11 @@ function Markets$Mint$Header(Props) {
   return React.createElement("div", {
               className: "flex justify-between items-center mb-2"
             }, React.createElement("div", {
-                  className: "text-xl"
-                }, React.createElement(Markets$Mint$Header$TypedCharacters, {
+                  className: "text-xl flex flex-row items-center"
+                }, React.createElement("img", {
+                      className: "h-6 mr-2",
+                      src: Backend.getMarketInfoUnsafe(market.marketIndex.toNumber()).icon
+                    }), React.createElement(Markets$Mint$Header$TypedCharacters, {
                       str: market.name
                     })), React.createElement(Link, {
                   href: "/app/markets?marketIndex=" + String(marketIndex) + "&actionOption=" + actionOption,
