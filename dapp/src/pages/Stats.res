@@ -54,14 +54,7 @@ let totalValueCard = (~totalValueLocked) =>
     </span>
   </div>
 
-let floatProtocolCard = (
-  ~liveSince,
-  ~totalTxs,
-  ~totalUsers,
-  ~totalGasUsed,
-  ~txHash,
-  ~numberOfSynths,
-) => {
+let floatProtocolCard = (~liveSince, ~totalTxs, ~totalUsers, ~txHash, ~numberOfSynths) => {
   let dateObj = liveSince->Ethers.BigNumber.toNumberFloat->DateFns.fromUnixTime
 
   <Card>
@@ -90,11 +83,6 @@ let floatProtocolCard = (
           (),
         ),
         createStatsLiProps(~prefix=`👷‍♀️ No. synths:`, ~value=numberOfSynths, ()),
-        createStatsLiProps(
-          ~prefix=`⛽ Gas used:`,
-          ~value=totalGasUsed->Ethers.BigNumber.toString->Misc.NumberFormat.formatInt,
-          (),
-        ),
       ]}
     />
   </Card>
@@ -176,14 +164,7 @@ let make = () => {
         {
           data: Some({
             globalStates: [
-              {
-                totalFloatMinted,
-                totalTxs,
-                totalUsers,
-                totalGasUsed,
-                timestampLaunched,
-                txHash,
-              } as global,
+              {totalFloatMinted, totalTxs, totalUsers, timestampLaunched, txHash} as global,
             ],
           }),
         },
@@ -203,7 +184,6 @@ let make = () => {
               ~liveSince=timestampLaunched,
               ~totalTxs,
               ~totalUsers,
-              ~totalGasUsed,
               ~txHash,
               ~numberOfSynths,
             )}

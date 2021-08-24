@@ -745,7 +745,6 @@ function useBasicUserInfo(userId) {
                 _0: {
                   id: match$1.id,
                   joinedAt: FromUnixTime(match$1.timestampJoined.toNumber()),
-                  gasUsed: match$1.totalGasUsed,
                   floatMinted: match$1.totalMintedFloat,
                   floatBalance: match$1.floatTokenBalance,
                   transactionCount: match$1.numberOfTransactions

@@ -9,8 +9,7 @@ fragment BasicUserInfo on User {
   id
   totalMintedFloat
   floatTokenBalance
-  numberOfTransactions
-  totalGasUsed
+  numberOfTransactions  
   timestampJoined
   tokenMints {
     tokensMinted
@@ -215,8 +214,7 @@ fragment CurrentStakeDetailed on CurrentStake {
 fragment GlobalStateInfo on GlobalState {
   totalFloatMinted,
   totalTxs,
-  totalUsers,
-  totalGasUsed,
+  totalUsers,  
   timestampLaunched,
   txHash @ppxCustom(module: "Bytes")
 }
