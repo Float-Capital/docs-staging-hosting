@@ -57,7 +57,7 @@ contract("LongShort (admin)", (accounts) => {
       longShort.updateMarketOracle(marketIndex, newOracleAddress, {
         from: user1,
       }),
-      "only admin"
+      `AccessControl: account ${user1.toLowerCase()} is missing role 0xa49807205ce4d355092ef5a8a18f56e8913cf4a201fbe287825b095693c21775`
     );
   });
 
@@ -68,9 +68,9 @@ contract("LongShort (admin)", (accounts) => {
       from: admin,
     });
 
-    const contractAdmin = await longShort.admin.call();
+    // const contractAdmin = await longShort.admin.call();
 
-    assert.equal(admin, contractAdmin, "is admin");
+    // assert.equal(admin, contractAdmin, "is admin");
 
     const updatedOracleAddress = await longShort.oracleManagers.call(
       marketIndex
