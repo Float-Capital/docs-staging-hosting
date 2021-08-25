@@ -1,12 +1,11 @@
 open LetOps;
-open StakerHelpers;
 open Mocha;
 open Globals;
 
 let test =
     (
       ~contracts: ref(Helpers.stakerUnitTestContracts),
-      ~accounts: ref(array(Ethers.Wallet.t)),
+      ~accounts as _: ref(array(Ethers.Wallet.t)),
     ) => {
   let marketIndex = 1;
   let tenToThe14 = tenToThe18->div(bnFromInt(10000)); // 0.01 %
@@ -56,10 +55,6 @@ let test =
       let%AwaitThen _ =
         staker->StakerSmocked.InternalMock.setupFunctionForUnitTesting(
           ~functionName="_calculateFloatPerSecond",
-        );
-      let%AwaitThen _ =
-        staker->Staker.Exposed.setLongShort(
-          ~longShort=longShortSmocked.address,
         );
 
       longShortSmocked->LongShortSmocked.mockMarketSideValueInPaymentTokenToReturn(

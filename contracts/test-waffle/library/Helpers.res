@@ -245,18 +245,22 @@ type stakerUnitTestContracts = {
 
 let initializeStakerUnit = () => {
   JsPromise.all4((
-    Staker.Exposed.make()->JsPromise.then(staker => {
+    Staker.Exposed.makeSmock()->JsPromise.then(staker => {
       staker->StakerSmocked.InternalMock.setup->JsPromise.map(_ => staker)
     }),
     LongShortSmocked.make(),
     FloatTokenSmocked.make(),
     SyntheticTokenSmocked.make(),
-  ))->JsPromise.map(((staker, longShortSmocked, floatTokenSmocked, syntheticTokenSmocked)) => {
-    staker: staker,
-    longShortSmocked: longShortSmocked,
-    floatTokenSmocked: floatTokenSmocked,
-    syntheticTokenSmocked: syntheticTokenSmocked,
-  })
+  ))->JsPromise.then(((staker, longShortSmocked, floatTokenSmocked, syntheticTokenSmocked)) =>
+    staker
+    ->Staker.setVariable(~name="longShort", ~value=longShortSmocked.address)
+    ->JsPromise.map(_ => {
+      staker: staker,
+      longShortSmocked: longShortSmocked,
+      floatTokenSmocked: floatTokenSmocked,
+      syntheticTokenSmocked: syntheticTokenSmocked,
+    })
+  )
 }
 
 type longShortUnitTestContracts = {
@@ -290,7 +294,7 @@ let deployAYieldManager = (~longShort: Ethers.ethAddress, ~lendingPoolAddressesP
 
 let initializeLongShortUnit = () => {
   JsPromise.all7((
-    LongShort.Exposed.make()->JsPromise.then(staker => {
+    LongShort.Exposed.makeSmock()->JsPromise.then(staker => {
       staker->LongShortSmocked.InternalMock.setup->JsPromise.map(_ => staker)
     }),
     StakerSmocked.make(),
