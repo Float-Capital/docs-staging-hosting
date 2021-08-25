@@ -53,19 +53,20 @@ contract LongShort is ILongShort, AccessControlledAndUpgradeable {
   /* ══════ Market specific ══════ */
   mapping(uint32 => bool) public marketExists;
   mapping(uint32 => int256) public assetPrice;
-  mapping(uint32 => uint256) public marketUpdateIndex;
+  mapping(uint32 => uint256) public override marketUpdateIndex;
   mapping(uint32 => address) public paymentTokens;
   mapping(uint32 => address) public yieldManagers;
   mapping(uint32 => address) public oracleManagers;
   mapping(uint32 => uint256) public marketTreasurySplitGradient_e18;
 
   /* ══════ Market + position (long/short) specific ══════ */
-  mapping(uint32 => mapping(bool => address)) public syntheticTokens;
+  mapping(uint32 => mapping(bool => address)) public override syntheticTokens;
   mapping(uint32 => mapping(bool => uint256)) public override marketSideValueInPaymentToken;
 
   /// @notice synthetic token prices of a given market of a (long/short) at every previous price update
   mapping(uint32 => mapping(bool => mapping(uint256 => uint256)))
-    public syntheticToken_priceSnapshot;
+    public
+    override syntheticToken_priceSnapshot;
 
   mapping(uint32 => mapping(bool => uint256)) public batched_amountPaymentToken_deposit;
   mapping(uint32 => mapping(bool => uint256)) public batched_amountSyntheticToken_redeem;
@@ -517,9 +518,9 @@ contract LongShort is ILongShort, AccessControlledAndUpgradeable {
         );
       }
 
-      uint256 amountSyntheticTokensToBeShiftedAwayFromOriginSide = userNextPrice_syntheticToken_toShiftAwayFrom_marketSide[
-          marketIndex
-        ][!isLong][user];
+
+        uint256 amountSyntheticTokensToBeShiftedAwayFromOriginSide
+       = userNextPrice_syntheticToken_toShiftAwayFrom_marketSide[marketIndex][!isLong][user];
 
       if (amountSyntheticTokensToBeShiftedAwayFromOriginSide > 0) {
         uint256 syntheticTokenPriceOnOriginSide = syntheticToken_priceSnapshot[marketIndex][
@@ -620,10 +621,10 @@ contract LongShort is ILongShort, AccessControlledAndUpgradeable {
     );
 
     uint256 marketAmount = IYieldManager(yieldManagers[marketIndex])
-      .distributeYieldForTreasuryAndReturnMarketAllocation(
-        totalValueLockedInMarket,
-        treasuryYieldPercent_e18
-      );
+    .distributeYieldForTreasuryAndReturnMarketAllocation(
+      totalValueLockedInMarket,
+      treasuryYieldPercent_e18
+    );
 
     if (marketAmount > 0) {
       if (isLongSideUnderbalanced) {
@@ -738,10 +739,10 @@ contract LongShort is ILongShort, AccessControlledAndUpgradeable {
         int256 long_changeInMarketValue_inPaymentToken,
         int256 short_changeInMarketValue_inPaymentToken
       ) = _batchConfirmOutstandingPendingActions(
-          marketIndex,
-          syntheticTokenPrice_inPaymentTokens_long,
-          syntheticTokenPrice_inPaymentTokens_short
-        );
+        marketIndex,
+        syntheticTokenPrice_inPaymentTokens_long,
+        syntheticTokenPrice_inPaymentTokens_short
+      );
 
       newLongPoolValue = uint256(
         int256(newLongPoolValue) + long_changeInMarketValue_inPaymentToken
@@ -1038,9 +1039,9 @@ contract LongShort is ILongShort, AccessControlledAndUpgradeable {
     address user,
     bool isShiftFromLong
   ) internal virtual {
-    uint256 syntheticToken_toShiftAwayFrom_marketSide = userNextPrice_syntheticToken_toShiftAwayFrom_marketSide[
-        marketIndex
-      ][isShiftFromLong][user];
+
+      uint256 syntheticToken_toShiftAwayFrom_marketSide
+     = userNextPrice_syntheticToken_toShiftAwayFrom_marketSide[marketIndex][isShiftFromLong][user];
     if (syntheticToken_toShiftAwayFrom_marketSide > 0) {
       uint256 syntheticToken_toShiftTowardsTargetSide = getAmountSyntheticTokenToMintOnTargetSide(
         marketIndex,

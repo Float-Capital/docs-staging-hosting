@@ -238,7 +238,6 @@ type User @entity {
   totalMintedFloat: BigInt!
   floatTokenBalance: BigInt!
   timestampJoined: BigInt!
-  totalGasUsed: BigInt!
   numberOfTransactions: BigInt!
   currentStakes: [CurrentStake!]!
   stateChangesAffectingUser: [StateChange!]!
@@ -337,7 +336,6 @@ type GlobalState @entity {
   longShort: LongShortContract!
   totalFloatMinted: BigInt!
   totalTxs: BigInt!
-  totalGasUsed: BigInt!
   totalUsers: BigInt!
   timestampLaunched: BigInt!
   txHash: Bytes!
