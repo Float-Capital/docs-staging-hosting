@@ -29,6 +29,9 @@ contract("LongShort (admin)", (accounts) => {
 
   const zeroAddressStr = "0x0000000000000000000000000000000000000000";
 
+  const adminRoleBytesStr =
+    "0xa49807205ce4d355092ef5a8a18f56e8913cf4a201fbe287825b095693c21775";
+
   beforeEach(async () => {
     const result = await initialize(admin);
 
@@ -57,7 +60,7 @@ contract("LongShort (admin)", (accounts) => {
       longShort.updateMarketOracle(marketIndex, newOracleAddress, {
         from: user1,
       }),
-      `AccessControl: account ${user1.toLowerCase()} is missing role 0xa49807205ce4d355092ef5a8a18f56e8913cf4a201fbe287825b095693c21775`
+      `AccessControl: account ${user1.toLowerCase()} is missing role ${adminRoleBytesStr}`
     );
   });
 
@@ -68,9 +71,12 @@ contract("LongShort (admin)", (accounts) => {
       from: admin,
     });
 
-    // const contractAdmin = await longShort.admin.call();
+    const adminIsContractAdmin = await longShort.hasRole(
+      adminRoleBytesStr,
+      admin
+    );
 
-    // assert.equal(admin, contractAdmin, "is admin");
+    assert(adminIsContractAdmin, "is admin");
 
     const updatedOracleAddress = await longShort.oracleManagers.call(
       marketIndex
