@@ -137,7 +137,6 @@ function getCallsArrayContent(fnType) {
 function getCallsInternal(fnType) {
   var match = getCallsHelper(fnType);
   var fnName = match[1];
-  console.log(fnType);
   var match$1 = fnType.parameters.length >= 1 ? [
       parametersToDestructuredRecord(fnType) + ": " + match[0],
       identifiersToTuple(fnType.parameters)
@@ -152,7 +151,6 @@ function getCallsExternal(fnType) {
   var match = getCallsHelper(fnType);
   var fnName = match[1];
   var fnCallType = match[0];
-  console.log(fnType);
   var match$1 = fnType.parameters.length >= 1 ? [
       parametersToDestructuredRecord(fnType) + ": " + fnCallType,
       identifiersToTuple(fnType.parameters)
