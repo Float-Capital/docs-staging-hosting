@@ -152,6 +152,7 @@ export function getOrCreateGlobalState(): GlobalState {
     globalState.totalUsers = ZERO;
     globalState.timestampLaunched = ZERO;
     globalState.txHash = ZERO_ADDRESS_BYTES;
+    globalState.totalValueLocked = ZERO;
   }
 
   return globalState as GlobalState;
