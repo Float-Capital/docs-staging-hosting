@@ -3,16 +3,16 @@
 pragma solidity 0.8.3;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/presets/ERC20PresetMinterPauserUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+
+import "./abstract/AccessControlledAndUpgradeable.sol";
 
 import "./interfaces/IFloatToken.sol";
 import "./interfaces/ILongShort.sol";
 import "./interfaces/IStaker.sol";
 import "./interfaces/ISyntheticToken.sol";
-
 import "hardhat/console.sol";
 
-contract Staker is IStaker, Initializable, UUPSUpgradeable {
+contract Staker is IStaker, AccessControlledAndUpgradeable {
   /*╔═════════════════════════════╗
     ║          VARIABLES          ║
     ╚═════════════════════════════╝*/
@@ -21,7 +21,6 @@ contract Staker is IStaker, Initializable, UUPSUpgradeable {
   uint256 public constant FLOAT_ISSUANCE_FIXED_DECIMAL = 1e42;
 
   /* ══════ Global state ══════ */
-  address public admin;
   address public floatCapital;
   address public floatTreasury;
   uint256 public floatPercentage;
@@ -68,7 +67,7 @@ contract Staker is IStaker, Initializable, UUPSUpgradeable {
     ╚═════════════════════════════╝*/
 
   function onlyAdminModifierLogic() internal virtual {
-    require(msg.sender == admin, "not admin");
+    _checkRole(ADMIN_ROLE, msg.sender);
   }
 
   modifier onlyAdmin() {
@@ -137,11 +136,12 @@ contract Staker is IStaker, Initializable, UUPSUpgradeable {
     address _floatCapital,
     uint256 _floatPercentage
   ) external virtual initializer {
-    admin = _admin;
     floatCapital = _floatCapital;
     floatTreasury = _floatTreasury;
     longShort = _longShort;
     floatToken = _floatToken;
+
+    _AccessControlledAndUpgradeable_init(_admin);
 
     _changeFloatPercentage(_floatPercentage);
 
@@ -151,19 +151,6 @@ contract Staker is IStaker, Initializable, UUPSUpgradeable {
   /*╔═══════════════════╗
     ║       ADMIN       ║
     ╚═══════════════════╝*/
-
-  /**
-  @notice Changes admin for the contract
-  @param _admin The address of the new admin.
-  */
-  function changeAdmin(address _admin) external onlyAdmin {
-    admin = _admin;
-    emit ChangeAdmin(_admin);
-  }
-
-  /// @notice Authorizes an upgrade to a new address.
-  /// @dev Can only be called by the current admin.
-  function _authorizeUpgrade(address) internal override onlyAdmin {}
 
   /// @dev Logic for changeFloatPercentage
   function _changeFloatPercentage(uint256 newFloatPercentage) internal virtual {

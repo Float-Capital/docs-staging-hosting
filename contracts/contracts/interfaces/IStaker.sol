@@ -56,8 +56,6 @@ interface IStaker {
 
   event FloatPercentageUpdated(uint256 floatPercentage);
 
-  event ChangeAdmin(address newAdmin);
-
   function userAmountStaked(address, address) external view returns (uint256);
 
   function addNewStakingFund(
