@@ -70,7 +70,7 @@ fragment SyntheticMarketBasic on SyntheticMarket {
 #   Fragments: CurrentStakeHighLevel
 fragment MarketIStakeInfo on SyntheticMarket {
   id
-  latestStakerState {
+  latestAccumulativeFloatIssuanceSnapshot {
     accumulativeFloatPerTokenLong
     accumulativeFloatPerTokenShort
     floatRatePerTokenOverIntervalLong

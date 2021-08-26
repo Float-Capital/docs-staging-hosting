@@ -380,7 +380,7 @@ var query$5 = (require("@apollo/client").gql`
   fragment MarketIStakeInfo on SyntheticMarket   {
     __typename
     id
-    latestStakerState  {
+    latestAccumulativeFloatIssuanceSnapshot  {
       __typename
       accumulativeFloatPerTokenLong
       accumulativeFloatPerTokenShort
@@ -392,11 +392,11 @@ var query$5 = (require("@apollo/client").gql`
 `);
 
 function parse$5(value) {
-  var value$1 = value.latestStakerState;
+  var value$1 = value.latestAccumulativeFloatIssuanceSnapshot;
   return {
           __typename: value.__typename,
           id: value.id,
-          latestStakerState: {
+          latestAccumulativeFloatIssuanceSnapshot: {
             __typename: value$1.__typename,
             accumulativeFloatPerTokenLong: GqlConverters.$$BigInt.parse(value$1.accumulativeFloatPerTokenLong),
             accumulativeFloatPerTokenShort: GqlConverters.$$BigInt.parse(value$1.accumulativeFloatPerTokenShort),
@@ -408,7 +408,7 @@ function parse$5(value) {
 }
 
 function serialize$5(value) {
-  var value$1 = value.latestStakerState;
+  var value$1 = value.latestAccumulativeFloatIssuanceSnapshot;
   var value$2 = value$1.timestamp;
   var value$3 = GqlConverters.$$BigInt.serialize(value$2);
   var value$4 = value$1.floatRatePerTokenOverIntervalShort;
@@ -420,7 +420,7 @@ function serialize$5(value) {
   var value$10 = value$1.accumulativeFloatPerTokenLong;
   var value$11 = GqlConverters.$$BigInt.serialize(value$10);
   var value$12 = value$1.__typename;
-  var latestStakerState = {
+  var latestAccumulativeFloatIssuanceSnapshot = {
     __typename: value$12,
     accumulativeFloatPerTokenLong: value$11,
     accumulativeFloatPerTokenShort: value$9,
@@ -433,7 +433,7 @@ function serialize$5(value) {
   return {
           __typename: value$14,
           id: value$13,
-          latestStakerState: latestStakerState
+          latestAccumulativeFloatIssuanceSnapshot: latestAccumulativeFloatIssuanceSnapshot
         };
 }
 
