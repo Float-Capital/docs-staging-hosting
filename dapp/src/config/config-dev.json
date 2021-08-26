@@ -1,5 +1,5 @@
 {
-  "graphEndpoint": "http://127.0.0.1:8000/subgraphs/name/float-capital/float-capital",
+  "graphEndpoint": "https://test.graph.float.capital/subgraphs/name/float-capital/float-capital2",
   "priceHistoryGraphEndpoint": "https://api.thegraph.com/subgraphs/id/QmXpihmrnRMobQwFVLxS8V2p7bnS5dwo4iJbNeG2vMQmTe",
   "aaveGraphEndpoint": "https://api.thegraph.com/subgraphs/name/aave/aave-v2-polygon-mumbai",
   "networkId": 80001,
