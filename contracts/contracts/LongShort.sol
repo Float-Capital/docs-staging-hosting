@@ -128,10 +128,12 @@ contract LongShort is ILongShort, AccessControlledAndUpgradeable {
     address _tokenFactory,
     address _staker
   ) external virtual initializer {
-    require(_tokenFactory != address(0) && _staker != address(0));
-
+    require(
+      _admin != address(0) &&
+      _tokenFactory != address(0) &&
+      _staker != address(0)
+    );
     _AccessControlledAndUpgradeable_init(_admin);
-
     tokenFactory = _tokenFactory;
     staker = _staker;
 
@@ -183,6 +185,13 @@ contract LongShort is ILongShort, AccessControlledAndUpgradeable {
     address _oracleManager,
     address _yieldManager
   ) external adminOnly {
+
+    require(
+      _paymentToken != address(0) &&
+      _oracleManager != address(0) &&
+      _yieldManager != address(0) 
+    );
+
     uint32 marketIndex = ++latestMarket;
     address _staker = staker;
 
@@ -331,6 +340,14 @@ contract LongShort is ILongShort, AccessControlledAndUpgradeable {
     int256 balanceIncentiveCurve_equilibriumOffset,
     uint256 _marketTreasurySplitGradient_e18
   ) external adminOnly {
+    require(
+      kInitialMultiplier != 0 &&
+      unstakeFee_e18 != 0 &&
+      initialMarketSeedForEachMarketSide != 0 &&
+      balanceIncentiveCurve_exponent != 0 &&
+      _marketTreasurySplitGradient_e18 != 0
+    );
+    
     require(!marketExists[marketIndex], "already initialized");
     require(marketIndex <= latestMarket, "index too high");
 

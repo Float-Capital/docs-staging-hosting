@@ -136,6 +136,15 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
     address _floatCapital,
     uint256 _floatPercentage
   ) external virtual initializer {
+    require(
+      _admin != address(0) &&
+      _longShort != address(0) &&
+      _floatToken != address(0) &&
+      _floatTreasury != address(0) &&
+      _floatCapital != address(0) && 
+      _floatPercentage != 0
+    );
+
     floatCapital = _floatCapital;
     floatTreasury = _floatTreasury;
     longShort = _longShort;

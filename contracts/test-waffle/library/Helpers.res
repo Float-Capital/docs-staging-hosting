@@ -279,9 +279,9 @@ let deployAYieldManager = (~longShort: Ethers.ethAddress, ~lendingPoolAddressesP
       manager
       ->YieldManagerAave.initialize(
         ~longShort,
-        ~treasury=CONSTANTS.zeroAddress,
+        ~treasury=randomAddress(),
         ~paymentToken=paymentToken.address,
-        ~aToken=CONSTANTS.zeroAddress,
+        ~aToken=randomAddress(),
         ~lendingPoolAddressesProvider,
         ~aaveIncentivesController=randomAddress(),
         ~aaveReferralCode=0,
