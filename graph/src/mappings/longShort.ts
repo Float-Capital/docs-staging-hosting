@@ -526,6 +526,21 @@ export function handleNextPriceDeposit(event: NextPriceDeposit): void {
   globalState.save();
 
   let user = getOrCreateUser(userAddress, event);
+
+  saveEventToStateChange(
+    event,
+    "NextPriceDeposit",
+    bigIntArrayToStringArray([
+      depositAdded,
+      marketIndex,
+      oracleUpdateIndex,
+    ]).concat([isLong ? "true" : "false", user.id]),
+    ["depositAdded", "marketIndex", "oracleUpdateIndex", "isLong", "user"],
+    ["uint256", "uint32", "uint256", "bool", "address"],
+    [userAddress],
+    []
+  );
+
   let syntheticMarket = getSyntheticMarket(marketIndex.toString());
 
   let userNextPriceActionComponent = createUserNextPriceActionComponent(
@@ -558,20 +573,6 @@ export function handleNextPriceDeposit(event: NextPriceDeposit): void {
     event.params.depositAdded,
     paymentToken,
     event
-  );
-
-  saveEventToStateChange(
-    event,
-    "NextPriceDeposit",
-    bigIntArrayToStringArray([
-      depositAdded,
-      marketIndex,
-      oracleUpdateIndex,
-    ]).concat([isLong ? "true" : "false", user.id]),
-    ["depositAdded", "marketIndex", "oracleUpdateIndex", "isLong", "user"],
-    ["uint256", "uint32", "uint256", "bool", "address"],
-    [userAddress],
-    []
   );
 }
 

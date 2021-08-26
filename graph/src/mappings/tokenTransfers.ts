@@ -69,11 +69,13 @@ export function handleTransfer(event: TransferEvent): void {
   if (isFloatToken) {
     updateBalanceFloatTransfer(fromAddress, amount, true, event);
     updateBalanceFloatTransfer(toAddress, amount, false, event);
-    if(toAddressString == ZERO_ADDRESS){
+    if (toAddressString == ZERO_ADDRESS) {
       // token burn
       let globalState = GlobalState.load(GLOBAL_STATE_ID);
-      if(globalState != null){
-        globalState.totalFloatMinted = globalState.totalFloatMinted.minus(amount);
+      if (globalState != null) {
+        globalState.totalFloatMinted = globalState.totalFloatMinted.minus(
+          amount
+        );
         globalState.save();
       }
     }
@@ -248,17 +250,6 @@ export function handleApproval(event: Approval): void {
 
       let user = getOrCreateUser(owner, event);
 
-      let tokenApproval = createApproval(paymentToken, user, value, event);
-
-      let userTokenApproval = createOrUpdateUserCollateralApproval(
-        tokenApproval,
-        user,
-        event
-      );
-
-      tokenApproval.save();
-      userTokenApproval.save();
-
       saveEventToStateChange(
         event,
         "Approval",
@@ -269,6 +260,17 @@ export function handleApproval(event: Approval): void {
         [],
         false
       );
+
+      let tokenApproval = createApproval(paymentToken, user, value, event);
+
+      let userTokenApproval = createOrUpdateUserCollateralApproval(
+        tokenApproval,
+        user,
+        event
+      );
+
+      tokenApproval.save();
+      userTokenApproval.save();
     }
   }
 }

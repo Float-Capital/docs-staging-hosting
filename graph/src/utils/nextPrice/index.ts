@@ -41,7 +41,7 @@ function generateBatchedNextPriceExecId(
 ): string {
   return "batched-" + marketIndex.toString() + "-" + updateIndex.toString();
 }
-function getNetxBatchedNextPriceExecId(marketIndex: BigInt): string {
+function getNextBatchedNextPriceExecId(marketIndex: BigInt): string {
   return "nextBatch-" + marketIndex.toString();
 }
 function getUsersCurrentNextPriceActionId(
@@ -102,7 +102,6 @@ export function createOrUpdateBatchedNextPriceExec(
   let isLong = userNextPriceActionComponent.marketSide;
   let actionType = userNextPriceActionComponent.actionType;
   let amount = userNextPriceActionComponent.amount;
-
   let batchedNextPriceExecId = generateBatchedNextPriceExecId(
     marketIndex,
     updateIndex
@@ -116,10 +115,15 @@ export function createOrUpdateBatchedNextPriceExec(
 
     batchedNextPriceExec.updateIndex = updateIndex;
     batchedNextPriceExec.marketIndex = marketIndex;
-    batchedNextPriceExec.save();
+    batchedNextPriceExec.linkedUserNextPriceActions = [];
+    batchedNextPriceExec.amountPaymentTokenForDepositLong = ZERO;
+    batchedNextPriceExec.amountPaymentTokenForDepositShort = ZERO;
+    batchedNextPriceExec.amountSynthTokenForWithdrawalLong = ZERO;
+    batchedNextPriceExec.amountSynthTokenForWithdrawalShort = ZERO;
 
+    batchedNextPriceExec.save();
     // TODO: move this externally to its own getter (avoid even a remote change of race conditions)
-    let nextBatchedNextPriceExecId = getNetxBatchedNextPriceExecId(marketIndex);
+    let nextBatchedNextPriceExecId = getNextBatchedNextPriceExecId(marketIndex);
     let nextBatchedNextPriceExec = NextBatchedNextPriceExec.load(
       nextBatchedNextPriceExecId
     );
@@ -128,19 +132,16 @@ export function createOrUpdateBatchedNextPriceExec(
         nextBatchedNextPriceExecId
       );
     }
-
     nextBatchedNextPriceExec.nextBatch = batchedNextPriceExec.id;
     nextBatchedNextPriceExec.currentUpdateIndex = updateIndex;
 
     nextBatchedNextPriceExec.save();
   }
-
   let userNextPriceActionId = generateUserNextPriceActionId(
     userAddress,
     marketIndex,
     updateIndex
   );
-
   if (
     batchedNextPriceExec.linkedUserNextPriceActions.indexOf(
       userNextPriceActionId
@@ -150,7 +151,6 @@ export function createOrUpdateBatchedNextPriceExec(
       [userNextPriceActionId]
     );
   }
-
   if (actionType == ACTION_MINT) {
     if (isLong == MARKET_SIDE_LONG) {
       batchedNextPriceExec.amountPaymentTokenForDepositLong = batchedNextPriceExec.amountPaymentTokenForDepositLong.plus(
@@ -172,7 +172,6 @@ export function createOrUpdateBatchedNextPriceExec(
       );
     }
   }
-
   return batchedNextPriceExec as BatchedNextPriceExec;
 }
 

@@ -1,6 +1,6 @@
 {
   "graphEndpoint": "https://test.graph.float.capital/subgraphs/name/float-capital/float-capital",
-  "priceHistoryGraphEndpoint": "https://test.graph.float.capital/subgraphs/name/float-capital/float-oracle-prices",
+  "priceHistoryGraphEndpoint": "https://api.thegraph.com/subgraphs/id/QmXpihmrnRMobQwFVLxS8V2p7bnS5dwo4iJbNeG2vMQmTe",
   "aaveGraphEndpoint": "https://api.thegraph.com/subgraphs/name/aave/aave-v2-polygon-mumbai",
   "networkId": 80001,
   "networkName": "mumbai testnet",
@@ -17,9 +17,9 @@
   "contracts": {
     "FloatCapital_v0": "0x263Fd5519885E4bf1c2c444d20F42b8DeF535F15",
     "FloatToken": "0x51b38ce62d076BFdEfF7EA310d3B86Cb52015b8C",
-    "LongShort": "0xa9d25B772f5AA249DA6bAee7Ea1F05524b0f0973",
+    "LongShort": "0x6025b79dEaf8d3bddA7e3504b1EE2F5c55c95500",
     "Migrations": "0x007a4ec86915db37b22FBa5AE25865F406E00A16",
-    "Staker": "0x553Eeb0A95b052Ead0fC5E4363729709E6A18F7A",
+    "Staker": "0xb52DBc99715Cd66C437Eb63a5d0823f0aB275ABe",
     "TokenFactory": "0x0FE97583c138838A1c748E8E03918d4BA24186B2",
     "Treasury_v0": "0xeC7FdC3eea4d02E318330300F24469d1d08d16EB",
     "Dai": "0x001B3B4d0F3714Ca98ba10F6042DaEbF0B1B7b6F"
