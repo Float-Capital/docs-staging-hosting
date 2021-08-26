@@ -249,27 +249,32 @@ export function handleSystemStateUpdated(event: SystemStateUpdated): void {
         .times(longTokenPrice)
         .div(shortTokenPrice);
 
-      if (tokensShiftedToLong.gt(ZERO)) {
-        // TODO: save this to the users shift history
-        updateUserBalance(
-          longTokenId,
-          user,
-          tokensShiftedToLong,
-          true,
-          timestamp
-        );
-      }
+      /* Note: this is causing the token balances accounting to be off
+        At the time of finding the contracts had no NextPriceSyntheticPositionShift or ExecuteNextPriceMarketSideShiftSettlementUser events emitted 
+      */
 
-      if (tokensShiftedToShort.gt(ZERO)) {
-        // TODO: save this to the users shift history
-        updateUserBalance(
-          shortTokenId,
-          user,
-          tokensShiftedToShort,
-          true,
-          timestamp
-        );
-      }
+      // if (tokensShiftedToLong.gt(ZERO)) {
+      //   // TODO: save this to the users shift history
+      //   updateUserBalance(
+      //     longTokenId,
+      //     user,
+      //     tokensShiftedToLong,
+      //     true,
+      //     timestamp
+      //   );
+      // }
+
+      // if (tokensShiftedToShort.gt(ZERO)) {
+      //   // TODO: save this to the users shift history
+      //   updateUserBalance(
+      //     shortTokenId,
+      //     user,
+      //     tokensShiftedToShort,
+      //     true,
+      //     timestamp
+      //   );
+      // }
+
       if (tokensMintedLong.gt(ZERO)) {
         increaseUserMints(user, syntheticTokenLong, tokensMintedLong);
         updateUserBalance(longTokenId, user, tokensMintedLong, true, timestamp);
