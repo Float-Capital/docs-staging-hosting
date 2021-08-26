@@ -24,7 +24,7 @@ var LongShort = {
 var abi$1 = Ethers.makeAbi([
       "function stake(address tokenAddress, uint256 amount)",
       "function stakeAndEarnImmediately(address tokenAddress, uint256 amount)  @1200000",
-      "function withdraw(address tokenAddress, uint256 amount) @5000000",
+      "function withdraw(uint32, bool, uint256 amount) @5000000",
       "function claimFloatCustom(uint32[] calldata marketIndexes) @2000000"
     ]);
 

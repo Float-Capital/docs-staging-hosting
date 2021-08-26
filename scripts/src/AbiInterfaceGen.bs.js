@@ -116,11 +116,11 @@ function typeOutputs(outputs, functionName) {
   return "type " + lowerCaseFirstLetter(functionName) + "Return = " + rescriptType;
 }
 
-function generateConstructor(constructorParams) {
+function generateConstructor(constructorParams, moduleName) {
   var typeNamesFull = typeInputs(constructorParams, /* NamedTyped */0);
   var typeNames = typeInputs(constructorParams, /* NamedUntyped */1);
   var callParams = typeInputs(constructorParams, /* UnnamedUntyped */2);
-  return "let make: (" + typeNamesFull + ") => JsPromise.t<t> = (" + typeNames + ") =>\n    deployContract" + String(constructorParams.length) + "(contractName, " + callParams + ")->Obj.magic";
+  return "let make: (" + typeNamesFull + ") => JsPromise.t<t> = (" + typeNames + ") =>\n    deployContract" + String(constructorParams.length) + "(contractName, " + callParams + ")->Obj.magic\n\n    let makeSmock: (" + typeNamesFull + ") => JsPromise.t<t> = (" + typeNames + ") =>\n    deployMockContract" + String(constructorParams.length) + "(contractName, " + callParams + ")->Obj.magic\n\n    let setVariable: (t, ~name: string, ~value: 'a) => JsPromise.t<unit> = setVariableRaw\n    \n    ";
 }
 
 var moduleDictionary = {};
@@ -128,11 +128,11 @@ var moduleDictionary = {};
 Belt_Array.map(files, (function (abiFileName) {
         var abiFileContents = Fs.readFileSync("../contracts/abis/" + abiFileName, "utf8");
         var abiFileObject = JSON.parse(abiFileContents);
+        var moduleName = getMmoduleName(abiFileName);
         var moduleContents = {};
         var moduleConstructor = {
-          contents: "let make: unit => JsPromise.t<t> = () => deployContract0(contractName)->Obj.magic"
+          contents: "let make: unit => JsPromise.t<t> = () => deployContract0(contractName)->Obj.magic\n    let makeSmock: unit => JsPromise.t<t> = () => deployMockContract0(contractName)->Obj.magic\n\n    let setVariable: (t, ~name: string, ~value: 'a) => JsPromise.t<unit> = setVariableRaw\n    "
         };
-        var moduleName = getMmoduleName(abiFileName);
         Belt_Array.map(abiFileObject, (function (abiItem) {
                 var name = abiItem.name;
                 var itemType = abiItem.type;
@@ -143,7 +143,7 @@ Belt_Array.map(files, (function (abiFileName) {
                 }
                 if (itemType !== "function") {
                   if (itemType === "constructor") {
-                    moduleConstructor.contents = generateConstructor(inputs);
+                    moduleConstructor.contents = generateConstructor(inputs, moduleName);
                   } else {
                     console.log("We have an unhandled type - " + name + " " + itemType, abiItem);
                   }
@@ -178,7 +178,7 @@ var _writeFiles = Belt_Array.map(Js_dict.entries(moduleDictionary), (function (p
         var match = param[1];
         var optExposedFunctions = Js_dict.get(moduleDictionary, moduleName + "Mockable");
         var exposedFunctionBinding = optExposedFunctions !== undefined ? "module Exposed = {\n          let contractName = \"" + moduleName + "Mockable\"\n\n          " + optExposedFunctions[1] + "\n          " + Caml_splice_call.spliceObjApply("", "concat", [Js_dict.values(optExposedFunctions[0])]) + "\n        }" : "";
-        Fs.writeFileSync("../contracts/test-waffle/library/contracts/" + moduleName + ".res", "\n@@ocaml.warning(\"-32\")\nopen ContractHelpers\ntype t = {address: Ethers.ethAddress}\nlet contractName = \"" + moduleName + "\"\n\nlet at: Ethers.ethAddress => JsPromise.t<t> = contractAddress =>\n  attachToContract(contractName, ~contractAddress)->Obj.magic\n\n" + match[1] + "\n\n" + Caml_splice_call.spliceObjApply("", "concat", [Js_dict.values(match[0])]) + "\n\n" + exposedFunctionBinding + "\n", "utf8");
+        Fs.writeFileSync("../contracts/test-waffle/library/contracts/" + moduleName + ".res", "\n@@ocaml.warning(\"-32\")\nopen SmockGeneral\nopen ContractHelpers\ntype t = {address: Ethers.ethAddress}\nlet contractName = \"" + moduleName + "\"\n\nlet at: Ethers.ethAddress => JsPromise.t<t> = contractAddress =>\n  attachToContract(contractName, ~contractAddress)->Obj.magic\n\n" + match[1] + "\n\n" + Caml_splice_call.spliceObjApply("", "concat", [Js_dict.values(match[0])]) + "\n\n" + exposedFunctionBinding + "\n", "utf8");
         
       }));
 

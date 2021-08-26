@@ -1,12 +1,11 @@
 open LetOps;
-open StakerHelpers;
 open Mocha;
 open Globals;
 
 let test =
     (
-      ~contracts: ref(Helpers.coreContracts),
-      ~accounts: ref(array(Ethers.Wallet.t)),
+      ~contracts: ref(Helpers.stakerUnitTestContracts),
+      ~accounts as _: ref(array(Ethers.Wallet.t)),
     ) => {
   let marketIndex = 1;
   let tenToThe14 = tenToThe18->div(bnFromInt(10000)); // 0.01 %
@@ -47,24 +46,28 @@ let test =
       (overBalancedSideRate, underBalancedSideRate);
     };
 
-    let balanceIncentiveCurve_exponent = ref(None->Obj.magic);
-    let safeExponentBitShifting = ref(None->Obj.magic);
+    let balanceIncentiveCurve_exponent = bnFromInt(5);
+    let safeExponentBitShifting = bnFromInt(50);
 
-    before_each(() => {
-      let%Await _ =
-        deployAndSetupStakerToUnitTest(
+    before(() => {
+      let {staker, longShortSmocked} = contracts.contents;
+
+      let%AwaitThen _ =
+        staker->StakerSmocked.InternalMock.setupFunctionForUnitTesting(
           ~functionName="_calculateFloatPerSecond",
-          ~contracts,
-          ~accounts,
         );
-      let%AwaitThen balanceIncentiveCurve_exponentFetched =
-        contracts^.staker->Staker.balanceIncentiveCurve_exponent(marketIndex);
-      balanceIncentiveCurve_exponent := balanceIncentiveCurve_exponentFetched;
 
-      let%Await safeExponentBitShiftingFetched =
-        contracts.contents.staker
-        ->Staker.safeExponentBitShifting(marketIndex);
-      safeExponentBitShifting := safeExponentBitShiftingFetched;
+      longShortSmocked->LongShortSmocked.mockMarketSideValueInPaymentTokenToReturn(
+        CONSTANTS.tenToThe18,
+      );
+
+      let%Await _ =
+        staker->Staker.Exposed._changeBalanceIncentiveParametersExposed(
+          ~marketIndex,
+          ~balanceIncentiveCurve_exponent,
+          ~balanceIncentiveCurve_equilibriumOffset=CONSTANTS.zeroBn,
+          ~safeExponentBitShifting,
+        );
 
       StakerSmocked.InternalMock.mock_getKValueToReturn(kVal);
     });
@@ -112,10 +115,10 @@ let test =
           let (longRate, shortRate) =
             calculateFloatPerSecondPerPaymentTokenLocked(
               ~underBalancedSideValue=shortValue,
-              ~exponent=balanceIncentiveCurve_exponent^,
+              ~exponent=balanceIncentiveCurve_exponent,
               ~equilibriumOffsetMarketScaled,
               ~totalLocked,
-              ~requiredBitShifting=safeExponentBitShifting^,
+              ~requiredBitShifting=safeExponentBitShifting,
               ~equilibriumMultiplier=bnFromInt(-1),
             );
 
@@ -133,10 +136,10 @@ let test =
         let (shortRate, longRate) =
           calculateFloatPerSecondPerPaymentTokenLocked(
             ~underBalancedSideValue=longValue,
-            ~exponent=balanceIncentiveCurve_exponent^,
+            ~exponent=balanceIncentiveCurve_exponent,
             ~equilibriumOffsetMarketScaled,
             ~totalLocked,
-            ~requiredBitShifting=safeExponentBitShifting^,
+            ~requiredBitShifting=safeExponentBitShifting,
             ~equilibriumMultiplier=oneBn,
           );
 
@@ -171,7 +174,7 @@ let test =
       "returns correct longFloatPerSecond and shortFloatPerSecond for each market side",
       () => {
         describe("without offset", () => {
-          before_each(() => {
+          before(() => {
             contracts.contents.staker
             ->Staker.Exposed.setEquilibriumOffset(
                 ~marketIndex,
@@ -233,7 +236,7 @@ let test =
           });
         });
         describe("with negative offset", () => {
-          before_each(() => {
+          before_once'(() => {
             contracts.contents.staker
             ->Staker.Exposed.setEquilibriumOffset(
                 ~marketIndex,
@@ -332,7 +335,7 @@ let test =
           });
         });
         describe("with positive offset", () => {
-          before_each(() => {
+          before_once'(() => {
             contracts.contents.staker
             ->Staker.Exposed.setEquilibriumOffset(
                 ~marketIndex,
@@ -434,7 +437,6 @@ let test =
     );
     it("calls getKValue correctly", () => {
       StakerSmocked.InternalMock.mock_getKValueToReturn(kVal);
-
       let%Await _result =
         contracts^.staker
         ->Staker.Exposed._calculateFloatPerSecondExposed(

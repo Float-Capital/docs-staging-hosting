@@ -149,10 +149,10 @@ export function getOrCreateGlobalState(): GlobalState {
     globalState.longShort = ZERO_ADDRESS;
     globalState.totalFloatMinted = ZERO;
     globalState.totalTxs = ZERO;
-    globalState.totalGasUsed = ZERO;
     globalState.totalUsers = ZERO;
     globalState.timestampLaunched = ZERO;
     globalState.txHash = ZERO_ADDRESS_BYTES;
+    globalState.totalValueLocked = ZERO;
   }
 
   return globalState as GlobalState;
@@ -166,7 +166,6 @@ export function getOrCreateUser(address: Bytes, event: ethereum.Event): User {
     user.totalMintedFloat = ZERO;
     user.floatTokenBalance = ZERO;
     user.timestampJoined = event.block.timestamp;
-    user.totalGasUsed = ZERO;
     user.numberOfTransactions = ZERO;
     user.currentStakes = [];
     user.tokenBalances = [];

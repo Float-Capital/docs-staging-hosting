@@ -10,6 +10,8 @@ module StakeForm = %form(
   }
 )
 
+let {toNumber} = module(Ethers.BigNumber)
+
 module UnstakeTxStatusModal = {
   @react.component
   let make = (~txStateUnstake, ~resetFormButton) => {
@@ -75,7 +77,14 @@ module StakeFormInput = {
 
 module ConnectedStakeForm = {
   @react.component
-  let make = (~tokenId, ~signer, ~synthetic: Queries.SyntheticTokenInfo.t) => {
+  let make = (
+    ~signer,
+    ~synthetic as {
+      id: tokenId,
+      syntheticMarket: {marketIndex, name: syntheticMarketName},
+      tokenType,
+    }: Queries.SyntheticTokenInfo.t,
+  ) => {
     let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction(
       ~signer,
     )
@@ -100,7 +109,8 @@ module ConnectedStakeForm = {
         contractExecutionHandler(
           ~makeContractInstance=Contracts.Staker.make(~address=Config.staker),
           ~contractFunction=Contracts.Staker.withdraw(
-            ~tokenAddress=tokenId->Ethers.Utils.getAddressUnsafe,
+            ~marketIndex=marketIndex->toNumber,
+            ~isWithdrawFromLong=tokenType == #Long,
             ~amount,
           ),
         )
@@ -160,7 +170,7 @@ module ConnectedStakeForm = {
     }
 
     let (_optAdditionalErrorMessage, buttonText, buttonDisabled) = {
-      let defaultButtonText = `Unstake ${synthetic.tokenType->Obj.magic} ${synthetic.syntheticMarket.name}`
+      let defaultButtonText = `Unstake ${tokenType->Obj.magic} ${syntheticMarketName}`
       switch (formAmount, optTokenBalance) {
       | (Some(amount), Some(balance)) => {
           let greaterThanBalance = amount->Ethers.BigNumber.gt(balance)
@@ -214,7 +224,7 @@ let make = (~tokenId) => {
   | {loading: true} => <Loader.Mini />
   | {data: Some({syntheticToken: Some(synthetic)})} =>
     switch optSigner {
-    | Some(signer) => <ConnectedStakeForm signer tokenId synthetic />
+    | Some(signer) => <ConnectedStakeForm signer synthetic />
     | None =>
       showLogin
         ? <Login />

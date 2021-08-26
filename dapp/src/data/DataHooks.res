@@ -429,7 +429,6 @@ let useFloatBalancesForUser = (~userId) => {
 type basicUserInfo = {
   id: string,
   joinedAt: Js.Date.t,
-  gasUsed: Ethers.BigNumber.t,
   floatMinted: Ethers.BigNumber.t,
   floatBalance: Ethers.BigNumber.t,
   transactionCount: Ethers.BigNumber.t,
@@ -450,7 +449,6 @@ let useBasicUserInfo = (~userId) => {
           totalMintedFloat,
           floatTokenBalance,
           numberOfTransactions,
-          totalGasUsed,
         }),
       }),
     } =>
@@ -458,7 +456,6 @@ let useBasicUserInfo = (~userId) => {
       ExistingUser({
         id: id,
         joinedAt: timestampJoined->Ethers.BigNumber.toNumberFloat->DateFns.fromUnixTime,
-        gasUsed: totalGasUsed,
         floatMinted: totalMintedFloat,
         floatBalance: floatTokenBalance,
         transactionCount: numberOfTransactions,

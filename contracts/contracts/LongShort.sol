@@ -2,10 +2,8 @@
 
 pragma solidity 0.8.3;
 
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 import "./interfaces/ITokenFactory.sol";
 import "./interfaces/ISyntheticToken.sol";
@@ -13,6 +11,8 @@ import "./interfaces/IStaker.sol";
 import "./interfaces/ILongShort.sol";
 import "./interfaces/IYieldManager.sol";
 import "./interfaces/IOracleManager.sol";
+import "./abstract/AccessControlledAndUpgradeable.sol";
+import "hardhat/console.sol";
 
 /**
  **** visit https://float.capital *****
@@ -24,7 +24,7 @@ import "./interfaces/IOracleManager.sol";
 /// @dev All functions in this file are currently `virtual`. This is NOT to encourage inheritance.
 /// It is merely for convenince when unit testing.
 /// @custom:auditors This contract balances long and short sides.
-contract LongShort is ILongShort, Initializable, UUPSUpgradeable {
+contract LongShort is ILongShort, AccessControlledAndUpgradeable {
   //Using Open Zeppelin safe transfer library for token transfers
   using SafeERC20 for IERC20;
 
@@ -44,7 +44,6 @@ contract LongShort is ILongShort, Initializable, UUPSUpgradeable {
   uint256[45] private __constantsGap;
 
   /* ══════ Global state ══════ */
-  address public admin;
   uint32 public latestMarket;
 
   address public staker;
@@ -54,19 +53,20 @@ contract LongShort is ILongShort, Initializable, UUPSUpgradeable {
   /* ══════ Market specific ══════ */
   mapping(uint32 => bool) public marketExists;
   mapping(uint32 => int256) public assetPrice;
-  mapping(uint32 => uint256) public marketUpdateIndex;
+  mapping(uint32 => uint256) public override marketUpdateIndex;
   mapping(uint32 => address) public paymentTokens;
   mapping(uint32 => address) public yieldManagers;
   mapping(uint32 => address) public oracleManagers;
   mapping(uint32 => uint256) public marketTreasurySplitGradient_e18;
 
   /* ══════ Market + position (long/short) specific ══════ */
-  mapping(uint32 => mapping(bool => address)) public syntheticTokens;
+  mapping(uint32 => mapping(bool => address)) public override syntheticTokens;
   mapping(uint32 => mapping(bool => uint256)) public override marketSideValueInPaymentToken;
 
   /// @notice synthetic token prices of a given market of a (long/short) at every previous price update
   mapping(uint32 => mapping(bool => mapping(uint256 => uint256)))
-    public syntheticToken_priceSnapshot;
+    public
+    override syntheticToken_priceSnapshot;
 
   mapping(uint32 => mapping(bool => uint256)) public batched_amountPaymentToken_deposit;
   mapping(uint32 => mapping(bool => uint256)) public batched_amountSyntheticToken_redeem;
@@ -88,7 +88,7 @@ contract LongShort is ILongShort, Initializable, UUPSUpgradeable {
     ╚═════════════════════════════╝*/
 
   function adminOnlyModifierLogic() internal virtual {
-    require(msg.sender == admin, "only admin");
+    _checkRole(ADMIN_ROLE, msg.sender);
   }
 
   modifier adminOnly() {
@@ -133,8 +133,7 @@ contract LongShort is ILongShort, Initializable, UUPSUpgradeable {
       _tokenFactory != address(0) &&
       _staker != address(0)
     );
-
-    admin = _admin;
+    _AccessControlledAndUpgradeable_init(_admin);
     tokenFactory = _tokenFactory;
     staker = _staker;
 
@@ -144,21 +143,6 @@ contract LongShort is ILongShort, Initializable, UUPSUpgradeable {
   /*╔═══════════════════╗
     ║       ADMIN       ║
     ╚═══════════════════╝*/
-
-  /// @notice Authorizes an upgrade to a new address.
-  /// @dev Can only be called by the current admin.
-  function _authorizeUpgrade(address) internal override adminOnly {}
-
-  /// @notice Changes the admin address for this contract.
-  /// @dev Can only be called by the current admin.
-  /// @param _admin Address of the new admin.
-  function changeAdmin(address _admin) external adminOnly {
-    require(
-      _admin != address(0)
-    );
-
-    admin = _admin;
-  }
 
   /// @notice Update oracle for a market
   /// @dev Can only be called by the current admin.
@@ -291,8 +275,8 @@ contract LongShort is ILongShort, Initializable, UUPSUpgradeable {
 
     emit SyntheticMarketCreated(
       marketIndex,
-      syntheticTokens[marketIndex][true],
-      syntheticTokens[marketIndex][false],
+      _longToken,
+      _shortToken,
       _paymentToken,
       assetPrice[marketIndex],
       syntheticName,

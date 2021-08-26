@@ -128,5 +128,110 @@ let deployContract8 = (
   )
   ->JsPromise.then(deployed)
 }
+let deployMockContract0 = contractName => {
+  SmockGeneral.getMockContractFactory(contractName)
+  ->JsPromise.then(deploy)
+  ->JsPromise.then(deployed)
+}
+let deployMockContract1 = (contractName, firstParam) => {
+  SmockGeneral.getMockContractFactory(contractName)
+  ->JsPromise.then(deploy1(_, firstParam))
+  ->JsPromise.then(deployed)
+}
+let deployMockContract2 = (contractName, firstParam, secondParam) => {
+  SmockGeneral.getMockContractFactory(contractName)
+  ->JsPromise.then(deploy2(_, firstParam, secondParam))
+  ->JsPromise.then(deployed)
+}
+let deployMockContract3 = (contractName, firstParam, secondParam, thirdParam) => {
+  SmockGeneral.getMockContractFactory(contractName)
+  ->JsPromise.then(deploy3(_, firstParam, secondParam, thirdParam))
+  ->JsPromise.then(deployed)
+}
+let deployMockContract4 = (contractName, firstParam, secondParam, thirdParam, fourthParam) => {
+  SmockGeneral.getMockContractFactory(contractName)
+  ->JsPromise.then(deploy4(_, firstParam, secondParam, thirdParam, fourthParam))
+  ->JsPromise.then(deployed)
+}
+let deployMockContract5 = (
+  contractName,
+  firstParam,
+  secondParam,
+  thirdParam,
+  fourthParam,
+  fifthParam,
+) => {
+  SmockGeneral.getMockContractFactory(contractName)
+  ->JsPromise.then(deploy5(_, firstParam, secondParam, thirdParam, fourthParam, fifthParam))
+  ->JsPromise.then(deployed)
+}
+let deployMockContract6 = (
+  contractName,
+  firstParam,
+  secondParam,
+  thirdParam,
+  fourthParam,
+  fifthParam,
+  sixthParam,
+) => {
+  SmockGeneral.getMockContractFactory(contractName)
+  ->JsPromise.then(
+    deploy6(_, firstParam, secondParam, thirdParam, fourthParam, fifthParam, sixthParam),
+  )
+  ->JsPromise.then(deployed)
+}
+let deployMockContract7 = (
+  contractName,
+  firstParam,
+  secondParam,
+  thirdParam,
+  fourthParam,
+  fifthParam,
+  sixthParam,
+  seventhParam,
+) => {
+  SmockGeneral.getMockContractFactory(contractName)
+  ->JsPromise.then(
+    deploy7(
+      _,
+      firstParam,
+      secondParam,
+      thirdParam,
+      fourthParam,
+      fifthParam,
+      sixthParam,
+      seventhParam,
+    ),
+  )
+  ->JsPromise.then(deployed)
+}
+
+let deployMockContract8 = (
+  contractName,
+  firstParam,
+  secondParam,
+  thirdParam,
+  fourthParam,
+  fifthParam,
+  sixthParam,
+  seventhParam,
+  eighthParam,
+) => {
+  SmockGeneral.getMockContractFactory(contractName)
+  ->JsPromise.then(
+    deploy8(
+      _,
+      firstParam,
+      secondParam,
+      thirdParam,
+      fourthParam,
+      fifthParam,
+      sixthParam,
+      seventhParam,
+      eighthParam,
+    ),
+  )
+  ->JsPromise.then(deployed)
+}
 
 @send external connect: ('contract, ~address: Ethers.Wallet.t) => 'contract = "connect"
