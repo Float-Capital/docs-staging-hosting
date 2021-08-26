@@ -425,7 +425,7 @@ export function handleSyntheticMarketCreated(
   let initalLatestAccumulativeFloatIssuanceSnapshot =
     accumulativeFloatIssuanceSnapshotRetrieval.entity;
 
-  if (!accumulativeFloatIssunanceSnapshotRetrival.wasCreated)
+  if (!accumulativeFloatIssuanceSnapshotRetrieval.wasCreated)
     log.critical(
       "There was an existing snapshot for a market that didn't exist yet",
       []
