@@ -325,6 +325,15 @@ query {
 }
 `)
 
+// Used externally in MarketingSite.res
+module TVL = %graphql(`
+query {
+  globalState(id:"globalState"){  
+    totalValueLocked
+  }
+}
+`)
+
 // Used externally in: Profile.res
 module SyntheticTokens = %graphql(`
 query {

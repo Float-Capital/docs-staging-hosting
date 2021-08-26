@@ -152,9 +152,14 @@ export function handleAccumulativeIssuancePerStakedSynthSnapshotCreated(
     marketIndex,
     accumulativeFloatIssuanceSnapshotIndex
   );
-  let state = getOrInitializeAccumulativeFloatIssuanceSnapshot(
+  let accumulativeFloatIssuanceSnapshotRetrieval = getOrInitializeAccumulativeFloatIssuanceSnapshot(
     accumulativeFloatIssuanceSnapshotId
-  ).entity;
+  );
+  let state = accumulativeFloatIssuanceSnapshotRetrieval.entity;
+  if (accumulativeFloatIssuanceSnapshotRetrieval.wasCreated) {
+    state.longToken = syntheticMarket.syntheticLong;
+    state.shortToken = syntheticMarket.syntheticShort;
+  }
   state.blockNumber = blockNumber;
   state.creationTxHash = txHash;
   state.index = accumulativeFloatIssuanceSnapshotIndex;
