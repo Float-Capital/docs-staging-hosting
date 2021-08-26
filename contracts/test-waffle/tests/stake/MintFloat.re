@@ -13,7 +13,7 @@ let test =
       ref(None->Obj.magic);
 
     let floatCapitalAddressRef: ref(Ethers.ethAddress) =
-      ref(CONSTANTS.zeroAddress);
+      ref(Helpers.randomAddress());
 
     let user = Helpers.randomAddress();
     let floatToMint = Helpers.randomTokenAmount();

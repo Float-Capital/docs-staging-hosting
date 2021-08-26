@@ -97,8 +97,9 @@ contract YieldManagerAave is IYieldManager, Initializable, UUPSUpgradeable {
       _treasury != address(0) &&
       _paymentToken != address(0) &&
       _aToken != address(0) &&
-      _lendingPool != address(0) &&
+      _lendingPoolAddressesProvider != address(0) &&
       _aaveIncentivesController != address(0) &&
+      _admin != address(0)
     );
     
     longShort = _longShort;

@@ -130,7 +130,6 @@ contract LongShort is ILongShort, Initializable, UUPSUpgradeable {
   ) external virtual initializer {
     require(
       _admin != address(0) &&
-      _treasury != address(0) &&
       _tokenFactory != address(0) &&
       _staker != address(0)
     );
