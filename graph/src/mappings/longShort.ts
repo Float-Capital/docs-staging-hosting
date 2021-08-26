@@ -74,17 +74,15 @@ import {
   doesBatchExist,
 } from "../utils/nextPrice";
 import {
-  generateSyntheticMarketId,
   generateAccumulativeFloatIssuanceSnapshotId,
-  getOrInitializeAccumulativeFloatIssuanceSnapshot,
   generateSystemStateId,
-  getOrInitializeGlobalState,
   getOrInitializeSystemState,
   getSystemState,
   getSyntheticMarket,
-  getUserNextPriceActionComponent,
   getUserNextPriceAction,
   getPaymentToken,
+  getAccumulativeFloatIssuanceSnapshot,
+  getOrInitializeAccumulativeFloatIssuanceSnapshot,
 } from "../generated/EntityHelpers";
 
 export function handleLongShortV1(event: LongShortV1): void {
@@ -421,17 +419,22 @@ export function handleSyntheticMarketCreated(
   syntheticMarket.save();
   // This function uses the synthetic market internally, so can only be created once the synthetic market has been created.
 
-  let accumulativeFloatIssunanceSnapshotRetrival = getOrInitializeAccumulativeFloatIssuanceSnapshot(
+  let accumulativeFloatIssuanceSnapshotRetrieval = getOrInitializeAccumulativeFloatIssuanceSnapshot(
     accumulativeFloatIssuanceSnapshotId
   );
+  let initalLatestAccumulativeFloatIssuanceSnapshot =
+    accumulativeFloatIssuanceSnapshotRetrieval.entity;
+
   if (!accumulativeFloatIssunanceSnapshotRetrival.wasCreated)
     log.critical(
       "There was an existing snapshot for a market that didn't exist yet",
       []
     );
+  initalLatestAccumulativeFloatIssuanceSnapshot.longToken =
+    syntheticMarket.syntheticLong;
+  initalLatestAccumulativeFloatIssuanceSnapshot.shortToken =
+    syntheticMarket.syntheticShort;
 
-  let initalLatestAccumulativeFloatIssuanceSnapshot =
-    accumulativeFloatIssunanceSnapshotRetrival.entity;
   initalLatestAccumulativeFloatIssuanceSnapshot.blockNumber =
     event.block.number;
   initalLatestAccumulativeFloatIssuanceSnapshot.creationTxHash =
