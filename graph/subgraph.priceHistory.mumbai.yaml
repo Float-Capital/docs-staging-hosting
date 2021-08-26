@@ -6,9 +6,9 @@ dataSources:
     name: LongShort
     network: mumbai
     source:
-      address: "0xa9d25B772f5AA249DA6bAee7Ea1F05524b0f0973"
+      address: "0x6025b79dEaf8d3bddA7e3504b1EE2F5c55c95500"
       abi: LongShort
-      startBlock: 16257253
+      startBlock: 17876207
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -22,7 +22,7 @@ dataSources:
         - name: OracleManager
           file: ./abis/OracleManagerChainlink.json
       eventHandlers:
-        - event: SyntheticMarketCreated(uint32,address,address,address,uint256,string,string,address,address)
+        - event: SyntheticMarketCreated(uint32,address,address,address,int256,string,string,address,address)
           handler: handleSyntheticMarketCreated
         - event: OracleUpdated(uint32,address,address)
           handler: handleOracleUpdated
