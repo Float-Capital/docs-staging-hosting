@@ -7,10 +7,9 @@ var React = require("react");
 var Loader = require("../../components/UI/Base/Loader.js");
 var Queries = require("../../data/Queries.js");
 var CONSTANTS = require("../../CONSTANTS.js");
-var StatsCalcs = require("../../libraries/StatsCalcs.js");
 
 function TVL(Props) {
-  var marketDetailsQuery = Curry.app(Queries.MarketDetails.use, [
+  var tvlQuery = Curry.app(Queries.TVL.use, [
         undefined,
         undefined,
         undefined,
@@ -26,11 +25,11 @@ function TVL(Props) {
         undefined,
         undefined
       ]);
-  var match = marketDetailsQuery.data;
-  if (marketDetailsQuery.loading) {
+  var match = tvlQuery.data;
+  if (tvlQuery.loading) {
     return React.createElement(Loader.Tiny.make, {});
   }
-  if (marketDetailsQuery.error !== undefined) {
+  if (tvlQuery.error !== undefined) {
     return React.createElement("div", {
                 className: "fixed bottom-3 left-3 flex flex-col items-end invisible md:visible bg-white bg-opacity-75 rounded-lg shadow-lg px-2 py-1"
               }, React.createElement("span", {
@@ -40,7 +39,10 @@ function TVL(Props) {
   if (match === undefined) {
     return React.createElement(React.Fragment, undefined, "");
   }
-  var match$1 = StatsCalcs.getTotalValueLockedAndTotalStaked(match.syntheticMarkets);
+  var match$1 = match.globalState;
+  if (match$1 === undefined) {
+    return React.createElement(React.Fragment, undefined, "");
+  }
   var totalValueLocked = match$1.totalValueLocked;
   if (totalValueLocked.gte(CONSTANTS.fiveHundredThousandInWei)) {
     return React.createElement("div", {
