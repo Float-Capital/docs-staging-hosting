@@ -27,6 +27,7 @@
     "test-codegen": "node ./test/util/Codegen.bs.js > ./test/stateChanges/Converters.res",
     "unit-test-codegen": "node ./testCodegenLib/EventGen.bs.js",
     "entity-helpers-codegen": "node ./testCodegenLib/GraphEntityGen.bs.js",
+    "generate-all": "yarn entity-helpers-codegen && yarn unit-test-codegen",
     "integration-test": "jest test ./integrationTests"
   },
   "dependencies": {

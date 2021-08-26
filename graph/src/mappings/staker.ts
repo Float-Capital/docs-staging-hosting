@@ -8,7 +8,6 @@ import {
   MarketAddedToStaker,
   StakeWithdrawalFeeUpdated,
   FloatPercentageUpdated,
-  ChangeAdmin,
   BalanceIncentiveParamsUpdated,
 } from "../../generated/Staker/Staker";
 import { erc20 } from "../../generated/templates";

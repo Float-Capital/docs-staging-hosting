@@ -110,18 +110,7 @@ export function createOrUpdateBatchedNextPriceExec(
     batchedNextPriceExecId
   );
   let batchedNextPriceExec = entityFetchResult.entity;
-  if (entityFetchResult.wasCreated == null) {
-    batchedNextPriceExec = new BatchedNextPriceExec(batchedNextPriceExecId);
-
-    batchedNextPriceExec.updateIndex = updateIndex;
-    batchedNextPriceExec.marketIndex = marketIndex;
-    batchedNextPriceExec.linkedUserNextPriceActions = [];
-    batchedNextPriceExec.amountPaymentTokenForDepositLong = ZERO;
-    batchedNextPriceExec.amountPaymentTokenForDepositShort = ZERO;
-    batchedNextPriceExec.amountSynthTokenForWithdrawalLong = ZERO;
-    batchedNextPriceExec.amountSynthTokenForWithdrawalShort = ZERO;
-
-    batchedNextPriceExec.save();
+  if (entityFetchResult.wasCreated) {
     // TODO: move this externally to its own getter (avoid even a remote change of race conditions)
     let nextBatchedNextPriceExecId = getNextBatchedNextPriceExecId(marketIndex);
     let nextBatchedNextPriceExec = NextBatchedNextPriceExec.load(

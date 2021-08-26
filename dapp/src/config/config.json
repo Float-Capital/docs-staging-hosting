@@ -1,5 +1,5 @@
 {
-  "graphEndpoint": "https://test.graph.float.capital/subgraphs/name/float-capital/float-capital",
+  "graphEndpoint": "https://test.graph.float.capital/subgraphs/name/float-capital/float-capital2",
   "priceHistoryGraphEndpoint": "https://api.thegraph.com/subgraphs/id/QmXpihmrnRMobQwFVLxS8V2p7bnS5dwo4iJbNeG2vMQmTe",
   "aaveGraphEndpoint": "https://api.thegraph.com/subgraphs/name/aave/aave-v2-matic",
   "networkId": 80001,
@@ -15,13 +15,13 @@
   "web3PollingInterval": 8000,
   "apolloConnectToDevTools": false,
   "contracts": {
-    "FloatCapital_v0": "0x263Fd5519885E4bf1c2c444d20F42b8DeF535F15",
-    "FloatToken": "0x51b38ce62d076BFdEfF7EA310d3B86Cb52015b8C",
+    "FloatCapital_v0": "0x26711691f1B9E980ADB4eFD92E00E98A051c7B87",
+    "FloatToken": "0x16daF830354eb3e496B610DfbE3562f84Cd5b50e",
     "LongShort": "0x6025b79dEaf8d3bddA7e3504b1EE2F5c55c95500",
-    "Migrations": "0x007a4ec86915db37b22FBa5AE25865F406E00A16",
+    "Migrations": "0x12A8Cdc63EeDA4481B0888cca9c424a88917Cc59",
     "Staker": "0xb52DBc99715Cd66C437Eb63a5d0823f0aB275ABe",
-    "TokenFactory": "0x0FE97583c138838A1c748E8E03918d4BA24186B2",
-    "Treasury_v0": "0xeC7FdC3eea4d02E318330300F24469d1d08d16EB",
+    "TokenFactory": "0xcE008cCeC1d8f11E9046b3b17e6B15556822C57d",
+    "Treasury_v0": "0xe679e76A5835a178EEd2c9133fd589e6C62ACA62",
     "Dai": "0x001B3B4d0F3714Ca98ba10F6042DaEbF0B1B7b6F"
   }
 }
