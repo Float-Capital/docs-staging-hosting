@@ -513,7 +513,7 @@ export function handleFloatMinted(event: FloatMinted): void {
   let expectedTotalAmount = amountLong.plus(amountShort);
 
   if (expectedTotalAmount.notEqual(amountFloatMinted)) {
-    log.critical(
+    log.warning(
       "Float issuance breakdown is incorrect. This is either a bug in the contracts or in the graph (more likely the graph).",
       []
     );
