@@ -478,7 +478,6 @@ function calculateAccumulatedFloatAndExecuteOutstandingShifts(
     amountFromShortStake,
   };
 }
-
 export function handleFloatMinted(event: FloatMinted): void {
   let userAddress = event.params.user;
   let userAddressString = userAddress.toHex();

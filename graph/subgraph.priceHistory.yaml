@@ -22,7 +22,7 @@ dataSources:
         - name: OracleManager
           file: ./abis/OracleManagerChainlink.json
       eventHandlers:
-        - event: SyntheticMarketCreated(uint32,address,address,address,uint256,string,string,address,address)
+        - event: SyntheticMarketCreated(uint32,address,address,address,int256,string,string,address,address)
           handler: handleSyntheticMarketCreated
         - event: OracleUpdated(uint32,address,address)
           handler: handleOracleUpdated
