@@ -380,7 +380,6 @@ function User$UserProfileCard(Props) {
   var addressStr = DisplayAddress.ellipsifyMiddle(userInfo.id, 8, 3);
   var joinedStr = Format(userInfo.joinedAt, "do MMM ''yy");
   var txStr = userInfo.transactionCount.toString();
-  var gasStr = Misc.NumberFormat.formatInt(userInfo.gasUsed.toString());
   var match = ContractHooks.useErc20BalanceRefresh(Config.config.contracts.Dai);
   var optDaiBalance = match.data;
   return React.createElement(UserUI.UserColumnCard.make, {
@@ -400,9 +399,6 @@ function User$UserProfileCard(Props) {
                             }) : null, React.createElement(UserUI.UserColumnText.make, {
                             head: "🎉 Joined",
                             body: joinedStr
-                          }), React.createElement(UserUI.UserColumnText.make, {
-                            head: "⛽ Gas used",
-                            body: gasStr
                           }), React.createElement(UserUI.UserColumnText.make, {
                             head: "🏃 No. txs",
                             body: txStr

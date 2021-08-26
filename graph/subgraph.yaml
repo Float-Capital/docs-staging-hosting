@@ -86,17 +86,13 @@ dataSources:
       eventHandlers:
         - event: AccumulativeIssuancePerStakedSynthSnapshotCreated(uint32,uint256,uint256,uint256)
           handler: handleAccumulativeIssuancePerStakedSynthSnapshotCreated
-        - event: BalanceIncentiveEquilibriumOffsetUpdated(uint32,int256)
-          handler: handleBalanceIncentiveEquilibriumOffsetUpdated
-        - event: BalanceIncentiveExponentUpdated(uint32,uint256)
-          handler: handleBalanceIncentiveExponentUpdated
-        - event: ChangeAdmin(address)
-          handler: handleChangeAdmin
+        - event: BalanceIncentiveParamsUpdated(uint32,uint256,int256,uint256)
+          handler: handleBalanceIncentiveParamsUpdated
         - event: FloatMinted(address,uint32,uint256)
           handler: handleFloatMinted
         - event: FloatPercentageUpdated(uint256)
           handler: handleFloatPercentageUpdated
-        - event: MarketAddedToStaker(uint32,uint256,uint256,uint256,uint256,int256)
+        - event: MarketAddedToStaker(uint32,uint256,uint256,uint256,uint256,int256,uint256)
           handler: handleMarketAddedToStaker
         - event: MarketLaunchIncentiveParametersChanges(uint32,uint256,uint256)
           handler: handleMarketLaunchIncentiveParametersChanges

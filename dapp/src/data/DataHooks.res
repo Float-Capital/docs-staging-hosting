@@ -96,11 +96,11 @@ let useTotalClaimableFloatForUser = (~userId, ~synthTokens) => {
               ? stake.lastMintState.accumulativeFloatPerTokenLong
               : stake.lastMintState.accumulativeFloatPerTokenShort
             let accumulativeFloatPerToken = isLong
-              ? stake.syntheticMarket.latestStakerState.accumulativeFloatPerTokenLong
-              : stake.syntheticMarket.latestStakerState.accumulativeFloatPerTokenShort
+              ? stake.syntheticMarket.latestAccumulativeFloatIssuanceSnapshot.accumulativeFloatPerTokenLong
+              : stake.syntheticMarket.latestAccumulativeFloatIssuanceSnapshot.accumulativeFloatPerTokenShort
             let floatRatePerTokenOverInterval = isLong
-              ? stake.syntheticMarket.latestStakerState.floatRatePerTokenOverIntervalLong
-              : stake.syntheticMarket.latestStakerState.floatRatePerTokenOverIntervalShort
+              ? stake.syntheticMarket.latestAccumulativeFloatIssuanceSnapshot.floatRatePerTokenOverIntervalLong
+              : stake.syntheticMarket.latestAccumulativeFloatIssuanceSnapshot.floatRatePerTokenOverIntervalShort
 
             // The amount of float the user is owed up to the last staker state.
             // Note that accumulativeFloatPerToken is in e42 scale (see Staker.sol).
@@ -429,7 +429,6 @@ let useFloatBalancesForUser = (~userId) => {
 type basicUserInfo = {
   id: string,
   joinedAt: Js.Date.t,
-  gasUsed: Ethers.BigNumber.t,
   floatMinted: Ethers.BigNumber.t,
   floatBalance: Ethers.BigNumber.t,
   transactionCount: Ethers.BigNumber.t,
@@ -450,7 +449,6 @@ let useBasicUserInfo = (~userId) => {
           totalMintedFloat,
           floatTokenBalance,
           numberOfTransactions,
-          totalGasUsed,
         }),
       }),
     } =>
@@ -458,7 +456,6 @@ let useBasicUserInfo = (~userId) => {
       ExistingUser({
         id: id,
         joinedAt: timestampJoined->Ethers.BigNumber.toNumberFloat->DateFns.fromUnixTime,
-        gasUsed: totalGasUsed,
         floatMinted: totalMintedFloat,
         floatBalance: floatTokenBalance,
         transactionCount: numberOfTransactions,

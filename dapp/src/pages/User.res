@@ -326,7 +326,6 @@ module UserProfileCard = {
     )
     let joinedStr = userInfo.joinedAt->DateFns.format(#"do MMM ''yy")
     let txStr = userInfo.transactionCount->toString
-    let gasStr = userInfo.gasUsed->toString->Misc.NumberFormat.formatInt
     let {Swr.data: optDaiBalance} = ContractHooks.useErc20BalanceRefresh(
       ~erc20Address=Config.config.contracts.dai,
     )
@@ -346,7 +345,6 @@ module UserProfileCard = {
           | None => React.null
           }}
           <UserColumnText head=`🎉 Joined` body={joinedStr} />
-          <UserColumnText head=`⛽ Gas used` body={gasStr} />
           <UserColumnText head=`🏃 No. txs` body={txStr} />
         </div>
       </UserColumnTextList>

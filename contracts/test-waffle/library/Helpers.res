@@ -48,6 +48,17 @@ let adjustNumberRandomlyWithinRange = (~basisPointsMin, ~basisPointsMax, number)
   number->add(number->mul(numerator)->div(bnFromInt(100000)))
 }
 
+let accessControlErrorMessage = (~address, ~roleBytesStr) => {
+  "AccessControl: account " ++
+  address->Ethers.Utils.ethAdrToLowerStr ++
+  " is missing role " ++
+  roleBytesStr
+}
+
+let adminRoleBytesString = "0xa49807205ce4d355092ef5a8a18f56e8913cf4a201fbe287825b095693c21775"
+let adminErrorMessage = (~address) =>
+  accessControlErrorMessage(~address, ~roleBytesStr=adminRoleBytesString)
+
 @ocaml.doc(`Generates random BigNumber between 0.01 and 21474836.47 of a token (10^18 in BigNumber units)`)
 let randomTokenAmount = () =>
   randomInteger()->Ethers.BigNumber.mul(Ethers.BigNumber.fromUnsafe("10000000000000000"))
@@ -234,18 +245,22 @@ type stakerUnitTestContracts = {
 
 let initializeStakerUnit = () => {
   JsPromise.all4((
-    Staker.Exposed.make()->JsPromise.then(staker => {
+    Staker.Exposed.makeSmock()->JsPromise.then(staker => {
       staker->StakerSmocked.InternalMock.setup->JsPromise.map(_ => staker)
     }),
     LongShortSmocked.make(),
     FloatTokenSmocked.make(),
     SyntheticTokenSmocked.make(),
-  ))->JsPromise.map(((staker, longShortSmocked, floatTokenSmocked, syntheticTokenSmocked)) => {
-    staker: staker,
-    longShortSmocked: longShortSmocked,
-    floatTokenSmocked: floatTokenSmocked,
-    syntheticTokenSmocked: syntheticTokenSmocked,
-  })
+  ))->JsPromise.then(((staker, longShortSmocked, floatTokenSmocked, syntheticTokenSmocked)) =>
+    staker
+    ->Staker.setVariable(~name="longShort", ~value=longShortSmocked.address)
+    ->JsPromise.map(_ => {
+      staker: staker,
+      longShortSmocked: longShortSmocked,
+      floatTokenSmocked: floatTokenSmocked,
+      syntheticTokenSmocked: syntheticTokenSmocked,
+    })
+  )
 }
 
 type longShortUnitTestContracts = {
@@ -260,21 +275,26 @@ type longShortUnitTestContracts = {
 
 let deployAYieldManager = (~longShort: Ethers.ethAddress, ~lendingPoolAddressesProvider) => {
   ERC20Mock.make(~name="Pay Token 1", ~symbol="PT1")->JsPromise.then(paymentToken =>
-    YieldManagerAave.make(
-      ~longShort,
-      ~treasury=CONSTANTS.zeroAddress,
-      ~paymentToken=paymentToken.address,
-      ~aToken=CONSTANTS.zeroAddress,
-      ~lendingPoolAddressesProvider,
-      ~aaveIncentivesController=randomAddress(),
-      ~aaveReferralCode=0,
+    YieldManagerAave.make()->JsPromise.then(manager =>
+      manager
+      ->YieldManagerAave.initialize(
+        ~longShort,
+        ~treasury=randomAddress(),
+        ~paymentToken=paymentToken.address,
+        ~aToken=randomAddress(),
+        ~lendingPoolAddressesProvider,
+        ~aaveIncentivesController=randomAddress(),
+        ~aaveReferralCode=0,
+        ~admin=randomAddress(),
+      )
+      ->JsPromise.map(_ => manager)
     )
   )
 }
 
 let initializeLongShortUnit = () => {
   JsPromise.all7((
-    LongShort.Exposed.make()->JsPromise.then(staker => {
+    LongShort.Exposed.makeSmock()->JsPromise.then(staker => {
       staker->LongShortSmocked.InternalMock.setup->JsPromise.map(_ => staker)
     }),
     StakerSmocked.make(),

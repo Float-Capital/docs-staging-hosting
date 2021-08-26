@@ -14,7 +14,6 @@ var query = (require("@apollo/client").gql`
     totalMintedFloat
     floatTokenBalance
     numberOfTransactions
-    totalGasUsed
     timestampJoined
     tokenMints  {
       __typename
@@ -31,7 +30,6 @@ function parse(value) {
           totalMintedFloat: GqlConverters.$$BigInt.parse(value.totalMintedFloat),
           floatTokenBalance: GqlConverters.$$BigInt.parse(value.floatTokenBalance),
           numberOfTransactions: GqlConverters.$$BigInt.parse(value.numberOfTransactions),
-          totalGasUsed: GqlConverters.$$BigInt.parse(value.totalGasUsed),
           timestampJoined: GqlConverters.$$BigInt.parse(value.timestampJoined),
           tokenMints: value$1.map(function (value) {
                 return {
@@ -55,23 +53,20 @@ function serialize(value) {
       });
   var value$2 = value.timestampJoined;
   var value$3 = GqlConverters.$$BigInt.serialize(value$2);
-  var value$4 = value.totalGasUsed;
+  var value$4 = value.numberOfTransactions;
   var value$5 = GqlConverters.$$BigInt.serialize(value$4);
-  var value$6 = value.numberOfTransactions;
+  var value$6 = value.floatTokenBalance;
   var value$7 = GqlConverters.$$BigInt.serialize(value$6);
-  var value$8 = value.floatTokenBalance;
+  var value$8 = value.totalMintedFloat;
   var value$9 = GqlConverters.$$BigInt.serialize(value$8);
-  var value$10 = value.totalMintedFloat;
-  var value$11 = GqlConverters.$$BigInt.serialize(value$10);
-  var value$12 = value.id;
-  var value$13 = value.__typename;
+  var value$10 = value.id;
+  var value$11 = value.__typename;
   return {
-          __typename: value$13,
-          id: value$12,
-          totalMintedFloat: value$11,
-          floatTokenBalance: value$9,
-          numberOfTransactions: value$7,
-          totalGasUsed: value$5,
+          __typename: value$11,
+          id: value$10,
+          totalMintedFloat: value$9,
+          floatTokenBalance: value$7,
+          numberOfTransactions: value$5,
           timestampJoined: value$3,
           tokenMints: tokenMints
         };
@@ -385,7 +380,7 @@ var query$5 = (require("@apollo/client").gql`
   fragment MarketIStakeInfo on SyntheticMarket   {
     __typename
     id
-    latestStakerState  {
+    latestAccumulativeFloatIssuanceSnapshot  {
       __typename
       accumulativeFloatPerTokenLong
       accumulativeFloatPerTokenShort
@@ -397,11 +392,11 @@ var query$5 = (require("@apollo/client").gql`
 `);
 
 function parse$5(value) {
-  var value$1 = value.latestStakerState;
+  var value$1 = value.latestAccumulativeFloatIssuanceSnapshot;
   return {
           __typename: value.__typename,
           id: value.id,
-          latestStakerState: {
+          latestAccumulativeFloatIssuanceSnapshot: {
             __typename: value$1.__typename,
             accumulativeFloatPerTokenLong: GqlConverters.$$BigInt.parse(value$1.accumulativeFloatPerTokenLong),
             accumulativeFloatPerTokenShort: GqlConverters.$$BigInt.parse(value$1.accumulativeFloatPerTokenShort),
@@ -413,7 +408,7 @@ function parse$5(value) {
 }
 
 function serialize$5(value) {
-  var value$1 = value.latestStakerState;
+  var value$1 = value.latestAccumulativeFloatIssuanceSnapshot;
   var value$2 = value$1.timestamp;
   var value$3 = GqlConverters.$$BigInt.serialize(value$2);
   var value$4 = value$1.floatRatePerTokenOverIntervalShort;
@@ -425,7 +420,7 @@ function serialize$5(value) {
   var value$10 = value$1.accumulativeFloatPerTokenLong;
   var value$11 = GqlConverters.$$BigInt.serialize(value$10);
   var value$12 = value$1.__typename;
-  var latestStakerState = {
+  var latestAccumulativeFloatIssuanceSnapshot = {
     __typename: value$12,
     accumulativeFloatPerTokenLong: value$11,
     accumulativeFloatPerTokenShort: value$9,
@@ -438,7 +433,7 @@ function serialize$5(value) {
   return {
           __typename: value$14,
           id: value$13,
-          latestStakerState: latestStakerState
+          latestAccumulativeFloatIssuanceSnapshot: latestAccumulativeFloatIssuanceSnapshot
         };
 }
 
@@ -1213,7 +1208,6 @@ var query$15 = (require("@apollo/client").gql`
     totalFloatMinted
     totalTxs
     totalUsers
-    totalGasUsed
     timestampLaunched
     txHash
   }
@@ -1225,7 +1219,6 @@ function parse$15(value) {
           totalFloatMinted: GqlConverters.$$BigInt.parse(value.totalFloatMinted),
           totalTxs: GqlConverters.$$BigInt.parse(value.totalTxs),
           totalUsers: GqlConverters.$$BigInt.parse(value.totalUsers),
-          totalGasUsed: GqlConverters.$$BigInt.parse(value.totalGasUsed),
           timestampLaunched: GqlConverters.$$BigInt.parse(value.timestampLaunched),
           txHash: GqlConverters.Bytes.parse(value.txHash)
         };
@@ -1236,21 +1229,18 @@ function serialize$15(value) {
   var value$2 = GqlConverters.Bytes.serialize(value$1);
   var value$3 = value.timestampLaunched;
   var value$4 = GqlConverters.$$BigInt.serialize(value$3);
-  var value$5 = value.totalGasUsed;
+  var value$5 = value.totalUsers;
   var value$6 = GqlConverters.$$BigInt.serialize(value$5);
-  var value$7 = value.totalUsers;
+  var value$7 = value.totalTxs;
   var value$8 = GqlConverters.$$BigInt.serialize(value$7);
-  var value$9 = value.totalTxs;
+  var value$9 = value.totalFloatMinted;
   var value$10 = GqlConverters.$$BigInt.serialize(value$9);
-  var value$11 = value.totalFloatMinted;
-  var value$12 = GqlConverters.$$BigInt.serialize(value$11);
-  var value$13 = value.__typename;
+  var value$11 = value.__typename;
   return {
-          __typename: value$13,
-          totalFloatMinted: value$12,
-          totalTxs: value$10,
-          totalUsers: value$8,
-          totalGasUsed: value$6,
+          __typename: value$11,
+          totalFloatMinted: value$10,
+          totalTxs: value$8,
+          totalUsers: value$6,
           timestampLaunched: value$4,
           txHash: value$2
         };

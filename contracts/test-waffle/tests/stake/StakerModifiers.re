@@ -15,7 +15,7 @@ let testUnit =
             contracts.contents.staker
             ->ContractHelpers.connect(~address=nonAdminWallet)
             ->Staker.Exposed.onlyAdminModifierLogicExposed,
-          ~reason="not admin",
+          ~reason=Helpers.adminErrorMessage(~address=nonAdminWallet.address),
         );
       })
     });

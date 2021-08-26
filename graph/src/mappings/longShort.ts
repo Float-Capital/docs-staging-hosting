@@ -518,7 +518,29 @@ export function handleNextPriceDeposit(event: NextPriceDeposit): void {
   let isLong = event.params.isLong;
   let userAddress = event.params.user;
 
+  let globalState = getOrCreateGlobalState();
+
+  globalState.totalValueLocked = globalState.totalValueLocked.plus(
+    depositAdded
+  );
+  globalState.save();
+
   let user = getOrCreateUser(userAddress, event);
+
+  saveEventToStateChange(
+    event,
+    "NextPriceDeposit",
+    bigIntArrayToStringArray([
+      depositAdded,
+      marketIndex,
+      oracleUpdateIndex,
+    ]).concat([isLong ? "true" : "false", user.id]),
+    ["depositAdded", "marketIndex", "oracleUpdateIndex", "isLong", "user"],
+    ["uint256", "uint32", "uint256", "bool", "address"],
+    [userAddress],
+    []
+  );
+
   let syntheticMarket = getSyntheticMarket(marketIndex.toString());
 
   let userNextPriceActionComponent = createUserNextPriceActionComponent(
@@ -552,24 +574,10 @@ export function handleNextPriceDeposit(event: NextPriceDeposit): void {
     paymentToken,
     event
   );
-
-  saveEventToStateChange(
-    event,
-    "NextPriceDeposit",
-    bigIntArrayToStringArray([
-      depositAdded,
-      marketIndex,
-      oracleUpdateIndex,
-    ]).concat([isLong ? "true" : "false", user.id]),
-    ["depositAdded", "marketIndex", "oracleUpdateIndex", "isLong", "user"],
-    ["uint256", "uint32", "uint256", "bool", "address"],
-    [userAddress],
-    []
-  );
 }
 
 export function handleNextPriceRedeem(event: NextPriceRedeem): void {
-  let depositAdded = event.params.synthRedeemed;
+  let synthRedeemed = event.params.synthRedeemed;
   let marketIndex = event.params.marketIndex;
   let oracleUpdateIndex = event.params.oracleUpdateIndex;
   let isLong = event.params.isLong;
@@ -582,7 +590,7 @@ export function handleNextPriceRedeem(event: NextPriceRedeem): void {
     user,
     syntheticMarket,
     oracleUpdateIndex,
-    depositAdded,
+    synthRedeemed,
     ACTION_REDEEM,
     isLong,
     event
@@ -605,7 +613,7 @@ export function handleNextPriceRedeem(event: NextPriceRedeem): void {
     event,
     "NextPriceRedeem",
     bigIntArrayToStringArray([
-      depositAdded,
+      synthRedeemed,
       marketIndex,
       oracleUpdateIndex,
     ]).concat([isLong ? "true" : "false", user.id]),
@@ -690,6 +698,10 @@ export function handleExecuteNextPriceRedeemSettlementUser(
   let userAddress = event.params.user;
   let isLong = event.params.isLong;
   let amount = event.params.amount;
+
+  let globalState = getOrCreateGlobalState();
+  globalState.totalValueLocked = globalState.totalValueLocked.minus(amount);
+  globalState.save();
 
   // TODO: do something something
 

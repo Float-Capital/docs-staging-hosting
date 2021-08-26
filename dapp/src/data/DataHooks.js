@@ -221,8 +221,8 @@ function useTotalClaimableFloatForUser(userId, synthTokens) {
                   var timestamp = stake.lastMintState.timestamp;
                   var isLong = stake.syntheticToken.id === stake.lastMintState.longToken.id;
                   var lastAccumulativeFloatPerToken = isLong ? stake.lastMintState.accumulativeFloatPerTokenLong : stake.lastMintState.accumulativeFloatPerTokenShort;
-                  var accumulativeFloatPerToken = isLong ? stake.syntheticMarket.latestStakerState.accumulativeFloatPerTokenLong : stake.syntheticMarket.latestStakerState.accumulativeFloatPerTokenShort;
-                  var floatRatePerTokenOverInterval = isLong ? stake.syntheticMarket.latestStakerState.floatRatePerTokenOverIntervalLong : stake.syntheticMarket.latestStakerState.floatRatePerTokenOverIntervalShort;
+                  var accumulativeFloatPerToken = isLong ? stake.syntheticMarket.latestAccumulativeFloatIssuanceSnapshot.accumulativeFloatPerTokenLong : stake.syntheticMarket.latestAccumulativeFloatIssuanceSnapshot.accumulativeFloatPerTokenShort;
+                  var floatRatePerTokenOverInterval = isLong ? stake.syntheticMarket.latestAccumulativeFloatIssuanceSnapshot.floatRatePerTokenOverIntervalLong : stake.syntheticMarket.latestAccumulativeFloatIssuanceSnapshot.floatRatePerTokenOverIntervalShort;
                   var claimableFloat = accumulativeFloatPerToken.sub(lastAccumulativeFloatPerToken).mul(amount).div(CONSTANTS.tenToThe42).add(totalClaimable);
                   var predictedFloat = currentTimestamp.sub(timestamp).mul(floatRatePerTokenOverInterval).mul(amount).div(CONSTANTS.tenToThe42).add(totalPredicted);
                   return {
@@ -745,7 +745,6 @@ function useBasicUserInfo(userId) {
                 _0: {
                   id: match$1.id,
                   joinedAt: FromUnixTime(match$1.timestampJoined.toNumber()),
-                  gasUsed: match$1.totalGasUsed,
                   floatMinted: match$1.totalMintedFloat,
                   floatBalance: match$1.floatTokenBalance,
                   transactionCount: match$1.numberOfTransactions

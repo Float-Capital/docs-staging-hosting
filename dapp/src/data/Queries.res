@@ -9,8 +9,7 @@ fragment BasicUserInfo on User {
   id
   totalMintedFloat
   floatTokenBalance
-  numberOfTransactions
-  totalGasUsed
+  numberOfTransactions  
   timestampJoined
   tokenMints {
     tokensMinted
@@ -71,7 +70,7 @@ fragment SyntheticMarketBasic on SyntheticMarket {
 #   Fragments: CurrentStakeHighLevel
 fragment MarketIStakeInfo on SyntheticMarket {
   id
-  latestStakerState {
+  latestAccumulativeFloatIssuanceSnapshot {
     accumulativeFloatPerTokenLong
     accumulativeFloatPerTokenShort
     floatRatePerTokenOverIntervalLong
@@ -215,8 +214,7 @@ fragment CurrentStakeDetailed on CurrentStake {
 fragment GlobalStateInfo on GlobalState {
   totalFloatMinted,
   totalTxs,
-  totalUsers,
-  totalGasUsed,
+  totalUsers,  
   timestampLaunched,
   txHash @ppxCustom(module: "Bytes")
 }

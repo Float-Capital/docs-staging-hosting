@@ -2,7 +2,6 @@
 
 pragma solidity 0.8.3;
 
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
@@ -12,6 +11,8 @@ import "./interfaces/IStaker.sol";
 import "./interfaces/ILongShort.sol";
 import "./interfaces/IYieldManager.sol";
 import "./interfaces/IOracleManager.sol";
+import "./abstract/AccessControlledAndUpgradeable.sol";
+import "hardhat/console.sol";
 
 /**
  **** visit https://float.capital *****
@@ -23,7 +24,7 @@ import "./interfaces/IOracleManager.sol";
 /// @dev All functions in this file are currently `virtual`. This is NOT to encourage inheritance.
 /// It is merely for convenince when unit testing.
 /// @custom:auditors This contract balances long and short sides.
-contract LongShort is ILongShort, Initializable {
+contract LongShort is ILongShort, AccessControlledAndUpgradeable {
   //Using Open Zeppelin safe transfer library for token transfers
   using SafeERC20 for IERC20;
 
@@ -43,7 +44,6 @@ contract LongShort is ILongShort, Initializable {
   uint256[45] private __constantsGap;
 
   /* ══════ Global state ══════ */
-  address public admin;
   uint32 public latestMarket;
 
   address public staker;
@@ -53,19 +53,20 @@ contract LongShort is ILongShort, Initializable {
   /* ══════ Market specific ══════ */
   mapping(uint32 => bool) public marketExists;
   mapping(uint32 => int256) public assetPrice;
-  mapping(uint32 => uint256) public marketUpdateIndex;
+  mapping(uint32 => uint256) public override marketUpdateIndex;
   mapping(uint32 => address) public paymentTokens;
   mapping(uint32 => address) public yieldManagers;
   mapping(uint32 => address) public oracleManagers;
   mapping(uint32 => uint256) public marketTreasurySplitGradient_e18;
 
   /* ══════ Market + position (long/short) specific ══════ */
-  mapping(uint32 => mapping(bool => address)) public syntheticTokens;
-  mapping(uint32 => mapping(bool => uint256)) public marketSideValueInPaymentToken;
+  mapping(uint32 => mapping(bool => address)) public override syntheticTokens;
+  mapping(uint32 => mapping(bool => uint256)) public override marketSideValueInPaymentToken;
 
   /// @notice synthetic token prices of a given market of a (long/short) at every previous price update
   mapping(uint32 => mapping(bool => mapping(uint256 => uint256)))
-    public syntheticToken_priceSnapshot;
+    public
+    override syntheticToken_priceSnapshot;
 
   mapping(uint32 => mapping(bool => uint256)) public batched_amountPaymentToken_deposit;
   mapping(uint32 => mapping(bool => uint256)) public batched_amountSyntheticToken_redeem;
@@ -87,7 +88,7 @@ contract LongShort is ILongShort, Initializable {
     ╚═════════════════════════════╝*/
 
   function adminOnlyModifierLogic() internal virtual {
-    require(msg.sender == admin, "only admin");
+    _checkRole(ADMIN_ROLE, msg.sender);
   }
 
   modifier adminOnly() {
@@ -127,9 +128,12 @@ contract LongShort is ILongShort, Initializable {
     address _tokenFactory,
     address _staker
   ) external virtual initializer {
-    require(_admin != address(0) && _tokenFactory != address(0) && _staker != address(0));
-
-    admin = _admin;
+    require(
+      _admin != address(0) &&
+      _tokenFactory != address(0) &&
+      _staker != address(0)
+    );
+    _AccessControlledAndUpgradeable_init(_admin);
     tokenFactory = _tokenFactory;
     staker = _staker;
 
@@ -139,13 +143,6 @@ contract LongShort is ILongShort, Initializable {
   /*╔═══════════════════╗
     ║       ADMIN       ║
     ╚═══════════════════╝*/
-
-  /// @notice Changes the admin address for this contract.
-  /// @dev Can only be called by the current admin.
-  /// @param _admin Address of the new admin.
-  function changeAdmin(address _admin) external adminOnly {
-    admin = _admin;
-  }
 
   /// @notice Update oracle for a market
   /// @dev Can only be called by the current admin.
@@ -188,6 +185,13 @@ contract LongShort is ILongShort, Initializable {
     address _oracleManager,
     address _yieldManager
   ) external adminOnly {
+
+    require(
+      _paymentToken != address(0) &&
+      _oracleManager != address(0) &&
+      _yieldManager != address(0) 
+    );
+
     uint32 marketIndex = ++latestMarket;
     address _staker = staker;
 
@@ -222,6 +226,57 @@ contract LongShort is ILongShort, Initializable {
       marketIndex,
       syntheticTokens[marketIndex][true],
       syntheticTokens[marketIndex][false],
+      _paymentToken,
+      assetPrice[marketIndex],
+      syntheticName,
+      syntheticSymbol,
+      _oracleManager,
+      _yieldManager
+    );
+  }
+
+  /// @notice Creates an entirely new long/short market tracking an underlying oracle price.
+  ///  Uses already created synthetic tokens.
+  /// @dev This does not make the market active.
+  /// The `initializeMarket` function was split out separately to this function to reduce costs.
+  /// @param syntheticName Name of the synthetic asset
+  /// @param syntheticSymbol Symbol for the synthetic asset
+  /// @param _longToken Address for the long token.
+  /// @param _shortToken Address for the short token.
+  /// @param _paymentToken The address of the erc20 token used to buy this synthetic asset
+  /// this will likely always be DAI
+  /// @param _oracleManager The address of the oracle manager that provides the price feed for this market
+  /// @param _yieldManager The contract that manages depositing the paymentToken into a yield bearing protocol
+  function createNewSyntheticMarketUpgradeable(
+    string calldata syntheticName,
+    string calldata syntheticSymbol,
+    address _longToken,
+    address _shortToken,
+    address _paymentToken,
+    address _oracleManager,
+    address _yieldManager
+  ) external adminOnly {
+    uint32 marketIndex = ++latestMarket;
+
+    // Ensure new markets don't use the same yield manager
+    IYieldManager(_yieldManager).initializeForMarket();
+
+    // Assign new synthetic long token.
+    syntheticTokens[marketIndex][true] = _longToken;
+
+    // Assign new synthetic short token.
+    syntheticTokens[marketIndex][false] = _shortToken;
+
+    // Initial market state.
+    paymentTokens[marketIndex] = _paymentToken;
+    yieldManagers[marketIndex] = _yieldManager;
+    oracleManagers[marketIndex] = _oracleManager;
+    assetPrice[marketIndex] = IOracleManager(oracleManagers[marketIndex]).updatePrice();
+
+    emit SyntheticMarketCreated(
+      marketIndex,
+      _longToken,
+      _shortToken,
       _paymentToken,
       assetPrice[marketIndex],
       syntheticName,
@@ -285,6 +340,14 @@ contract LongShort is ILongShort, Initializable {
     int256 balanceIncentiveCurve_equilibriumOffset,
     uint256 _marketTreasurySplitGradient_e18
   ) external adminOnly {
+    require(
+      kInitialMultiplier != 0 &&
+      unstakeFee_e18 != 0 &&
+      initialMarketSeedForEachMarketSide != 0 &&
+      balanceIncentiveCurve_exponent != 0 &&
+      _marketTreasurySplitGradient_e18 != 0
+    );
+    
     require(!marketExists[marketIndex], "already initialized");
     require(marketIndex <= latestMarket, "index too high");
 
@@ -294,6 +357,8 @@ contract LongShort is ILongShort, Initializable {
 
     // Set this value to one initially - 0 is a null value and thus potentially bug prone.
     marketUpdateIndex[marketIndex] = 1;
+
+    _seedMarketInitially(initialMarketSeedForEachMarketSide, marketIndex);
 
     // Add new staker funds with fresh synthetic tokens.
     IStaker(staker).addNewStakingFund(
@@ -306,8 +371,6 @@ contract LongShort is ILongShort, Initializable {
       balanceIncentiveCurve_exponent,
       balanceIncentiveCurve_equilibriumOffset
     );
-
-    _seedMarketInitially(initialMarketSeedForEachMarketSide, marketIndex);
   }
 
   /*╔══════════════════════════════╗

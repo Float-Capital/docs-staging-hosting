@@ -84,14 +84,23 @@ ${paramName}: ${rescriptType},`
   }
 }
 
-let generateConstructor = constructorParams => {
+let generateConstructor = (constructorParams, moduleName) => {
   let typeNamesFull = typeInputs(constructorParams, NamedTyped)
   let typeNames = typeInputs(constructorParams, NamedUntyped)
   let callParams = typeInputs(constructorParams, UnnamedUntyped)
   `let make: (${typeNamesFull}) => JsPromise.t<t> = (${typeNames}) =>
     deployContract${constructorParams
     ->Array.length
-    ->Int.toString}(contractName, ${callParams})->Obj.magic`
+    ->Int.toString}(contractName, ${callParams})->Obj.magic
+
+    let makeSmock: (${typeNamesFull}) => JsPromise.t<t> = (${typeNames}) =>
+    deployMockContract${constructorParams
+    ->Array.length
+    ->Int.toString}(contractName, ${callParams})->Obj.magic
+
+    let setVariable: (t, ~name: string, ~value: 'a) => JsPromise.t<unit> = setVariableRaw
+    
+    `
 }
 
 let moduleDictionary: Js.Dict.t<(Js.Dict.t<string>, string)> = Js.Dict.empty()
@@ -100,11 +109,14 @@ let _ = files->Array.map(abiFileName => {
 
   let abiFileObject = abiFileContents->Js.Json.parseExn->Obj.magic // use some useful polymorphic magic 🙌
 
-  let moduleContents = Js.Dict.empty()
-  let moduleConstructor = ref(
-    "let make: unit => JsPromise.t<t> = () => deployContract0(contractName)->Obj.magic",
-  )
   let moduleName = getMmoduleName(abiFileName)
+
+  let moduleContents = Js.Dict.empty()
+  let moduleConstructor = ref(`let make: unit => JsPromise.t<t> = () => deployContract0(contractName)->Obj.magic
+    let makeSmock: unit => JsPromise.t<t> = () => deployMockContract0(contractName)->Obj.magic
+
+    let setVariable: (t, ~name: string, ~value: 'a) => JsPromise.t<unit> = setVariableRaw
+    `)
   let _processEachItemInAbi = abiFileObject->Array.map(abiItem => {
     let name = abiItem["name"]
     let itemType = abiItem["type"]
@@ -151,7 +163,7 @@ let _ = files->Array.map(abiFileName => {
 ${callVersion}`,
         )
       }
-    | #constructor => moduleConstructor := generateConstructor(inputs)
+    | #constructor => moduleConstructor := generateConstructor(inputs, moduleName)
     | _ => Js.log2(`We have an unhandled type - ${name} ${itemType->Obj.magic}`, abiItem)
     }
   })
@@ -179,6 +191,7 @@ let _writeFiles =
         `../contracts/test-waffle/library/contracts/${moduleName}.res`,
         `
 @@ocaml.warning("-32")
+open SmockGeneral
 open ContractHelpers
 type t = {address: Ethers.ethAddress}
 let contractName = "${moduleName}"

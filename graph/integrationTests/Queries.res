@@ -169,8 +169,7 @@ module GetGlobalState = %graphql(`query ($blockNumber: Int!) {
       address
     }
     totalFloatMinted
-    totalTxs
-    totalGasUsed
+    totalTxs    
     totalUsers
     timestampLaunched
     txHash

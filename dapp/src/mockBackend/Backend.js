@@ -10,7 +10,8 @@ function getMarketInfoUnsafe(index) {
   return Belt_Option.getWithDefault(Belt_Array.get(marketsInfoData, index - 1 | 0), {
               name: "",
               description: "",
-              oracleHeartbeat: 300
+              oracleHeartbeat: 300,
+              icon: "/"
             });
 }
 

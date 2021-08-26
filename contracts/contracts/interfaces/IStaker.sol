@@ -21,7 +21,8 @@ interface IStaker {
     uint256 period,
     uint256 multiplier,
     uint256 balanceIncentiveExponent,
-    int256 balanceIncentiveEquilibriumOffset
+    int256 balanceIncentiveEquilibriumOffset,
+    uint256 safeExponentBitShifting
   );
 
   event AccumulativeIssuancePerStakedSynthSnapshotCreated(
@@ -46,16 +47,16 @@ interface IStaker {
 
   event StakeWithdrawalFeeUpdated(uint32 marketIndex, uint256 stakeWithdralFee);
 
-  event BalanceIncentiveExponentUpdated(uint32 marketIndex, uint256 balanceIncentiveExponent);
-
-  event BalanceIncentiveEquilibriumOffsetUpdated(
+  event BalanceIncentiveParamsUpdated(
     uint32 marketIndex,
-    int256 balanceIncentiveEquilibriumOffset
+    uint256 balanceIncentiveExponent,
+    int256 balanceIncentiveCurve_equilibriumOffset,
+    uint256 safeExponentBitShifting
   );
 
   event FloatPercentageUpdated(uint256 floatPercentage);
 
-  event ChangeAdmin(address newAdmin);
+  function userAmountStaked(address, address) external view returns (uint256);
 
   function addNewStakingFund(
     uint32 marketIndex,
@@ -78,4 +79,10 @@ interface IStaker {
   ) external;
 
   function stakeFromUser(address from, uint256 amount) external;
+
+  function shiftTokens(
+    uint256 amountSyntheticTokensToShift,
+    uint32 marketIndex,
+    bool isShiftFromLong
+  ) external;
 }
