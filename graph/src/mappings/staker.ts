@@ -31,18 +31,15 @@ import {
 } from "../utils/txEventHelpers";
 import { getOrCreateUser } from "../utils/globalStateManager";
 import {
-  generateSyntheticMarketId,
   generateAccumulativeFloatIssuanceSnapshotId,
   getOrInitializeAccumulativeFloatIssuanceSnapshot,
-  generateSystemStateId,
-  getOrInitializeGlobalState,
-  getOrInitializeSystemState,
-  getSystemState,
   getSyntheticMarket,
   getAccumulativeFloatIssuanceSnapshot,
   getSyntheticToken,
   getCurrentStake,
   getStake,
+  getOrInitializeCurrentStake,
+  getOrInitializeStake,
 } from "../generated/EntityHelpers";
 
 import {
@@ -314,14 +311,12 @@ export function handleStakeAdded(event: StakeAdded): void {
   stake.amount = amount;
   stake.withdrawn = false;
 
-  let currentStake = CurrentStake.load(
-    tokenAddressString + "-" + userAddressString + "-currentStake"
-  );
-  if (currentStake == null) {
+  let currentStakeId =
+    tokenAddressString + "-" + userAddressString + "-currentStake";
+  let currentStakeResult = getOrInitializeCurrentStake(currentStakeId);
+  let currentStake = currentStakeResult.entity;
+  if (currentStakeResult.wasCreated) {
     // They won't have a current stake.
-    currentStake = new CurrentStake(
-      tokenAddressString + "-" + userAddressString + "-currentStake"
-    );
     currentStake.user = user.id;
     currentStake.userAddress = user.address;
     currentStake.syntheticToken = syntheticToken.id;
@@ -330,11 +325,13 @@ export function handleStakeAdded(event: StakeAdded): void {
     user.currentStakes = user.currentStakes.concat([currentStake.id]);
   } else {
     // Note: Only add if still relevant and not withdrawn
-    let oldStake = Stake.load(currentStake.currentStake);
-    if (oldStake != null) {
+    let oldStakeResult = getOrInitializeStake(currentStake.currentStake);
+    if (!oldStakeResult.wasCreated) {
+      let oldStake = oldStakeResult.entity;
       if (!oldStake.withdrawn) {
         stake.amount = stake.amount.plus(oldStake.amount);
         oldStake.withdrawn = true;
+        oldStake.save();
       }
     }
   }
@@ -431,7 +428,7 @@ function calculateAccumulatedFloatAndExecuteOutstandingShifts(
   // TODO: handle case where user has pending token shifts! #
 
   let currentStakeLong = CurrentStake.load(
-    syntheticLong.tokenAddress.toHex() + user.toHex() + "currentStake"
+    syntheticLong.tokenAddress.toHex() + "-" + user.toHex() + "-currentStake"
   );
   let amountFromLongStake = ZERO;
   if (currentStakeLong != null) {
@@ -454,19 +451,19 @@ function calculateAccumulatedFloatAndExecuteOutstandingShifts(
     }
   }
   let currentStakeShort = CurrentStake.load(
-    syntheticShort.tokenAddress.toHex() + user.toHex() + "currentStake"
+    syntheticShort.tokenAddress.toHex() + "-" + user.toHex() + "-currentStake"
   );
 
   let amountFromShortStake = ZERO;
   if (currentStakeShort != null) {
-    let longStake = getStake(currentStakeShort.currentStake);
+    let shortStake = getStake(currentStakeShort.currentStake);
     let lastUserMintState = getAccumulativeFloatIssuanceSnapshot(
       currentStakeShort.lastMintState
     );
     let lastMarketMintState = getAccumulativeFloatIssuanceSnapshot(
       syntheticMarket.latestAccumulativeFloatIssuanceSnapshot
     );
-    let amountStakedShort = longStake.amount;
+    let amountStakedShort = shortStake.amount;
 
     if (amountStakedShort.gt(ZERO)) {
       let accumDeltaShort = lastMarketMintState.accumulativeFloatPerTokenShort.minus(
@@ -478,7 +475,7 @@ function calculateAccumulatedFloatAndExecuteOutstandingShifts(
     }
   }
   return {
-    amountFromShortStake,
+    amountFromLongStake,
     amountFromShortStake,
   };
 }
@@ -518,10 +515,18 @@ export function handleFloatMinted(event: FloatMinted): void {
   let expectedTotalAmount = amountLong.plus(amountShort);
 
   if (expectedTotalAmount.notEqual(amountFloatMinted)) {
-    log.warning(
-      "Float issuance breakdown is incorrect. This is either a bug in the contracts or in the graph (more likely the graph).",
-      []
-    );
+    if (expectedTotalAmount.notEqual(amountFloatMinted)) {
+      log.critical(
+        "Float issuance breakdown is incorrect. This is either a bug in the contracts or in the graph (more likely the graph).\nexpected amount: {}\nactual amount: {}\n    {} (amount long) + {} (amount short) \n\n\n The offending transaciton is {}",
+        [
+          expectedTotalAmount.toString(),
+          amountFloatMinted.toString(),
+          amountLong.toString(),
+          amountShort.toString(),
+          event.transaction.hash.toHex(),
+        ]
+      );
+    }
   }
 
   let changedStakesArray: Array<string> = [];
@@ -529,15 +534,9 @@ export function handleFloatMinted(event: FloatMinted): void {
     syntheticLong.floatMintedFromSpecificToken = syntheticLong.floatMintedFromSpecificToken.plus(
       amountLong
     );
-    // TODO - create a helper function the 'getOrCreate's the CurrentStake
-    let currentStakeLong = CurrentStake.load(
+    let currentStakeLong = getCurrentStake(
       syntheticMarket.syntheticLong + "-" + userAddressString + "-currentStake"
     );
-    if (currentStakeLong == null) {
-      log.critical("Current stake (long) is still null. ID {}", [
-        currentStakeLong.id,
-      ]);
-    }
     currentStakeLong.lastMintState = latestAccumulativeFloatIssuanceSnapshot.id;
     currentStakeLong.save();
     syntheticLong.save();
