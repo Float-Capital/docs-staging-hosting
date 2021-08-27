@@ -418,6 +418,9 @@ function StakeForm$StakeFormInput(Props) {
   var onMaxClickOpt = Props.onMaxClick;
   var synthetic = Props.synthetic;
   var txStatusModalsOpt = Props.txStatusModals;
+  var resetFormButtonOpt = Props.resetFormButton;
+  var tokenToStakeOpt = Props.tokenToStake;
+  var txStateStakeOpt = Props.txStateStake;
   var onSubmit = onSubmitOpt !== undefined ? onSubmitOpt : (function (param) {
         
       });
@@ -435,6 +438,12 @@ function StakeForm$StakeFormInput(Props) {
         
       });
   var txStatusModals = txStatusModalsOpt !== undefined ? Caml_option.valFromOption(txStatusModalsOpt) : null;
+  var resetFormButton = resetFormButtonOpt !== undefined ? resetFormButtonOpt : (function (param) {
+        return null;
+      });
+  var tokenToStake = tokenToStakeOpt !== undefined ? tokenToStakeOpt : "";
+  var txStateStake = txStateStakeOpt !== undefined ? txStateStakeOpt : /* UnInitialised */0;
+  StakeTxStatusModal.useStakeTxModal(txStateStake, resetFormButton, tokenToStake);
   return React.createElement(Form.make, {
               className: "mx-auto w-full",
               onSubmit: onSubmit,
@@ -575,11 +584,9 @@ function StakeForm$ConnectedStakeForm(Props) {
                               }), optTokenBalance !== undefined ? Ethers.Utils.formatEther(Caml_option.valFromOption(optTokenBalance)) : "0");
                 }),
               synthetic: synthetic,
-              txStatusModals: React.createElement(StakeTxStatusModal.make, {
-                    txStateStake: txState,
-                    resetFormButton: resetFormButton,
-                    tokenToStake: tokenToStake
-                  })
+              resetFormButton: resetFormButton,
+              tokenToStake: tokenToStake,
+              txStateStake: txState
             });
 }
 

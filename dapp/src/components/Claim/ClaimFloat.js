@@ -16,6 +16,7 @@ function ClaimFloat(Props) {
   var match = ContractActions.useContractFunction(signer);
   var txState = match[1];
   var contractExecutionHandler = match[0];
+  ClaimTxStatusModal.useClaimTxModal(txState);
   var toastDispatch = React.useContext(ToastProvider.DispatchToastContext.context);
   React.useEffect((function () {
           if (typeof txState === "number") {
@@ -67,18 +68,16 @@ function ClaimFloat(Props) {
           }
           
         }), [txState]);
-  return React.createElement(React.Fragment, undefined, React.createElement(Button.Tiny.make, {
-                  onClick: (function (param) {
-                      return Curry._2(contractExecutionHandler, (function (param) {
-                                    return Contracts.Staker.make(Config.staker, param);
-                                  }), (function (param) {
-                                    return param.claimFloatCustom(marketIndexes);
-                                  }));
-                    }),
-                  children: "Claim Float"
-                }), React.createElement(ClaimTxStatusModal.make, {
-                  txState: txState
-                }));
+  return React.createElement(Button.Tiny.make, {
+              onClick: (function (param) {
+                  return Curry._2(contractExecutionHandler, (function (param) {
+                                return Contracts.Staker.make(Config.staker, param);
+                              }), (function (param) {
+                                return param.claimFloatCustom(marketIndexes);
+                              }));
+                }),
+              children: "Claim Float"
+            });
 }
 
 var make = ClaimFloat;

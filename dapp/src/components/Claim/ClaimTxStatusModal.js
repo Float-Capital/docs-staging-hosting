@@ -2,71 +2,67 @@
 'use strict';
 
 var Tick = require("../UI/Base/Tick.js");
-var Modal = require("../UI/Base/Modal.js");
+var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
 var Config = require("../../config/Config.js");
 var Loader = require("../UI/Base/Loader.js");
 var Metamask = require("../UI/Base/Metamask.js");
+var ModalProvider = require("../../libraries/ModalProvider.js");
 var MessageUsOnDiscord = require("../Ethereum/MessageUsOnDiscord.js");
 var ViewOnBlockExplorer = require("../Ethereum/ViewOnBlockExplorer.js");
 
-function ClaimTxStatusModal(Props) {
-  var txState = Props.txState;
-  if (typeof txState === "number") {
-    if (txState === /* UnInitialised */0) {
-      return null;
-    } else {
-      return React.createElement(Modal.make, {
-                  id: 1,
-                  children: React.createElement("div", {
+function useClaimTxModal(txState) {
+  var match = ModalProvider.useModalDisplayChain(undefined);
+  var startModalChain = match.startModalChain;
+  var hideModalChain = match.hideModalChain;
+  var showNextModalInChain = match.showNextModalInChain;
+  React.useEffect((function () {
+          if (typeof txState === "number") {
+            if (txState === /* UnInitialised */0) {
+              Curry._1(hideModalChain, undefined);
+            } else {
+              Curry._1(startModalChain, React.createElement("div", {
                         className: "text-center m-3"
-                      }, React.createElement(Loader.Ellipses.make, {}), React.createElement("h1", undefined, "Confirm the transaction to claim Float"))
-                });
-    }
-  }
-  switch (txState.TAG | 0) {
-    case /* SignedAndSubmitted */0 :
-        return React.createElement(Modal.make, {
-                    id: 2,
-                    children: React.createElement("div", {
-                          className: "text-center m-3"
-                        }, React.createElement("div", {
-                              className: "m-2"
-                            }, React.createElement(Loader.Mini.make, {})), React.createElement("p", undefined, "Claiming transaction pending... "), React.createElement(ViewOnBlockExplorer.make, {
-                              txHash: txState._0
-                            }))
-                  });
-    case /* Declined */1 :
-        return React.createElement(Modal.make, {
-                    id: 4,
-                    children: React.createElement("div", {
-                          className: "text-center m-3"
-                        }, React.createElement("p", undefined, "The transaction was rejected by your wallet"), React.createElement(MessageUsOnDiscord.make, {}))
-                  });
-    case /* Complete */2 :
-        return React.createElement(Modal.make, {
-                    id: 3,
-                    children: null
-                  }, React.createElement("div", {
-                        className: "text-center m-3"
-                      }, React.createElement(Tick.make, {}), React.createElement("p", undefined, "Transaction complete 🎉")), React.createElement(Metamask.AddTokenButton.make, {
-                        token: Config.config.contracts.FloatToken,
-                        tokenSymbol: "FLOAT"
-                      }));
-    case /* Failed */3 :
-        return React.createElement(Modal.make, {
-                    id: 5,
-                    children: React.createElement("div", {
-                          className: "text-center m-3"
-                        }, React.createElement("h1", undefined, "The transaction failed."), React.createElement(ViewOnBlockExplorer.make, {
-                              txHash: txState._0
-                            }), React.createElement(MessageUsOnDiscord.make, {}))
-                  });
-    
-  }
+                      }, React.createElement(Loader.Ellipses.make, {}), React.createElement("h1", undefined, "Confirm the transaction to claim Float")));
+            }
+          } else {
+            switch (txState.TAG | 0) {
+              case /* SignedAndSubmitted */0 :
+                  Curry._1(showNextModalInChain, React.createElement("div", {
+                            className: "text-center m-3"
+                          }, React.createElement("div", {
+                                className: "m-2"
+                              }, React.createElement(Loader.Mini.make, {})), React.createElement("p", undefined, "Claiming transaction pending... "), React.createElement(ViewOnBlockExplorer.make, {
+                                txHash: txState._0
+                              })));
+                  break;
+              case /* Declined */1 :
+                  Curry._1(showNextModalInChain, React.createElement("div", {
+                            className: "text-center m-3"
+                          }, React.createElement("p", undefined, "The transaction was rejected by your wallet"), React.createElement(MessageUsOnDiscord.make, {})));
+                  break;
+              case /* Complete */2 :
+                  Curry._1(showNextModalInChain, React.createElement(React.Fragment, undefined, React.createElement("div", {
+                                className: "text-center m-3"
+                              }, React.createElement(Tick.make, {}), React.createElement("p", undefined, "Transaction complete 🎉")), React.createElement(Metamask.AddTokenButton.make, {
+                                token: Config.config.contracts.FloatToken,
+                                tokenSymbol: "FLOAT"
+                              })));
+                  break;
+              case /* Failed */3 :
+                  Curry._1(showNextModalInChain, React.createElement("div", {
+                            className: "text-center m-3"
+                          }, React.createElement("h1", undefined, "The transaction failed."), React.createElement(ViewOnBlockExplorer.make, {
+                                txHash: txState._0
+                              }), React.createElement(MessageUsOnDiscord.make, {})));
+                  break;
+              
+            }
+          }
+          
+        }), [txState]);
+  
 }
 
-var make = ClaimTxStatusModal;
-
-exports.make = make;
+exports.useClaimTxModal = useClaimTxModal;
 /* Tick Not a pure module */

@@ -4,7 +4,6 @@
 var Form = require("./Form.js");
 var Curry = require("rescript/lib/js/curry.js");
 var Login = require("../pages/Login.js");
-var Modal = require("./UI/Base/Modal.js");
 var React = require("react");
 var Button = require("./UI/Base/Button.js");
 var Config = require("../config/Config.js");
@@ -20,6 +19,7 @@ var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
 var Router = require("next/router");
 var RootProvider = require("../libraries/RootProvider.js");
+var ModalProvider = require("../libraries/ModalProvider.js");
 var ToastProvider = require("./UI/ToastProvider.js");
 var ContractActions = require("../ethereum/ContractActions.js");
 var MessageUsOnDiscord = require("./Ethereum/MessageUsOnDiscord.js");
@@ -415,48 +415,52 @@ function toNumber(prim) {
 function Unstake$UnstakeTxStatusModal(Props) {
   var txStateUnstake = Props.txStateUnstake;
   var resetFormButton = Props.resetFormButton;
-  if (typeof txStateUnstake === "number") {
-    if (txStateUnstake === /* UnInitialised */0) {
-      return null;
-    } else {
-      return React.createElement(Modal.make, {
-                  id: "unstake-1",
-                  children: React.createElement("div", {
+  var match = ModalProvider.useModalDisplay(undefined);
+  var hideModal = match.hideModal;
+  var showModal = match.showModal;
+  React.useEffect((function () {
+          if (typeof txStateUnstake === "number") {
+            if (txStateUnstake === /* UnInitialised */0) {
+              Curry._1(hideModal, undefined);
+            } else {
+              Curry._1(showModal, React.createElement("div", {
                         className: "text-center m-3"
-                      }, React.createElement("p", undefined, "Confirm unstake transaction in your wallet "))
-                });
-    }
-  }
-  switch (txStateUnstake.TAG | 0) {
-    case /* SignedAndSubmitted */0 :
-        return React.createElement(Modal.make, {
-                    id: "unstake-2",
-                    children: React.createElement("div", {
-                          className: "text-center m-3"
-                        }, React.createElement(Loader.Mini.make, {}), React.createElement("p", undefined, "Unstake transaction pending... "), React.createElement(ViewOnBlockExplorer.make, {
-                              txHash: txStateUnstake._0
-                            }))
-                  });
-    case /* Declined */1 :
-        return React.createElement(React.Fragment, undefined, Curry._1(resetFormButton, undefined));
-    case /* Complete */2 :
-        return React.createElement(Modal.make, {
-                    id: "unstake-3",
-                    children: React.createElement("div", {
-                          className: "text-center m-3"
-                        }, React.createElement("p", undefined, "Transaction complete 🎉"), Curry._1(resetFormButton, undefined))
-                  });
-    case /* Failed */3 :
-        var txHash = txStateUnstake._0;
-        return React.createElement(Modal.make, {
-                    id: "unstake-4",
-                    children: React.createElement("div", {
-                          className: "text-center m-3"
-                        }, React.createElement("p", undefined, "The transaction failed."), txHash !== "" ? React.createElement(ViewOnBlockExplorer.make, {
-                                txHash: txHash
-                              }) : null, React.createElement(MessageUsOnDiscord.make, {}), Curry._1(resetFormButton, undefined))
-                  });
-    
+                      }, React.createElement("p", undefined, "Confirm unstake transaction in your wallet ")));
+            }
+          } else {
+            switch (txStateUnstake.TAG | 0) {
+              case /* SignedAndSubmitted */0 :
+                  Curry._1(showModal, React.createElement("div", {
+                            className: "text-center m-3"
+                          }, React.createElement(Loader.Mini.make, {}), React.createElement("p", undefined, "Unstake transaction pending... "), React.createElement(ViewOnBlockExplorer.make, {
+                                txHash: txStateUnstake._0
+                              })));
+                  break;
+              case /* Declined */1 :
+                  Curry._1(hideModal, undefined);
+                  break;
+              case /* Complete */2 :
+                  Curry._1(showModal, React.createElement("div", {
+                            className: "text-center m-3"
+                          }, React.createElement("p", undefined, "Transaction complete 🎉"), Curry._1(resetFormButton, undefined)));
+                  break;
+              case /* Failed */3 :
+                  var txHash = txStateUnstake._0;
+                  Curry._1(showModal, React.createElement("div", {
+                            className: "text-center m-3"
+                          }, React.createElement("p", undefined, "The transaction failed."), txHash !== "" ? React.createElement(ViewOnBlockExplorer.make, {
+                                  txHash: txHash
+                                }) : null, React.createElement(MessageUsOnDiscord.make, {}), Curry._1(resetFormButton, undefined)));
+                  break;
+              
+            }
+          }
+          
+        }), [txStateUnstake]);
+  if (typeof txStateUnstake === "number" || txStateUnstake.TAG !== /* Declined */1) {
+    return null;
+  } else {
+    return Curry._1(resetFormButton, undefined);
   }
 }
 

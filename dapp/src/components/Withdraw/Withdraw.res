@@ -15,6 +15,8 @@ let make = (~marketIndex) => {
     Queries.UsersConfirmedRedeems.userId: user->Ethers.Utils.ethAdrToLowerStr,
   }
 
+  let _ = WithdrawTxStatusModal.useWithdrawTxModal(~txState)
+
   React.useEffect1(() => {
     switch txState {
     | Created =>
@@ -85,8 +87,5 @@ let make = (~marketIndex) => {
       ),
     )
 
-  <>
-    <Button.Tiny onClick={_ => executeNextPriceSettlementsCall()}> "Withdraw DAI" </Button.Tiny>
-    <WithdrawTxStatusModal txState />
-  </>
+  <Button.Tiny onClick={_ => executeNextPriceSettlementsCall()}> "Withdraw DAI" </Button.Tiny>
 }

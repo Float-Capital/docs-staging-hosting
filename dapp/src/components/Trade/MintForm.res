@@ -64,83 +64,69 @@ module SubmitButtonAndTxTracker = {
       )
     }
 
-    switch (txStateApprove, txStateMint) {
-    | (ContractActions.Created, _) => <>
-        <Modal id={1}>
+    let {showModal, hideModal} = ModalProvider.useModalDisplay()
+
+    React.useEffect1(_ => {
+      switch (txStateApprove, txStateMint) {
+      | (ContractActions.Created, _) =>
+        showModal(
           <div className="text-center mx-3 my-6">
             <Loader.Ellipses />
             <p> {`Please approve your ${Config.paymentTokenName} token `->React.string} </p>
-          </div>
-        </Modal>
-        <Button disabled=true onClick={_ => ()}> {buttonText} </Button>
-      </>
-    | (ContractActions.SignedAndSubmitted(txHash), _) => <>
-        <Modal id={2}>
+          </div>,
+        )
+
+      | (ContractActions.SignedAndSubmitted(txHash), _) =>
+        showModal(
           <div className="text-center m-3">
             <div className="m-2"> <Loader.Mini /> </div>
             <p> {"Approval transaction pending... "->React.string} </p>
             <ViewOnBlockExplorer txHash />
-          </div>
-        </Modal>
-        <Button disabled=true onClick={_ => ()}> {buttonText} </Button>
-      </>
-    | (ContractActions.Complete({transactionHash: _}), ContractActions.Created)
-    | (ContractActions.Complete({transactionHash: _}), ContractActions.UnInitialised) => <>
-        <Modal id={3}>
+          </div>,
+        )
+      | (ContractActions.Complete({transactionHash: _}), ContractActions.Created)
+      | (ContractActions.Complete({transactionHash: _}), ContractActions.UnInitialised) =>
+        showModal(
           <div className="text-center mx-3 my-6">
             <Loader.Ellipses />
             <p> {`Confirm transaction to mint ${tokenToMint}`->React.string} </p>
-          </div>
-        </Modal>
-        <Button disabled=true onClick={_ => ()}> {buttonText} </Button>
-      </>
-    | (ContractActions.Declined(_message), _) => <> {resetFormButton()} </>
-    | (ContractActions.Failed(txHash), _) => <>
-        <Modal id={4}>
+          </div>,
+        )
+      | (ContractActions.Failed(txHash), _) =>
+        showModal(
           <div className="text-center m-3">
             <p> {`The transaction failed.`->React.string} </p>
             <ViewOnBlockExplorer txHash />
             <MessageUsOnDiscord />
-          </div>
-        </Modal>
-        {resetFormButton()}
-      </>
-    | (_, ContractActions.Created) => <>
-        <Modal id={5}>
+          </div>,
+        )
+      | (_, ContractActions.Created) =>
+        showModal(
           <div className="text-center m-3">
             <Loader.Ellipses />
             <h1> {`Confirm the transaction to mint ${tokenToMint}`->React.string} </h1>
-          </div>
-        </Modal>
-        <Button disabled=true onClick={_ => ()}> {buttonText} </Button>
-      </>
-    | (
-        ContractActions.Complete({transactionHash}),
-        ContractActions.SignedAndSubmitted(txHash),
-      ) => <>
-        <Modal id={6}>
+          </div>,
+        )
+      | (ContractActions.Complete({transactionHash}), ContractActions.SignedAndSubmitted(txHash)) =>
+        showModal(
           <div className="text-center m-3">
             <p> {`Approval confirmed 🎉`->React.string} </p>
             <ViewOnBlockExplorer txHash={transactionHash} />
             <h1>
               {`Pending minting ${tokenToMint}`->React.string} <ViewOnBlockExplorer txHash />
             </h1>
-          </div>
-        </Modal>
-        <Button disabled=true onClick={_ => ()}> {buttonText} </Button>
-      </>
-    | (_, ContractActions.SignedAndSubmitted(txHash)) => <>
-        <Modal id={7}>
+          </div>,
+        )
+      | (_, ContractActions.SignedAndSubmitted(txHash)) =>
+        showModal(
           <div className="text-center m-3">
             <div className="m-2"> <Loader.Mini /> </div>
             <p> {"Minting transaction pending... "->React.string} </p>
             <ViewOnBlockExplorer txHash />
-          </div>
-        </Modal>
-        <Button disabled=true onClick={_ => ()}> {buttonText} </Button>
-      </>
-    | (_, ContractActions.Complete({transactionHash: _})) => <>
-        <Modal id={8}>
+          </div>,
+        )
+      | (_, ContractActions.Complete({transactionHash: _})) =>
+        showModal(
           <div className="text-center m-3">
             <Tick />
             <p> {`Transaction complete 🎉`->React.string} </p>
@@ -150,28 +136,32 @@ module SubmitButtonAndTxTracker = {
               tokenSymbol={`${isLong ? `↗️` : `↘️`}${marketName}`}
             />
             <ViewProfileButton />
-          </div>
-        </Modal>
-      </>
-    | (_, ContractActions.Declined(_message)) => <>
-        <Modal id={9}>
+          </div>,
+        )
+      | (_, ContractActions.Declined(_message)) =>
+        showModal(
           <div className="text-center m-3">
             <p> {`The transaction was rejected by your wallet`->React.string} </p>
             <MessageUsOnDiscord />
-          </div>
-        </Modal>
-        {resetFormButton()}
-      </>
-    | (_, ContractActions.Failed(txHash)) => <>
-        <Modal id={10}>
+          </div>,
+        )
+      | (_, ContractActions.Failed(txHash)) =>
+        showModal(
           <div className="text-center m-3">
             <h1> {`The transaction failed.`->React.string} </h1>
             <ViewOnBlockExplorer txHash />
             <MessageUsOnDiscord />
-          </div>
-        </Modal>
-        {resetFormButton()}
-      </>
+          </div>,
+        )
+      | _ => hideModal()
+      }
+      None
+    }, [txStateMint])
+
+    switch (txStateApprove, txStateMint) {
+    | (_, ContractActions.Complete({transactionHash: _})) => React.null
+    | (_, ContractActions.Declined(_)) => resetFormButton()
+    | (_, ContractActions.Failed(_)) => resetFormButton()
     | _ => <Button disabled=buttonDisabled onClick={_ => ()}> {buttonText} </Button>
     }
   }

@@ -10,6 +10,7 @@ var APYProvider = require("./libraries/APYProvider.js");
 var Router = require("next/router");
 var RootProvider = require("./libraries/RootProvider.js");
 var StartTrading = require("./components/UI/StartTrading.js");
+var ModalProvider = require("./libraries/ModalProvider.js");
 var ToastProvider = require("./components/UI/ToastProvider.js");
 var InjectedEthereum = require("./ethereum/InjectedEthereum.js");
 var StateChangeMonitor = require("./libraries/StateChangeMonitor.js");
@@ -33,7 +34,9 @@ function $$default(props) {
                         }, React.createElement(Client.make, {
                               children: React.createElement(APYProvider.make, {
                                     children: React.createElement(StateChangeMonitor.make, {
-                                          children: tmp
+                                          children: React.createElement(ModalProvider.make, {
+                                                children: tmp
+                                              })
                                         })
                                   })
                             }), React.createElement(Toast.make, {}))

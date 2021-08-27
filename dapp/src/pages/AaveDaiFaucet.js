@@ -4,7 +4,6 @@
 var Tick = require("../components/UI/Base/Tick.js");
 var Curry = require("rescript/lib/js/curry.js");
 var Login = require("./Login.js");
-var Modal = require("../components/UI/Base/Modal.js");
 var React = require("react");
 var Button = require("../components/UI/Base/Button.js");
 var Config = require("../config/Config.js");
@@ -12,70 +11,63 @@ var Loader = require("../components/UI/Base/Loader.js");
 var Metamask = require("../components/UI/Base/Metamask.js");
 var CONSTANTS = require("../CONSTANTS.js");
 var Contracts = require("../ethereum/Contracts.js");
+var ModalProvider = require("../libraries/ModalProvider.js");
 var ToastProvider = require("../components/UI/ToastProvider.js");
 var ContractActions = require("../ethereum/ContractActions.js");
 var MessageUsOnDiscord = require("../components/Ethereum/MessageUsOnDiscord.js");
 var ViewOnBlockExplorer = require("../components/Ethereum/ViewOnBlockExplorer.js");
 
-function AaveDaiFaucet$FaucetTxStatusModal(Props) {
-  var txState = Props.txState;
-  if (typeof txState === "number") {
-    if (txState === /* UnInitialised */0) {
-      return null;
-    } else {
-      return React.createElement(Modal.make, {
-                  id: 1,
-                  children: React.createElement("div", {
+function useFaucetTxStatusModal(txState) {
+  var match = ModalProvider.useModalDisplay(undefined);
+  var hideModal = match.hideModal;
+  var showModal = match.showModal;
+  React.useEffect((function () {
+          if (typeof txState === "number") {
+            if (txState === /* UnInitialised */0) {
+              Curry._1(hideModal, undefined);
+            } else {
+              Curry._1(showModal, React.createElement("div", {
                         className: "text-center m-3"
-                      }, React.createElement(Loader.Ellipses.make, {}), React.createElement("h1", undefined, "Confirm the transaction to mint testnet DAI"))
-                });
-    }
-  }
-  switch (txState.TAG | 0) {
-    case /* SignedAndSubmitted */0 :
-        return React.createElement(Modal.make, {
-                    id: 2,
-                    children: React.createElement("div", {
-                          className: "text-center m-3"
-                        }, React.createElement("div", {
-                              className: "m-2"
-                            }, React.createElement(Loader.Mini.make, {})), React.createElement("p", undefined, "Minting testnet DAI transaction pending... "), React.createElement(ViewOnBlockExplorer.make, {
-                              txHash: txState._0
-                            }))
-                  });
-    case /* Declined */1 :
-        return React.createElement(Modal.make, {
-                    id: 4,
-                    children: React.createElement("div", {
-                          className: "text-center m-3"
-                        }, React.createElement("p", undefined, "The transaction was rejected by your wallet"), React.createElement(MessageUsOnDiscord.make, {}))
-                  });
-    case /* Complete */2 :
-        return React.createElement(Modal.make, {
-                    id: 3,
-                    children: null
-                  }, React.createElement("div", {
-                        className: "text-center m-3"
-                      }, React.createElement(Tick.make, {}), React.createElement("p", undefined, "Transaction complete 🎉")), React.createElement(Metamask.AddTokenButton.make, {
-                        token: Config.config.contracts.Dai,
-                        tokenSymbol: "DAI"
-                      }));
-    case /* Failed */3 :
-        return React.createElement(Modal.make, {
-                    id: 5,
-                    children: React.createElement("div", {
-                          className: "text-center m-3"
-                        }, React.createElement("h1", undefined, "The transaction failed."), React.createElement(ViewOnBlockExplorer.make, {
-                              txHash: txState._0
-                            }), React.createElement(MessageUsOnDiscord.make, {}))
-                  });
-    
-  }
+                      }, React.createElement(Loader.Ellipses.make, {}), React.createElement("h1", undefined, "Confirm the transaction to mint testnet DAI")));
+            }
+          } else {
+            switch (txState.TAG | 0) {
+              case /* SignedAndSubmitted */0 :
+                  Curry._1(showModal, React.createElement("div", {
+                            className: "text-center m-3"
+                          }, React.createElement("div", {
+                                className: "m-2"
+                              }, React.createElement(Loader.Mini.make, {})), React.createElement("p", undefined, "Minting testnet DAI transaction pending... "), React.createElement(ViewOnBlockExplorer.make, {
+                                txHash: txState._0
+                              })));
+                  break;
+              case /* Declined */1 :
+                  Curry._1(showModal, React.createElement("div", {
+                            className: "text-center m-3"
+                          }, React.createElement("p", undefined, "The transaction was rejected by your wallet"), React.createElement(MessageUsOnDiscord.make, {})));
+                  break;
+              case /* Complete */2 :
+                  Curry._1(showModal, React.createElement(React.Fragment, undefined, React.createElement("div", {
+                                className: "text-center m-3"
+                              }, React.createElement(Tick.make, {}), React.createElement("p", undefined, "Transaction complete 🎉")), React.createElement(Metamask.AddTokenButton.make, {
+                                token: Config.config.contracts.Dai,
+                                tokenSymbol: "DAI"
+                              })));
+                  break;
+              case /* Failed */3 :
+                  Curry._1(showModal, React.createElement("div", {
+                            className: "text-center m-3"
+                          }, React.createElement("h1", undefined, "The transaction failed."), React.createElement(ViewOnBlockExplorer.make, {
+                                txHash: txState._0
+                              }), React.createElement(MessageUsOnDiscord.make, {})));
+                  break;
+              
+            }
+          }
+          
+        }), [txState]);
+  
 }
-
-var FaucetTxStatusModal = {
-  make: AaveDaiFaucet$FaucetTxStatusModal
-};
 
 function AaveDaiFaucet$FaucetCard(Props) {
   var signer = Props.signer;
@@ -83,6 +75,7 @@ function AaveDaiFaucet$FaucetCard(Props) {
   var txState = match[1];
   var contractExecutionHandler = match[0];
   var toastDispatch = React.useContext(ToastProvider.DispatchToastContext.context);
+  useFaucetTxStatusModal(txState);
   React.useEffect((function () {
           if (typeof txState === "number") {
             if (txState !== /* UnInitialised */0) {
@@ -157,9 +150,7 @@ function AaveDaiFaucet$FaucetCard(Props) {
                                       }));
                         }),
                       children: "Mint testnet dai"
-                    })), React.createElement(AaveDaiFaucet$FaucetTxStatusModal, {
-                  txState: txState
-                }));
+                    })));
 }
 
 var FaucetCard = {
@@ -181,7 +172,7 @@ var make = AaveDaiFaucet;
 
 var $$default = AaveDaiFaucet;
 
-exports.FaucetTxStatusModal = FaucetTxStatusModal;
+exports.useFaucetTxStatusModal = useFaucetTxStatusModal;
 exports.FaucetCard = FaucetCard;
 exports.make = make;
 exports.$$default = $$default;

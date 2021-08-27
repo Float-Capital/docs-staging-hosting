@@ -26,6 +26,7 @@ function Withdraw(Props) {
   var reqVariables = {
     userId: Ethers.Utils.ethAdrToLowerStr(user)
   };
+  WithdrawTxStatusModal.useWithdrawTxModal(txState);
   React.useEffect((function () {
           if (typeof txState === "number") {
             if (txState !== /* UnInitialised */0) {
@@ -104,18 +105,16 @@ function Withdraw(Props) {
                     
                   });
         }), [txState]);
-  return React.createElement(React.Fragment, undefined, React.createElement(Button.Tiny.make, {
-                  onClick: (function (param) {
-                      return Curry._2(contractExecutionHandler, (function (param) {
-                                    return Contracts.LongShort.make(Config.longShort, param);
-                                  }), (function (param) {
-                                    return param.executeOutstandingNextPriceSettlementsUser(user, marketIndex);
-                                  }));
-                    }),
-                  children: "Withdraw DAI"
-                }), React.createElement(WithdrawTxStatusModal.make, {
-                  txState: txState
-                }));
+  return React.createElement(Button.Tiny.make, {
+              onClick: (function (param) {
+                  return Curry._2(contractExecutionHandler, (function (param) {
+                                return Contracts.LongShort.make(Config.longShort, param);
+                              }), (function (param) {
+                                return param.executeOutstandingNextPriceSettlementsUser(user, marketIndex);
+                              }));
+                }),
+              children: "Withdraw DAI"
+            });
 }
 
 var make = Withdraw;
