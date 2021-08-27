@@ -1,20 +1,23 @@
 [
-    {    
-        "name": "Bitcoin Market",
-        "description": "Bitcoin is the first decentralized digital cryptocurrency launched in 2009 by an anonymous developer under the pseudonym 'Satoshi Nakamoto'. Bitcoin is used as a trasnfer of value and a store of wealth.",
-        "oracleHeartbeat": 70,
-        "icon": "/icons/tokens/btc.svg"
-    },
+{    
+    "name": "Bitcoin Market",
+    "description": "Bitcoin is the first decentralized digital cryptocurrency launched in 2009 by an anonymous developer under the pseudonym 'Satoshi Nakamoto'. Bitcoin is used as a trasnfer of value and a store of wealth.",
+    "oracleHeartbeat": 70,
+    "icon": "/icons/tokens/btc.svg",
+    "oracleDecimals": 8
+},
 {    
     "name": "Eth Market",
     "description": "Ether (ETH) is the main token of the Ethereum blockchain and acts as the primary 'fuel' that powers all activity on it. Ether is used to perform actions on the network, such as sending transactions and interacting with dapps.",
     "oracleHeartbeat": 70,
-    "icon": "/icons/tokens/eth.svg"
+    "icon": "/icons/tokens/eth.svg",
+    "oracleDecimals": 8
 },
 {    
     "name": "Matic Market",
     "description": "Matic is the native token of the polygon network. A proof of stake EVM compatable blockchain. Polygon transaction fees are payed in Matic token." ,
     "oracleHeartbeat": 70,
-    "icon": "/icons/tokens/matic.svg"
+    "icon": "/icons/tokens/matic.svg",
+    "oracleDecimals": 8
 }
 ]

@@ -11,7 +11,8 @@ function getMarketInfoUnsafe(index) {
               name: "",
               description: "",
               oracleHeartbeat: 300,
-              icon: "/"
+              icon: "/",
+              oracleDecimals: 8
             });
 }
 

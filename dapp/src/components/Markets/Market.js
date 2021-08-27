@@ -2,6 +2,7 @@
 'use strict';
 
 var React = require("react");
+var Backend = require("../../mockBackend/Backend.js");
 var Link = require("next/link").default;
 var PriceGraph = require("../PriceGraph.js");
 var MarketInfoCard = require("./MarketInfoCard.js");
@@ -26,7 +27,8 @@ function Market(Props) {
                         }, React.createElement(PriceGraph.make, {
                               marketName: marketData.name,
                               oracleAddress: marketData.oracleAddress,
-                              timestampCreated: marketData.timestampCreated
+                              timestampCreated: marketData.timestampCreated,
+                              oracleDecimals: Backend.getMarketInfoUnsafe(marketData.marketIndex.toNumber() - 1 | 0).oracleDecimals
                             }))), React.createElement(MarketInfoCard.make, {
                       marketIndex: marketData.marketIndex.toNumber()
                     }), React.createElement("div", {

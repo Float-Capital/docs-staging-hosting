@@ -55,18 +55,28 @@ module PriceCard = {
       },
     )
 
+    let marketIndex = market.marketIndex->Ethers.BigNumber.toNumber
+
+    let assetDecimals = ((marketIndex - 1)->Backend.getMarketInfoUnsafe).oracleDecimals
+
     let state: possibleState = switch priceHistory {
-    | {data: Some({priceIntervalManager: Some({prices, latestPriceInterval: {endPrice}})})} =>
+    | {data: Some({priceIntervalManager: Some({prices, latestPriceInterval: {endPrice}})})} => {
+      let normalizeDecimals = Ethers.Utils.make18DecimalsNormalizer(~decimals=assetDecimals)
       Response({
         data: prices->Array.reduceReverse([], (prev, {startTimestamp, endPrice}) => {
           let info: PriceGraph.priceData = {
             date: startTimestamp,
-            price: endPrice->Ethers.Utils.formatEther->Float.fromString->Option.getExn,
+            price: endPrice
+            ->normalizeDecimals
+            ->Ethers.Utils.formatEther
+            ->Float.fromString
+            ->Option.getExn,
           }
           prev->Array.concat([info])
         }),
-        latestPrice: endPrice->Ethers.Utils.formatEtherToPrecision(2),
+        latestPrice: endPrice->normalizeDecimals->Ethers.Utils.formatEtherToPrecision(2),
       })
+    }
     | {data: Some({priceIntervalManager: None})} =>
       GraphError("Couldn't fetch prices for this market.")
     | {data: None, error: None, loading: false} =>

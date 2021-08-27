@@ -68,6 +68,29 @@ function formatEther(__x) {
   return Ethers.utils.formatUnits(__x, "ether");
 }
 
+var tenBN = Ethers.BigNumber.from(10);
+
+function make18DecimalsNormalizer(decimals) {
+  var multiplierOrDivisor = tenBN.pow(Ethers.BigNumber.from(Math.abs(18 - decimals | 0)));
+  if (decimals < 18) {
+    return function (num) {
+      return num.mul(multiplierOrDivisor);
+    };
+  } else if (decimals > 18) {
+    return function (num) {
+      return num.div(multiplierOrDivisor);
+    };
+  } else {
+    return function (num) {
+      return num;
+    };
+  }
+}
+
+function normalizeTo18Decimals(num, decimals) {
+  return make18DecimalsNormalizer(decimals)(num);
+}
+
 function formatEtherToPrecision(number, digits) {
   var digitMultiplier = Math.pow(10.0, digits);
   return String(Math.floor(Belt_Option.getExn(Belt_Float.fromString(Ethers.utils.formatUnits(number, "ether"))) * digitMultiplier) / digitMultiplier);
@@ -87,6 +110,9 @@ var Utils = {
   parseEtherUnsafe: parseEtherUnsafe,
   getAddress: getAddress,
   formatEther: formatEther,
+  tenBN: tenBN,
+  make18DecimalsNormalizer: make18DecimalsNormalizer,
+  normalizeTo18Decimals: normalizeTo18Decimals,
   formatEtherToPrecision: formatEtherToPrecision,
   ethAdrToStr: ethAdrToStr,
   ethAdrToLowerStr: ethAdrToLowerStr
@@ -99,4 +125,4 @@ exports.Wallet = Wallet;
 exports.Providers = Providers;
 exports.Contract = Contract;
 exports.Utils = Utils;
-/* ethers Not a pure module */
+/* tenBN Not a pure module */
