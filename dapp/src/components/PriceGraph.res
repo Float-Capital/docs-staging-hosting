@@ -25,6 +25,7 @@ module LoadedGraph = {
           tickFormatter={value => value->Js.Float.toFixedWithPrecision(~digits=3)}
           domain={yAxisRange}
           axisLine={false}
+          tick={{"fontSize": 9}}
         />
       </LineChart>
     </ResponsiveContainer>
@@ -108,7 +109,9 @@ type dataInfo = {
 let extractGraphPriceInfo = (
   rawPriceData: array<Queries.PriceHistory.PriceHistory_inner.t_priceIntervalManager_prices>,
   graphZoomSetting,
-) =>
+  oracleDecimals
+) => {
+  let normalizeDecimals = Ethers.Utils.make18DecimalsNormalizer(~decimals=oracleDecimals)
   rawPriceData->Array.reduceReverse(
     {
       dataArray: [],
@@ -117,7 +120,7 @@ let extractGraphPriceInfo = (
       dateFormat: graphZoomSetting->dateFormattersFromGraphSetting,
     },
     (data, {startTimestamp, endPrice}) => {
-      let price = endPrice->Ethers.Utils.formatEther->Float.fromString->Option.getExn
+      let price = endPrice->normalizeDecimals->Ethers.Utils.formatEther->Float.fromString->Option.getExn
       {
         ...data,
         dataArray: data.dataArray->Array.concat([
@@ -131,6 +134,7 @@ let extractGraphPriceInfo = (
       }
     },
   )
+}
 
 @ocaml.doc(`Generate random data to show on page load as a place holder`)
 let generateDummyData = endTimestamp => {
@@ -167,7 +171,7 @@ let generateDummyData = endTimestamp => {
 }
 
 @react.component
-let make = (~marketName, ~oracleAddress, ~timestampCreated) => {
+let make = (~marketName, ~oracleAddress, ~timestampCreated, ~oracleDecimals) => {
   let currentTimestamp = Misc.Time.getCurrentTimestamp()
 
   let timestampCreatedInt = timestampCreated->Ethers.BigNumber.toNumber
@@ -194,7 +198,7 @@ let make = (~marketName, ~oracleAddress, ~timestampCreated) => {
       | {error: Some(_error)} => setOverlayMessageText(_ => Some("Error loading data"))
       | {data: Some({priceIntervalManager: Some({prices})})} =>
         setOverlayMessageText(_ => None)
-        setDisplayData(_ => prices->extractGraphPriceInfo(graphSetting))
+        setDisplayData(_ => prices->extractGraphPriceInfo(graphSetting, oracleDecimals))
       | {data: Some({priceIntervalManager: None})} =>
         setOverlayMessageText(_ => Some("Unable to find prices for this market"))
       | {data: None, error: None, loading: false}

@@ -5,6 +5,7 @@ let zeroBN = Ethers.BigNumber.fromInt(0)
 let oneBN = Ethers.BigNumber.fromInt(1)
 let twoBN = Ethers.BigNumber.fromInt(2)
 let fiveBN = Ethers.BigNumber.fromInt(5)
+let tenBN = Ethers.Utils.tenBN
 let tenToThe5 = Ethers.BigNumber.fromUnsafe("100000")
 let tenToThe6 = Ethers.BigNumber.fromUnsafe("1000000")
 let tenToThe9 = Ethers.BigNumber.fromUnsafe("1000000000")

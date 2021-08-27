@@ -130,7 +130,9 @@ function PriceGraph$LoadedGraph(Props) {
                               undefined,
                               undefined,
                               undefined,
-                              undefined,
+                              {
+                                fontSize: 9
+                              },
                               (function (value) {
                                   return value.toFixed(3);
                                 }),
@@ -286,14 +288,15 @@ function zoomAndNumDataPointsFromGraphSetting(graphSetting) {
   }
 }
 
-function extractGraphPriceInfo(rawPriceData, graphZoomSetting) {
+function extractGraphPriceInfo(rawPriceData, graphZoomSetting, oracleDecimals) {
+  var normalizeDecimals = Ethers.Utils.make18DecimalsNormalizer(oracleDecimals);
   return Belt_Array.reduceReverse(rawPriceData, {
               dataArray: [],
               minYValue: Js_int.max,
               maxYValue: 0,
               dateFormat: dateFormattersFromGraphSetting(graphZoomSetting)
             }, (function (data, param) {
-                var price = Belt_Option.getExn(Belt_Float.fromString(Ethers.Utils.formatEther(param.endPrice)));
+                var price = Belt_Option.getExn(Belt_Float.fromString(Ethers.Utils.formatEther(Curry._1(normalizeDecimals, param.endPrice))));
                 return {
                         dataArray: Belt_Array.concat(data.dataArray, [{
                                 date: param.startTimestamp,
@@ -342,6 +345,7 @@ function PriceGraph(Props) {
   var marketName = Props.marketName;
   var oracleAddress = Props.oracleAddress;
   var timestampCreated = Props.timestampCreated;
+  var oracleDecimals = Props.oracleDecimals;
   var currentTimestamp = Misc.Time.getCurrentTimestamp(undefined);
   var timestampCreatedInt = timestampCreated.toNumber();
   var timeMaketHasExisted = currentTimestamp - timestampCreatedInt | 0;
@@ -397,7 +401,7 @@ function PriceGraph(Props) {
                       
                     }));
               Curry._1(setDisplayData, (function (param) {
-                      return extractGraphPriceInfo(prices, graphSetting);
+                      return extractGraphPriceInfo(prices, graphSetting, oracleDecimals);
                     }));
             } else {
               Curry._1(setOverlayMessageText, (function (param) {

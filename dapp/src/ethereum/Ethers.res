@@ -163,6 +163,25 @@ module Utils = {
 
   let formatEther = formatUnits(. _, #ether)
 
+  let tenBN = BigNumber.fromInt(10)
+ 
+
+  let make18DecimalsNormalizer = (~decimals) => {
+    open BigNumber
+
+    let multiplierOrDivisor = tenBN->pow(Js.Math.abs_int(18 - decimals)->fromInt)
+    switch decimals {
+    | d if d < 18 => (num) => num->mul(multiplierOrDivisor)
+    | d if d > 18 =>
+      (num) => num->div(multiplierOrDivisor)
+    | _ => (num) => (num)
+    }
+  }
+
+  let normalizeTo18Decimals = (num, ~decimals) => {
+    make18DecimalsNormalizer(~decimals)(num)
+  }
+
   let formatEtherToPrecision = (number, digits) => {
     let digitMultiplier = Js.Math.pow_float(~base=10.0, ~exp=digits->Float.fromInt)
     number

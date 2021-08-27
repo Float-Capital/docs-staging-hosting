@@ -135,31 +135,38 @@ function Markets$PriceCard(Props) {
           numDataPoints: 168
         }
       ]);
+  var marketIndex = market.marketIndex.toNumber();
+  var assetDecimals = Backend.getMarketInfoUnsafe(marketIndex - 1 | 0).oracleDecimals;
   var match = priceHistory.data;
   var state;
   var exit = 0;
   if (match !== undefined) {
     var match$1 = match.priceIntervalManager;
-    state = match$1 !== undefined ? ({
-          TAG: 1,
-          _0: {
-            data: Belt_Array.reduceReverse(match$1.prices, [], (function (prev, param) {
-                    var info_date = param.startTimestamp;
-                    var info_price = Belt_Option.getExn(Belt_Float.fromString(Ethers.Utils.formatEther(param.endPrice)));
-                    var info = {
-                      date: info_date,
-                      price: info_price
-                    };
-                    return Belt_Array.concat(prev, [info]);
-                  })),
-            latestPrice: Ethers.Utils.formatEtherToPrecision(match$1.latestPriceInterval.endPrice, 2)
-          },
-          [Symbol.for("name")]: "Response"
-        }) : ({
-          TAG: 0,
-          _0: "Couldn't fetch prices for this market.",
-          [Symbol.for("name")]: "GraphError"
-        });
+    if (match$1 !== undefined) {
+      var normalizeDecimals = Ethers.Utils.make18DecimalsNormalizer(assetDecimals);
+      state = {
+        TAG: 1,
+        _0: {
+          data: Belt_Array.reduceReverse(match$1.prices, [], (function (prev, param) {
+                  var info_date = param.startTimestamp;
+                  var info_price = Belt_Option.getExn(Belt_Float.fromString(Ethers.Utils.formatEther(Curry._1(normalizeDecimals, param.endPrice))));
+                  var info = {
+                    date: info_date,
+                    price: info_price
+                  };
+                  return Belt_Array.concat(prev, [info]);
+                })),
+          latestPrice: Ethers.Utils.formatEtherToPrecision(Curry._1(normalizeDecimals, match$1.latestPriceInterval.endPrice), 2)
+        },
+        [Symbol.for("name")]: "Response"
+      };
+    } else {
+      state = {
+        TAG: 0,
+        _0: "Couldn't fetch prices for this market.",
+        [Symbol.for("name")]: "GraphError"
+      };
+    }
   } else if (priceHistory.error !== undefined || priceHistory.loading) {
     exit = 1;
   } else {
