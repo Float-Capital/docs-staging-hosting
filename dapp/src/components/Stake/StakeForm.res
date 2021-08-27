@@ -27,7 +27,11 @@ module StakeFormInput = {
     ~onMaxClick=_ => (),
     ~synthetic: Queries.SyntheticTokenInfo.t,
     ~txStatusModals=React.null,
-  ) =>
+    ~resetFormButton=_ => React.null,
+    ~tokenToStake="",
+    ~txStateStake=ContractActions.UnInitialised,
+  ) => {
+    let _ = StakeTxStatusModal.useStakeTxModal(~txStateStake, ~resetFormButton, ~tokenToStake)
     <Form className="mx-auto w-full" onSubmit>
       <AmountInput value optBalance disabled onBlur onChange onMaxClick />
       <Button disabled=buttonDisabled onClick={_ => ()}>
@@ -35,6 +39,7 @@ module StakeFormInput = {
       </Button>
       {txStatusModals}
     </Form>
+  }
 }
 
 module ConnectedStakeForm = {
@@ -137,7 +142,9 @@ module ConnectedStakeForm = {
           },
         )}
       synthetic
-      txStatusModals={<StakeTxStatusModal resetFormButton tokenToStake txStateStake=txState />}
+      resetFormButton
+      tokenToStake
+      txStateStake=txState
     />
   }
 }

@@ -3,7 +3,6 @@
 
 var Tick = require("../UI/Base/Tick.js");
 var Curry = require("rescript/lib/js/curry.js");
-var Modal = require("../UI/Base/Modal.js");
 var React = require("react");
 var Button = require("../UI/Base/Button.js");
 var Config = require("../../config/Config.js");
@@ -12,6 +11,7 @@ var Backend = require("../../mockBackend/Backend.js");
 var Withdraw = require("../Withdraw/Withdraw.js");
 var DataHooks = require("../../data/DataHooks.js");
 var ProgressBar = require("../UI/Base/ProgressBar.js");
+var ModalProvider = require("../../libraries/ModalProvider.js");
 var ViewProfileButton = require("../UI/ViewProfileButton.js");
 var MessageUsOnDiscord = require("../Ethereum/MessageUsOnDiscord.js");
 var ViewOnBlockExplorer = require("../Ethereum/ViewOnBlockExplorer.js");
@@ -38,14 +38,11 @@ function RedeemSubmitButtonAndTxStatusModal$ConfirmedTransactionModal(Props) {
                 })
         )
     );
-  return React.createElement(React.Fragment, undefined, React.createElement(Modal.make, {
-                  id: 8,
-                  children: React.createElement("div", {
-                        className: "text-center m-3"
-                      }, React.createElement(Tick.make, {}), React.createElement("p", undefined, "Transaction complete 🎉"), React.createElement("p", {
-                            className: "text-xxs text-gray-700"
-                          }, "You can withdraw your " + Config.paymentTokenName + " on the next oracle price update"), tmp, React.createElement(ViewProfileButton.make, {}))
-                }));
+  return React.createElement("div", {
+              className: "text-center m-3"
+            }, React.createElement(Tick.make, {}), React.createElement("p", undefined, "Transaction complete 🎉"), React.createElement("p", {
+                  className: "text-xxs text-gray-700"
+                }, "You can withdraw your " + Config.paymentTokenName + " on the next oracle price update"), tmp, React.createElement(ViewProfileButton.make, {}));
 }
 
 var ConfirmedTransactionModal = {
@@ -58,72 +55,69 @@ function RedeemSubmitButtonAndTxStatusModal(Props) {
   var buttonText = Props.buttonText;
   var buttonDisabled = Props.buttonDisabled;
   var marketIndex = Props.marketIndex;
-  if (typeof txStateRedeem === "number") {
-    if (txStateRedeem === /* UnInitialised */0) {
-      return React.createElement(Button.make, {
-                  onClick: (function (param) {
-                      
-                    }),
-                  children: buttonText,
-                  disabled: buttonDisabled
-                });
-    } else {
-      return React.createElement(React.Fragment, undefined, React.createElement(Modal.make, {
-                      id: 5,
-                      children: React.createElement("div", {
+  var match = ModalProvider.useModalDisplay(undefined);
+  var hideModal = match.hideModal;
+  var showModal = match.showModal;
+  React.useEffect((function () {
+          if (typeof txStateRedeem === "number") {
+            if (txStateRedeem === /* UnInitialised */0) {
+              Curry._1(hideModal, undefined);
+            } else {
+              Curry._1(showModal, React.createElement("div", {
+                        className: "text-center m-3"
+                      }, React.createElement(Loader.Ellipses.make, {}), React.createElement("h1", undefined, "Confirm the transaction to redeem " + Config.paymentTokenName)));
+            }
+          } else {
+            switch (txStateRedeem.TAG | 0) {
+              case /* SignedAndSubmitted */0 :
+                  Curry._1(showModal, React.createElement("div", {
                             className: "text-center m-3"
-                          }, React.createElement(Loader.Ellipses.make, {}), React.createElement("h1", undefined, "Confirm the transaction to redeem " + Config.paymentTokenName))
-                    }), React.createElement(Button.make, {
-                      onClick: (function (param) {
-                          
-                        }),
-                      children: buttonText,
-                      disabled: true
-                    }));
+                          }, React.createElement("div", {
+                                className: "m-2"
+                              }, React.createElement(Loader.Mini.make, {})), React.createElement("p", undefined, "Redeem transaction pending... "), React.createElement("p", {
+                                className: "text-xxs text-yellow-600"
+                              }, "⚡ Redeeming your position requires a second withdraw transaction once the oracle price has updated ⚡"), React.createElement(ViewOnBlockExplorer.make, {
+                                txHash: txStateRedeem._0
+                              })));
+                  break;
+              case /* Declined */1 :
+                  Curry._1(showModal, React.createElement("div", {
+                            className: "text-center m-3"
+                          }, React.createElement("p", undefined, "The transaction was rejected by your wallet"), React.createElement(MessageUsOnDiscord.make, {})));
+                  break;
+              case /* Complete */2 :
+                  Curry._1(showModal, React.createElement(RedeemSubmitButtonAndTxStatusModal$ConfirmedTransactionModal, {
+                            marketIndex: marketIndex
+                          }));
+                  break;
+              case /* Failed */3 :
+                  Curry._1(showModal, React.createElement("div", {
+                            className: "text-center m-3"
+                          }, React.createElement("h1", undefined, "The transaction failed."), React.createElement(ViewOnBlockExplorer.make, {
+                                txHash: txStateRedeem._0
+                              }), React.createElement(MessageUsOnDiscord.make, {})));
+                  break;
+              
+            }
+          }
+          
+        }), [txStateRedeem]);
+  if (typeof txStateRedeem !== "number") {
+    switch (txStateRedeem.TAG | 0) {
+      case /* Declined */1 :
+      case /* Failed */3 :
+          return Curry._1(resetFormButton, undefined);
+      default:
+        
     }
   }
-  switch (txStateRedeem.TAG | 0) {
-    case /* SignedAndSubmitted */0 :
-        return React.createElement(React.Fragment, undefined, React.createElement(Modal.make, {
-                        id: 7,
-                        children: React.createElement("div", {
-                              className: "text-center m-3"
-                            }, React.createElement("div", {
-                                  className: "m-2"
-                                }, React.createElement(Loader.Mini.make, {})), React.createElement("p", undefined, "Redeem transaction pending... "), React.createElement("p", {
-                                  className: "text-xxs text-yellow-600"
-                                }, "⚡ Redeeming your position requires a second withdraw transaction once the oracle price has updated ⚡"), React.createElement(ViewOnBlockExplorer.make, {
-                                  txHash: txStateRedeem._0
-                                }))
-                      }), React.createElement(Button.make, {
-                        onClick: (function (param) {
-                            
-                          }),
-                        children: buttonText,
-                        disabled: true
-                      }));
-    case /* Declined */1 :
-        return React.createElement(React.Fragment, undefined, React.createElement(Modal.make, {
-                        id: 9,
-                        children: React.createElement("div", {
-                              className: "text-center m-3"
-                            }, React.createElement("p", undefined, "The transaction was rejected by your wallet"), React.createElement(MessageUsOnDiscord.make, {}))
-                      }), Curry._1(resetFormButton, undefined));
-    case /* Complete */2 :
-        return React.createElement(RedeemSubmitButtonAndTxStatusModal$ConfirmedTransactionModal, {
-                    marketIndex: marketIndex
-                  });
-    case /* Failed */3 :
-        return React.createElement(React.Fragment, undefined, React.createElement(Modal.make, {
-                        id: 10,
-                        children: React.createElement("div", {
-                              className: "text-center m-3"
-                            }, React.createElement("h1", undefined, "The transaction failed."), React.createElement(ViewOnBlockExplorer.make, {
-                                  txHash: txStateRedeem._0
-                                }), React.createElement(MessageUsOnDiscord.make, {}))
-                      }), Curry._1(resetFormButton, undefined));
-    
-  }
+  return React.createElement(Button.make, {
+              onClick: (function (param) {
+                  
+                }),
+              children: buttonText,
+              disabled: buttonDisabled
+            });
 }
 
 var make = RedeemSubmitButtonAndTxStatusModal;

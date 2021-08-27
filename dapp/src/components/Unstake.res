@@ -15,41 +15,50 @@ let {toNumber} = module(Ethers.BigNumber)
 module UnstakeTxStatusModal = {
   @react.component
   let make = (~txStateUnstake, ~resetFormButton) => {
-    switch txStateUnstake {
-    | ContractActions.Created =>
-      <Modal id={"unstake-1"}>
-        <div className="text-center m-3">
-          <p> {`Confirm unstake transaction in your wallet `->React.string} </p>
-        </div>
-      </Modal>
-    | ContractActions.SignedAndSubmitted(txHash) =>
-      <Modal id={"unstake-2"}>
-        <div className="text-center m-3">
-          <Loader.Mini />
-          <p> {"Unstake transaction pending... "->React.string} </p>
-          <ViewOnBlockExplorer txHash />
-        </div>
-      </Modal>
-    | ContractActions.Complete({transactionHash: _}) =>
-      <Modal id={"unstake-3"}>
-        <div className="text-center m-3">
-          <p> {`Transaction complete 🎉`->React.string} </p> {resetFormButton()}
-        </div>
-      </Modal>
-    | ContractActions.Declined(_message) => <> {resetFormButton()} </>
-    | ContractActions.Failed(txHash) =>
-      <Modal id={"unstake-4"}>
-        <div className="text-center m-3">
-          <p> {`The transaction failed.`->React.string} </p>
-          {if txHash != "" {
+    let {showModal, hideModal} = ModalProvider.useModalDisplay()
+
+    React.useEffect1(_ => {
+      switch txStateUnstake {
+      | ContractActions.Created =>
+        showModal(
+          <div className="text-center m-3">
+            <p> {`Confirm unstake transaction in your wallet `->React.string} </p>
+          </div>,
+        )
+      | ContractActions.SignedAndSubmitted(txHash) =>
+        showModal(
+          <div className="text-center m-3">
+            <Loader.Mini />
+            <p> {"Unstake transaction pending... "->React.string} </p>
             <ViewOnBlockExplorer txHash />
-          } else {
-            React.null
-          }}
-          <MessageUsOnDiscord />
-          {resetFormButton()}
-        </div>
-      </Modal>
+          </div>,
+        )
+      | ContractActions.Complete({transactionHash: _}) =>
+        showModal(
+          <div className="text-center m-3">
+            <p> {`Transaction complete 🎉`->React.string} </p> {resetFormButton()}
+          </div>,
+        )
+      | ContractActions.Failed(txHash) =>
+        showModal(
+          <div className="text-center m-3">
+            <p> {`The transaction failed.`->React.string} </p>
+            {if txHash != "" {
+              <ViewOnBlockExplorer txHash />
+            } else {
+              React.null
+            }}
+            <MessageUsOnDiscord />
+            {resetFormButton()}
+          </div>,
+        )
+      | _ => hideModal()
+      }
+      None
+    }, [txStateUnstake])
+
+    switch txStateUnstake {
+    | ContractActions.Declined(_) => resetFormButton()
     | _ => React.null
     }
   }

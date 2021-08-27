@@ -5,7 +5,6 @@ var Form = require("../Form.js");
 var Next = require("../../bindings/Next.js");
 var Tick = require("../UI/Base/Tick.js");
 var Curry = require("rescript/lib/js/curry.js");
-var Modal = require("../UI/Base/Modal.js");
 var React = require("react");
 var Button = require("../UI/Base/Button.js");
 var Config = require("../../config/Config.js");
@@ -24,6 +23,7 @@ var Caml_option = require("rescript/lib/js/caml_option.js");
 var TweetButton = require("../UI/TweetButton.js");
 var Router = require("next/router");
 var ContractHooks = require("../Testing/Admin/ContractHooks.js");
+var ModalProvider = require("../../libraries/ModalProvider.js");
 var ToastProvider = require("../UI/ToastProvider.js");
 var ContractActions = require("../../ethereum/ContractActions.js");
 var LongOrShortSelect = require("../UI/LongOrShortSelect.js");
@@ -479,172 +479,134 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
     ];
     return possibleTweetMessages[Js_math.random_int(0, possibleTweetMessages.length)];
   };
-  var exit = 0;
-  if (typeof txStateApprove === "number") {
-    if (txStateApprove !== /* UnInitialised */0) {
-      return React.createElement(React.Fragment, undefined, React.createElement(Modal.make, {
-                      id: 1,
-                      children: React.createElement("div", {
-                            className: "text-center mx-3 my-6"
-                          }, React.createElement(Loader.Ellipses.make, {}), React.createElement("p", undefined, "Please approve your " + Config.paymentTokenName + " token "))
-                    }), React.createElement(Button.make, {
-                      onClick: (function (param) {
-                          
-                        }),
-                      children: buttonText,
-                      disabled: true
-                    }));
-    }
-    exit = 1;
-  } else {
-    switch (txStateApprove.TAG | 0) {
-      case /* SignedAndSubmitted */0 :
-          return React.createElement(React.Fragment, undefined, React.createElement(Modal.make, {
-                          id: 2,
-                          children: React.createElement("div", {
-                                className: "text-center m-3"
-                              }, React.createElement("div", {
-                                    className: "m-2"
-                                  }, React.createElement(Loader.Mini.make, {})), React.createElement("p", undefined, "Approval transaction pending... "), React.createElement(ViewOnBlockExplorer.make, {
-                                    txHash: txStateApprove._0
-                                  }))
-                        }), React.createElement(Button.make, {
-                          onClick: (function (param) {
-                              
-                            }),
-                          children: buttonText,
-                          disabled: true
-                        }));
-      case /* Declined */1 :
-          return React.createElement(React.Fragment, undefined, Curry._1(resetFormButton, undefined));
-      case /* Complete */2 :
-          if (typeof txStateMint === "number") {
-            exit = 2;
-          } else {
-            if (txStateMint.TAG === /* SignedAndSubmitted */0) {
-              return React.createElement(React.Fragment, undefined, React.createElement(Modal.make, {
-                              id: 6,
-                              children: React.createElement("div", {
-                                    className: "text-center m-3"
-                                  }, React.createElement("p", undefined, "Approval confirmed 🎉"), React.createElement(ViewOnBlockExplorer.make, {
-                                        txHash: txStateApprove._0.transactionHash
-                                      }), React.createElement("h1", undefined, "Pending minting " + tokenToMint, React.createElement(ViewOnBlockExplorer.make, {
-                                            txHash: txStateMint._0
-                                          })))
-                            }), React.createElement(Button.make, {
-                              onClick: (function (param) {
-                                  
-                                }),
-                              children: buttonText,
-                              disabled: true
-                            }));
+  var match = ModalProvider.useModalDisplay(undefined);
+  var hideModal = match.hideModal;
+  var showModal = match.showModal;
+  React.useEffect((function () {
+          var exit = 0;
+          if (typeof txStateApprove === "number") {
+            if (txStateApprove === /* UnInitialised */0) {
+              exit = 1;
+            } else {
+              Curry._1(showModal, React.createElement("div", {
+                        className: "text-center mx-3 my-6"
+                      }, React.createElement(Loader.Ellipses.make, {}), React.createElement("p", undefined, "Please approve your " + Config.paymentTokenName + " token ")));
             }
-            exit = 1;
+          } else {
+            switch (txStateApprove.TAG | 0) {
+              case /* SignedAndSubmitted */0 :
+                  Curry._1(showModal, React.createElement("div", {
+                            className: "text-center m-3"
+                          }, React.createElement("div", {
+                                className: "m-2"
+                              }, React.createElement(Loader.Mini.make, {})), React.createElement("p", undefined, "Approval transaction pending... "), React.createElement(ViewOnBlockExplorer.make, {
+                                txHash: txStateApprove._0
+                              })));
+                  break;
+              case /* Declined */1 :
+                  exit = 1;
+                  break;
+              case /* Complete */2 :
+                  if (typeof txStateMint === "number") {
+                    exit = 2;
+                  } else if (txStateMint.TAG === /* SignedAndSubmitted */0) {
+                    Curry._1(showModal, React.createElement("div", {
+                              className: "text-center m-3"
+                            }, React.createElement("p", undefined, "Approval confirmed 🎉"), React.createElement(ViewOnBlockExplorer.make, {
+                                  txHash: txStateApprove._0.transactionHash
+                                }), React.createElement("h1", undefined, "Pending minting " + tokenToMint, React.createElement(ViewOnBlockExplorer.make, {
+                                      txHash: txStateMint._0
+                                    }))));
+                  } else {
+                    exit = 1;
+                  }
+                  break;
+              case /* Failed */3 :
+                  Curry._1(showModal, React.createElement("div", {
+                            className: "text-center m-3"
+                          }, React.createElement("p", undefined, "The transaction failed."), React.createElement(ViewOnBlockExplorer.make, {
+                                txHash: txStateApprove._0
+                              }), React.createElement(MessageUsOnDiscord.make, {})));
+                  break;
+              
+            }
           }
-          break;
+          switch (exit) {
+            case 1 :
+                if (typeof txStateMint === "number") {
+                  if (txStateMint === /* UnInitialised */0) {
+                    Curry._1(hideModal, undefined);
+                  } else {
+                    Curry._1(showModal, React.createElement("div", {
+                              className: "text-center m-3"
+                            }, React.createElement(Loader.Ellipses.make, {}), React.createElement("h1", undefined, "Confirm the transaction to mint " + tokenToMint)));
+                  }
+                } else {
+                  switch (txStateMint.TAG | 0) {
+                    case /* SignedAndSubmitted */0 :
+                        Curry._1(showModal, React.createElement("div", {
+                                  className: "text-center m-3"
+                                }, React.createElement("div", {
+                                      className: "m-2"
+                                    }, React.createElement(Loader.Mini.make, {})), React.createElement("p", undefined, "Minting transaction pending... "), React.createElement(ViewOnBlockExplorer.make, {
+                                      txHash: txStateMint._0
+                                    })));
+                        break;
+                    case /* Declined */1 :
+                        Curry._1(showModal, React.createElement("div", {
+                                  className: "text-center m-3"
+                                }, React.createElement("p", undefined, "The transaction was rejected by your wallet"), React.createElement(MessageUsOnDiscord.make, {})));
+                        break;
+                    case /* Complete */2 :
+                        Curry._1(showModal, React.createElement("div", {
+                                  className: "text-center m-3"
+                                }, React.createElement(Tick.make, {}), React.createElement("p", undefined, "Transaction complete 🎉"), React.createElement(TweetButton.make, {
+                                      message: randomMintTweetMessage(isLong, marketName)
+                                    }), React.createElement(Metamask.AddTokenButton.make, {
+                                      token: Config.config.contracts.FloatToken,
+                                      tokenSymbol: (
+                                        isLong ? "↗️" : "↘️"
+                                      ) + marketName
+                                    }), React.createElement(ViewProfileButton.make, {})));
+                        break;
+                    case /* Failed */3 :
+                        Curry._1(showModal, React.createElement("div", {
+                                  className: "text-center m-3"
+                                }, React.createElement("h1", undefined, "The transaction failed."), React.createElement(ViewOnBlockExplorer.make, {
+                                      txHash: txStateMint._0
+                                    }), React.createElement(MessageUsOnDiscord.make, {})));
+                        break;
+                    
+                  }
+                }
+                break;
+            case 2 :
+                Curry._1(showModal, React.createElement("div", {
+                          className: "text-center mx-3 my-6"
+                        }, React.createElement(Loader.Ellipses.make, {}), React.createElement("p", undefined, "Confirm transaction to mint " + tokenToMint)));
+                break;
+            
+          }
+          
+        }), [txStateMint]);
+  if (typeof txStateMint !== "number") {
+    switch (txStateMint.TAG | 0) {
+      case /* Complete */2 :
+          return null;
+      case /* Declined */1 :
       case /* Failed */3 :
-          return React.createElement(React.Fragment, undefined, React.createElement(Modal.make, {
-                          id: 4,
-                          children: React.createElement("div", {
-                                className: "text-center m-3"
-                              }, React.createElement("p", undefined, "The transaction failed."), React.createElement(ViewOnBlockExplorer.make, {
-                                    txHash: txStateApprove._0
-                                  }), React.createElement(MessageUsOnDiscord.make, {}))
-                        }), Curry._1(resetFormButton, undefined));
-      
+          return Curry._1(resetFormButton, undefined);
+      default:
+        
     }
   }
-  switch (exit) {
-    case 1 :
-        if (typeof txStateMint === "number") {
-          if (txStateMint === /* UnInitialised */0) {
-            return React.createElement(Button.make, {
-                        onClick: (function (param) {
-                            
-                          }),
-                        children: buttonText,
-                        disabled: buttonDisabled
-                      });
-          } else {
-            return React.createElement(React.Fragment, undefined, React.createElement(Modal.make, {
-                            id: 5,
-                            children: React.createElement("div", {
-                                  className: "text-center m-3"
-                                }, React.createElement(Loader.Ellipses.make, {}), React.createElement("h1", undefined, "Confirm the transaction to mint " + tokenToMint))
-                          }), React.createElement(Button.make, {
-                            onClick: (function (param) {
-                                
-                              }),
-                            children: buttonText,
-                            disabled: true
-                          }));
-          }
-        }
-        switch (txStateMint.TAG | 0) {
-          case /* SignedAndSubmitted */0 :
-              return React.createElement(React.Fragment, undefined, React.createElement(Modal.make, {
-                              id: 7,
-                              children: React.createElement("div", {
-                                    className: "text-center m-3"
-                                  }, React.createElement("div", {
-                                        className: "m-2"
-                                      }, React.createElement(Loader.Mini.make, {})), React.createElement("p", undefined, "Minting transaction pending... "), React.createElement(ViewOnBlockExplorer.make, {
-                                        txHash: txStateMint._0
-                                      }))
-                            }), React.createElement(Button.make, {
-                              onClick: (function (param) {
-                                  
-                                }),
-                              children: buttonText,
-                              disabled: true
-                            }));
-          case /* Declined */1 :
-              return React.createElement(React.Fragment, undefined, React.createElement(Modal.make, {
-                              id: 9,
-                              children: React.createElement("div", {
-                                    className: "text-center m-3"
-                                  }, React.createElement("p", undefined, "The transaction was rejected by your wallet"), React.createElement(MessageUsOnDiscord.make, {}))
-                            }), Curry._1(resetFormButton, undefined));
-          case /* Complete */2 :
-              return React.createElement(React.Fragment, undefined, React.createElement(Modal.make, {
-                              id: 8,
-                              children: React.createElement("div", {
-                                    className: "text-center m-3"
-                                  }, React.createElement(Tick.make, {}), React.createElement("p", undefined, "Transaction complete 🎉"), React.createElement(TweetButton.make, {
-                                        message: randomMintTweetMessage(isLong, marketName)
-                                      }), React.createElement(Metamask.AddTokenButton.make, {
-                                        token: Config.config.contracts.FloatToken,
-                                        tokenSymbol: (
-                                          isLong ? "↗️" : "↘️"
-                                        ) + marketName
-                                      }), React.createElement(ViewProfileButton.make, {}))
-                            }));
-          case /* Failed */3 :
-              return React.createElement(React.Fragment, undefined, React.createElement(Modal.make, {
-                              id: 10,
-                              children: React.createElement("div", {
-                                    className: "text-center m-3"
-                                  }, React.createElement("h1", undefined, "The transaction failed."), React.createElement(ViewOnBlockExplorer.make, {
-                                        txHash: txStateMint._0
-                                      }), React.createElement(MessageUsOnDiscord.make, {}))
-                            }), Curry._1(resetFormButton, undefined));
-          
-        }
-    case 2 :
-        return React.createElement(React.Fragment, undefined, React.createElement(Modal.make, {
-                        id: 3,
-                        children: React.createElement("div", {
-                              className: "text-center mx-3 my-6"
-                            }, React.createElement(Loader.Ellipses.make, {}), React.createElement("p", undefined, "Confirm transaction to mint " + tokenToMint))
-                      }), React.createElement(Button.make, {
-                        onClick: (function (param) {
-                            
-                          }),
-                        children: buttonText,
-                        disabled: true
-                      }));
-    
-  }
+  return React.createElement(Button.make, {
+              onClick: (function (param) {
+                  
+                }),
+              children: buttonText,
+              disabled: buttonDisabled
+            });
 }
 
 var SubmitButtonAndTxTracker = {

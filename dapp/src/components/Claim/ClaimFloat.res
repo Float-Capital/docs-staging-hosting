@@ -6,6 +6,8 @@ let make = (~marketIndexes) => {
     ~signer,
   )
 
+  let _ = ClaimTxStatusModal.useClaimTxModal(~txState)
+
   let toastDispatch = React.useContext(ToastProvider.DispatchToastContext.context)
 
   React.useEffect1(() => {
@@ -41,8 +43,5 @@ let make = (~marketIndexes) => {
       ~contractFunction=Contracts.Staker.claimFloatCustom(~marketIndexes),
     )
 
-  <>
-    <Button.Tiny onClick={_ => claimFloatCall()}> "Claim Float" </Button.Tiny>
-    <ClaimTxStatusModal txState />
-  </>
+  <Button.Tiny onClick={_ => claimFloatCall()}> "Claim Float" </Button.Tiny>
 }

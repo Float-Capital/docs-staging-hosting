@@ -31,10 +31,12 @@ let default = (props: props): React.element => {
         <Client>
           <APYProvider>
             <StateChangeMonitor>
-              {switch router.route {
-              | "/" => <SiteLayout> content </SiteLayout>
-              | _ => <MainLayout> content </MainLayout>
-              }}
+              <ModalProvider>
+                {switch router.route {
+                | "/" => <SiteLayout> content </SiteLayout>
+                | _ => <MainLayout> content </MainLayout>
+                }}
+              </ModalProvider>
             </StateChangeMonitor>
           </APYProvider>
         </Client>

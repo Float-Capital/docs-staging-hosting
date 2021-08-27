@@ -1,47 +1,48 @@
-module FaucetTxStatusModal = {
-  @react.component
-  let make = (~txState) => {
+let useFaucetTxStatusModal = (~txState) => {
+  let {showModal, hideModal} = ModalProvider.useModalDisplay()
+  React.useEffect1(() => {
     switch txState {
     | ContractActions.Created =>
-      <Modal id={1}>
+      showModal(
         <div className="text-center m-3">
           <Loader.Ellipses />
           <h1> {`Confirm the transaction to mint testnet DAI`->React.string} </h1>
-        </div>
-      </Modal>
+        </div>,
+      )
     | ContractActions.SignedAndSubmitted(txHash) =>
-      <Modal id={2}>
+      showModal(
         <div className="text-center m-3">
           <div className="m-2"> <Loader.Mini /> </div>
           <p> {"Minting testnet DAI transaction pending... "->React.string} </p>
           <ViewOnBlockExplorer txHash />
-        </div>
-      </Modal>
+        </div>,
+      )
     | ContractActions.Complete({transactionHash: _}) =>
-      <Modal id={3}>
+      showModal(<>
         <div className="text-center m-3">
           <Tick /> <p> {`Transaction complete 🎉`->React.string} </p>
         </div>
         <Metamask.AddTokenButton token={Config.config.contracts.dai} tokenSymbol={`DAI`} />
-      </Modal>
+      </>)
     | ContractActions.Declined(_message) =>
-      <Modal id={4}>
+      showModal(
         <div className="text-center m-3">
           <p> {`The transaction was rejected by your wallet`->React.string} </p>
           <MessageUsOnDiscord />
-        </div>
-      </Modal>
+        </div>,
+      )
     | ContractActions.Failed(txHash) =>
-      <Modal id={5}>
+      showModal(
         <div className="text-center m-3">
           <h1> {`The transaction failed.`->React.string} </h1>
           <ViewOnBlockExplorer txHash />
           <MessageUsOnDiscord />
-        </div>
-      </Modal>
-    | _ => React.null
+        </div>,
+      )
+    | _ => hideModal()
     }
-  }
+    None
+  }, [txState])
 }
 
 module FaucetCard = {
@@ -52,6 +53,8 @@ module FaucetCard = {
     )
 
     let toastDispatch = React.useContext(ToastProvider.DispatchToastContext.context)
+
+    let _ = useFaucetTxStatusModal(~txState)
 
     React.useEffect1(() => {
       switch txState {
@@ -114,7 +117,6 @@ module FaucetCard = {
       <div className="mx-auto max-w-sm">
         <Button onClick={_ => mintMoniesCall()}> {"Mint testnet dai"} </Button>
       </div>
-      <FaucetTxStatusModal txState />
     </section>
   }
 }
