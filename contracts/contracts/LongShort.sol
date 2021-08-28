@@ -994,13 +994,6 @@ contract LongShort is ILongShort, AccessControlledAndUpgradeable {
         user,
         amountSyntheticTokensToTransferToUser
       );
-
-      emit ExecuteNextPriceMintSettlementUser(
-        user,
-        marketIndex,
-        isLong,
-        amountSyntheticTokensToTransferToUser
-      );
     }
   }
 
@@ -1027,13 +1020,6 @@ contract LongShort is ILongShort, AccessControlledAndUpgradeable {
 
       IYieldManager(yieldManagers[marketIndex]).transferPaymentTokensToUser(
         user,
-        amountPaymentToken_toRedeem
-      );
-
-      emit ExecuteNextPriceRedeemSettlementUser(
-        user,
-        marketIndex,
-        isLong,
         amountPaymentToken_toRedeem
       );
     }
@@ -1069,13 +1055,6 @@ contract LongShort is ILongShort, AccessControlledAndUpgradeable {
           user,
           syntheticToken_toShiftTowardsTargetSide
         )
-      );
-
-      emit ExecuteNextPriceMarketSideShiftSettlementUser(
-        user,
-        marketIndex,
-        isShiftFromLong,
-        syntheticToken_toShiftTowardsTargetSide
       );
     }
   }

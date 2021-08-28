@@ -59,27 +59,6 @@ interface ILongShort {
 
   event NewMarketLaunchedAndSeeded(uint32 marketIndex, uint256 initialSeed);
 
-  event ExecuteNextPriceMintSettlementUser(
-    address user,
-    uint32 marketIndex,
-    bool isLong,
-    uint256 amount
-  );
-
-  event ExecuteNextPriceRedeemSettlementUser(
-    address user,
-    uint32 marketIndex,
-    bool isLong,
-    uint256 amount
-  );
-
-  event ExecuteNextPriceMarketSideShiftSettlementUser(
-    address user,
-    uint32 marketIndex,
-    bool isShiftFromLong,
-    uint256 amount
-  );
-
   event ExecuteNextPriceSettlementsUser(address user, uint32 marketIndex);
 
   function syntheticTokens(uint32, bool) external view returns (address);

@@ -14,9 +14,6 @@ dataSources:
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
-        - ExecuteNextPriceMarketSideShiftSettlementUser
-        - ExecuteNextPriceMintSettlementUser
-        - ExecuteNextPriceRedeemSettlementUser
         - ExecuteNextPriceSettlementsUser
         - LongShortV1
         - NewMarketLaunchedAndSeeded
@@ -30,12 +27,6 @@ dataSources:
         - name: LongShort
           file: ./abis/LongShort.json
       eventHandlers:
-        - event: ExecuteNextPriceMarketSideShiftSettlementUser(address,uint32,bool,uint256)
-          handler: handleExecuteNextPriceMarketSideShiftSettlementUser
-        - event: ExecuteNextPriceMintSettlementUser(address,uint32,bool,uint256)
-          handler: handleExecuteNextPriceMintSettlementUser
-        - event: ExecuteNextPriceRedeemSettlementUser(address,uint32,bool,uint256)
-          handler: handleExecuteNextPriceRedeemSettlementUser
         - event: ExecuteNextPriceSettlementsUser(address,uint32)
           handler: handleExecuteNextPriceSettlementsUser
         - event: LongShortV1(address,address,address)

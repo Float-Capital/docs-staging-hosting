@@ -8,17 +8,12 @@ import {
   UsersCurrentNextPriceAction,
 } from "../../../generated/schema";
 import { Address, BigInt, Bytes, ethereum, log } from "@graphprotocol/graph-ts";
-import {
-  ACTION_MINT,
-  ACTION_SHIFT,
-  MARKET_SIDE_LONG,
-  ZERO,
-} from "../../CONSTANTS";
-import { getUser } from "../globalStateManager";
+import { ACTION_MINT, ACTION_SHIFT, MARKET_SIDE_LONG } from "../../CONSTANTS";
 import {
   getOrInitializeBatchedNextPriceExec,
   getOrInitializeUserNextPriceAction,
   getUserNextPriceAction,
+  getUsersCurrentNextPriceAction,
 } from "../../generated/EntityHelpers";
 
 function generateUserNextPriceActionId(
@@ -35,7 +30,7 @@ function generateUserNextPriceActionId(
     updateIndex.toString()
   );
 }
-function generateBatchedNextPriceExecId(
+export function generateBatchedNextPriceExecId(
   marketIndex: BigInt,
   updateIndex: BigInt
 ): string {
@@ -53,7 +48,7 @@ function getUsersCurrentNextPriceActionId(
   );
 }
 
-export function getUsersCurrentNextPriceAction(
+export function getCurrentUserNextPriceAction(
   userAddress: Bytes,
   marketIndex: BigInt
 ): UserNextPriceAction {
@@ -61,14 +56,9 @@ export function getUsersCurrentNextPriceAction(
     userAddress,
     marketIndex
   );
-  let usersCurrentNextPriceAction = UsersCurrentNextPriceAction.load(
+  let usersCurrentNextPriceAction = getUsersCurrentNextPriceAction(
     usersCurrentNextPriceActionId
   );
-  if (usersCurrentNextPriceAction == null) {
-    log.critical("The UsersCurrentNextPriceAction is undefined with id {}", [
-      usersCurrentNextPriceActionId,
-    ]);
-  }
 
   return getUserNextPriceAction(usersCurrentNextPriceAction.currentAction);
 }
@@ -164,24 +154,6 @@ export function createOrUpdateBatchedNextPriceExec(
   return batchedNextPriceExec as BatchedNextPriceExec;
 }
 
-export function getBatchedNextPriceExec(
-  marketIndex: BigInt,
-  updateIndex: BigInt
-): BatchedNextPriceExec {
-  let batchedNextPriceExecId = generateBatchedNextPriceExecId(
-    marketIndex,
-    updateIndex
-  );
-  let batchedNextPriceExec = BatchedNextPriceExec.load(batchedNextPriceExecId);
-  if (batchedNextPriceExec == null) {
-    log.warning(
-      "error: BatchedNextPriceExec doesn't exist, make sure `createOrUpdateBatchedNextPriceExec` has already been executed. entityId: {}",
-      [batchedNextPriceExecId]
-    );
-  }
-
-  return batchedNextPriceExec as BatchedNextPriceExec;
-}
 export function doesBatchExist(
   marketIndex: BigInt,
   updateIndex: BigInt
@@ -306,6 +278,9 @@ export function createOrUpdateUserNextPriceAction(
 
     user.save();
   }
+  userNextPriceAction.nextPriceActionComponents = userNextPriceAction.nextPriceActionComponents.concat(
+    [userNextPriceActionComponent.id]
+  );
 
   if (actionType == ACTION_MINT) {
     if (isLong == MARKET_SIDE_LONG) {
