@@ -246,8 +246,8 @@ module IncompleteWithdrawalItem = {
         let marketName = (marketIndex->toNumber->Backend.getMarketInfoUnsafe).name
 
         let syntheticTokenPrice = isLong
-          ? syntheticPrices.redeemPriceSnapshotLong
-          : syntheticPrices.redeemPriceSnapshotShort
+          ? syntheticPrices.priceSnapshotLong
+          : syntheticPrices.priceSnapshotShort
 
         let daiAmount =
           amount

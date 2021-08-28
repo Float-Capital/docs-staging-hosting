@@ -300,7 +300,7 @@ function User$IncompleteWithdrawalItem(Props) {
   }
   var syntheticPrices = syntheticPricesQuery._0;
   var marketName = Backend.getMarketInfoUnsafe(marketIndex.toNumber()).name;
-  var syntheticTokenPrice = isLong ? syntheticPrices.redeemPriceSnapshotLong : syntheticPrices.redeemPriceSnapshotShort;
+  var syntheticTokenPrice = isLong ? syntheticPrices.priceSnapshotLong : syntheticPrices.priceSnapshotShort;
   var daiAmount = amount.mul(syntheticTokenPrice).div(CONSTANTS.tenToThe18);
   return React.createElement("div", {
               className: "flex items-center justify-between "

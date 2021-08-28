@@ -1955,8 +1955,8 @@ var query$23 = (require("@apollo/client").gql`
     batchedNextPriceExec(id: $batchId)  {
       __typename
       id
-      redeemPriceSnapshotLong
-      redeemPriceSnapshotShort
+      priceSnapshotLong
+      priceSnapshotShort
     }
   }
 `);
@@ -1967,8 +1967,8 @@ function parse$23(value) {
           batchedNextPriceExec: !(value$1 == null) ? ({
                 __typename: value$1.__typename,
                 id: value$1.id,
-                redeemPriceSnapshotLong: GqlConverters.$$BigInt.parse(value$1.redeemPriceSnapshotLong),
-                redeemPriceSnapshotShort: GqlConverters.$$BigInt.parse(value$1.redeemPriceSnapshotShort)
+                priceSnapshotLong: GqlConverters.$$BigInt.parse(value$1.priceSnapshotLong),
+                priceSnapshotShort: GqlConverters.$$BigInt.parse(value$1.priceSnapshotShort)
               }) : undefined
         };
 }
@@ -1977,17 +1977,17 @@ function serialize$23(value) {
   var value$1 = value.batchedNextPriceExec;
   var batchedNextPriceExec;
   if (value$1 !== undefined) {
-    var value$2 = value$1.redeemPriceSnapshotShort;
+    var value$2 = value$1.priceSnapshotShort;
     var value$3 = GqlConverters.$$BigInt.serialize(value$2);
-    var value$4 = value$1.redeemPriceSnapshotLong;
+    var value$4 = value$1.priceSnapshotLong;
     var value$5 = GqlConverters.$$BigInt.serialize(value$4);
     var value$6 = value$1.id;
     var value$7 = value$1.__typename;
     batchedNextPriceExec = {
       __typename: value$7,
       id: value$6,
-      redeemPriceSnapshotLong: value$5,
-      redeemPriceSnapshotShort: value$3
+      priceSnapshotLong: value$5,
+      priceSnapshotShort: value$3
     };
   } else {
     batchedNextPriceExec = null;

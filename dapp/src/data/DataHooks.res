@@ -317,8 +317,8 @@ let useUsersConfirmedMints = (~userId) => {
 }
 
 type batchedSynthPrices = {
-  redeemPriceSnapshotLong: Ethers.BigNumber.t,
-  redeemPriceSnapshotShort: Ethers.BigNumber.t,
+  priceSnapshotLong: Ethers.BigNumber.t,
+  priceSnapshotShort: Ethers.BigNumber.t,
 }
 
 @ocaml.doc(`Returns the prices of the synths for that market at that update index`)
@@ -330,17 +330,15 @@ let useBatchedSynthPrices = (~marketIndex, ~updateIndex) => {
     ~fetchPolicy=NetworkOnly,
   )
   switch batchedExecsSynthPricesQuery {
-  | {
-      data: Some({batchedNextPriceExec: Some({redeemPriceSnapshotLong, redeemPriceSnapshotShort})}),
-    } =>
+  | {data: Some({batchedNextPriceExec: Some({priceSnapshotLong, priceSnapshotShort})})} =>
     Response({
-      redeemPriceSnapshotLong: redeemPriceSnapshotLong,
-      redeemPriceSnapshotShort: redeemPriceSnapshotShort,
+      priceSnapshotLong: priceSnapshotLong,
+      priceSnapshotShort: priceSnapshotShort,
     })
   | {data: Some({batchedNextPriceExec: None})} =>
     Response({
-      redeemPriceSnapshotLong: CONSTANTS.zeroBN,
-      redeemPriceSnapshotShort: CONSTANTS.zeroBN,
+      priceSnapshotLong: CONSTANTS.zeroBN,
+      priceSnapshotShort: CONSTANTS.zeroBN,
     })
   | {error: Some({message})} => GraphError(message)
   | _ => Loading
