@@ -1,4 +1,3 @@
-const { ethers, upgrades, getNamedAccounts } = require("hardhat");
 const {
   STAKER,
   COLLATERAL_TOKEN,
@@ -10,7 +9,7 @@ const {
 } = require("../helper-hardhat-config");
 
 module.exports = async ({ getNamedAccounts, deployments }) => {
-  const { deploy, log } = deployments;
+  const { deploy } = deployments;
   const { deployer, admin } = await getNamedAccounts();
 
   let paymentToken;

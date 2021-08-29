@@ -2,7 +2,7 @@ const { runTestTransactions } = require("../deployTests/RunTestTransactions");
 const {
   runMumbaiTransactions,
 } = require("../deployTests/RunMumbaiTransactions");
-const { ethers, getNamedAccounts } = require("hardhat");
+const { ethers } = require("hardhat");
 
 const {
   STAKER,
@@ -16,8 +16,7 @@ const {
 
 module.exports = async ({ getNamedAccounts, deployments }) => {
   console.log("setup contracts");
-  const { deploy, log, get } = deployments;
-  const { deployer, admin } = await getNamedAccounts();
+  const { admin } = await getNamedAccounts();
 
   /////////////////////////
   //Retrieve Deployments//
