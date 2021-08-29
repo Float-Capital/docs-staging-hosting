@@ -19,7 +19,6 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
   const { deploy, log, get } = deployments;
   const { deployer, admin } = await getNamedAccounts();
 
-  console.log("here 1.1");
   /////////////////////////
   //Retrieve Deployments//
   ////////////////////////
@@ -33,12 +32,10 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     COLLATERAL_TOKEN,
     paymentTokenAddress
   );
-  console.log("here 1.2");
 
   const LongShort = await deployments.get(LONGSHORT);
   const longShort = await ethers.getContractAt(LONGSHORT, LongShort.address);
 
-  console.log("here 1.3");
   const Treasury = await deployments.get(TREASURY);
   const treasury = await ethers.getContractAt(TREASURY, Treasury.address);
 
@@ -47,7 +44,6 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     TOKEN_FACTORY,
     TokenFactory.address
   );
-  console.log("here 1.4");
 
   const Staker = await deployments.get(STAKER);
   const staker = await ethers.getContractAt(STAKER, Staker.address);
