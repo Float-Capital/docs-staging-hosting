@@ -115,6 +115,9 @@ export function createOrUpdateBatchedNextPriceExec(
     nextBatchedNextPriceExec.currentUpdateIndex = updateIndex;
 
     nextBatchedNextPriceExec.save();
+
+    batchedNextPriceExec.marketIndex = marketIndex;
+    batchedNextPriceExec.save();
   }
   let userNextPriceActionId = generateUserNextPriceActionId(
     userAddress,
