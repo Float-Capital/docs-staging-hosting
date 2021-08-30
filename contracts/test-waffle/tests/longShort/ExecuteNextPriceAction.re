@@ -130,28 +130,6 @@ let testUnit =
               });
           });
 
-          it(
-            "should emit the ExecuteNextPriceMintSettlementUser event with the correct arguments",
-            () => {
-              let expectedAmountOfSynthToRecieve =
-                Contract.LongShortHelpers.calcAmountSyntheticToken(
-                  ~amountPaymentToken=userNextPrice_syntheticToken_redeemAmount,
-                  ~price=syntheticToken_priceSnapshot,
-                );
-
-              Chai.callEmitEvents(
-                ~call=executeOutstandingNextPriceMintsTx.contents,
-                ~contract=contracts.contents.longShort->Obj.magic,
-                ~eventName="ExecuteNextPriceMintSettlementUser",
-              )
-              ->Chai.withArgs4(
-                  user,
-                  marketIndex,
-                  isLong,
-                  expectedAmountOfSynthToRecieve,
-                );
-            },
-          );
           it("should reset userNextPriceDepositAmount to zero", () => {
             let%Await userNextPriceDepositAmount =
               contracts.contents.longShort
@@ -282,28 +260,6 @@ let testUnit =
               });
           });
 
-          it(
-            "should emit the ExecuteNextPriceRedeemSettlementUser event with the correct arguments",
-            () => {
-              let expectedAmountOfPaymentTokenToRecieve =
-                Contract.LongShortHelpers.calcAmountPaymentToken(
-                  ~amountSyntheticToken=userNextPrice_syntheticToken_redeemAmount,
-                  ~price=syntheticToken_priceSnapshot,
-                );
-
-              Chai.callEmitEvents(
-                ~call=executeOutstandingNextPriceRedeemsTx.contents,
-                ~contract=contracts.contents.longShort->Obj.magic,
-                ~eventName="ExecuteNextPriceRedeemSettlementUser",
-              )
-              ->Chai.withArgs4(
-                  user,
-                  marketIndex,
-                  isLong,
-                  expectedAmountOfPaymentTokenToRecieve,
-                );
-            },
-          );
           it("should reset userNextPriceDepositAmount to zero", () => {
             let%Await userNextPriceDepositAmount =
               contracts.contents.longShort
@@ -457,33 +413,6 @@ let testUnit =
               });
           });
 
-          it(
-            "should emit the ExecuteNextPriceRedeemSettlementUser event with the correct arguments",
-            () => {
-              let expectedAmountOfPaymentTokenToRecieve =
-                Contract.LongShortHelpers.calcAmountPaymentToken(
-                  ~amountSyntheticToken=userNextPrice_syntheticToken_toShiftAwayFrom_marketSide,
-                  ~price=syntheticToken_priceSnapshotShiftedFrom,
-                );
-              let expectedAmountOfOtherSyntheticTokenToRecieve =
-                Contract.LongShortHelpers.calcAmountSyntheticToken(
-                  ~amountPaymentToken=expectedAmountOfPaymentTokenToRecieve,
-                  ~price=syntheticToken_priceSnapshotShiftedTo,
-                );
-
-              Chai.callEmitEvents(
-                ~call=executeOutstandingNextPriceRedeemsTx.contents,
-                ~contract=contracts.contents.longShort->Obj.magic,
-                ~eventName="ExecuteNextPriceMarketSideShiftSettlementUser",
-              )
-              ->Chai.withArgs4(
-                  user,
-                  marketIndex,
-                  isShiftFromLong,
-                  expectedAmountOfOtherSyntheticTokenToRecieve,
-                );
-            },
-          );
           it(
             "should reset userNextPrice_syntheticToken_toShiftAwayFrom_marketSide to zero",
             () => {
