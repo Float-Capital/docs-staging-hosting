@@ -2,7 +2,7 @@ const { runTestTransactions } = require("../deployTests/RunTestTransactions");
 const {
   runMumbaiTransactions,
 } = require("../deployTests/RunMumbaiTransactions");
-const { ethers, getNamedAccounts } = require("hardhat");
+const { ethers } = require("hardhat");
 
 const {
   STAKER,
@@ -16,10 +16,8 @@ const {
 
 module.exports = async ({ getNamedAccounts, deployments }) => {
   console.log("setup contracts");
-  const { deploy, log, get } = deployments;
-  const { deployer, admin } = await getNamedAccounts();
+  const { admin } = await getNamedAccounts();
 
-  console.log("here 1.1");
   /////////////////////////
   //Retrieve Deployments//
   ////////////////////////
@@ -33,12 +31,10 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     COLLATERAL_TOKEN,
     paymentTokenAddress
   );
-  console.log("here 1.2");
 
   const LongShort = await deployments.get(LONGSHORT);
   const longShort = await ethers.getContractAt(LONGSHORT, LongShort.address);
 
-  console.log("here 1.3");
   const Treasury = await deployments.get(TREASURY);
   const treasury = await ethers.getContractAt(TREASURY, Treasury.address);
 
@@ -47,7 +43,6 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     TOKEN_FACTORY,
     TokenFactory.address
   );
-  console.log("here 1.4");
 
   const Staker = await deployments.get(STAKER);
   const staker = await ethers.getContractAt(STAKER, Staker.address);
