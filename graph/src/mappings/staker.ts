@@ -502,7 +502,12 @@ export function handleFloatMinted(event: FloatMinted): void {
   syntheticMarket.totalFloatMinted = syntheticMarket.totalFloatMinted.plus(
     amountFloatMinted
   );
+
+  syntheticMarket.save();
+
   user.totalMintedFloat = user.totalMintedFloat.plus(amountFloatMinted);
+
+  user.save();
 
   let fltBreakdown = calculateAccumulatedFloatAndExecuteOutstandingShifts(
     syntheticMarket,
@@ -516,7 +521,7 @@ export function handleFloatMinted(event: FloatMinted): void {
 
   if (expectedTotalAmount.notEqual(amountFloatMinted)) {
     if (expectedTotalAmount.notEqual(amountFloatMinted)) {
-      log.critical(
+      log.warning(
         "Float issuance breakdown is incorrect. This is either a bug in the contracts or in the graph (more likely the graph).\nexpected amount: {}\nactual amount: {}\n    {} (amount long) + {} (amount short) \n\n\n The offending transaciton is {}",
         [
           expectedTotalAmount.toString(),
@@ -567,7 +572,6 @@ export function handleFloatMinted(event: FloatMinted): void {
     amountFloatMinted
   );
 
-  user.save();
   globalState.save();
 
   saveEventToStateChange(

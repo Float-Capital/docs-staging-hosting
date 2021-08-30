@@ -29,7 +29,7 @@ let connectors = [
   // },
 ]
 
-let metamaskDefaultChainIds = Set.Int.fromArray([1, 3, 4, 5, 42])
+let metamaskDefaultChainIds = Set.Int.fromArray([1, 3, 4, 5, 42, 1337])
 
 let metamaskDefaultChainIdsToMetamaskName = chainId =>
   switch chainId {
@@ -37,6 +37,7 @@ let metamaskDefaultChainIdsToMetamaskName = chainId =>
   | 4 => "Rinkeby Test Network"
   | 5 => "Goerli Test Network"
   | 42 => "Kovan Test Network"
+  | 1337 => "Local Network"
   | _ => "Ethereum Mainnet"
   }
 

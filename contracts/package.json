@@ -6,6 +6,7 @@
   "scripts": {
     "compile": "hardhat compile",
     "truffle-compile": "truffle compile --all",
+    "truffle-deploy-local": "truffle migrate",
     "test": "hardhat test # You need to run 'yarn generate-all' before this command - but alas, truffle tests will be removed soon",
     "test-waffle": "yarn generate-all && WAFFLE_TEST='true' hardhat test",
     "test-waffle-compiled": "WAFFLE_TEST='true' hardhat test",
