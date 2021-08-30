@@ -567,8 +567,8 @@ function useBatchedSynthPrices(marketIndex, updateIndex) {
       return {
               TAG: 1,
               _0: {
-                redeemPriceSnapshotLong: match$1.redeemPriceSnapshotLong,
-                redeemPriceSnapshotShort: match$1.redeemPriceSnapshotShort
+                priceSnapshotLong: match$1.priceSnapshotLong,
+                priceSnapshotShort: match$1.priceSnapshotShort
               },
               [Symbol.for("name")]: "Response"
             };
@@ -576,8 +576,8 @@ function useBatchedSynthPrices(marketIndex, updateIndex) {
       return {
               TAG: 1,
               _0: {
-                redeemPriceSnapshotLong: CONSTANTS.zeroBN,
-                redeemPriceSnapshotShort: CONSTANTS.zeroBN
+                priceSnapshotLong: CONSTANTS.zeroBN,
+                priceSnapshotShort: CONSTANTS.zeroBN
               },
               [Symbol.for("name")]: "Response"
             };

@@ -81,7 +81,6 @@ import {
   getSyntheticMarket,
   getUserNextPriceAction,
   getPaymentToken,
-  getAccumulativeFloatIssuanceSnapshot,
   getOrInitializeAccumulativeFloatIssuanceSnapshot,
 } from "../generated/EntityHelpers";
 
@@ -204,11 +203,8 @@ export function handleSystemStateUpdated(event: SystemStateUpdated): void {
       updateIndex
     );
 
-    // TODO: combine these into two values:
-    batchedNextPriceExec.mintPriceSnapshotLong = longTokenPrice;
-    batchedNextPriceExec.mintPriceSnapshotShort = shortTokenPrice;
-    batchedNextPriceExec.redeemPriceSnapshotLong = longTokenPrice;
-    batchedNextPriceExec.redeemPriceSnapshotShort = shortTokenPrice;
+    batchedNextPriceExec.priceSnapshotLong = longTokenPrice;
+    batchedNextPriceExec.priceSnapshotShort = shortTokenPrice;
 
     batchedNextPriceExec.executedTimestamp = executedTimestamp;
 

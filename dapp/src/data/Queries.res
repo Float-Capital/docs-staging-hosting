@@ -293,8 +293,8 @@ module BatchedSynthPrices = %graphql(`
 query ($batchId: String!) {
   batchedNextPriceExec (id: $batchId) {
     id
-		redeemPriceSnapshotLong
-    redeemPriceSnapshotShort
+		priceSnapshotLong
+    priceSnapshotShort
   }
 }`)
 
