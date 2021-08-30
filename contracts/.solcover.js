@@ -70,5 +70,6 @@ module.exports = {
     "testing/generated/StakerMockable.sol"
   ].concat(extraFilesToIgnore),
   istanbulFolder: coverageReportOutputDirectory,
+  configureYulOptimizer: true
 };
 
