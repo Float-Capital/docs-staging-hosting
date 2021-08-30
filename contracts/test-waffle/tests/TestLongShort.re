@@ -158,7 +158,6 @@ describe("Float System", () => {
     UtilsHelpers.testUnit(~contracts, ~accounts);
     GetUsersConfirmedButNotSettledBalance.testUnit(~contracts, ~accounts);
     PriceCalculationFunctions.testUnit(~contracts, ~accounts);
-    BatchedSettlement.testUnit(~contracts, ~accounts);
     MintNextPrice.testUnit(~contracts, ~accounts);
     ShiftNextPrice.testUnit(~contracts, ~accounts);
     ExecuteNextPriceAction.testUnit(~contracts, ~accounts);
@@ -187,7 +186,8 @@ describe("Float System", () => {
       ClaimAndDistributeYieldThenRebalanceMarket.testUnit(
         ~contracts,
         ~accounts,
-      )
+      );
+      BatchedSettlement.testUnit(~contracts, ~accounts);
       CreateNewSyntheticMarket.testUnit(~contracts, ~accounts);
     });
   });

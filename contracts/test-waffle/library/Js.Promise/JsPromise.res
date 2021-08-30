@@ -43,6 +43,18 @@ external all7: ((t<'a>, t<'b>, t<'c>, t<'d>, t<'e>, t<'f>, t<'g>)) => t<(
   'g,
 )> = "all"
 
+@scope("Promise") @val
+external all8: ((t<'a>, t<'b>, t<'c>, t<'d>, t<'e>, t<'f>, t<'g>, t<'h>)) => t<(
+  'a,
+  'b,
+  'c,
+  'd,
+  'e,
+  'f,
+  'g,
+  'h,
+)> = "all"
+
 @send
 external _catch: (t<'a>, @uncurry (exn => t<'a>)) => t<'a> = "catch"
 

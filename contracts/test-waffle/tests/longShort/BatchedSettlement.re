@@ -5,7 +5,7 @@ open SmockGeneral;
 
 let testUnit =
     (
-      ~contracts: ref(Helpers.coreContracts),
+      ~contracts: ref(Helpers.longShortUnitTestContracts),
       ~accounts as _: ref(array(Ethers.Wallet.t)),
     ) => {
   describeUnit("Batched Settlement", () => {
@@ -73,7 +73,7 @@ let testUnit =
         let returnOfPerformOutstandingBatchedSettlements =
           ref(None->Obj.magic);
 
-        before_each(() => {
+        before_once'(() => {
           let%Await functionCallReturn =
             setup(
               ~batched_amountPaymentToken_depositLong,
@@ -326,29 +326,24 @@ let testUnit =
       });
     });
     describe("_handleChangeInSyntheticTokensTotalSupply", () => {
-      let longSyntheticToken = ref("Not Set Yet"->Obj.magic);
-      let shortSyntheticToken = ref("Not Set Yet"->Obj.magic);
-
-      before_each(() => {
-        let {longShort} = contracts.contents;
-
-        let%Await smockedSynthLong = SyntheticTokenSmocked.make();
-        let%Await smockedSynthShort = SyntheticTokenSmocked.make();
-
-        longSyntheticToken := smockedSynthLong;
-        shortSyntheticToken := smockedSynthShort;
+      before_once'(() => {
+        let {
+          longShort,
+          syntheticToken1Smocked: longSyntheticToken,
+          syntheticToken2Smocked: shortSyntheticToken,
+        } =
+          contracts.contents;
 
         longShort->LongShort.Exposed.setHandleChangeInSyntheticTokensTotalSupplyGlobals(
           ~marketIndex,
-          ~longSyntheticToken=smockedSynthLong.address,
-          ~shortSyntheticToken=smockedSynthShort.address,
+          ~longSyntheticToken=longSyntheticToken.address,
+          ~shortSyntheticToken=shortSyntheticToken.address,
         );
       });
-      let testHandleChangeInSyntheticTokensTotalSupply =
-          (~isLong, ~syntheticTokenRef) => {
+      let testHandleChangeInSyntheticTokensTotalSupply = (~isLong) => {
         describe("changeInSyntheticTokensTotalSupply > 0", () => {
           let changeInSyntheticTokensTotalSupply = Helpers.randomTokenAmount();
-          before_each(() => {
+          before_once'(() => {
             let {longShort} = contracts.contents;
 
             longShort->LongShort.Exposed._handleChangeInSyntheticTokensTotalSupplyExposed(
@@ -360,24 +355,39 @@ let testUnit =
           it(
             "should call the mint function on the correct synthetic token with correct arguments.",
             () => {
-            syntheticTokenRef.contents
-            ->SyntheticTokenSmocked.mintCallCheck({
-                _to: contracts.contents.longShort.address,
+              let {longShort, syntheticToken1Smocked, syntheticToken2Smocked} =
+                contracts.contents;
+              let syntheticToken =
+                isLong ? syntheticToken1Smocked : syntheticToken2Smocked;
+              syntheticToken->SyntheticTokenSmocked.mintCallCheck({
+                _to: longShort.address,
                 amount: changeInSyntheticTokensTotalSupply,
-              })
-          });
+              });
+            },
+          );
           it("should NOT call the burn function.", () => {
-            expect(
-              syntheticTokenRef.contents->SyntheticTokenSmocked.burnFunction,
-            )
-            ->toHaveCallCount(0)
+            let {syntheticToken1Smocked, syntheticToken2Smocked} =
+              contracts.contents;
+            let syntheticToken =
+              isLong ? syntheticToken1Smocked : syntheticToken2Smocked;
+
+            expect(syntheticToken->SyntheticTokenSmocked.burnFunction)
+            ->toHaveCallCount(0);
           });
         });
         describe("changeInSyntheticTokensTotalSupply < 0", () => {
           let changeInSyntheticTokensTotalSupply =
             zeroBn->sub(Helpers.randomTokenAmount());
-          before_each(() => {
-            let {longShort} = contracts.contents;
+          before_once'(() => {
+            let {longShort, syntheticToken1Smocked, syntheticToken2Smocked} =
+              contracts.contents;
+            let syntheticToken =
+              isLong ? syntheticToken1Smocked : syntheticToken2Smocked;
+
+            let _ =
+              syntheticToken
+              ->SyntheticTokenSmocked.mintFunction
+              ->SmockGeneral.reset;
 
             longShort->LongShort.Exposed._handleChangeInSyntheticTokensTotalSupplyExposed(
               ~marketIndex,
@@ -388,24 +398,43 @@ let testUnit =
           it(
             "should NOT call the mint function on the correct synthetic token.",
             () => {
-            expect(
-              syntheticTokenRef.contents->SyntheticTokenSmocked.mintFunction,
-            )
-            ->toHaveCallCount(0)
+            let {syntheticToken1Smocked, syntheticToken2Smocked} =
+              contracts.contents;
+            let syntheticToken =
+              isLong ? syntheticToken1Smocked : syntheticToken2Smocked;
+
+            expect(syntheticToken->SyntheticTokenSmocked.mintFunction)
+            ->toHaveCallCount(0);
           });
           it(
             "should call the burn function on the correct synthetic token with correct arguments.",
             () => {
-            syntheticTokenRef.contents
-            ->SyntheticTokenSmocked.burnCallCheck({
+              let {syntheticToken1Smocked, syntheticToken2Smocked} =
+                contracts.contents;
+              let syntheticToken =
+                isLong ? syntheticToken1Smocked : syntheticToken2Smocked;
+
+              syntheticToken->SyntheticTokenSmocked.burnCallCheck({
                 amount: zeroBn->sub(changeInSyntheticTokensTotalSupply),
-              })
-          });
+              });
+            },
+          );
         });
         describe("changeInSyntheticTokensTotalSupply == 0", () => {
           it("should call NEITHER the mint NOR burn function.", () => {
             let changeInSyntheticTokensTotalSupply = zeroBn;
-            let {longShort} = contracts.contents;
+            let {longShort, syntheticToken1Smocked, syntheticToken2Smocked} =
+              contracts.contents;
+            let syntheticToken =
+              isLong ? syntheticToken1Smocked : syntheticToken2Smocked;
+            let _ =
+              syntheticToken
+              ->SyntheticTokenSmocked.mintFunction
+              ->SmockGeneral.reset;
+            let _ =
+              syntheticToken
+              ->SyntheticTokenSmocked.burnFunction
+              ->SmockGeneral.reset;
 
             let%Await _ =
               longShort->LongShort.Exposed._handleChangeInSyntheticTokensTotalSupplyExposed(
@@ -413,49 +442,33 @@ let testUnit =
                 ~isLong,
                 ~changeInSyntheticTokensTotalSupply,
               );
-            ();
-            expect(
-              syntheticTokenRef.contents->SyntheticTokenSmocked.mintFunction,
-            )
+
+            expect(syntheticToken->SyntheticTokenSmocked.mintFunction)
             ->toHaveCallCount(0);
-            expect(
-              syntheticTokenRef.contents->SyntheticTokenSmocked.burnFunction,
-            )
+            expect(syntheticToken->SyntheticTokenSmocked.burnFunction)
             ->toHaveCallCount(0);
           })
         });
       };
       describe("LongSide", () => {
-        testHandleChangeInSyntheticTokensTotalSupply(
-          ~isLong=true,
-          ~syntheticTokenRef=longSyntheticToken,
-        );
-        testHandleChangeInSyntheticTokensTotalSupply(
-          ~isLong=false,
-          ~syntheticTokenRef=shortSyntheticToken,
-        );
+        testHandleChangeInSyntheticTokensTotalSupply(~isLong=true);
+        testHandleChangeInSyntheticTokensTotalSupply(~isLong=false);
       });
     });
     describe(
       "_handleTotalPaymentTokenValueChangeForMarketWithYieldManager", () => {
-      let yieldManagerRef = ref("Not Set Yet"->Obj.magic);
+      before_once'(() => {
+        let {longShort, yieldManagerSmocked} = contracts.contents;
 
-      before_each(() => {
-        let {longShort} = contracts.contents;
-
-        let%Await smockedYieldManager = YieldManagerMockSmocked.make();
-
-        yieldManagerRef := smockedYieldManager;
-
-        longShort->LongShort.Exposed.setHandleTotalValueChangeForMarketWithYieldManagerGlobals(
+        longShort->LongShortStateSetters.setYieldManager(
           ~marketIndex,
-          ~yieldManager=smockedYieldManager.address,
+          ~yieldManager=yieldManagerSmocked.address,
         );
       });
       describe("totalPaymentTokenValueChangeForMarket > 0", () => {
         let totalPaymentTokenValueChangeForMarket =
           Helpers.randomTokenAmount();
-        before_each(() => {
+        before_once'(() => {
           let {longShort} = contracts.contents;
 
           longShort->LongShort.Exposed._handleTotalPaymentTokenValueChangeForMarketWithYieldManagerExposed(
@@ -466,15 +479,15 @@ let testUnit =
         it(
           "should call the depositPaymentToken function on the correct synthetic token with correct arguments.",
           () => {
-          yieldManagerRef.contents
-          ->YieldManagerMockSmocked.depositPaymentTokenCallCheck({
+          contracts.contents.yieldManagerSmocked
+          ->YieldManagerAaveSmocked.depositPaymentTokenCallCheck({
               amount: totalPaymentTokenValueChangeForMarket,
             })
         });
         it("should NOT call the removePaymentTokenFromMarket function.", () =>
           expect(
-            yieldManagerRef.contents
-            ->YieldManagerMockSmocked.removePaymentTokenFromMarketFunction,
+            contracts.contents.yieldManagerSmocked
+            ->YieldManagerAaveSmocked.removePaymentTokenFromMarketFunction,
           )
           ->toHaveCallCount(0)
         );
@@ -482,8 +495,13 @@ let testUnit =
       describe("totalPaymentTokenValueChangeForMarket < 0", () => {
         let totalPaymentTokenValueChangeForMarket =
           zeroBn->sub(Helpers.randomTokenAmount());
-        before_each(() => {
-          let {longShort} = contracts.contents;
+        before_once'(() => {
+          let {longShort, yieldManagerSmocked} = contracts.contents;
+
+          let _ =
+            yieldManagerSmocked
+            ->YieldManagerAaveSmocked.depositPaymentTokenFunction
+            ->SmockGeneral.reset;
 
           longShort->LongShort.Exposed._handleTotalPaymentTokenValueChangeForMarketWithYieldManagerExposed(
             ~marketIndex,
@@ -494,16 +512,16 @@ let testUnit =
           "should NOT call the depositPaymentToken function on the correct synthetic token.",
           () =>
           expect(
-            yieldManagerRef.contents
-            ->YieldManagerMockSmocked.depositPaymentTokenFunction,
+            contracts.contents.yieldManagerSmocked
+            ->YieldManagerAaveSmocked.depositPaymentTokenFunction,
           )
           ->toHaveCallCount(0)
         );
         it(
           "should call the removePaymentTokenFromMarket function on the correct synthetic token with correct arguments.",
           () => {
-          yieldManagerRef.contents
-          ->YieldManagerMockSmocked.removePaymentTokenFromMarketCallCheck({
+          contracts.contents.yieldManagerSmocked
+          ->YieldManagerAaveSmocked.removePaymentTokenFromMarketCallCheck({
               amount: zeroBn->sub(totalPaymentTokenValueChangeForMarket),
             })
         });
@@ -513,23 +531,30 @@ let testUnit =
           "should call NEITHER the depositPaymentToken NOR removePaymentTokenFromMarket function.",
           () => {
             let totalPaymentTokenValueChangeForMarket = zeroBn;
-            let {longShort} = contracts.contents;
+
+            let {longShort, yieldManagerSmocked} = contracts.contents;
+
+            let _ =
+              yieldManagerSmocked
+              ->YieldManagerAaveSmocked.depositPaymentTokenFunction
+              ->SmockGeneral.reset;
+            let _ =
+              yieldManagerSmocked
+              ->YieldManagerAaveSmocked.removePaymentTokenFromMarketFunction
+              ->SmockGeneral.reset;
 
             let%Await _ =
               longShort->LongShort.Exposed._handleTotalPaymentTokenValueChangeForMarketWithYieldManagerExposed(
                 ~marketIndex,
                 ~totalPaymentTokenValueChangeForMarket,
               );
-            ();
 
             expect(
-              yieldManagerRef.contents
-              ->YieldManagerMockSmocked.depositPaymentTokenFunction,
+              yieldManagerSmocked->YieldManagerAaveSmocked.depositPaymentTokenFunction,
             )
             ->toHaveCallCount(0);
             expect(
-              yieldManagerRef.contents
-              ->YieldManagerMockSmocked.removePaymentTokenFromMarketFunction,
+              yieldManagerSmocked->YieldManagerAaveSmocked.removePaymentTokenFromMarketFunction,
             )
             ->toHaveCallCount(0);
           },

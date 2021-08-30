@@ -7,10 +7,6 @@ NOTE: This contract is for testing purposes only!
 */
 
 contract LongShortInternalStateSetters is LongShort {
-  bool overRideexecuteOutstandingNextPriceSettlements;
-
-  event executeOutstandingNextPriceSettlementsMock(address _user, uint32 _marketIndex);
-
   function setInitializeMarketParams(
     uint32 marketIndex,
     bool marketIndexValue,
@@ -35,10 +31,6 @@ contract LongShortInternalStateSetters is LongShort {
     for (uint256 i = 0; i < length; i++) {
       marketExists[marketIndexes[i]] = true;
     }
-  }
-
-  function setAssetPrice(uint32 marketIndex, int256 _assetPrice) external {
-    assetPrice[marketIndex] = _assetPrice;
   }
 
   function set_updateSystemStateInternalGlobals(
@@ -76,14 +68,6 @@ contract LongShortInternalStateSetters is LongShort {
     staker = _staker;
 
     userNextPrice_currentUpdateIndex[marketIndex][_staker] = stakerNextPrice_currentUpdateIndex;
-  }
-
-  function setUseexecuteOutstandingNextPriceSettlementsMock(bool shouldUseMock) public {
-    overRideexecuteOutstandingNextPriceSettlements = shouldUseMock;
-  }
-
-  function setCreateSyntheticMarketUpgradeableGlobals(uint32 _latestMarket) public {
-    latestMarket = _latestMarket;
   }
 
   function setGetUsersConfirmedButNotSettledBalanceGlobals(
@@ -153,17 +137,6 @@ contract LongShortInternalStateSetters is LongShort {
   ) external {
     syntheticTokens[marketIndex][true] = longSyntheticToken;
     syntheticTokens[marketIndex][false] = shortSyntheticToken;
-  }
-
-  function setHandleTotalValueChangeForMarketWithYieldManagerGlobals(
-    uint32 marketIndex,
-    address yieldManager
-  ) external {
-    yieldManagers[marketIndex] = yieldManager;
-  }
-
-  function setMintNextPriceGlobals(uint32 marketIndex, uint256 _marketUpdateIndex) external {
-    marketUpdateIndex[marketIndex] = _marketUpdateIndex;
   }
 
   function setRedeemNextPriceGlobals(
@@ -274,10 +247,6 @@ contract LongShortInternalStateSetters is LongShort {
     address yieldManager
   ) external {
     paymentTokens[marketIndex] = paymentToken;
-    yieldManagers[marketIndex] = yieldManager;
-  }
-
-  function setLockFundsInMarketGlobals(uint32 marketIndex, address yieldManager) external {
     yieldManagers[marketIndex] = yieldManager;
   }
 }

@@ -193,7 +193,7 @@ let testUnit =
 
       let%AwaitThen _ =
         contracts.contents.longShort
-        ->LongShort.Exposed.setMintNextPriceGlobals(
+        ->LongShortStateSetters.setMarketUpdateIndex(
             ~marketIndex,
             ~marketUpdateIndex,
           );

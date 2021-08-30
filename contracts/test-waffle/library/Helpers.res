@@ -267,7 +267,8 @@ type longShortUnitTestContracts = {
   longShort: LongShort.t,
   stakerSmocked: StakerSmocked.t,
   floatTokenSmocked: FloatTokenSmocked.t,
-  syntheticTokenSmocked: SyntheticTokenSmocked.t,
+  syntheticToken1Smocked: SyntheticTokenSmocked.t,
+  syntheticToken2Smocked: SyntheticTokenSmocked.t,
   tokenFactorySmocked: TokenFactorySmocked.t,
   yieldManagerSmocked: YieldManagerAaveSmocked.t,
   oracleManagerSmocked: OracleManagerMockSmocked.t,
@@ -293,12 +294,13 @@ let deployAYieldManager = (~longShort: Ethers.ethAddress, ~lendingPoolAddressesP
 }
 
 let initializeLongShortUnit = () => {
-  JsPromise.all7((
+  JsPromise.all8((
     LongShort.Exposed.makeSmock()->JsPromise.then(staker => {
       staker->LongShortSmocked.InternalMock.setup->JsPromise.map(_ => staker)
     }),
     StakerSmocked.make(),
     FloatTokenSmocked.make(),
+    SyntheticTokenSmocked.make(),
     SyntheticTokenSmocked.make(),
     TokenFactorySmocked.make(),
     YieldManagerAaveSmocked.make(),
@@ -307,7 +309,8 @@ let initializeLongShortUnit = () => {
     longShort,
     stakerSmocked,
     floatTokenSmocked,
-    syntheticTokenSmocked,
+    syntheticToken1Smocked,
+    syntheticToken2Smocked,
     tokenFactorySmocked,
     yieldManagerSmocked,
     oracleManagerSmocked,
@@ -318,7 +321,8 @@ let initializeLongShortUnit = () => {
       floatTokenSmocked: floatTokenSmocked,
       yieldManagerSmocked: yieldManagerSmocked,
       oracleManagerSmocked: oracleManagerSmocked,
-      syntheticTokenSmocked: syntheticTokenSmocked,
+      syntheticToken1Smocked: syntheticToken1Smocked,
+      syntheticToken2Smocked: syntheticToken2Smocked,
       tokenFactorySmocked: tokenFactorySmocked,
     }
   })
