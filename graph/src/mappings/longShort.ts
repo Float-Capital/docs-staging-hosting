@@ -10,9 +10,6 @@ import {
   NewMarketLaunchedAndSeeded,
   NextPriceRedeem,
   ExecuteNextPriceSettlementsUser,
-  ExecuteNextPriceRedeemSettlementUser,
-  ExecuteNextPriceMintSettlementUser,
-  ExecuteNextPriceMarketSideShiftSettlementUser,
   NextPriceSyntheticPositionShift,
 } from "../../generated/LongShort/LongShort";
 import {
@@ -22,12 +19,12 @@ import {
   TokenFactory,
   LongShortContract,
   SyntheticToken,
-  PaymentToken,
   LatestPrice,
   Price,
   LatestUnderlyingPrice,
   UnderlyingPrice,
-  SystemState,
+  BatchedNextPriceExec,
+  User,
 } from "../../generated/schema";
 import { BigInt, log, Bytes, Address } from "@graphprotocol/graph-ts";
 import {
@@ -48,7 +45,6 @@ import {
 import {
   createNewTokenDataSource,
   increaseUserMints,
-  updateBalanceTransfer,
   updateUserBalance,
 } from "../utils/helperFunctions";
 import { decreaseOrCreateUserApprovals } from "./tokenTransfers";
@@ -58,20 +54,19 @@ import {
   STAKER_ID,
   TOKEN_FACTORY_ID,
   LONG_SHORT_ID,
-  MARKET_SIDE_SHORT,
   MARKET_SIDE_LONG,
   ACTION_MINT,
   ACTION_REDEEM,
-  TEN_TO_THE_18,
   ACTION_SHIFT,
+  TEN_TO_THE_18,
 } from "../CONSTANTS";
 import {
   createOrUpdateUserNextPriceAction,
   createUserNextPriceActionComponent,
   createOrUpdateBatchedNextPriceExec,
-  getBatchedNextPriceExec,
-  getUsersCurrentNextPriceAction,
   doesBatchExist,
+  getCurrentUserNextPriceAction,
+  generateBatchedNextPriceExecId,
 } from "../utils/nextPrice";
 import {
   generateAccumulativeFloatIssuanceSnapshotId,
@@ -81,8 +76,9 @@ import {
   getSyntheticMarket,
   getUserNextPriceAction,
   getPaymentToken,
-  getAccumulativeFloatIssuanceSnapshot,
   getOrInitializeAccumulativeFloatIssuanceSnapshot,
+  getBatchedNextPriceExec,
+  getUserNextPriceActionComponent,
 } from "../generated/EntityHelpers";
 
 export function handleLongShortV1(event: LongShortV1): void {
@@ -199,16 +195,14 @@ export function handleSystemStateUpdated(event: SystemStateUpdated): void {
     let syntheticTokenLong = getSyntheticTokenById(longTokenId);
     let syntheticTokenShort = getSyntheticTokenById(shortTokenId);
 
-    let batchedNextPriceExec = getBatchedNextPriceExec(
+    let batchedNextPriceExecId = generateBatchedNextPriceExecId(
       marketIndex,
       updateIndex
     );
+    let batchedNextPriceExec = getBatchedNextPriceExec(batchedNextPriceExecId);
 
-    // TODO: combine these into two values:
-    batchedNextPriceExec.mintPriceSnapshotLong = longTokenPrice;
-    batchedNextPriceExec.mintPriceSnapshotShort = shortTokenPrice;
-    batchedNextPriceExec.redeemPriceSnapshotLong = longTokenPrice;
-    batchedNextPriceExec.redeemPriceSnapshotShort = shortTokenPrice;
+    batchedNextPriceExec.priceSnapshotLong = longTokenPrice;
+    batchedNextPriceExec.priceSnapshotShort = shortTokenPrice;
 
     batchedNextPriceExec.executedTimestamp = executedTimestamp;
 
@@ -661,13 +655,85 @@ export function removeFromArrayAtIndex(
   }
 }
 
+function handleExecuteNextPriceMintSettlementUserAction(
+  batch: BatchedNextPriceExec,
+  isLong: boolean,
+  amountPaymentTokenForMint: BigInt,
+  user: User,
+  timestamp: BigInt
+): void {
+  let price = isLong ? batch.priceSnapshotLong : batch.priceSnapshotShort;
+
+  let amountMinted = amountPaymentTokenForMint.times(TEN_TO_THE_18).div(price);
+
+  let synthToken = getSyntheticTokenByMarketIdAndTokenType(
+    batch.marketIndex,
+    isLong
+  );
+
+  // reverse double counting of tokenBalances from synth token TransferEvent
+  updateUserBalance(synthToken.id, user, amountMinted, false, timestamp);
+  user.save();
+}
+
+function handleExecuteNextPriceMarketSideShiftSettlementUserAction(
+  batch: BatchedNextPriceExec,
+  isShiftFromLong: boolean,
+  amountPaymentTokenForMint: BigInt,
+  user: User,
+  timestamp: BigInt
+): void {
+  let priceOriginSide = isShiftFromLong
+    ? batch.priceSnapshotLong
+    : batch.priceSnapshotShort;
+  let priceTargetSide = isShiftFromLong
+    ? batch.priceSnapshotShort
+    : batch.priceSnapshotLong;
+
+  let amountShifted = amountPaymentTokenForMint
+    .times(priceOriginSide)
+    .div(priceTargetSide);
+
+  let synthTokenRecieved = getSyntheticTokenByMarketIdAndTokenType(
+    batch.marketIndex,
+    !isShiftFromLong
+  );
+
+  user.save();
+  // reverse double counting of tokenBalances from synth token TransferEvent
+  updateUserBalance(
+    synthTokenRecieved.id,
+    user,
+    amountShifted,
+    false,
+    timestamp
+  );
+}
+
+function handleExecuteNextPriceRedeemSettlementUserAction(
+  batch: BatchedNextPriceExec,
+  isLong: boolean,
+  amountSynthToRedeem: BigInt
+): void {
+  let price = isLong ? batch.priceSnapshotLong : batch.priceSnapshotShort;
+
+  let amountRedeemed = amountSynthToRedeem.times(price).div(TEN_TO_THE_18);
+
+  let globalState = getOrCreateGlobalState();
+  globalState.totalValueLocked = globalState.totalValueLocked.minus(
+    amountRedeemed
+  );
+
+  globalState.save();
+}
+
 export function handleExecuteNextPriceSettlementsUser(
   event: ExecuteNextPriceSettlementsUser
 ): void {
   let marketIndex = event.params.marketIndex;
   let userAddress = event.params.user;
 
-  let userNextPriceAction = getUsersCurrentNextPriceAction(
+  let userNextPriceAction = getCurrentUserNextPriceAction(
     userAddress,
     marketIndex
   );
@@ -688,6 +754,41 @@ export function handleExecuteNextPriceSettlementsUser(
 
   user.save();
 
+  let usersConfirmedActionIds = userNextPriceAction.nextPriceActionComponents;
+  let numberOfConfirmedActions = usersConfirmedActionIds.length;
+
+  for (let i = 0; i < numberOfConfirmedActions; i++) {
+    let confirmedActionComponent = getUserNextPriceActionComponent(
+      usersConfirmedActionIds[i]
+    );
+    let amount = confirmedActionComponent.amount;
+    let batchId = confirmedActionComponent.associatedBatch;
+    let isLong = confirmedActionComponent.marketSide == MARKET_SIDE_LONG;
+    let batch = getBatchedNextPriceExec(batchId);
+    let type = confirmedActionComponent.actionType;
+    if (type == ACTION_MINT) {
+      handleExecuteNextPriceMintSettlementUserAction(
+        batch,
+        isLong,
+        amount,
+        user,
+        event.block.timestamp
+      );
+    } else if (type == ACTION_REDEEM) {
+      handleExecuteNextPriceRedeemSettlementUserAction(batch, isLong, amount);
+    } else if (type == ACTION_SHIFT) {
+      handleExecuteNextPriceMarketSideShiftSettlementUserAction(
+        batch,
+        isLong,
+        amount,
+        user,
+        event.block.timestamp
+      );
+    } else {
+      log.critical("Unhandled action type {}", [type]);
+    }
+  }
+
   saveEventToStateChange(
     event,
     "ExecuteNextPriceSettlementsUser",
@@ -695,171 +796,6 @@ export function handleExecuteNextPriceSettlementsUser(
     ["marketIndex", "userAddress"],
     ["uint32", "address"],
     [userAddress],
-    []
-  );
-}
-
-export function handleExecuteNextPriceRedeemSettlementUser(
-  event: ExecuteNextPriceRedeemSettlementUser
-): void {
-  let marketIndex = event.params.marketIndex;
-  let userAddress = event.params.user;
-  let isLong = event.params.isLong;
-  let amount = event.params.amount;
-
-  let globalState = getOrCreateGlobalState();
-  globalState.totalValueLocked = globalState.totalValueLocked.minus(amount);
-  globalState.save();
-
-  // TODO: do something something
-
-  saveEventToStateChange(
-    event,
-    "ExecuteNextPriceRedeemSettlementUser",
-    [
-      marketIndex.toString(),
-      userAddress.toHex(),
-      isLong ? "true" : "false",
-      amount.toString(),
-    ],
-    ["marketIndex", "userAddress", "isLong", "amount"],
-    ["uint32", "address", "bool", "uint256"],
-    [userAddress],
-    []
-  );
-}
-
-export function handleExecuteNextPriceMintSettlementUser(
-  event: ExecuteNextPriceMintSettlementUser
-): void {
-  let marketIndex = event.params.marketIndex;
-  let userAddress = event.params.user;
-  let isLong = event.params.isLong;
-  let amount = event.params.amount;
-
-  let synthToken = getSyntheticTokenByMarketIdAndTokenType(marketIndex, isLong);
-
-  let user = getUser(userAddress);
-
-  // reverse double counting of tokenBalances from synth token TransferEvent
-  updateUserBalance(synthToken.id, user, amount, false, event.block.timestamp);
-
-  user.save();
-
-  saveEventToStateChange(
-    event,
-    "ExecuteNextPriceMintSettlementUser",
-    [
-      marketIndex.toString(),
-      userAddress.toHex(),
-      isLong ? "true" : "false",
-      amount.toString(),
-    ],
-    ["marketIndex", "userAddress", "isLong", "amount"],
-    ["uint32", "address", "bool", "uint256"],
-    [userAddress],
-    []
-  );
-}
-
-export function handleNextPriceSyntheticPositionShift(
-  event: NextPriceSyntheticPositionShift
-): void {
-  let synthShifted = event.params.synthShifted;
-  let marketIndex = event.params.marketIndex;
-  let oracleUpdateIndex = event.params.oracleUpdateIndex;
-  let isLong = event.params.isShiftFromLong;
-  let userAddress = event.params.user;
-
-  let user = getOrCreateUser(userAddress, event);
-  let syntheticMarket = getSyntheticMarket(marketIndex.toString());
-
-  let userNextPriceActionComponent = createUserNextPriceActionComponent(
-    user,
-    syntheticMarket,
-    oracleUpdateIndex,
-    synthShifted,
-    ACTION_SHIFT,
-    isLong,
-    event
-  );
-
-  let batchedNextPriceExec = createOrUpdateBatchedNextPriceExec(
-    userNextPriceActionComponent
-  );
-  let userNextPriceAction = createOrUpdateUserNextPriceAction(
-    userNextPriceActionComponent,
-    syntheticMarket,
-    user
-  );
-  userNextPriceAction.confirmedTimestamp = event.block.timestamp;
-
-  userNextPriceAction.save();
-  batchedNextPriceExec.save();
-
-  // TODO Add functionality.
-  saveEventToStateChange(
-    event,
-    "NextPriceSyntheticPositionShift",
-    [
-      marketIndex.toString(),
-      isLong ? "true" : "false",
-      synthShifted.toString(),
-      userAddress.toHex(),
-      oracleUpdateIndex.toString(),
-    ],
-    [
-      "marketIndex",
-      "isShiftFromLong",
-      "synthShifted",
-      "user",
-      "oracleUpdateIndex",
-    ],
-    ["uint32", "bool", "uint256", "address", "uint256"],
-    [event.params.user],
-    []
-  );
-}
-
-export function handleExecuteNextPriceMarketSideShiftSettlementUser(
-  event: ExecuteNextPriceMarketSideShiftSettlementUser
-): void {
-  let marketIndex = event.params.marketIndex;
-  let userAddress = event.params.user;
-  let isLong = event.params.isShiftFromLong;
-  let amount = event.params.amount;
-
-  let synthTokenRecieved = getSyntheticTokenByMarketIdAndTokenType(
-    marketIndex,
-    !isLong
-  );
-
-  let user = getUser(userAddress);
-
-  // reverse double counting of tokenBalances from synth token TransferEvent
-  updateUserBalance(
-    synthTokenRecieved.id,
-    user,
-    amount,
-    false,
-    event.block.timestamp
-  );
-
-  user.save();
-
-  // TODO Add functionality.
-  saveEventToStateChange(
-    event,
-    "ExecuteNextPriceMarketSideShiftSettlementUser",
-    [
-      userAddress.toHex(),
-      marketIndex.toString(),
-      isLong ? "true" : "false",
-      amount.toString(),
-    ],
-    ["user", "marketIndex", "isShiftFromLong", "amount"],
-    ["address", "uint32", "bool", "uint256"],
-    [event.params.user],
     []
   );
 }

@@ -4,7 +4,11 @@ yarn compile
 
 cp -r abis/* ../graph/abis-copy
 
-cd ../graph/scripts
+cd ../graph
+
+yarn generate-all
+
+cd scripts
 
 docker-compose -f docker-compose.mumbai.selfhosted.yaml up --build -d
 docker image prune -f

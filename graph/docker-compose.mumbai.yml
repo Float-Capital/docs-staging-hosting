@@ -1,6 +1,6 @@
 version: "3"
 services:
-  graph-node:
+  graph-node_mumbai:
     image: graphprotocol/graph-node:v0.22.0
     ports:
       - "8000:8000"
@@ -9,26 +9,26 @@ services:
       - "8030:8030"
       - "8040:8040"
     depends_on:
-      - ipfs
-      - postgres
+      - ipfs_mumbai
+      - postgres_mumbai
     environment:
-      postgres_host: postgres
+      postgres_host: postgres_mumbai
       postgres_port: 5432
       postgres_user: graph-node
       postgres_pass: let-me-in
       postgres_db: graph-node
-      ipfs: "ipfs:5001"
+      ipfs: "ipfs_mumbai:5001"
       ethereum: "mumbai:${MUMBAI_RPC_ENDPOINT:-https://rpc-mumbai.matic.today}"
       RUST_LOG: info
 
-  ipfs:
+  ipfs_mumbai:
     image: ipfs/go-ipfs:v0.4.23
     ports:
       - "5001:5001"
     volumes:
-      - ipfs-data:/data/ipfs
+      - ipfs-data_mumbai:/data/ipfs
 
-  postgres:
+  postgres_mumbai:
     image: postgres
     ports:
       - "5432:5432"
@@ -38,9 +38,8 @@ services:
       POSTGRES_PASSWORD: let-me-in
       POSTGRES_DB: graph-node
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - postgres-data_mumbai:/var/lib/postgresql/data
 
 volumes:
-  ganache-data:
-  ipfs-data:
-  postgres-data:
+  ipfs-data_mumbai:
+  postgres-data_mumbai:

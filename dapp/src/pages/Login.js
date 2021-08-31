@@ -45,15 +45,19 @@ var metamaskDefaultChainIds = Belt_SetInt.fromArray([
       3,
       4,
       5,
-      42
+      42,
+      1337
     ]);
 
 function metamaskDefaultChainIdsToMetamaskName(chainId) {
+  if (chainId === 42) {
+    return "Kovan Test Network";
+  }
   if (chainId >= 6) {
-    if (chainId !== 42) {
+    if (chainId !== 1337) {
       return "Ethereum Mainnet";
     } else {
-      return "Kovan Test Network";
+      return "Local Network";
     }
   }
   if (chainId < 3) {

@@ -25,6 +25,10 @@ import {
   MARKET_SIDE_SHORT,
 } from "../CONSTANTS";
 import { createNewTokenDataSource } from "./helperFunctions";
+import {
+  getSyntheticMarket,
+  getSyntheticToken,
+} from "../generated/EntityHelpers";
 
 function createInitialTokenPrice(
   id: string,
@@ -213,16 +217,11 @@ export function getSyntheticTokenByMarketIdAndTokenType(
   marketIndex: BigInt,
   isLong: boolean
 ): SyntheticToken {
-  let syntheticMarket = SyntheticMarket.load(marketIndex.toString());
-  if (syntheticMarket == null) {
-    log.critical("Synthetic market with id {} is undefined.", []);
-  }
+  let syntheticMarket = getSyntheticMarket(marketIndex.toString());
   if (isLong) {
-    return SyntheticToken.load(syntheticMarket.syntheticLong) as SyntheticToken;
+    return getSyntheticToken(syntheticMarket.syntheticLong);
   } else {
-    return SyntheticToken.load(
-      syntheticMarket.syntheticShort
-    ) as SyntheticToken;
+    return getSyntheticToken(syntheticMarket.syntheticShort);
   }
 }
 

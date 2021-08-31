@@ -68,10 +68,8 @@ type BatchedNextPriceExec @entity {
   amountSynthTokenForWithdrawalShort: BigInt!
   amountSynthTokenForShiftFromLong: BigInt!
   amountSynthTokenForShiftFromShort: BigInt!
-  mintPriceSnapshotLong: BigInt!
-  mintPriceSnapshotShort: BigInt!
-  redeemPriceSnapshotLong: BigInt!
-  redeemPriceSnapshotShort: BigInt!
+  priceSnapshotLong: BigInt!
+  priceSnapshotShort: BigInt!
   executedTimestamp: BigInt!
   linkedUserNextPriceActions: [UserNextPriceAction!]!
 }
@@ -369,5 +367,6 @@ type GlobalState @entity {
   totalUsers: BigInt!
   timestampLaunched: BigInt!
   txHash: Bytes!
+  # NOTE: this `totalValueLocked` includes funds that users are yet to withdraw. It is also very in-accurate since it doesn't take into account yield. (#1227)
   totalValueLocked: BigInt!
 }

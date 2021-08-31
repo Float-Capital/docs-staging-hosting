@@ -1,6 +1,6 @@
 require("hardhat-spdx-license-identifier");
 require("@tenderly/hardhat-tenderly"); // https://hardhat.org/plugins/tenderly-hardhat-tenderly.html
-require("@float-capital/solidity-coverage");
+require("solidity-coverage");
 require("@openzeppelin/hardhat-upgrades");
 require("./hardhat-plugins/codegen");
 require("hardhat-deploy");
