@@ -129,6 +129,16 @@ contract FloatToken is
     super._burn(account, amount);
   }
 
+  function totalSupply()
+    public
+    view
+    virtual
+    override(ERC20Upgradeable, IFloatToken)
+    returns (uint256)
+  {
+    return ERC20Upgradeable.totalSupply();
+  }
+
   function transfer(address recipient, uint256 amount)
     public
     virtual
@@ -136,5 +146,13 @@ contract FloatToken is
     returns (bool)
   {
     return ERC20Upgradeable.transfer(recipient, amount);
+  }
+
+  function burnFrom(address account, uint256 amount)
+    public
+    virtual
+    override(ERC20BurnableUpgradeable, IFloatToken)
+  {
+    ERC20BurnableUpgradeable.burnFrom(account, amount);
   }
 }
