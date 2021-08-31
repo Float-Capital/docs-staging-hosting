@@ -5,18 +5,18 @@ open SmockGeneral;
 
 let testUnit =
     (
-      ~contracts: ref(Helpers.coreContracts),
+      ~contracts: ref(Helpers.longShortUnitTestContracts),
       ~accounts as _: ref(array(Ethers.Wallet.t)),
     ) => {
   describeUnit("Execute next price action", () => {
     let marketIndex = Helpers.randomJsInteger();
     let user = Helpers.randomAddress();
 
-    describe("_executeOutstandingNextPriceMints", () => {
-      let longSynthSmocked = ref(SyntheticTokenSmocked.uninitializedValue);
-      let shortSynthSmocked = ref(SyntheticTokenSmocked.uninitializedValue);
-      let longShortRef: ref(LongShort.t) = ref(""->Obj.magic);
+    before_once'(() =>
+      contracts.contents.longShort->LongShortStateSetters.turnOffMocking
+    );
 
+    describe("_executeOutstandingNextPriceMints", () => {
       let setup =
           (
             ~isLong,
@@ -24,23 +24,22 @@ let testUnit =
             ~userNextPrice_currentUpdateIndex,
             ~syntheticToken_priceSnapshot,
           ) => {
-        let {longShort} = contracts.contents;
-        longShortRef := longShort;
-        let%Await smockedLongSynth = SyntheticTokenSmocked.make();
-        let%Await smockedShortSynth = SyntheticTokenSmocked.make();
+        let {longShort, syntheticToken1Smocked, syntheticToken2Smocked} =
+          contracts.contents;
 
-        smockedLongSynth->SyntheticTokenSmocked.mockTransferToReturn(true);
-        smockedShortSynth->SyntheticTokenSmocked.mockTransferToReturn(true);
-
-        longSynthSmocked := smockedLongSynth;
-        shortSynthSmocked := smockedShortSynth;
+        syntheticToken1Smocked->SyntheticTokenSmocked.mockTransferToReturn(
+          true,
+        );
+        syntheticToken2Smocked->SyntheticTokenSmocked.mockTransferToReturn(
+          true,
+        );
 
         longShort->LongShort.Exposed.setExecuteOutstandingNextPriceMintsGlobals(
           ~marketIndex,
           ~user,
           ~isLong,
           ~syntheticToken=
-            (isLong ? smockedLongSynth : smockedShortSynth).address,
+            (isLong ? syntheticToken1Smocked : syntheticToken2Smocked).address,
           ~userNextPrice_syntheticToken_redeemAmount,
           ~userNextPrice_currentUpdateIndex,
           ~syntheticToken_priceSnapshot,
@@ -51,7 +50,10 @@ let testUnit =
           let executeOutstandingNextPriceMintsTx =
             ref("Undefined"->Obj.magic);
 
-          before_each(() => {
+          before_once'(() => {
+            let {longShort, syntheticToken1Smocked, syntheticToken2Smocked} =
+              contracts.contents;
+
             let%Await _ =
               setup(
                 ~isLong,
@@ -60,20 +62,26 @@ let testUnit =
                 ~syntheticToken_priceSnapshot=Helpers.randomTokenAmount(),
               );
 
+            let _ =
+              (isLong ? syntheticToken1Smocked : syntheticToken2Smocked)
+              ->SyntheticTokenSmocked.transferFunction
+              ->SmockGeneral.reset;
+
             executeOutstandingNextPriceMintsTx :=
-              contracts.contents.longShort
-              ->LongShort.Exposed._executeOutstandingNextPriceMintsExposed(
-                  ~marketIndex,
-                  ~user,
-                  ~isLong,
-                );
+              longShort->LongShort.Exposed._executeOutstandingNextPriceMintsExposed(
+                ~marketIndex,
+                ~user,
+                ~isLong,
+              );
           });
           it("should not call any functions or change any state", () => {
+            let {syntheticToken1Smocked, syntheticToken2Smocked} =
+              contracts.contents;
+
             let%Await _ = executeOutstandingNextPriceMintsTx.contents;
-            ();
 
             expect(
-              (isLong ? longSynthSmocked : shortSynthSmocked).contents
+              (isLong ? syntheticToken1Smocked : syntheticToken2Smocked)
               ->SyntheticTokenSmocked.transferFunction,
             )
             ->toHaveCallCount(0);
@@ -96,7 +104,7 @@ let testUnit =
             Helpers.randomTokenAmount();
           let syntheticToken_priceSnapshot = Helpers.randomTokenAmount();
 
-          before_each(() => {
+          before_once'(() => {
             let%Await _ =
               setup(
                 ~isLong,
@@ -117,13 +125,16 @@ let testUnit =
           it(
             "should call transfer on the correct amount of synthetic tokens to the user",
             () => {
+            let {syntheticToken1Smocked, syntheticToken2Smocked} =
+              contracts.contents;
+
             let%Await _ = executeOutstandingNextPriceMintsTx.contents;
             let expectedAmountOfSynthToRecieve =
               Contract.LongShortHelpers.calcAmountSyntheticToken(
                 ~amountPaymentToken=userNextPrice_syntheticToken_redeemAmount,
                 ~price=syntheticToken_priceSnapshot,
               );
-            (isLong ? longSynthSmocked : shortSynthSmocked).contents
+            (isLong ? syntheticToken1Smocked : syntheticToken2Smocked)
             ->SyntheticTokenSmocked.transferCallCheck({
                 recipient: user,
                 amount: expectedAmountOfSynthToRecieve,
@@ -182,7 +193,7 @@ let testUnit =
           let executeOutstandingNextPriceRedeemsTx =
             ref("Undefined"->Obj.magic);
 
-          before_each(() => {
+          before_once'(() => {
             let%Await _ =
               setup(
                 ~isLong,
@@ -226,7 +237,7 @@ let testUnit =
             Helpers.randomTokenAmount();
           let syntheticToken_priceSnapshot = Helpers.randomTokenAmount();
 
-          before_each(() => {
+          before_once'(() => {
             let%Await _ =
               setup(
                 ~isLong,
@@ -281,9 +292,6 @@ let testUnit =
     });
 
     describe("_executeOutstandingNextPriceTokenShifts", () => {
-      let longSynthSmocked = ref(SyntheticTokenSmocked.uninitializedValue);
-      let shortSynthSmocked = ref(SyntheticTokenSmocked.uninitializedValue);
-
       let setup =
           (
             ~isShiftFromLong,
@@ -292,23 +300,23 @@ let testUnit =
             ~syntheticToken_priceSnapshotShiftedFrom,
             ~syntheticToken_priceSnapshotShiftedTo,
           ) => {
-        let {longShort} = contracts.contents;
+        let {longShort, syntheticToken1Smocked, syntheticToken2Smocked} =
+          contracts.contents;
 
-        let%Await smockedLongSynth = SyntheticTokenSmocked.make();
-        let%Await smockedShortSynth = SyntheticTokenSmocked.make();
-
-        smockedLongSynth->SyntheticTokenSmocked.mockTransferToReturn(true);
-        smockedShortSynth->SyntheticTokenSmocked.mockTransferToReturn(true);
-
-        longSynthSmocked := smockedLongSynth;
-        shortSynthSmocked := smockedShortSynth;
+        syntheticToken1Smocked->SyntheticTokenSmocked.mockTransferToReturn(
+          true,
+        );
+        syntheticToken2Smocked->SyntheticTokenSmocked.mockTransferToReturn(
+          true,
+        );
 
         longShort->LongShort.Exposed.setExecuteOutstandingNextPriceTokenShiftsGlobals(
           ~marketIndex,
           ~user,
           ~isShiftFromLong,
           ~syntheticTokenShiftedTo=
-            (isShiftFromLong ? smockedShortSynth : smockedLongSynth).address,
+            (isShiftFromLong ? syntheticToken1Smocked : syntheticToken2Smocked).
+              address,
           ~userNextPrice_syntheticToken_toShiftAwayFrom_marketSide,
           ~userNextPrice_currentUpdateIndex,
           ~syntheticToken_priceSnapshotShiftedFrom,
@@ -320,7 +328,10 @@ let testUnit =
           let executeOutstandingNextPriceRedeemsTx =
             ref("Undefined"->Obj.magic);
 
-          before_each(() => {
+          before_once'(() => {
+            let {longShort, syntheticToken1Smocked, syntheticToken2Smocked} =
+              contracts.contents;
+
             let%Await _ =
               setup(
                 ~isShiftFromLong,
@@ -332,19 +343,32 @@ let testUnit =
                   Helpers.randomTokenAmount(),
               );
 
+            let _ =
+              (
+                isShiftFromLong
+                  ? syntheticToken1Smocked : syntheticToken2Smocked
+              )
+              ->SyntheticTokenSmocked.transferFunction
+              ->SmockGeneral.reset;
+
             executeOutstandingNextPriceRedeemsTx :=
-              contracts.contents.longShort
-              ->LongShort.Exposed._executeOutstandingNextPriceTokenShiftsExposed(
-                  ~marketIndex,
-                  ~user,
-                  ~isShiftFromLong,
-                );
+              longShort->LongShort.Exposed._executeOutstandingNextPriceTokenShiftsExposed(
+                ~marketIndex,
+                ~user,
+                ~isShiftFromLong,
+              );
           });
           it("should not call any functions or change any state", () => {
+            let {syntheticToken1Smocked, syntheticToken2Smocked} =
+              contracts.contents;
+
             let%Await _ = executeOutstandingNextPriceRedeemsTx.contents;
 
             expect(
-              (isShiftFromLong ? shortSynthSmocked : longSynthSmocked).contents
+              (
+                isShiftFromLong
+                  ? syntheticToken1Smocked : syntheticToken2Smocked
+              )
               ->SyntheticTokenSmocked.transferFunction,
             )
             ->toHaveCallCount(0);
@@ -361,9 +385,8 @@ let testUnit =
             ->Chai.expectToNotEmit
           });
         });
-        describe("userNextPriceDepositAmount > 0", () => {
-          let executeOutstandingNextPriceRedeemsTx =
-            ref("Undefined"->Obj.magic);
+        describe(
+          "userNextPrice_syntheticToken_toShiftAwayFrom_marketSide > 0", () => {
           let userNextPrice_syntheticToken_toShiftAwayFrom_marketSide =
             Helpers.randomTokenAmount();
           let syntheticToken_priceSnapshotShiftedFrom =
@@ -371,7 +394,7 @@ let testUnit =
           let syntheticToken_priceSnapshotShiftedTo =
             Helpers.randomTokenAmount();
 
-          before_each(() => {
+          before_once'(() => {
             let%Await _ =
               setup(
                 ~isShiftFromLong,
@@ -381,19 +404,22 @@ let testUnit =
                 ~syntheticToken_priceSnapshotShiftedTo,
               );
 
-            executeOutstandingNextPriceRedeemsTx :=
-              contracts.contents.longShort
-              ->LongShort.Exposed._executeOutstandingNextPriceTokenShiftsExposed(
-                  ~marketIndex,
-                  ~user,
-                  ~isShiftFromLong,
-                );
+            let {longShort} = contracts.contents;
+
+            // LongShortS;
+
+            longShort->LongShort.Exposed._executeOutstandingNextPriceTokenShiftsExposed(
+              ~marketIndex,
+              ~user,
+              ~isShiftFromLong,
+            );
           });
 
           it(
             "should call transfer on the correct amount of Syntetic Tokens to the user",
             () => {
-            let%Await _ = executeOutstandingNextPriceRedeemsTx.contents;
+            let {syntheticToken1Smocked, syntheticToken2Smocked} =
+              contracts.contents;
 
             let expectedAmountOfPaymentTokenToRecieve =
               Contract.LongShortHelpers.calcAmountPaymentToken(
@@ -406,7 +432,7 @@ let testUnit =
                 ~amountPaymentToken=expectedAmountOfPaymentTokenToRecieve,
                 ~price=syntheticToken_priceSnapshotShiftedTo,
               );
-            (isShiftFromLong ? shortSynthSmocked : longSynthSmocked).contents
+            (isShiftFromLong ? syntheticToken1Smocked : syntheticToken2Smocked)
             ->SyntheticTokenSmocked.transferCallCheck({
                 recipient: user,
                 amount: expectedAmountOfOtherSyntheticTokenToRecieve,

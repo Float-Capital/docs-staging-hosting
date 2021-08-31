@@ -117,21 +117,19 @@ let testIntegration =
 
 let testUnit =
     (
-      ~contracts: ref(Helpers.coreContracts),
+      ~contracts: ref(Helpers.longShortUnitTestContracts),
       ~accounts: ref(array(Ethers.Wallet.t)),
     ) => {
-  describe("mintNextPrice external functions", () => {
+  describeUnit("mintNextPrice external functions", () => {
     let marketIndex = 1;
     let amount = Helpers.randomTokenAmount();
 
-    let setup = () => {
-      contracts.contents.longShort->LongShortSmocked.InternalMock.setup;
-    };
+    before_once'(() =>
+      contracts.contents.longShort->LongShortSmocked.InternalMock.setup
+    );
 
     describe("mintLongNextPrice", () => {
       it("calls _mintNextPrice with isLong==true", () => {
-        let%Await _ = setup();
-
         let%Await _ =
           contracts.contents.longShort
           ->LongShortSmocked.InternalMock.setupFunctionForUnitTesting(
@@ -152,8 +150,6 @@ let testUnit =
 
     describe("mintShortNextPrice", () => {
       it("calls _mintNextPrice with isLong==false", () => {
-        let%Await _ = setup();
-
         let%Await _ =
           contracts.contents.longShort
           ->LongShortSmocked.InternalMock.setupFunctionForUnitTesting(
@@ -180,40 +176,44 @@ let testUnit =
     let marketIndex = 1;
     let marketUpdateIndex = Helpers.randomInteger();
     let amount = Helpers.randomTokenAmount();
-
-    let setup = (~isLong, ~testWallet: Ethers.walletType) => {
-      let%AwaitThen _ =
-        contracts.contents.longShort->LongShortSmocked.InternalMock.setup;
-
-      let%AwaitThen _ =
-        contracts.contents.longShort
-        ->LongShortSmocked.InternalMock.setupFunctionForUnitTesting(
-            ~functionName="_mintNextPrice",
-          );
-
-      let%AwaitThen _ =
-        contracts.contents.longShort
-        ->LongShortStateSetters.setMarketUpdateIndex(
-            ~marketIndex,
-            ~marketUpdateIndex,
-          );
-
-      let longShort =
-        contracts.contents.longShort
-        ->ContractHelpers.connect(~address=testWallet);
-
-      longShort->LongShort.Exposed._mintNextPriceExposed(
-        ~marketIndex,
-        ~amount,
-        ~isLong,
-      );
-    };
+    let mintNextPriceExposedTxRef = ref("Not defined yet"->Obj.magic);
 
     let testMarketSide = (~isLong) => {
-      it("calls the executeOutstandingNextPriceSettlements modifier", () => {
+      before_once'(() => {
+        Js.log("Running" ++ (isLong ? "Long" : "Short"));
         let testWallet = accounts.contents->Array.getUnsafe(1);
 
-        let%Await _ = setup(~isLong, ~testWallet);
+        let%AwaitThen _ =
+          contracts.contents.longShort->LongShortSmocked.InternalMock.setup;
+
+        let%AwaitThen _ =
+          contracts.contents.longShort
+          ->LongShortSmocked.InternalMock.setupFunctionForUnitTesting(
+              ~functionName="_mintNextPrice",
+            );
+
+        let%AwaitThen _ =
+          contracts.contents.longShort
+          ->LongShortStateSetters.setMarketUpdateIndex(
+              ~marketIndex,
+              ~marketUpdateIndex,
+            );
+
+        let longShort =
+          contracts.contents.longShort
+          ->ContractHelpers.connect(~address=testWallet);
+
+        mintNextPriceExposedTxRef :=
+          longShort->LongShort.Exposed._mintNextPriceExposed(
+            ~marketIndex,
+            ~amount,
+            ~isLong,
+          );
+        mintNextPriceExposedTxRef.contents;
+      });
+
+      it("calls the executeOutstandingNextPriceSettlements modifier", () => {
+        let testWallet = accounts.contents->Array.getUnsafe(1);
 
         LongShortSmocked.InternalMock._executeOutstandingNextPriceSettlementsCallCheck({
           user: testWallet.address,
@@ -225,7 +225,7 @@ let testUnit =
         let testWallet = accounts.contents->Array.getUnsafe(1);
 
         Chai.callEmitEvents(
-          ~call=setup(~isLong, ~testWallet),
+          ~call=mintNextPriceExposedTxRef.contents,
           ~eventName="NextPriceDeposit",
           ~contract=contracts.contents.longShort->Obj.magic,
         )
@@ -239,20 +239,14 @@ let testUnit =
       });
 
       it("calls depositFunds with correct parameters", () => {
-        let testWallet = accounts.contents->Array.getUnsafe(1);
-
-        let%Await _ = setup(~isLong, ~testWallet);
-
         LongShortSmocked.InternalMock._transferPaymentTokensFromUserToYieldManagerCallCheck({
           marketIndex,
           amount,
-        });
+        })
       });
 
       it("updates the correct state variables with correct values", () => {
         let testWallet = accounts.contents->Array.getUnsafe(1);
-
-        let%AwaitThen _ = setup(~isLong, ~testWallet);
 
         let%AwaitThen updatedBatchedAmountOfTokens_deposit =
           contracts.contents.longShort

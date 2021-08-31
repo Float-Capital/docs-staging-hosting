@@ -5,6 +5,10 @@ let createValueAtKey = %raw(`(key, value) => {
   return result
 }`)
 
+let turnOffMocking = longShort => {
+  longShort->LongShort.setVariable(~name="shouldUseMock", ~value=false)
+}
+
 let setAssetPrice = (longShort, ~marketIndex: int, ~assetPrice: Ethers.BigNumber.t) => {
   longShort->LongShort.setVariable(
     ~name="assetPrice",

@@ -71,6 +71,7 @@ contract ${fileNameWithoutExtension}Mockable is ${fileNameWithoutExtension}Inter
 
   function setFunctionToNotMock(string calldata _functionToNotMock) external {
     functionToNotMock = _functionToNotMock;
+    shouldUseMock = true;
   }
 
 ${fullBody}

@@ -153,21 +153,6 @@ describe("Float System", () => {
         ~amount=Ethers.BigNumber.fromUnsafe("10000000000000000000000"),
       );
     });
-    InitializeMarket.testUnit(~contracts, ~accounts);
-    UpdateSystemState.testUnit(~contracts, ~accounts);
-    UtilsHelpers.testUnit(~contracts, ~accounts);
-    GetUsersConfirmedButNotSettledBalance.testUnit(~contracts, ~accounts);
-    PriceCalculationFunctions.testUnit(~contracts, ~accounts);
-    MintNextPrice.testUnit(~contracts, ~accounts);
-    ShiftNextPrice.testUnit(~contracts, ~accounts);
-    ExecuteNextPriceAction.testUnit(~contracts, ~accounts);
-    ExecuteOutstandingNextPriceSettlements.testUnit(~contracts, ~accounts);
-    ExecuteOutstandingNextPriceSettlementsUserMulti.testUnit(
-      ~contracts,
-      ~accounts,
-    );
-    RedeemNextPrice.testUnit(~contracts, ~accounts);
-    DepositFunds.testUnit(~contracts, ~accounts);
   });
 
   describe("Smocked", () => {
@@ -183,10 +168,25 @@ describe("Float System", () => {
       contracts := deployedContracts;
     });
     describeUnit("Unit tests", () => {
+      ExecuteOutstandingNextPriceSettlements.testUnit(~contracts, ~accounts);
+      ExecuteOutstandingNextPriceSettlementsUserMulti.testUnit(
+        ~contracts,
+        ~accounts,
+      );
+      ExecuteNextPriceAction.testUnit(~contracts, ~accounts);
+      PriceCalculationFunctions.testUnit(~contracts, ~accounts);
+      DepositFunds.testUnit(~contracts, ~accounts);
+      GetUsersConfirmedButNotSettledBalance.testUnit(~contracts, ~accounts);
+      InitializeMarket.testUnit(~contracts, ~accounts);
+      UpdateSystemState.testUnit(~contracts, ~accounts);
       ClaimAndDistributeYieldThenRebalanceMarket.testUnit(
         ~contracts,
         ~accounts,
       );
+      UtilsHelpers.testUnit(~contracts, ~accounts);
+      RedeemNextPrice.testUnit(~contracts, ~accounts);
+      ShiftNextPrice.testUnit(~contracts, ~accounts);
+      MintNextPrice.testUnit(~contracts, ~accounts);
       BatchedSettlement.testUnit(~contracts, ~accounts);
       CreateNewSyntheticMarket.testUnit(~contracts, ~accounts);
     });

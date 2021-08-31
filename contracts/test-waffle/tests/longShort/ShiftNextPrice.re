@@ -151,21 +151,19 @@ let testIntegration =
 
 let testUnit =
     (
-      ~contracts: ref(Helpers.coreContracts),
+      ~contracts: ref(Helpers.longShortUnitTestContracts),
       ~accounts: ref(array(Ethers.Wallet.t)),
     ) => {
   describe("shiftNextPrice external functions", () => {
     let marketIndex = 1;
     let amountSyntheticTokensToShift = Helpers.randomTokenAmount();
 
-    let setup = () => {
-      contracts.contents.longShort->LongShortSmocked.InternalMock.setup;
-    };
+    before_once'(() =>
+      contracts.contents.longShort->LongShortSmocked.InternalMock.setup
+    );
 
     describe("shiftPositionFromLongNextPrice", () => {
       it("calls _shiftPositionNextPrice with isShiftFromLong==true", () => {
-        let%Await _ = setup();
-
         let%Await _ =
           contracts.contents.longShort
           ->LongShortSmocked.InternalMock.setupFunctionForUnitTesting(
@@ -189,8 +187,6 @@ let testUnit =
 
     describe("shiftPositionFromShortNextPrice", () => {
       it("calls _shiftPositionNextPrice with isShiftFromLong==false", () => {
-        let%Await _ = setup();
-
         let%Await _ =
           contracts.contents.longShort
           ->LongShortSmocked.InternalMock.setupFunctionForUnitTesting(
@@ -218,43 +214,50 @@ let testUnit =
     let marketUpdateIndex = Helpers.randomInteger();
     let amount = Helpers.randomTokenAmount();
     let smockedSyntheticToken = ref(SyntheticTokenSmocked.uninitializedValue);
-
-    let setup = (~isShiftFromLong, ~testWallet: Ethers.walletType) => {
-      let {longShort} = contracts.contents;
-
-      let%AwaitThen longSynthSmocked = SyntheticTokenSmocked.make();
-      longSynthSmocked->SyntheticTokenSmocked.mockTransferFromToReturn(true);
-      smockedSyntheticToken := longSynthSmocked;
-
-      let%AwaitThen _ = longShort->LongShortSmocked.InternalMock.setup;
-
-      let%AwaitThen _ =
-        longShort->LongShortSmocked.InternalMock.setupFunctionForUnitTesting(
-          ~functionName="shiftPositionNextPrice",
-        );
-
-      let%AwaitThen _ =
-        longShort->LongShort.Exposed.setShiftNextPriceGlobals(
-          ~marketIndex,
-          ~marketUpdateIndex,
-          ~syntheticTokenShiftedFrom=longSynthSmocked.address,
-          ~isShiftFromLong,
-        );
-
-      let longShort = longShort->ContractHelpers.connect(~address=testWallet);
-
-      longShort->LongShort.shiftPositionNextPrice(
-        ~marketIndex,
-        ~amountSyntheticTokensToShift=amount,
-        ~isShiftFromLong,
-      );
-    };
+    let shiftPositionNextPriceExposedTxRef =
+      ref("Not defined yet"->Obj.magic);
 
     let testMarketSide = (~isShiftFromLong) => {
-      it("calls the executeOutstandingNextPriceSettlements modifier", () => {
+      before_once'(() => {
         let testWallet = accounts.contents->Array.getUnsafe(1);
 
-        let%Await _ = setup(~isShiftFromLong, ~testWallet);
+        let {longShort} = contracts.contents;
+
+        let%AwaitThen longSynthSmocked = SyntheticTokenSmocked.make();
+        longSynthSmocked->SyntheticTokenSmocked.mockTransferFromToReturn(
+          true,
+        );
+        smockedSyntheticToken := longSynthSmocked;
+
+        let%AwaitThen _ = longShort->LongShortSmocked.InternalMock.setup;
+
+        let%AwaitThen _ =
+          longShort->LongShortSmocked.InternalMock.setupFunctionForUnitTesting(
+            ~functionName="shiftPositionNextPrice",
+          );
+
+        let%AwaitThen _ =
+          longShort->LongShort.Exposed.setShiftNextPriceGlobals(
+            ~marketIndex,
+            ~marketUpdateIndex,
+            ~syntheticTokenShiftedFrom=longSynthSmocked.address,
+            ~isShiftFromLong,
+          );
+
+        let longShort =
+          longShort->ContractHelpers.connect(~address=testWallet);
+
+        shiftPositionNextPriceExposedTxRef :=
+          longShort->LongShort.shiftPositionNextPrice(
+            ~marketIndex,
+            ~amountSyntheticTokensToShift=amount,
+            ~isShiftFromLong,
+          );
+        shiftPositionNextPriceExposedTxRef.contents;
+      });
+
+      it("calls the executeOutstandingNextPriceSettlements modifier", () => {
+        let testWallet = accounts.contents->Array.getUnsafe(1);
 
         // TODO: fix bug in codegen that adds the modifiers to the generated code too (which means this gets called twice - even though it only gets called once!)
         LongShortSmocked.InternalMock._executeOutstandingNextPriceSettlementsCallCheck({
@@ -267,7 +270,7 @@ let testUnit =
         let testWallet = accounts.contents->Array.getUnsafe(1);
 
         Chai.callEmitEvents(
-          ~call=setup(~isShiftFromLong, ~testWallet),
+          ~call=shiftPositionNextPriceExposedTxRef.contents,
           ~eventName="NextPriceSyntheticPositionShift",
           ~contract=contracts.contents.longShort->Obj.magic,
         )
@@ -285,8 +288,6 @@ let testUnit =
         () => {
         let testWallet = accounts.contents->Array.getUnsafe(1);
 
-        let%Await _ = setup(~isShiftFromLong, ~testWallet);
-
         smockedSyntheticToken.contents
         ->SyntheticTokenSmocked.transferFromCallCheck({
             sender: testWallet.address,
@@ -297,8 +298,6 @@ let testUnit =
 
       it("updates the correct state variables with correct values", () => {
         let testWallet = accounts.contents->Array.getUnsafe(1);
-
-        let%AwaitThen _ = setup(~isShiftFromLong, ~testWallet);
 
         let%AwaitThen updatedbatched_amountSyntheticTokenToShiftMarketSide =
           contracts.contents.longShort
