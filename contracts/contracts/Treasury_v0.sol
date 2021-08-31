@@ -34,18 +34,4 @@ contract Treasury_v0 is AccessControlledAndUpgradeable {
   function _getValueLockedInTreasury() internal view returns (uint256) {
     return IERC20(paymentToken).balanceOf(address(this));
   }
-
-  function _getFloatTokenSupply() internal view returns (uint256) {
-    return IFloatToken(floatToken).totalSupply();
-  }
-
-  function burnFloatForShareOfTreasury(uint256 amountOfFloatToBurn) external {
-    uint256 amountToRecieve = (_getValueLockedInTreasury() * amountOfFloatToBurn) /
-      _getFloatTokenSupply();
-
-    // Currently requires user to approve treasury contract.
-    // Can modify the core FLT token if wanted to remove the need for this step.
-    IFloatToken(floatToken).burnFrom(msg.sender, amountOfFloatToBurn);
-    IERC20(paymentToken).safeTransfer(msg.sender, amountToRecieve);
-  }
 }
