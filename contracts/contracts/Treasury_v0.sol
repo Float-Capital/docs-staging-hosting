@@ -3,7 +3,6 @@
 pragma solidity 0.8.3;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 import "./abstract/AccessControlledAndUpgradeable.sol";
 import "./interfaces/IFloatToken.sol";
@@ -15,9 +14,6 @@ import "./interfaces/IFloatToken.sol";
 
 /** @title Treasury Contract */
 contract Treasury_v0 is AccessControlledAndUpgradeable {
-  //Using Open Zeppelin safe transfer library for token transfers
-  using SafeERC20 for IERC20;
-
   address public paymentToken;
   address public floatToken;
 
@@ -29,9 +25,5 @@ contract Treasury_v0 is AccessControlledAndUpgradeable {
     _AccessControlledAndUpgradeable_init(_admin);
     paymentToken = _paymentToken;
     floatToken = _floatToken;
-  }
-
-  function _getValueLockedInTreasury() internal view returns (uint256) {
-    return IERC20(paymentToken).balanceOf(address(this));
   }
 }
