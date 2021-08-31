@@ -126,35 +126,6 @@ describe("Float System", () => {
     });
   });
 
-  describeUnit("LongShort - internals exposed", () => {
-    let contracts: ref(Helpers.coreContracts) = ref(None->Obj.magic);
-    let accounts: ref(array(Ethers.Wallet.t)) = ref(None->Obj.magic);
-
-    before(() => {
-      let%Await loadedAccounts = Ethers.getSigners();
-      accounts := loadedAccounts;
-    });
-
-    before_each(() => {
-      let%Await deployedContracts =
-        Helpers.initialize(
-          ~admin=accounts.contents->Array.getUnsafe(0),
-          ~exposeInternals=true,
-        );
-      contracts := deployedContracts;
-      let firstMarketPaymentToken =
-        deployedContracts.markets->Array.getUnsafe(1).paymentToken;
-
-      let testUser = accounts.contents->Array.getUnsafe(1);
-
-      firstMarketPaymentToken->Contract.PaymentTokenHelpers.mintAndApprove(
-        ~user=testUser,
-        ~spender=deployedContracts.longShort.address,
-        ~amount=Ethers.BigNumber.fromUnsafe("10000000000000000000000"),
-      );
-    });
-  });
-
   describe("Smocked", () => {
     let contracts = ref("NOT INITIALIZED"->Obj.magic);
     let accounts = ref("NOT INITIALIZED"->Obj.magic);
