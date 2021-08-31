@@ -50,33 +50,24 @@ const initialize = async (admin) => {
   const floatToken = await FloatToken.new({
     from: admin,
   });
-  await floatToken.initialize(
-    "Float token",
-    "FLOAT TOKEN",
-    staker.address,
-    {
-      from: admin,
-    }
-  );
-
-  await treasury.initialize(admin, {
+  await floatToken.initialize("Float token", "FLOAT TOKEN", staker.address, {
     from: admin,
   });
 
-  await longShort.initialize(
-    admin,
-    tokenFactory.address,
-    staker.address,
-    {
-      from: admin,
-    }
-  );
+  // NOTE: ledacy tests. We are not testing treasury, adding this for alpha to fix tests onlyS
+  await treasury.initialize(admin, floatToken.address, floatToken.address, {
+    from: admin,
+  });
+
+  await longShort.initialize(admin, tokenFactory.address, staker.address, {
+    from: admin,
+  });
 
   await staker.initialize(
     admin,
     longShort.address,
     floatToken.address,
-    /// Using the float capital address for the 
+    /// Using the float capital address for the
     floatCapital.address,
     floatCapital.address,
     "250000000000000000", // 25%
