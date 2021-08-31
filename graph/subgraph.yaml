@@ -104,6 +104,8 @@ dataSources:
           handler: handleStakeWithdrawn
         - event: StakerV1(address,address,address,address,uint256)
           handler: handleStakerV1
+        - event: NextPriceStakeShift(address,uint32,uint256,bool,uint256)
+          handler: handleNextPriceStakeShift
       file: ./src/mappings/staker.ts
 
 templates:

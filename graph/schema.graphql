@@ -248,6 +248,8 @@ type User @entity {
   pendingNextPriceActions: [UserNextPriceAction!]!
   confirmedNextPriceActions: [UserNextPriceAction!]!
   settledNextPriceActions: [UserNextPriceAction!]!
+  pendingNextPriceStakeActions: [UserNextPriceStakeAction!]!
+  settledNextPriceStakeActions: [UserNextPriceStakeAction!]!
 }
 
 type UserSyntheticTokenBalance @entity {
@@ -273,6 +275,34 @@ type CurrentStake @entity {
   syntheticMarket: SyntheticMarket!
   currentStake: Stake!
   lastMintState: AccumulativeFloatIssuanceSnapshot!
+}
+
+type BatchedNextPriceStakeAction @entity {
+  id: ID! # marketIndex-updateIndex
+  updateIndex: BigInt!
+  marketIndex: BigInt!
+  linkedUserNextPriceStakeActions: [UserNextPriceStakeAction!]!
+}
+
+type UserCurrentNextPriceStakeAction
+  @entity { # to-do: make consistent
+  id: ID! #userAddress-marketIndex
+  marketIndex: BigInt!
+  currentAction: UserNextPriceStakeAction!
+  user: User!
+}
+# TODL: add component - for tx history / finer-grained ui stuff
+
+type UserNextPriceStakeAction @entity {
+  id: ID! # userAddress-marketIndex-updateIndex
+  marketIndex: BigInt!
+  updateIndex: BigInt!
+  user: User!
+  amountStakeForShiftFromLong: BigInt!
+  amountStakeForShiftFromShort: BigInt!
+  settledTimestamp: BigInt! # note: like mints, confirmed == settled from user's perspective.
+  settled: Boolean!
+  floatMintedPastSettled: Boolean!
 }
 
 type Stake @entity {

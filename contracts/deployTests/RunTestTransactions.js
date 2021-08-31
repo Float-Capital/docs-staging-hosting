@@ -3,12 +3,14 @@
 
 var LetOps = require("../test-waffle/library/LetOps.js");
 var Globals = require("../test-waffle/library/Globals.js");
+var CONSTANTS = require("../test-waffle/CONSTANTS.js");
 var DeployHelpers = require("./DeployHelpers.js");
 
 function runTestTransactions(param) {
   var treasury = param.treasury;
   var paymentToken = param.paymentToken;
   var longShort = param.longShort;
+  var staker = param.staker;
   return LetOps.Await.let_(ethers.getSigners(), (function (loadedAccounts) {
                 var admin = loadedAccounts[1];
                 var user1 = loadedAccounts[2];
@@ -65,7 +67,14 @@ function runTestTransactions(param) {
                                                                                                                                                                                                                         return DeployHelpers.stakeSynthLong(longStakeAmount, longShort, __x, user1);
                                                                                                                                                                                                                       })), (function (param) {
                                                                                                                                                                                                                     return LetOps.AwaitThen.let_(priceAndStateUpdate(undefined), (function (param) {
-                                                                                                                                                                                                                                  return Promise.resolve(undefined);
+                                                                                                                                                                                                                                  console.log("Shifting stake");
+                                                                                                                                                                                                                                  return LetOps.AwaitThen.let_(DeployHelpers.executeOnMarkets(initialMarkets, (function (marketIndex) {
+                                                                                                                                                                                                                                                    return staker.shiftTokens(longStakeAmount.div(CONSTANTS.twoBn), marketIndex, true);
+                                                                                                                                                                                                                                                  })), (function (param) {
+                                                                                                                                                                                                                                                return LetOps.AwaitThen.let_(priceAndStateUpdate(undefined), (function (param) {
+                                                                                                                                                                                                                                                              return Promise.resolve(undefined);
+                                                                                                                                                                                                                                                            }));
+                                                                                                                                                                                                                                              }));
                                                                                                                                                                                                                                 }));
                                                                                                                                                                                                                   }));
                                                                                                                                                                                                     }));

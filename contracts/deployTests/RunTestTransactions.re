@@ -10,7 +10,7 @@ type allContracts = {
   syntheticToken: SyntheticToken.t,
 };
 
-let runTestTransactions = ({longShort, treasury, paymentToken}) => {
+let runTestTransactions = ({longShort, treasury, paymentToken, staker}) => {
   let%Await loadedAccounts = Ethers.getSigners();
 
   let admin = loadedAccounts->Array.getUnsafe(1);
@@ -157,6 +157,14 @@ let runTestTransactions = ({longShort, treasury, paymentToken}) => {
     );
 
   let%AwaitThen _ = priceAndStateUpdate();
+
+  Js.log("Shifting stake");
+  let%AwaitThen _ = executeOnMarkets(initialMarkets, (marketIndex) => {
+    staker->Staker.shiftTokens(~amountSyntheticTokensToShift=longStakeAmount->Ethers.BigNumber.div(CONSTANTS.twoBn), ~marketIndex, ~isShiftFromLong=true);
+  })
+
+  let%AwaitThen _ = priceAndStateUpdate();
+
 
   JsPromise.resolve();
 };

@@ -7,6 +7,7 @@ import {
   MarketLaunchIncentiveParametersChanges,
   MarketAddedToStaker,
   StakeWithdrawalFeeUpdated,
+  NextPriceStakeShift,
   FloatPercentageUpdated,
   BalanceIncentiveParamsUpdated,
 } from "../../generated/Staker/Staker";
@@ -18,6 +19,7 @@ import {
   CurrentStake,
   Stake,
   AccumulativeFloatIssuanceSnapshot,
+  BatchedStakerNextPriceAction,
 } from "../../generated/schema";
 import {
   log,
@@ -29,7 +31,7 @@ import {
   bigIntArrayToStringArray,
   saveEventToStateChange,
 } from "../utils/txEventHelpers";
-import { getOrCreateUser } from "../utils/globalStateManager";
+import { getOrCreateUser, getUser } from "../utils/globalStateManager";
 import {
   generateAccumulativeFloatIssuanceSnapshotId,
   getOrInitializeAccumulativeFloatIssuanceSnapshot,
@@ -40,7 +42,13 @@ import {
   getStake,
   getOrInitializeCurrentStake,
   getOrInitializeStake,
+  getOrInitializeBatchedStakerNextPriceAction,
+  getOrInitializeUserCurrentNextPriceStakeAction,
+  getOrInitializeUserNextPriceStakeAction,
+  getBatchedNextPriceStakeAction,
+  getUserNextPriceStakeAction,
 } from "../generated/EntityHelpers";
+import { removeFromArrayAtIndex } from "./longShort";
 
 import {
   ZERO,
@@ -121,6 +129,35 @@ export function handleMarketAddedToStaker(event: MarketAddedToStaker): void {
     [],
     []
   );
+}
+
+function initializeCurrentStake(
+  currentStake,
+  syntheticToken,
+  userAddress,
+  marketIndex,
+  accumulativeFloatIssuanceSnapshotId,
+  txHash,
+  timestamp,
+  blockNumber
+) {
+  currentStake.syntheticToken = syntheticToken;
+  currentStake.user = userAddress.toHex();
+  currentStake.userAddress = userAddress;
+  currentStake.syntheticMarket = marketIndex.toString();
+  currentStake.lastMintState = accumulativeFloatIssuanceSnapshotId;
+
+  let stake = new Stake(txHash.toHex());
+  stake.timestamp = timestamp;
+  stake.blockNumber = blockNumber;
+  stake.creationTxHash = txHash;
+  stake.syntheticToken = syntheticToken;
+  stake.amount = ZERO;
+  stake.user = userAddress.toHex();
+  stake.withdrawn = true;
+  stake.save();
+
+  currentStake.stake = txHash.toHex();
 }
 
 export function handleAccumulativeIssuancePerStakedSynthSnapshotCreated(
@@ -210,6 +247,82 @@ export function handleAccumulativeIssuancePerStakedSynthSnapshotCreated(
       state.floatRatePerTokenOverIntervalShort = changeInAccumulativeFloatPerSecondShort.div(
         timeElapsedSinceLastStateChange
       );
+    }
+  }
+
+  // rather do this in _updateSystemState handler
+
+  let batchedNextPriceStakerShifts = getBatchedNextPriceStakeAction(
+    marketIndex.toString() +
+      "-" +
+      accumulativeFloatIssuanceSnapshotIndex.toString()
+  );
+  if (batchedNextPriceStakerShifts != null) {
+    let linkedNextPriceStakerActions =
+      batchedNextPriceStakerShifts.linkedUserNextPriceStakeActions;
+    for (let i = 0; i < linkedNextPriceStakerActions.length; i++) {
+      let userNextPriceActionId: string = linkedNextPriceStakerActions[i];
+
+      let userNextPriceAction = getUserNextPriceStakeAction(
+        userNextPriceActionId
+      );
+      userNextPriceAction.settledTimestamp = event.block.timestamp;
+      userNextPriceAction.settled = true;
+      userNextPriceAction.save();
+
+      let userAddress = Address.fromString(userNextPriceAction.user);
+      let user = getUser(userAddress);
+
+      user.pendingNextPriceStakeActions = removeFromArrayAtIndex(
+        user.pendingNextPriceStakeActions,
+        user.pendingNextPriceStakeActions.indexOf(userNextPriceActionId)
+      );
+
+      user.settledNextPriceStakeActions = user.settledNextPriceStakeActions.concat(
+        [userNextPriceActionId]
+      );
+
+      let currentStakeLongFetch = getOrInitializeCurrentStake(
+        syntheticMarket.syntheticLong + "-" + user.id
+      );
+      let currentStakeLong = currentStakeLongFetch.entity;
+      if (currentStakeLongFetch.wasCreated) {
+        initializeCurrentStake(
+          currentStakeLong,
+          syntheticMarket.syntheticLong,
+          user.address,
+          marketIndex,
+          accumulativeFloatIssuanceSnapshotId,
+          txHash,
+          timestamp,
+          blockNumber
+        );
+      }
+      let currentStakeShortFetch = getOrInitializeCurrentStake(
+        syntheticMarket.syntheticShort + "-" + user.id
+      );
+      let currentStakeShort = currentStakeShortFetch.entity;
+      if (currentStakeShortFetch.wasCreated) {
+        initializeCurrentStake(
+          currentStakeShort,
+          syntheticMarket.syntheticShort,
+          user.address,
+          marketIndex,
+          accumulativeFloatIssuanceSnapshotId,
+          txHash,
+          timestamp,
+          blockNumber
+        );
+      }
+
+      let deltaLong = ZERO.minus(
+        userNextPriceAction.amountStakeForShiftFromLong
+      );
+      let deltaShort = ZERO.minus(
+        userNextPriceAction.amountStakeForShiftFromShort
+      );
+
+      let shortStake = getStake(currentStakeShort.currentStake);
     }
   }
 
@@ -465,7 +578,7 @@ function calculateAccumulatedFloatAndExecuteOutstandingShifts(
     );
     let amountStakedShort = shortStake.amount;
 
-    if (amountStakedShort.gt(ZERO)) {
+    if (amountStakedShort.gt(ZERO) && !shortStake.withdrawn) {
       let accumDeltaShort = lastMarketMintState.accumulativeFloatPerTokenShort.minus(
         lastUserMintState.accumulativeFloatPerTokenShort
       );
@@ -641,6 +754,89 @@ export function handleStakeWithdrawalFeeUpdate(
     ["marketIndex", "stakeWithdralFee"],
     ["uint32", "uint256"],
     [],
+    []
+  );
+}
+
+export function handleNextPriceStakeShift(event: NextPriceStakeShift): void {
+  let user = event.params.user;
+  let userAddressStr = user.toHex();
+  let marketIndex = event.params.marketIndex;
+  let marketIndexStr = marketIndex.toString();
+  let isShiftFromLong = event.params.isShiftFromLong;
+  let amount = event.params.amount;
+  let userShiftIndex = event.params.userShiftIndex;
+  let userShiftIndexStr = userShiftIndex.toString();
+
+  let userNextPriceStakeActionId =
+    userAddressStr + "-" + marketIndex + "-" + userShiftIndexStr;
+  let userNextPriceStakeActionRetrieval = getOrInitializeUserNextPriceStakeAction(
+    userNextPriceStakeActionId
+  );
+
+  let userNextPriceStakeAction = userNextPriceStakeActionRetrieval.entity;
+
+  if (userNextPriceStakeActionRetrieval.wasCreated) {
+    userNextPriceStakeAction.user = userAddressStr;
+    userNextPriceStakeAction.marketIndex = marketIndex;
+    userNextPriceStakeAction.updateIndex = userShiftIndex;
+
+    let batchedStakeRetrieval = getOrInitializeBatchedStakerNextPriceAction(
+      marketIndexStr + "-" + userShiftIndexStr
+    );
+    let batchedStake = batchedStakeRetrieval.entity;
+    if (batchedStakeRetrieval.wasCreated) {
+      batchedStake.marketIndex = marketIndex;
+      batchedStake.updateIndex = userShiftIndex;
+    }
+    batchedStake.linkedUserNextPriceStakeActions = batchedStake.linkedUserNextPriceStakeActions.concat(
+      [userNextPriceStakeActionId]
+    );
+    batchedStake.save();
+
+    let userCurrentStakeActionRetrieval = getOrInitializeUserCurrentNextPriceStakeAction(
+      userAddressStr + "-" + marketIndexStr
+    );
+    let userCurrentStakeAction = userCurrentStakeActionRetrieval.entity;
+    if (userCurrentStakeActionRetrieval.wasCreated) {
+      userCurrentStakeAction.user = userAddressStr;
+      userCurrentStakeAction.marketIndex = marketIndex;
+    }
+    userCurrentStakeAction.currentAction = userNextPriceStakeActionId;
+    userCurrentStakeAction.save();
+
+    let userObj = getOrCreateUser(user, event);
+    userObj.pendingNextPriceStakeActions = userObj.pendingNextPriceStakeActions.concat(
+      [userNextPriceStakeActionId]
+    );
+    userObj.save();
+  }
+
+  if (isShiftFromLong) {
+    userNextPriceStakeAction.amountStakeForShiftFromLong = userNextPriceStakeAction.amountStakeForShiftFromLong.plus(
+      amount
+    );
+  } else {
+    userNextPriceStakeAction.amountStakeForShiftFromShort = userNextPriceStakeAction.amountStakeForShiftFromShort.plus(
+      amount
+    );
+  }
+
+  userNextPriceStakeAction.save();
+
+  saveEventToStateChange(
+    event,
+    "NextPriceStakeShift",
+    [
+      userAddressStr,
+      marketIndexStr,
+      amount.toString(),
+      isShiftFromLong ? "true" : "false",
+      userShiftIndexStr,
+    ],
+    ["user", "marketIndex", "amount", "isShiftFromLong", "userShiftIndex"],
+    ["address", "uint32", "uint256", "bool", "uint256"],
+    [user],
     []
   );
 }
