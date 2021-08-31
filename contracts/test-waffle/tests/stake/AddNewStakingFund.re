@@ -1,12 +1,11 @@
 open Globals;
 open LetOps;
-open StakerHelpers;
 open Mocha;
 open SmockGeneral;
 
 let test =
     (
-      ~contracts: ref(Helpers.coreContracts),
+      ~contracts: ref(Helpers.stakerUnitTestContracts),
       ~accounts: ref(array(Ethers.Wallet.t)),
     ) => {
   describe("addNewStakingFund", () => {
@@ -25,11 +24,10 @@ let test =
 
     before_once'(() => {
       let%Await _ =
-        deployAndSetupStakerToUnitTest(
-          ~functionName="addNewStakingFund",
-          ~contracts,
-          ~accounts,
-        );
+        contracts^.staker
+        ->StakerSmocked.InternalMock.setupFunctionForUnitTesting(
+            ~functionName="addNewStakingFund",
+          );
 
       let longShortAddress = (accounts^)->Array.getUnsafe(5);
       let%AwaitThen _ =

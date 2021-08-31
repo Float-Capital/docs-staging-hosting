@@ -241,17 +241,19 @@ type stakerUnitTestContracts = {
   longShortSmocked: LongShortSmocked.t,
   floatTokenSmocked: FloatTokenSmocked.t,
   syntheticTokenSmocked: SyntheticTokenSmocked.t,
+  floatCapitalSmocked: FloatCapital_v0.t,
 }
 
 let initializeStakerUnit = () => {
-  JsPromise.all4((
+  JsPromise.all5((
     Staker.Exposed.makeSmock()->JsPromise.then(staker => {
       staker->StakerSmocked.InternalMock.setup->JsPromise.map(_ => staker)
     }),
     LongShortSmocked.make(),
     FloatTokenSmocked.make(),
     SyntheticTokenSmocked.make(),
-  ))->JsPromise.then(((staker, longShortSmocked, floatTokenSmocked, syntheticTokenSmocked)) =>
+   FloatCapital_v0.make(),
+  ))->JsPromise.then(((staker, longShortSmocked, floatTokenSmocked, syntheticTokenSmocked, floatCapitalSmocked)) =>
     staker
     ->Staker.setVariable(~name="longShort", ~value=longShortSmocked.address)
     ->JsPromise.map(_ => {
@@ -259,6 +261,7 @@ let initializeStakerUnit = () => {
       longShortSmocked: longShortSmocked,
       floatTokenSmocked: floatTokenSmocked,
       syntheticTokenSmocked: syntheticTokenSmocked,
+      floatCapitalSmocked: floatCapitalSmocked
     })
   )
 }

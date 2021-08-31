@@ -306,14 +306,21 @@ let testUnit =
         let adminWallet = accounts.contents->Array.getUnsafe(0);
         let newExponent = bnFromInt(4);
 
+        let {staker, longShortSmocked} = contracts.contents;
+
         let _ =
-          contracts.contents.longShortSmocked
-          ->LongShortSmocked.mockMarketSideValueInPaymentTokenToReturn(
-              CONSTANTS.tenToThe18,
-            );
+          longShortSmocked->LongShortSmocked.mockMarketSideValueInPaymentTokenToReturn(
+            CONSTANTS.tenToThe18,
+          );
 
         let%Await _ =
-          contracts.contents.staker
+          staker->Staker.setVariable(
+            ~name="longShort",
+            ~value=longShortSmocked.address,
+          );
+
+        let%Await _ =
+          staker
           ->ContractHelpers.connect(~address=adminWallet)
           ->Staker.Exposed._changeBalanceIncentiveParametersExposed(
               ~marketIndex,
@@ -323,8 +330,7 @@ let testUnit =
             );
 
         let%Await exponentAfterCall =
-          contracts.contents.staker
-          ->Staker.Exposed.balanceIncentiveCurve_exponent(marketIndex);
+          staker->Staker.Exposed.balanceIncentiveCurve_exponent(marketIndex);
 
         Chai.bnEqual(exponentAfterCall, newExponent);
       });

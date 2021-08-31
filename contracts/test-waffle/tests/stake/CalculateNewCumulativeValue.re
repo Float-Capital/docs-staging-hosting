@@ -1,13 +1,12 @@
 open LetOps;
-open StakerHelpers;
 open Mocha;
 
 open Globals;
 
 let test =
     (
-      ~contracts: ref(Helpers.coreContracts),
-      ~accounts: ref(array(Ethers.Wallet.t)),
+      ~contracts: ref(Helpers.stakerUnitTestContracts),
+      ~accounts as _: ref(array(Ethers.Wallet.t)),
     ) => {
   let marketIndex = Helpers.randomJsInteger();
 
@@ -32,14 +31,12 @@ let test =
       ) =
       ref(None->Obj.magic);
     before_once'(() => {
-      let%AwaitThen _ =
-        deployAndSetupStakerToUnitTest(
-          ~functionName="calculateNewCumulativeValue",
-          ~contracts,
-          ~accounts,
-        );
+      let {staker} = contracts.contents;
 
-      let {staker} = contracts^;
+      let%AwaitThen _ =
+        staker->StakerSmocked.InternalMock.setupFunctionForUnitTesting(
+          ~functionName="calculateNewCumulativeValue",
+        );
 
       StakerSmocked.InternalMock.mock_calculateFloatPerSecondToReturn(
         longFloatPerSecond,

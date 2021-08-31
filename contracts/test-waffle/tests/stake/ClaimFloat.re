@@ -1,6 +1,5 @@
 open Globals;
 open LetOps;
-open StakerHelpers;
 open Mocha;
 open SmockGeneral;
 
@@ -30,7 +29,7 @@ let iterativeMockCalculateAccumulatedFloatToReturn:
 
 let test =
     (
-      ~contracts: ref(Helpers.coreContracts),
+      ~contracts: ref(Helpers.stakerUnitTestContracts),
       ~accounts: ref(array(Ethers.Wallet.t)),
     ) => {
   describe("_mintAccumulatedFloatAndExecuteOutstandingShiftsMulti", () => {
@@ -57,12 +56,12 @@ let test =
 
     let setup =
         (~marketIndices, ~latestRewardIndices, ~floatRewardsForMarkets) => {
+      let {staker} = contracts.contents;
+
       let%Await _ =
-        deployAndSetupStakerToUnitTest(
+        staker->StakerSmocked.InternalMock.setupFunctionForUnitTesting(
           ~functionName=
             "_mintAccumulatedFloatAndExecuteOutstandingShiftsMulti",
-          ~contracts,
-          ~accounts,
         );
 
       userWalletRef := accounts.contents->Array.getUnsafe(5);
