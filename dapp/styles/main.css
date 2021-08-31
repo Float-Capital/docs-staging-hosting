@@ -9,7 +9,6 @@ html {
   scroll-behavior: smooth;
 }
 
-
 @import url("https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap");
 
 .shine {
@@ -22,7 +21,6 @@ html {
   background-size: 400% 100% !important;
   animation: placeholder-active 1.15s ease;
 }
-
 
 @keyframes placeholder-active {
   0% {
@@ -56,16 +54,16 @@ html {
   @apply font-default min-h-screen w-screen bg-right-top bg-cover bg-gray-50;
 }
 
-.fighter-blue {
-  background: url("/backgrounds/fighter-right.gif"),
+.electric-lines {
+  background: url("/backgrounds/electric-lines.png"),
     linear-gradient(
       to bottom left,
       rgba(86, 136, 241, 0.2),
       rgba(62, 77, 167, 0.6)
     );
-  background-position: right bottom;
-  @apply font-default min-h-screen bg-right-bottom w-screen bg-cover;
+  @apply font-default min-h-screen bg-left-bottom w-screen bg-cover;
 }
+
 .ballot-box {
   background: linear-gradient(
       to bottom left,
