@@ -4,7 +4,7 @@ open Helpers;
 
 let testUnit =
     (
-      ~contracts: ref(Helpers.coreContracts),
+      ~contracts: ref(Helpers.longShortUnitTestContracts),
       ~accounts as _: ref(array(Ethers.Wallet.t)),
     ) => {
   describe("_getSyntheticTokenPrice", () => {

@@ -4,7 +4,7 @@ open Globals;
 
 let testUnit =
     (
-      ~contracts: ref(Helpers.coreContracts),
+      ~contracts: ref(Helpers.longShortUnitTestContracts),
       ~accounts as _: ref(array(Ethers.Wallet.t)),
     ) => {
   describe("getUsersConfirmedButNotSettledSynthBalance", () => {
