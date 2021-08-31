@@ -15,3 +15,6 @@ external getMockContractFactory: string => JsPromise.t<'a> = "mock"
 @send
 external setVariableRaw: ('smockedContract, ~name: string, ~value: 'a) => JsPromise.t<unit> =
   "setVariable"
+
+@send
+external reset: 'smartContractFunction => unit = "reset"

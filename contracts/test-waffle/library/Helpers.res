@@ -241,17 +241,19 @@ type stakerUnitTestContracts = {
   longShortSmocked: LongShortSmocked.t,
   floatTokenSmocked: FloatTokenSmocked.t,
   syntheticTokenSmocked: SyntheticTokenSmocked.t,
+  floatCapitalSmocked: FloatCapital_v0.t,
 }
 
 let initializeStakerUnit = () => {
-  JsPromise.all4((
+  JsPromise.all5((
     Staker.Exposed.makeSmock()->JsPromise.then(staker => {
       staker->StakerSmocked.InternalMock.setup->JsPromise.map(_ => staker)
     }),
     LongShortSmocked.make(),
     FloatTokenSmocked.make(),
     SyntheticTokenSmocked.make(),
-  ))->JsPromise.then(((staker, longShortSmocked, floatTokenSmocked, syntheticTokenSmocked)) =>
+   FloatCapital_v0.make(),
+  ))->JsPromise.then(((staker, longShortSmocked, floatTokenSmocked, syntheticTokenSmocked, floatCapitalSmocked)) =>
     staker
     ->Staker.setVariable(~name="longShort", ~value=longShortSmocked.address)
     ->JsPromise.map(_ => {
@@ -259,6 +261,7 @@ let initializeStakerUnit = () => {
       longShortSmocked: longShortSmocked,
       floatTokenSmocked: floatTokenSmocked,
       syntheticTokenSmocked: syntheticTokenSmocked,
+      floatCapitalSmocked: floatCapitalSmocked
     })
   )
 }
@@ -267,7 +270,8 @@ type longShortUnitTestContracts = {
   longShort: LongShort.t,
   stakerSmocked: StakerSmocked.t,
   floatTokenSmocked: FloatTokenSmocked.t,
-  syntheticTokenSmocked: SyntheticTokenSmocked.t,
+  syntheticToken1Smocked: SyntheticTokenSmocked.t,
+  syntheticToken2Smocked: SyntheticTokenSmocked.t,
   tokenFactorySmocked: TokenFactorySmocked.t,
   yieldManagerSmocked: YieldManagerAaveSmocked.t,
   oracleManagerSmocked: OracleManagerMockSmocked.t,
@@ -293,12 +297,13 @@ let deployAYieldManager = (~longShort: Ethers.ethAddress, ~lendingPoolAddressesP
 }
 
 let initializeLongShortUnit = () => {
-  JsPromise.all7((
+  JsPromise.all8((
     LongShort.Exposed.makeSmock()->JsPromise.then(staker => {
       staker->LongShortSmocked.InternalMock.setup->JsPromise.map(_ => staker)
     }),
     StakerSmocked.make(),
     FloatTokenSmocked.make(),
+    SyntheticTokenSmocked.make(),
     SyntheticTokenSmocked.make(),
     TokenFactorySmocked.make(),
     YieldManagerAaveSmocked.make(),
@@ -307,7 +312,8 @@ let initializeLongShortUnit = () => {
     longShort,
     stakerSmocked,
     floatTokenSmocked,
-    syntheticTokenSmocked,
+    syntheticToken1Smocked,
+    syntheticToken2Smocked,
     tokenFactorySmocked,
     yieldManagerSmocked,
     oracleManagerSmocked,
@@ -318,7 +324,8 @@ let initializeLongShortUnit = () => {
       floatTokenSmocked: floatTokenSmocked,
       yieldManagerSmocked: yieldManagerSmocked,
       oracleManagerSmocked: oracleManagerSmocked,
-      syntheticTokenSmocked: syntheticTokenSmocked,
+      syntheticToken1Smocked: syntheticToken1Smocked,
+      syntheticToken2Smocked: syntheticToken2Smocked,
       tokenFactorySmocked: tokenFactorySmocked,
     }
   })

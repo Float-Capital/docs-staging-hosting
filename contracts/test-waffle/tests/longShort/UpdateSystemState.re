@@ -11,7 +11,7 @@ let randomValueChange = tokenAmount => {
 
 let testUnit =
     (
-      ~contracts: ref(Helpers.coreContracts),
+      ~contracts: ref(Helpers.longShortUnitTestContracts),
       ~accounts as _: ref(array(Ethers.Wallet.t)),
     ) => {
   describeUnit("updateSystemState", () => {

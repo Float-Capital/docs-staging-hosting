@@ -25,7 +25,7 @@ let testUnit =
     let setup = (~newAssetPrice) => {
       let%AwaitThen _ =
         contracts.contents.longShort
-        ->LongShort.Exposed.setAssetPrice(
+        ->LongShortStateSetters.setAssetPrice(
             ~marketIndex,
             ~assetPrice=oldAssetPrice,
           );

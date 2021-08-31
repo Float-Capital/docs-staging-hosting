@@ -144,21 +144,19 @@ let testIntegration =
 
 let testUnit =
     (
-      ~contracts: ref(Helpers.coreContracts),
+      ~contracts: ref(Helpers.longShortUnitTestContracts),
       ~accounts: ref(array(Ethers.Wallet.t)),
     ) => {
   describe("redeemNextPrice external functions", () => {
     let marketIndex = 1;
     let tokens_redeem = Helpers.randomTokenAmount();
 
-    let setup = () => {
-      contracts.contents.longShort->LongShortSmocked.InternalMock.setup;
-    };
+    before_once'(() =>
+      contracts.contents.longShort->LongShortSmocked.InternalMock.setup
+    );
 
     describe("redeemLongNextPrice", () => {
       it("calls _redeemNextPrice with isLong==true", () => {
-        let%Await _ = setup();
-
         let%Await _ =
           contracts.contents.longShort
           ->LongShortSmocked.InternalMock.setupFunctionForUnitTesting(
@@ -179,8 +177,6 @@ let testUnit =
 
     describe("redeemShortNextPrice", () => {
       it("calls _redeemNextPrice with isLong==false", () => {
-        let%Await _ = setup();
-
         let%Await _ =
           contracts.contents.longShort
           ->LongShortSmocked.InternalMock.setupFunctionForUnitTesting(
@@ -205,46 +201,51 @@ let testUnit =
     let marketUpdateIndex = Helpers.randomInteger();
     let amount = Helpers.randomTokenAmount();
     let smockedSyntheticToken = ref(SyntheticTokenSmocked.uninitializedValue);
-
-    let setup = (~isLong, ~testWallet: Ethers.walletType) => {
-      let%AwaitThen longSynthSmocked = SyntheticTokenSmocked.make();
-      longSynthSmocked->SyntheticTokenSmocked.mockTransferFromToReturn(true);
-      smockedSyntheticToken := longSynthSmocked;
-
-      let%AwaitThen _ =
-        contracts.contents.longShort->LongShortSmocked.InternalMock.setup;
-
-      let%AwaitThen _ =
-        contracts.contents.longShort
-        ->LongShortSmocked.InternalMock.setupFunctionForUnitTesting(
-            ~functionName="_redeemNextPrice",
-          );
-
-      let%AwaitThen _ =
-        contracts.contents.longShort
-        ->LongShort.Exposed.setRedeemNextPriceGlobals(
-            ~marketIndex,
-            ~marketUpdateIndex,
-            ~syntheticToken=longSynthSmocked.address,
-            ~isLong,
-          );
-
-      let longShort =
-        contracts.contents.longShort
-        ->ContractHelpers.connect(~address=testWallet);
-
-      longShort->LongShort.Exposed._redeemNextPriceExposed(
-        ~marketIndex,
-        ~tokens_redeem=amount,
-        ~isLong,
-      );
-    };
+    let redeemNextPriceExposedTxRef = ref("Not defined yet"->Obj.magic);
 
     let testMarketSide = (~isLong) => {
-      it("calls the executeOutstandingNextPriceSettlements modifier", () => {
+      before_once'(() => {
         let testWallet = accounts.contents->Array.getUnsafe(1);
 
-        let%Await _ = setup(~isLong, ~testWallet);
+        let%AwaitThen longSynthSmocked = SyntheticTokenSmocked.make();
+        longSynthSmocked->SyntheticTokenSmocked.mockTransferFromToReturn(
+          true,
+        );
+        smockedSyntheticToken := longSynthSmocked;
+
+        let%AwaitThen _ =
+          contracts.contents.longShort->LongShortSmocked.InternalMock.setup;
+
+        let%AwaitThen _ =
+          contracts.contents.longShort
+          ->LongShortSmocked.InternalMock.setupFunctionForUnitTesting(
+              ~functionName="_redeemNextPrice",
+            );
+
+        let%AwaitThen _ =
+          contracts.contents.longShort
+          ->LongShort.Exposed.setRedeemNextPriceGlobals(
+              ~marketIndex,
+              ~marketUpdateIndex,
+              ~syntheticToken=longSynthSmocked.address,
+              ~isLong,
+            );
+
+        let longShort =
+          contracts.contents.longShort
+          ->ContractHelpers.connect(~address=testWallet);
+
+        redeemNextPriceExposedTxRef :=
+          longShort->LongShort.Exposed._redeemNextPriceExposed(
+            ~marketIndex,
+            ~tokens_redeem=amount,
+            ~isLong,
+          );
+        redeemNextPriceExposedTxRef.contents;
+      });
+
+      it("calls the executeOutstandingNextPriceSettlements modifier", () => {
+        let testWallet = accounts.contents->Array.getUnsafe(1);
 
         LongShortSmocked.InternalMock._executeOutstandingNextPriceSettlementsCallCheck({
           user: testWallet.address,
@@ -256,7 +257,7 @@ let testUnit =
         let testWallet = accounts.contents->Array.getUnsafe(1);
 
         Chai.callEmitEvents(
-          ~call=setup(~isLong, ~testWallet),
+          ~call=redeemNextPriceExposedTxRef.contents,
           ~eventName="NextPriceRedeem",
           ~contract=contracts.contents.longShort->Obj.magic,
         )
@@ -274,8 +275,6 @@ let testUnit =
         () => {
         let testWallet = accounts.contents->Array.getUnsafe(1);
 
-        let%Await _ = setup(~isLong, ~testWallet);
-
         smockedSyntheticToken.contents
         ->SyntheticTokenSmocked.transferFromCallCheck({
             sender: testWallet.address,
@@ -286,8 +285,6 @@ let testUnit =
 
       it("updates the correct state variables with correct values", () => {
         let testWallet = accounts.contents->Array.getUnsafe(1);
-
-        let%AwaitThen _ = setup(~isLong, ~testWallet);
 
         let%AwaitThen updatedbatched_amountSyntheticToken_redeem =
           contracts.contents.longShort

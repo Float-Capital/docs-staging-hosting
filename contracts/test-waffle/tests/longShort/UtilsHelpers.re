@@ -4,10 +4,11 @@ open LetOps;
 
 let testUnit =
     (
-      ~contracts: ref(Helpers.coreContracts),
+      ~contracts: ref(Helpers.longShortUnitTestContracts),
       ~accounts as _: ref(array(Ethers.Wallet.t)),
     ) => {
-  describeUnit("Long Short Utilities and helpers", () => {
+  describe("Long Short Utilities and helpers", () => {
+    // describeUnit("Long Short Utilities and helpers", () => {
     describe("_getMin(a,b)", () => {
       it("returns `a` when `a < b`", () => {
         let a = Js.Math.random_int(0, Js.Int.max - 1);

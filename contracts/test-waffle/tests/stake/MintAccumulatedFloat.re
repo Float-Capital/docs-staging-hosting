@@ -1,13 +1,12 @@
 open Globals;
 open LetOps;
-open StakerHelpers;
 open Mocha;
 open SmockGeneral;
 
 let test =
     (
-      ~contracts: ref(Helpers.coreContracts),
-      ~accounts: ref(array(Ethers.Wallet.t)),
+      ~contracts: ref(Helpers.stakerUnitTestContracts),
+      ~accounts as _: ref(array(Ethers.Wallet.t)),
     ) => {
   describe("mintAccumulatedFloat", () => {
     let marketIndex = Helpers.randomJsInteger();
@@ -21,11 +20,11 @@ let test =
       ref(None->Obj.magic);
 
     let setup = (~floatToMintLong, ~floatToMintShort) => {
+      let {staker} = contracts.contents;
+
       let%AwaitThen _ =
-        deployAndSetupStakerToUnitTest(
+        staker->StakerSmocked.InternalMock.setupFunctionForUnitTesting(
           ~functionName="mintAccumulatedFloat",
-          ~contracts,
-          ~accounts,
         );
 
       StakerSmocked.InternalMock.mock_calculateAccumulatedFloatAndExecuteOutstandingShiftsToReturn(
@@ -33,11 +32,10 @@ let test =
       );
 
       let%AwaitThen _ =
-        contracts^.staker
-        ->Staker.Exposed.setMintAccumulatedFloatAndClaimFloatParams(
-            ~marketIndex,
-            ~latestRewardIndexForMarket,
-          );
+        staker->Staker.Exposed.setMintAccumulatedFloatAndClaimFloatParams(
+          ~marketIndex,
+          ~latestRewardIndexForMarket,
+        );
 
       promiseRef :=
         contracts^.staker
@@ -90,12 +88,20 @@ let test =
     });
 
     describe("case floatToMint == 0", () => {
-      before_once'(() =>
+      before_once'(() => {
+        let {staker} = contracts.contents;
+        let%Await _ =
+          staker->StakerStakeSetters.setUserIndexOfLastClaimedReward(
+            ~marketIndex,
+            ~user,
+            ~rewardIndex=zeroBn,
+          );
+
         setup(
           ~floatToMintLong=CONSTANTS.zeroBn,
           ~floatToMintShort=CONSTANTS.zeroBn,
-        )
-      );
+        );
+      });
 
       it("calls calculateAccumulatedFloat with correct arguments", () =>
         StakerSmocked.InternalMock._calculateAccumulatedFloatAndExecuteOutstandingShiftsCallCheck({
@@ -113,7 +119,7 @@ let test =
         let%Await lastClaimed =
           contracts^.staker
           ->Staker.userIndexOfLastClaimedReward(marketIndex, user);
-        lastClaimed->Chai.bnEqual(CONSTANTS.zeroBn); // bit hacky but won't have been set yet
+        lastClaimed->Chai.bnEqual(zeroBn);
       });
 
       it("doesn't emit FloatMinted event", () => {
