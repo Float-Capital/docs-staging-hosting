@@ -855,7 +855,7 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
 
     userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[marketIndex][isShiftFromLong][
       msg.sender
-    ] += totalAmountForNextShift;
+    ] = totalAmountForNextShift;
 
     uint256 userRewardIndex = latestRewardIndex[marketIndex] + 1;
     userNextPrice_stakedSyntheticTokenShiftIndex[marketIndex][msg.sender] = userRewardIndex;
