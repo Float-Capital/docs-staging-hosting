@@ -1,18 +1,23 @@
+const { network } = require("hardhat");
 const {
   STAKER,
   COLLATERAL_TOKEN,
   TREASURY,
+  TREASURY_ALPHA,
   LONGSHORT,
   FLOAT_TOKEN,
+  FLOAT_TOKEN_ALPHA,
   TOKEN_FACTORY,
   FLOAT_CAPITAL,
+  isAlphaLaunch
 } = require("../helper-hardhat-config");
+const mumbaiDaiAddress = "0x001B3B4d0F3714Ca98ba10F6042DaEbF0B1B7b6F";
 
 module.exports = async ({ getNamedAccounts, deployments }) => {
   const { deploy } = deployments;
   const { deployer, admin } = await getNamedAccounts();
 
-  let paymentToken;
+  let paymentTokenAddress;
 
   if (network.name != "mumbai") {
     console.log(network.name);
@@ -22,18 +27,34 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
       args: ["dai token", "DAI"],
     });
     console.log("dai address", paymentToken.address);
+    paymentTokenAddress = paymentToken.address;
+  } else if (network.name === "mumbai") {
+    paymentTokenAddress = mumbaiDaiAddress;
+  } else {
+    throw new Error(`network ${network.name} un-accounted for`)
   }
 
   console.log("Deploying contracts with the account:", deployer);
   console.log("Admin Account:", admin);
 
-  await deploy(TREASURY, {
+  const floatTokenToUse = isAlphaLaunch ? FLOAT_TOKEN_ALPHA : FLOAT_TOKEN;
+  let floatToken = await deploy(floatTokenToUse, {
+    from: deployer,
+    log: true,
+    proxy: {
+      proxyContract: "UUPSProxy",
+      initializer: false,
+    },
+  });
+
+  let treasuryToUse = isAlphaLaunch ? TREASURY_ALPHA : TREASURY;
+  await deploy(treasuryToUse, {
     from: deployer,
     proxy: {
       proxyContract: "UUPSProxy",
       execute: {
         methodName: "initialize",
-        args: [admin],
+        args: [admin, paymentTokenAddress, floatToken.address],
       },
     },
     log: true,
@@ -73,15 +94,6 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     from: admin,
     log: true,
     args: [longShort.address],
-  });
-
-  await deploy(FLOAT_TOKEN, {
-    from: deployer,
-    log: true,
-    proxy: {
-      proxyContract: "UUPSProxy",
-      initializer: false,
-    },
   });
 };
 module.exports.tags = ["all", "contracts"];
