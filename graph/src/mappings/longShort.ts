@@ -25,6 +25,9 @@ import {
   UnderlyingPrice,
   BatchedNextPriceExec,
   User,
+  Stake,
+  CurrentStake,
+  BatchedNextPriceStakeAction,
 } from "../../generated/schema";
 import { BigInt, log, Bytes, Address } from "@graphprotocol/graph-ts";
 import {
@@ -59,6 +62,7 @@ import {
   ACTION_REDEEM,
   ACTION_SHIFT,
   TEN_TO_THE_18,
+  ONE,
 } from "../CONSTANTS";
 import {
   createOrUpdateUserNextPriceAction,
@@ -79,6 +83,10 @@ import {
   getOrInitializeAccumulativeFloatIssuanceSnapshot,
   getBatchedNextPriceExec,
   getUserNextPriceActionComponent,
+  getBatchedNextPriceStakeAction,
+  getUserNextPriceStakeAction,
+  getCurrentStake,
+  getStake,
 } from "../generated/EntityHelpers";
 
 export function handleLongShortV1(event: LongShortV1): void {
@@ -128,6 +136,22 @@ export function handleLongShortV1(event: LongShortV1): void {
     [],
     []
   );
+}
+
+function initializeCurrentStake(
+  currentStake: CurrentStake | null,
+  syntheticToken: string,
+  userAddress: Bytes,
+  marketIndex: BigInt,
+  accumulativeFloatIssuanceSnapshotId: string
+): void {
+  if (currentStake != null) {
+    currentStake.syntheticToken = syntheticToken;
+    currentStake.user = userAddress.toHex();
+    currentStake.userAddress = userAddress;
+    currentStake.syntheticMarket = marketIndex.toString();
+    currentStake.lastMintState = accumulativeFloatIssuanceSnapshotId;
+  }
 }
 
 export function handleSystemStateUpdated(event: SystemStateUpdated): void {
@@ -243,31 +267,27 @@ export function handleSystemStateUpdated(event: SystemStateUpdated): void {
         .times(longTokenPrice)
         .div(shortTokenPrice);
 
-      /* Note: this is causing the token balances accounting to be off
-        At the time of finding the contracts had no NextPriceSyntheticPositionShift or ExecuteNextPriceMarketSideShiftSettlementUser events emitted 
-      */
+      if (tokensShiftedToLong.gt(ZERO)) {
+        // TODO: save this to the users shift history
+        updateUserBalance(
+          longTokenId,
+          user,
+          tokensShiftedToLong,
+          true,
+          timestamp
+        );
+      }
 
-      // if (tokensShiftedToLong.gt(ZERO)) {
-      //   // TODO: save this to the users shift history
-      //   updateUserBalance(
-      //     longTokenId,
-      //     user,
-      //     tokensShiftedToLong,
-      //     true,
-      //     timestamp
-      //   );
-      // }
-
-      // if (tokensShiftedToShort.gt(ZERO)) {
-      //   // TODO: save this to the users shift history
-      //   updateUserBalance(
-      //     shortTokenId,
-      //     user,
-      //     tokensShiftedToShort,
-      //     true,
-      //     timestamp
-      //   );
-      // }
+      if (tokensShiftedToShort.gt(ZERO)) {
+        // TODO: save this to the users shift history
+        updateUserBalance(
+          shortTokenId,
+          user,
+          tokensShiftedToShort,
+          true,
+          timestamp
+        );
+      }
 
       if (tokensMintedLong.gt(ZERO)) {
         increaseUserMints(user, syntheticTokenLong, tokensMintedLong);
@@ -301,6 +321,138 @@ export function handleSystemStateUpdated(event: SystemStateUpdated): void {
     }
 
     batchedNextPriceExec.save();
+  }
+
+  // staker update index lags behind market update index by 1.
+  let stakerUpdateIndex = marketIndex.minus(ONE).toString();
+  let batchedNextPriceStakeLoad = BatchedNextPriceStakeAction.load(
+    stakerUpdateIndex.toString() + "-" + updateIndex.toString()
+  );
+
+  log.warning(marketIndex.toString() + "-" + updateIndex.toString(), []);
+
+  if (batchedNextPriceStakeLoad != null) {
+    let batchedNextPriceStakerShifts = batchedNextPriceStakeLoad as BatchedNextPriceStakeAction;
+    let blockNumber = event.block.number;
+    let accumulativeFloatIssuanceSnapshotId = generateAccumulativeFloatIssuanceSnapshotId(
+      marketIndex,
+      updateIndex
+    );
+    let linkedNextPriceStakerActions =
+      batchedNextPriceStakerShifts.linkedUserNextPriceStakeActions;
+    for (let i = 0; i < linkedNextPriceStakerActions.length; i++) {
+      let userNextPriceActionId: string = linkedNextPriceStakerActions[i];
+
+      let userNextPriceAction = getUserNextPriceStakeAction(
+        userNextPriceActionId
+      );
+      userNextPriceAction.settledTimestamp = event.block.timestamp;
+      userNextPriceAction.settled = true;
+      userNextPriceAction.save();
+
+      let userAddress = Address.fromString(userNextPriceAction.user);
+      let user = getUser(userAddress);
+
+      user.pendingNextPriceStakeActions = removeFromArrayAtIndex(
+        user.pendingNextPriceStakeActions,
+        user.pendingNextPriceStakeActions.indexOf(userNextPriceActionId)
+      );
+
+      user.settledNextPriceStakeActions = user.settledNextPriceStakeActions.concat(
+        [userNextPriceActionId]
+      );
+
+      let oldStakeAmountLong = ZERO;
+      let oldStakeAmountShort = ZERO;
+
+      let currentStakeLongId = syntheticMarket.syntheticLong + "-" + user.id;
+      let currentStakeLong = CurrentStake.load(currentStakeLongId);
+
+      if (currentStakeLong != null) {
+        let longStake = getStake(currentStakeLong.currentStake);
+        if (!longStake.withdrawn) {
+          oldStakeAmountLong = longStake.amount;
+          longStake.withdrawn = true;
+          longStake.save();
+        }
+      }
+
+      let currentStakeShortId = syntheticMarket.syntheticShort + "-" + user.id;
+      let currentStakeShort = CurrentStake.load(currentStakeShortId);
+
+      if (currentStakeShort != null) {
+        let shortStake = getStake(currentStakeShort.currentStake);
+        if (!shortStake.withdrawn) {
+          oldStakeAmountShort = shortStake.amount;
+          shortStake.withdrawn = true;
+          shortStake.save();
+        }
+      }
+
+      let deltaLong = userNextPriceAction.amountStakeForShiftFromShort
+        .times(shortTokenPrice)
+        .div(longTokenPrice)
+        .minus(userNextPriceAction.amountStakeForShiftFromLong);
+
+      let newStakeAmountLong = oldStakeAmountLong.plus(deltaLong);
+
+      let deltaShort = userNextPriceAction.amountStakeForShiftFromLong
+        .times(longTokenPrice)
+        .div(shortTokenPrice)
+        .minus(userNextPriceAction.amountStakeForShiftFromShort);
+
+      let newStakeAmountShort = oldStakeAmountShort.plus(deltaShort);
+
+      if (!newStakeAmountLong.equals(ZERO)) {
+        let stake = new Stake(txHash.toString());
+        stake.timestamp = timestamp;
+        stake.blockNumber = blockNumber;
+        stake.creationTxHash = txHash;
+        stake.syntheticToken = syntheticMarket.syntheticLong;
+        stake.amount = oldStakeAmountLong.plus(deltaLong);
+        stake.user = userAddress.toHex();
+        stake.withdrawn = false;
+        stake.save();
+
+        if (currentStakeLong == null) {
+          currentStakeLong = new CurrentStake(currentStakeLongId);
+          initializeCurrentStake(
+            currentStakeLong,
+            syntheticMarket.syntheticLong,
+            user.address,
+            marketIndex,
+            accumulativeFloatIssuanceSnapshotId
+          );
+        }
+        currentStakeLong.currentStake = txHash.toString();
+        currentStakeLong.save();
+      }
+
+      if (!newStakeAmountShort.equals(ZERO)) {
+        let stake = new Stake(txHash.toString());
+        stake.timestamp = timestamp;
+        stake.blockNumber = blockNumber;
+        stake.creationTxHash = txHash;
+        stake.syntheticToken = syntheticMarket.syntheticShort;
+        stake.amount = oldStakeAmountShort.plus(deltaShort);
+        stake.user = userAddress.toHex();
+        stake.withdrawn = false;
+        stake.save();
+
+        if (currentStakeShort == null) {
+          currentStakeShort = new CurrentStake(currentStakeShortId);
+          initializeCurrentStake(
+            currentStakeShort,
+            syntheticMarket.syntheticShort,
+            user.address,
+            marketIndex,
+            accumulativeFloatIssuanceSnapshotId
+          );
+        }
+        currentStakeShort.currentStake = txHash.toString();
+        currentStakeShort.save();
+      }
+    }
   }
 
   saveEventToStateChange(
@@ -892,3 +1044,5 @@ function updateLatestUnderlyingPrice(
     latestPrice.save();
   }
 }
+
+// TODO - ADD A HANDLER FOR USER SYNTHETIC POSITION SHIFTS

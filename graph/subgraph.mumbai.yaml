@@ -37,8 +37,6 @@ dataSources:
           handler: handleNextPriceDeposit
         - event: NextPriceRedeem(uint32,bool,uint256,address,uint256)
           handler: handleNextPriceRedeem
-        - event: NextPriceSyntheticPositionShift(uint32,bool,uint256,address,uint256)
-          handler: handleNextPriceSyntheticPositionShift
         - event: OracleUpdated(uint32,address,address)
           handler: handleOracleUpdated
         - event: SyntheticMarketCreated(uint32,address,address,address,int256,string,string,address,address)

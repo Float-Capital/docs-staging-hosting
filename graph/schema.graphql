@@ -282,8 +282,7 @@ type BatchedNextPriceStakeAction @entity {
   linkedUserNextPriceStakeActions: [UserNextPriceStakeAction!]!
 }
 
-type UserCurrentNextPriceStakeAction
-  @entity { # to-do: make consistent
+type UserCurrentNextPriceStakeAction @entity {
   id: ID! #userAddress-marketIndex
   marketIndex: BigInt!
   currentAction: UserNextPriceStakeAction!
@@ -315,7 +314,7 @@ type Stake @entity {
 }
 
 type AccumulativeFloatIssuanceSnapshot @entity {
-  id: ID! # token address - state indexed
+  id: ID! # market index - state indexed
   index: BigInt! #
   blockNumber: BigInt!
   creationTxHash: Bytes!

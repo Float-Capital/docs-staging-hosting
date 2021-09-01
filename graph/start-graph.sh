@@ -88,8 +88,7 @@ function start {
     done
 
     echo "####### DEPLOYING CONTRACTS #######"
-    cd ../contracts && yarn clean && rm -f .openzeppelin/dev-321.json && yarn truffle-deploy-local
-    # cd ../contracts && yarn clean && rm -f .openzeppelin/dev-321.json && yarn deploy --network ganache
+    cd ../contracts && yarn clean && rm -f .openzeppelin/dev-321.json && yarn deploy --network ganache
     if [ "$?" -ne 0 ];
     then
         echo "ERROR: Could not deploy contracts successfully"
