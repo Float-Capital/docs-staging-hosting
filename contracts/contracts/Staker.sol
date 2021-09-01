@@ -362,7 +362,7 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
     uint256 initialTimestamp = accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][0]
       .timestamp;
 
-    if (block.timestamp - initialTimestamp <= kPeriod) {
+    if (block.timestamp - initialTimestamp <= kPeriod && kPeriod != 0) {
       return
         kInitialMultiplier -
         (((kInitialMultiplier - 1e18) * (block.timestamp - initialTimestamp)) / kPeriod);

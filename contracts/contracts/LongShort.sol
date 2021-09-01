@@ -364,6 +364,15 @@ contract LongShort is ILongShort, AccessControlledAndUpgradeable {
       balanceIncentiveCurve_exponent,
       balanceIncentiveCurve_equilibriumOffset
     );
+
+    IStaker(staker).pushUpdatedMarketPricesToUpdateFloatIssuanceCalculations(
+      marketIndex,
+      1,
+      1e18,
+      1e18,
+      initialMarketSeedForEachMarketSide,
+      initialMarketSeedForEachMarketSide
+    );
   }
 
   /*╔══════════════════════════════╗
@@ -709,15 +718,6 @@ contract LongShort is ILongShort, AccessControlledAndUpgradeable {
       // if there is a price change and the 'staker' contract has pending updates, push the stakers price snapshot index to the staker
       // (so the staker can handle its internal accounting)
 
-      IStaker(staker).pushUpdatedMarketPricesToUpdateFloatIssuanceCalculations(
-        marketIndex,
-        currentMarketIndex,
-        syntheticTokenPrice_inPaymentTokens_long,
-        syntheticTokenPrice_inPaymentTokens_short,
-        marketSideValueInPaymentToken[marketIndex][true],
-        marketSideValueInPaymentToken[marketIndex][false]
-      );
-
       (
         uint256 newLongPoolValue,
         uint256 newShortPoolValue
@@ -762,6 +762,15 @@ contract LongShort is ILongShort, AccessControlledAndUpgradeable {
       );
       marketSideValueInPaymentToken[marketIndex][true] = newLongPoolValue;
       marketSideValueInPaymentToken[marketIndex][false] = newShortPoolValue;
+
+      IStaker(staker).pushUpdatedMarketPricesToUpdateFloatIssuanceCalculations(
+        marketIndex,
+        currentMarketIndex,
+        syntheticTokenPrice_inPaymentTokens_long,
+        syntheticTokenPrice_inPaymentTokens_short,
+        newLongPoolValue,
+        newShortPoolValue
+      );
 
       emit SystemStateUpdated(
         marketIndex,
