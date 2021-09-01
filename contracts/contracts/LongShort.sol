@@ -4,6 +4,7 @@ pragma solidity 0.8.3;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts/utils/math/Math.sol";
 
 import "./interfaces/ITokenFactory.sol";
 import "./interfaces/ISyntheticToken.sol";
@@ -379,18 +380,6 @@ contract LongShort is ILongShort, AccessControlledAndUpgradeable {
     ║       GETTER FUNCTIONS       ║
     ╚══════════════════════════════╝*/
 
-  /// @notice Return the minimum of the 2 parameters. If they are equal return the first parameter.
-  /// @param a Any uint256
-  /// @param b Any uint256
-  /// @return min The minimum of the 2 parameters.
-  function _getMin(uint256 a, uint256 b) internal pure virtual returns (uint256) {
-    if (a > b) {
-      return b;
-    } else {
-      return a;
-    }
-  }
-
   /// @notice Calculates the conversion rate from synthetic tokens to payment tokens.
   /// @dev Synth tokens have a fixed 18 decimals.
   /// @param amountPaymentTokenBackingSynth Amount of payment tokens in that token's lowest denomination.
@@ -597,7 +586,7 @@ contract LongShort is ILongShort, AccessControlledAndUpgradeable {
     uint256 marketPercentCalculated_e18 = (imbalance *
       marketTreasurySplitGradient_e18[marketIndex]) / totalValueLockedInMarket;
 
-    uint256 marketPercent_e18 = _getMin(marketPercentCalculated_e18, 1e18);
+    uint256 marketPercent_e18 = Math.min(marketPercentCalculated_e18, 1e18);
 
     unchecked {
       treasuryYieldPercent_e18 = 1e18 - marketPercent_e18;
@@ -660,7 +649,7 @@ contract LongShort is ILongShort, AccessControlledAndUpgradeable {
     // long side would have $50/$100 = 50% exposure to price movements based on the liquidity imbalance.
     // min(longValue, shortValue) = $50 , therefore if the price change was -10% then
     // $50 * 10% = $5 gained for short side and conversely $5 lost for long side.
-    int256 underbalancedSideValue = int256(_getMin(longValue, shortValue));
+    int256 underbalancedSideValue = int256(Math.min(longValue, shortValue));
 
     // See this equation in latex: https://ipfs.io/ipfs/QmPeJ3SZdn1GfxqCD4GDYyWTJGPMSHkjPJaxrzk2qTTPSE
     // Interact with this equation: https://www.desmos.com/calculator/t8gr6j5vsq

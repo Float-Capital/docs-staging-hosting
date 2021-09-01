@@ -1,16 +1,14 @@
 open Globals;
 open LetOps;
-open StakerHelpers;
 open Mocha;
 open SmockGeneral;
 
 let test =
     (
-      ~contracts: ref(Helpers.coreContracts),
+      ~contracts: ref(Helpers.stakerUnitTestContracts),
       ~accounts: ref(array(Ethers.Wallet.t)),
     ) => {
   describe("stakeFromUser", () => {
-    let longShortSmockedRef: ref(LongShortSmocked.t) = ref(None->Obj.magic);
     let marketIndexForToken = Helpers.randomJsInteger();
 
     let latestRewardIndex =
@@ -29,15 +27,12 @@ let test =
       ref(None->Obj.magic);
 
     let setup = (~userLastRewardIndex, ~latestRewardIndex) => {
-      let%Await _ =
-        deployAndSetupStakerToUnitTest(
-          ~functionName="stakeFromUser",
-          ~contracts,
-          ~accounts,
-        );
+      let {staker, longShortSmocked} = contracts.contents;
 
-      let%Await longShortSmocked = LongShortSmocked.make();
-      longShortSmockedRef := longShortSmocked;
+      let%Await _ =
+        staker->StakerSmocked.InternalMock.setupFunctionForUnitTesting(
+          ~functionName="stakeFromUser",
+        );
 
       mockTokenWalletRef := accounts.contents->Array.getExn(6);
 
@@ -69,17 +64,17 @@ let test =
     });
 
     it("calls updateSystemState on longshort with correct args", () => {
+      let {longShortSmocked} = contracts.contents;
+
       let%Await _ =
         setup(
           ~userLastRewardIndex=randomRewardIndexBelow(latestRewardIndex),
           ~latestRewardIndex,
         );
-      Js.log(marketIndexForToken);
 
-      longShortSmockedRef.contents
-      ->LongShortSmocked.updateSystemStateCallCheck({
-          marketIndex: marketIndexForToken,
-        });
+      longShortSmocked->LongShortSmocked.updateSystemStateCallCheck({
+        marketIndex: marketIndexForToken,
+      });
     });
 
     describe("case user has outstanding float to be minted", () => {

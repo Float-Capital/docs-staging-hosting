@@ -1,12 +1,11 @@
 open Globals;
 open LetOps;
-open StakerHelpers;
 open Mocha;
 
 let test =
     (
-      ~contracts: ref(Helpers.coreContracts),
-      ~accounts: ref(array(Ethers.Wallet.t)),
+      ~contracts: ref(Helpers.stakerUnitTestContracts),
+      ~accounts as _: ref(array(Ethers.Wallet.t)),
     ) => {
   let marketIndex = 2;
 
@@ -20,11 +19,10 @@ let test =
     let periodRef = ref(CONSTANTS.zeroBn);
     let setup = (~multiplier, ~periodShouldBeOver) => {
       let%AwaitThen _ =
-        deployAndSetupStakerToUnitTest(
-          ~functionName="getKValue",
-          ~contracts,
-          ~accounts,
-        );
+        contracts.contents.staker
+        ->StakerSmocked.InternalMock.setupFunctionForUnitTesting(
+            ~functionName="getKValue",
+          );
 
       let%AwaitThen pastTimestamp = Helpers.getRandomTimestampInPast();
       let%AwaitThen {timestamp: nowTimestamp} = Helpers.getBlock();

@@ -221,6 +221,18 @@ external all7: ((t<'a>, t<'b>, t<'c>, t<'d>, t<'e>, t<'f>, t<'g>)) => t<(
   'g,
 )> = "all"
 
+@scope("Promise") @val
+external all8: ((t<'a>, t<'b>, t<'c>, t<'d>, t<'e>, t<'f>, t<'g>, t<'h>)) => t<(
+  'a,
+  'b,
+  'c,
+  'd,
+  'e,
+  'f,
+  'g,
+  'h,
+)> = "all"
+
 // Added utilitys (not in upstream)
 @ocaml.doc("
 [map(promise, callback)] converts an encapsulated value of a promise into

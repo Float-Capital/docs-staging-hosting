@@ -2,7 +2,7 @@ open Mocha;
 
 let testUnit =
     (
-      ~contracts: ref(Helpers.coreContracts),
+      ~contracts: ref(Helpers.stakerUnitTestContracts),
       ~accounts: ref(array(Ethers.Wallet.t)),
     ) => {
   describe("Staker Modifiers", () => {

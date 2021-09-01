@@ -1,40 +1,32 @@
 open Globals;
 open LetOps;
-open StakerHelpers;
 open Mocha;
 
 let test =
     (
-      ~contracts: ref(Helpers.coreContracts),
-      ~accounts: ref(array(Ethers.Wallet.t)),
+      ~contracts: ref(Helpers.stakerUnitTestContracts),
+      ~accounts as _: ref(array(Ethers.Wallet.t)),
     ) => {
   describe("_mintFloat", () => {
-    let floatTokenSmockedRef: ref(FloatTokenSmocked.t) =
-      ref(None->Obj.magic);
-
-    let floatCapitalAddressRef: ref(Ethers.ethAddress) =
-      ref(Helpers.randomAddress());
-
     let user = Helpers.randomAddress();
     let floatToMint = Helpers.randomTokenAmount();
 
     let floatPercentage = Helpers.randomJsInteger() / 65536; // divide by 2^16 to keep in range of uint16 I think?
 
     before_once'(() => {
+      let {staker, floatCapitalSmocked, floatTokenSmocked} =
+        contracts.contents;
+
       let%Await _ =
-        deployAndSetupStakerToUnitTest(
+        staker->StakerSmocked.InternalMock.setupFunctionForUnitTesting(
           ~functionName="_mintFloat",
-          ~contracts,
-          ~accounts,
         );
 
-      let staker = contracts^.staker;
-
-      floatCapitalAddressRef := contracts^.floatCapital_v0.address;
-
-      let%AwaitThen floatTokenSmocked = FloatTokenSmocked.make();
-
-      floatTokenSmockedRef := floatTokenSmocked;
+      let%Await _ =
+        staker->Staker.setVariable(
+          ~name="floatCapital",
+          ~value=floatCapitalSmocked.address,
+        );
 
       let%AwaitThen _ =
         staker->Staker.Exposed.set_mintFloatParams(
@@ -46,21 +38,23 @@ let test =
     });
 
     it("calls mint on floatToken for user for amount floatToMint", () =>
-      (floatTokenSmockedRef^)
+      contracts.contents.floatTokenSmocked
       ->FloatTokenSmocked.mintCallCheck({_to: user, amount: floatToMint})
     );
 
     it(
       "calls mint on floatTokens for floatCapital for amount (floatToMint * floatPercentage) / 1e18",
-      () =>
-      (floatTokenSmockedRef^)
-      ->FloatTokenSmocked.mintCallCheck({
-          _to: floatCapitalAddressRef^,
+      () => {
+        let {floatCapitalSmocked, floatTokenSmocked} = contracts.contents;
+
+        floatTokenSmocked->FloatTokenSmocked.mintCallCheck({
+          _to: floatCapitalSmocked.address,
           amount:
             floatToMint
             ->mul(floatPercentage->bnFromInt)
             ->div(CONSTANTS.tenToThe18),
-        })
+        });
+      },
     );
   });
 };

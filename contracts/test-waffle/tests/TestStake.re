@@ -103,50 +103,7 @@ describe("Float System", () => {
       ();
     });
   });
-  describeUnit("Staking - internals exposed", () => {
-    let contracts: ref(Helpers.coreContracts) = ref(None->Obj.magic);
-    let accounts: ref(array(Ethers.Wallet.t)) = ref(None->Obj.magic);
 
-    before(() => {
-      let%Await loadedAccounts = Ethers.getSigners();
-      accounts := loadedAccounts;
-    });
-
-    // ONE DEPLOYMENT PER TEST
-    describe("", () => {
-      before_each(() => {
-        let%Await deployedContracts =
-          Helpers.initialize(
-            ~admin=accounts.contents->Array.getUnsafe(0),
-            ~exposeInternals=true,
-          );
-        contracts := deployedContracts;
-      });
-      CalculateAccumulatedFloat.test(~contracts);
-      GetMarketLaunchIncentiveParameters.test(~contracts);
-      CalculateTimeDelta.test(~contracts);
-    });
-
-    // TESTS THAT MAY TEST MULTIPLE THINGS PER DEPLOYMENT
-    describe("", () => {
-      before_once'(() => {
-        let%Await deployedContracts =
-          Helpers.initialize(
-            ~admin=accounts.contents->Array.getUnsafe(0),
-            ~exposeInternals=true,
-          );
-        contracts := deployedContracts;
-      });
-      AddNewStakingFund.test(~contracts, ~accounts);
-      GetKValue.test(~contracts, ~accounts);
-      CalculateNewCumulativeValue.test(~contracts, ~accounts);
-      MintFloat.test(~contracts, ~accounts);
-      MintAccumulatedFloat.test(~contracts, ~accounts);
-      ClaimFloat.test(~contracts, ~accounts);
-      StakeFromUser.test(~contracts, ~accounts);
-      StakerModifiers.testUnit(~contracts, ~accounts);
-    });
-  });
   describe("Smocked", () => {
     let contracts = ref("NOT INITIALIZED"->Obj.magic);
     let accounts = ref("NOT INITIALIZED"->Obj.magic);
@@ -160,6 +117,12 @@ describe("Float System", () => {
       contracts := deployedContracts;
     });
     describeUnit("Unit tests", () => {
+      AddNewStakingFund.test(~contracts, ~accounts);
+      GetKValue.test(~contracts, ~accounts);
+      CalculateNewCumulativeValue.test(~contracts, ~accounts);
+      MintFloat.test(~contracts, ~accounts);
+      MintAccumulatedFloat.test(~contracts, ~accounts);
+      ClaimFloat.test(~contracts, ~accounts);
       StakerAdminFunctions.testUnit(~contracts, ~accounts);
       ShiftTokens.testUnit(~contracts, ~accounts);
       CalculateAccumulatedFloatInRange.testUnit(~contracts, ~accounts);
@@ -167,6 +130,8 @@ describe("Float System", () => {
       AddNewStateForFloatRewards.testUnit(~contracts, ~accounts);
       Withdraw.testUnit(~contracts, ~accounts);
       CalculateFloatPerSecond.test(~contracts, ~accounts);
+      StakerModifiers.testUnit(~contracts, ~accounts);
+      StakeFromUser.test(~contracts, ~accounts);
     });
   });
 });
