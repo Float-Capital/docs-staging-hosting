@@ -190,7 +190,11 @@ let initialize = (~admin: Ethers.Wallet.t, ~exposeInternals: bool) => {
           ~symbol="FLOAT TOKEN",
           ~stakerAddress=staker.address,
         ),
-        treasury->Treasury_v0.initialize(~admin=admin.address),
+        treasury->Treasury_v0.initialize(
+          ~admin=admin.address,
+          ~paymentToken=payToken1.address,
+          ~floatToken=floatToken.address,
+        ),
         longShort->LongShort.initialize(
           ~admin=admin.address,
           ~tokenFactory=tokenFactory.address,
@@ -252,8 +256,14 @@ let initializeStakerUnit = () => {
     LongShortSmocked.make(),
     FloatTokenSmocked.make(),
     SyntheticTokenSmocked.make(),
-   FloatCapital_v0.make(),
-  ))->JsPromise.then(((staker, longShortSmocked, floatTokenSmocked, syntheticTokenSmocked, floatCapitalSmocked)) =>
+    FloatCapital_v0.make(),
+  ))->JsPromise.then(((
+    staker,
+    longShortSmocked,
+    floatTokenSmocked,
+    syntheticTokenSmocked,
+    floatCapitalSmocked,
+  )) =>
     staker
     ->Staker.setVariable(~name="longShort", ~value=longShortSmocked.address)
     ->JsPromise.map(_ => {
@@ -261,7 +271,7 @@ let initializeStakerUnit = () => {
       longShortSmocked: longShortSmocked,
       floatTokenSmocked: floatTokenSmocked,
       syntheticTokenSmocked: syntheticTokenSmocked,
-      floatCapitalSmocked: floatCapitalSmocked
+      floatCapitalSmocked: floatCapitalSmocked,
     })
   )
 }

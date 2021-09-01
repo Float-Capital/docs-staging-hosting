@@ -19,7 +19,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
  @title FloatToken
  @notice The Float Token is the governance token for the Float Capital protocol
  */
-contract FloatToken is
+contract AlphaTestFLT is
   IFloatToken,
   Initializable,
   ERC20Upgradeable,
@@ -34,6 +34,8 @@ contract FloatToken is
   bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
   bytes32 public constant UPGRADER_ROLE = keccak256("UPGRADER_ROLE");
 
+  address public treasury;
+
   /**
    @notice Initialize the Float Token with relevant
    @dev This function is called `initialize` to differentiate it from `initialize(string,string)` in the parent contract which should NOT be called to initialize this contract. 
@@ -44,7 +46,8 @@ contract FloatToken is
   function initialize(
     string calldata name,
     string calldata symbol,
-    address stakerAddress
+    address stakerAddress,
+    address treasuryAddress
   ) external initializer {
     __ERC20_init(name, symbol);
     __ERC20Burnable_init();
@@ -52,6 +55,8 @@ contract FloatToken is
     __AccessControl_init();
     __ERC20Permit_init(name);
     __UUPSUpgradeable_init();
+
+    treasury = treasuryAddress;
 
     renounceRole(DEFAULT_ADMIN_ROLE, msg.sender);
     renounceRole(MINTER_ROLE, msg.sender);
@@ -153,6 +158,12 @@ contract FloatToken is
     virtual
     override(ERC20BurnableUpgradeable, IFloatToken)
   {
-    ERC20BurnableUpgradeable.burnFrom(account, amount);
+    // If the burn comes from the treasury, let it happen automatically.
+    //   This is only for the alpha launch, no need to add these permissions to the main FLT deployment.
+    if (msg.sender == treasury) {
+      _burn(account, amount);
+    } else {
+      ERC20BurnableUpgradeable.burnFrom(account, amount);
+    }
   }
 }
