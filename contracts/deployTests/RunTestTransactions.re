@@ -10,7 +10,34 @@ type allContracts = {
   syntheticToken: SyntheticToken.t,
 };
 
-let runTestTransactions = ({longShort, treasury, paymentToken}) => {
+let runTestTransactions =
+    (
+      {longShort, treasury, paymentToken, staker},
+      deploymentArgs: Hardhat.hardhatDeployArgument,
+    ) => {
+  let%AwaitThen namedAccounts = deploymentArgs.getNamedAccounts();
+  let%AwaitThen _exampleSyntheticToken =
+    deploymentArgs.deployments
+    ->Hardhat.deploy(
+        ~name="SyntheticTokenUpgradeable",
+        ~arguments={
+          "from": namedAccounts.deployer,
+          "log": true,
+          "proxy": {
+            "proxyContract": "UUPSProxy",
+            "initializer": true,
+            "args": (
+              "Name",
+              "SMBL",
+              longShort.address,
+              staker.address,
+              1,
+              true,
+            ),
+          },
+        },
+      );
+
   let%Await loadedAccounts = Ethers.getSigners();
 
   let admin = loadedAccounts->Array.getUnsafe(1);

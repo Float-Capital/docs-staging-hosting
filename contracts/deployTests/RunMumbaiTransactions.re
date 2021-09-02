@@ -10,13 +10,32 @@ type allContracts = {
   syntheticToken: SyntheticToken.t,
 };
 
-let runMumbaiTransactions = ({longShort, treasury, paymentToken}) => {
-  let%Await loadedAccounts = Ethers.getSigners();
+let runMumbaiTransactions =
+    (
+      {longShort, treasury, paymentToken},
+      deploymentArgs: Hardhat.hardhatDeployArgument,
+    ) => {
+  let%AwaitThen namedAccounts = deploymentArgs.getNamedAccounts();
+  let%AwaitThen loadedAccounts = Ethers.getSigners();
 
   let admin = loadedAccounts->Array.getUnsafe(1);
   let user1 = loadedAccounts->Array.getUnsafe(2);
   let user2 = loadedAccounts->Array.getUnsafe(3);
   let user3 = loadedAccounts->Array.getUnsafe(4);
+
+  let%AwaitThen _uninitializedSyntheticToken =
+    deploymentArgs.deployments
+    ->Hardhat.deploy(
+        ~name="SyntheticTokenUpgradeable",
+        ~arguments={
+          "from": namedAccounts.deployer,
+          "log": true,
+          "proxy": {
+            "proxyContract": "UUPSProxy",
+            "initializer": false,
+          },
+        },
+      );
 
   let%AwaitThen _ = DeployHelpers.topupBalanceIfLow(~from=admin, ~to_=user1);
   let%AwaitThen _ = DeployHelpers.topupBalanceIfLow(~from=admin, ~to_=user2);
