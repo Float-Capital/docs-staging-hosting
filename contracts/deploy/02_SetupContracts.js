@@ -71,7 +71,7 @@ module.exports = async (hardhatDeployArguments) => {
   await longShort.initialize(admin, tokenFactory.address, staker.address);
 
   if (isAlphaLaunch) {
-    await floatToken.initialize("Float", "FLT", staker.address, treasury.address);
+    await floatToken.initialize("Alpha Float", "alphaFLT", staker.address, treasury.address);
   } else {
     await floatToken.initialize("Float", "FLT", staker.address);
   }
@@ -81,7 +81,7 @@ module.exports = async (hardhatDeployArguments) => {
     floatToken.address,
     treasury.address,
     floatCapital.address,
-    "250000000000000000" //25%
+    "100000000000000", // mint an additional 0.01% for the treasury - just for testing purposes
   );
 
   console.log("before test txs");
