@@ -126,6 +126,7 @@ module.exports = {
       ":YieldManagerMock$",
       ":LongShort$",
       ":SyntheticToken$",
+      ":SyntheticTokenUpgradeable$",
       ":YieldManagerAave$",
       ":FloatCapital_v0$",
       ":Migrations$",

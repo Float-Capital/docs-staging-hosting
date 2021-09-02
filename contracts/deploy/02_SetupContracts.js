@@ -12,13 +12,17 @@ const {
   FLOAT_TOKEN,
   TOKEN_FACTORY,
   FLOAT_CAPITAL,
+  isAlphaLaunch,
+  FLOAT_TOKEN_ALPHA,
+  TREASURY_ALPHA
 } = require("../helper-hardhat-config");
 
-module.exports = async ({ getNamedAccounts, deployments }) => {
+module.exports = async (hardhatDeployArguments) => {
   console.log("setup contracts");
+  const { getNamedAccounts, deployments } = hardhatDeployArguments;
   const { admin } = await getNamedAccounts();
 
-  /////////////////////////
+  ////////////////////////
   //Retrieve Deployments//
   ////////////////////////
   let paymentTokenAddress;
@@ -32,11 +36,13 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     paymentTokenAddress
   );
 
+
   const LongShort = await deployments.get(LONGSHORT);
   const longShort = await ethers.getContractAt(LONGSHORT, LongShort.address);
 
-  const Treasury = await deployments.get(TREASURY);
-  const treasury = await ethers.getContractAt(TREASURY, Treasury.address);
+  let treasuryToUse = isAlphaLaunch ? TREASURY_ALPHA : TREASURY;
+  const Treasury = await deployments.get(treasuryToUse);
+  const treasury = await ethers.getContractAt(treasuryToUse, Treasury.address);
 
   const TokenFactory = await deployments.get(TOKEN_FACTORY);
   const tokenFactory = await ethers.getContractAt(
@@ -47,9 +53,10 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
   const Staker = await deployments.get(STAKER);
   const staker = await ethers.getContractAt(STAKER, Staker.address);
 
-  const FloatToken = await deployments.get(FLOAT_TOKEN);
+  const floatTokenToUse = isAlphaLaunch ? FLOAT_TOKEN_ALPHA : FLOAT_TOKEN;
+  const FloatToken = await deployments.get(floatTokenToUse);
   const floatToken = await ethers.getContractAt(
-    FLOAT_TOKEN,
+    floatTokenToUse,
     FloatToken.address
   );
 
@@ -63,8 +70,11 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
   ///////////////////////////
   await longShort.initialize(admin, tokenFactory.address, staker.address);
 
-  await floatToken.initialize("Float", "FLT", staker.address);
-
+  if (isAlphaLaunch) {
+    await floatToken.initialize("Float", "FLT", staker.address, treasury.address);
+  } else {
+    await floatToken.initialize("Float", "FLT", staker.address);
+  }
   await staker.initialize(
     admin,
     longShort.address,
@@ -82,7 +92,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
       longShort: longShort.connect(admin),
       paymentToken,
       treasury,
-    });
+    }, hardhatDeployArguments);
   } else if (network.name == "hardhat" || network.name == "ganache") {
     console.log("mumbai test transactions");
     await runTestTransactions({
@@ -90,7 +100,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
       longShort: longShort.connect(admin),
       paymentToken,
       treasury,
-    });
+    }, hardhatDeployArguments);
   }
   console.log("after test txs");
 };

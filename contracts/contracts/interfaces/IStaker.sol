@@ -72,8 +72,6 @@ interface IStaker {
     uint256 newAmountStakedShort
   );
 
-  // change name
-
   function userAmountStaked(address, address) external view returns (uint256);
 
   function addNewStakingFund(
