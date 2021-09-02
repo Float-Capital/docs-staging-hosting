@@ -56,15 +56,17 @@ function RedeemSubmitButtonAndTxStatusModal(Props) {
   var buttonDisabled = Props.buttonDisabled;
   var marketIndex = Props.marketIndex;
   var match = ModalProvider.useModalDisplay(undefined);
+  var hideModal = match.hideModal;
   var showModal = match.showModal;
   React.useEffect((function () {
           if (typeof txStateRedeem === "number") {
-            if (txStateRedeem !== /* UnInitialised */0) {
+            if (txStateRedeem === /* UnInitialised */0) {
+              Curry._1(hideModal, undefined);
+            } else {
               Curry._1(showModal, React.createElement("div", {
                         className: "text-center m-3"
                       }, React.createElement(Loader.Ellipses.make, {}), React.createElement("h1", undefined, "Confirm the transaction to redeem " + Config.paymentTokenName)));
             }
-            
           } else {
             switch (txStateRedeem.TAG | 0) {
               case /* SignedAndSubmitted */0 :
