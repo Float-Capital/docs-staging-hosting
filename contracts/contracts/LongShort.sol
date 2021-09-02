@@ -194,8 +194,8 @@ contract LongShort is ILongShort, AccessControlledAndUpgradeable {
 
     // Create new synthetic long token.
     syntheticTokens[marketIndex][true] = ITokenFactory(tokenFactory).createSyntheticToken(
-      string(abi.encodePacked("Float Up ", syntheticName)),
-      string(abi.encodePacked("fu", syntheticSymbol)),
+      string(abi.encodePacked("Float Long ", syntheticName)),
+      string(abi.encodePacked("fl", syntheticSymbol)),
       _staker,
       marketIndex,
       true
@@ -203,8 +203,8 @@ contract LongShort is ILongShort, AccessControlledAndUpgradeable {
 
     // Create new synthetic short token.
     syntheticTokens[marketIndex][false] = ITokenFactory(tokenFactory).createSyntheticToken(
-      string(abi.encodePacked("Float Down ", syntheticName)),
-      string(abi.encodePacked("fd", syntheticSymbol)),
+      string(abi.encodePacked("Float Short ", syntheticName)),
+      string(abi.encodePacked("fs", syntheticSymbol)),
       _staker,
       marketIndex,
       false
@@ -241,7 +241,7 @@ contract LongShort is ILongShort, AccessControlledAndUpgradeable {
   /// this will likely always be DAI
   /// @param _oracleManager The address of the oracle manager that provides the price feed for this market
   /// @param _yieldManager The contract that manages depositing the paymentToken into a yield bearing protocol
-  function createNewSyntheticMarketUpgradeable(
+  function createNewSyntheticMarketExternalSyntheticTokens(
     string calldata syntheticName,
     string calldata syntheticSymbol,
     address _longToken,

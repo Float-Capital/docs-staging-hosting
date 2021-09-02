@@ -87,6 +87,14 @@ let redeemShortNextPriceWithSystemUpdate =
   updateSystemState(~longShort, ~admin, ~marketIndex);
 };
 
+let redeemNextPrice = (~amount, ~marketIndex, ~longShort, ~user, ~isLong) => {
+  let redeemFunction =
+    isLong ? LongShort.redeemLongNextPrice : LongShort.redeemShortNextPrice;
+  longShort
+  ->ContractHelpers.connect(~address=user)
+  ->redeemFunction(~marketIndex, ~tokens_redeem=amount);
+};
+
 let shiftFromShortNextPriceWithSystemUpdate =
     (~amount, ~marketIndex, ~longShort, ~user, ~admin) => {
   let%AwaitThen _ =
@@ -136,6 +144,31 @@ let mintLongNextPriceWithSystemUpdate =
     ->LongShort.mintLongNextPrice(~marketIndex, ~amount);
   let%AwaitThen _ = setOracleManagerPrice(~longShort, ~marketIndex, ~admin);
   updateSystemState(~longShort, ~admin, ~marketIndex);
+};
+
+let mintNextPrice =
+    (
+      ~amount,
+      ~marketIndex,
+      ~paymentToken,
+      ~longShort: LongShort.t,
+      ~user,
+      ~isLong,
+    ) => {
+  let%AwaitThen _ =
+    mintAndApprove(
+      ~paymentToken,
+      ~amount,
+      ~user,
+      ~approvedAddress=longShort.address,
+    );
+
+  let mintFunction =
+    isLong ? LongShort.mintLongNextPrice : LongShort.mintShortNextPrice;
+
+  longShort
+  ->ContractHelpers.connect(~address=user)
+  ->mintFunction(~marketIndex, ~amount);
 };
 
 let mintShortNextPriceWithSystemUpdate =
@@ -202,8 +235,8 @@ let deployTestMarket =
       );
 
   let%AwaitThen latestMarket = longShortInstance->LongShort.latestMarket;
-  let kInitialMultiplier = bnFromString("5000000000000000000"); // 5x
-  let kPeriod = bnFromInt(864000); // 10 days
+  let kInitialMultiplier = bnFromString("1000000000000000000"); // 5x
+  let kPeriod = bnFromInt(0); // 10 days
 
   let%AwaitThen _ =
     mintAndApprove(
@@ -293,6 +326,127 @@ let deployMumbaiMarket =
   ->ContractHelpers.connect(~address=admin)
   ->LongShort.initializeMarket(
       ~marketIndex=latestMarket,
+      ~kInitialMultiplier,
+      ~kPeriod,
+      ~unstakeFee_e18, // 50 basis point unstake fee
+      ~initialMarketSeedForEachMarketSide,
+      ~balanceIncentiveCurve_exponent=bnFromInt(5),
+      ~balanceIncentiveCurve_equilibriumOffset=bnFromInt(0),
+      ~marketTreasurySplitGradient_e18=bnFromInt(1),
+    );
+};
+
+let deployMumbaiMarketUpgradeable =
+    (
+      ~syntheticName,
+      ~syntheticSymbol,
+      ~longShortInstance: LongShort.t,
+      ~stakerInstance: Staker.t,
+      ~treasuryInstance: Treasury_v0.t,
+      ~admin,
+      ~paymentToken: ERC20Mock.t,
+      ~oraclePriceFeedAddress: Ethers.ethAddress,
+      ~deployments: Hardhat.deployments_t,
+      ~namedAccounts: Hardhat.namedAccounts,
+    ) => {
+  let%AwaitThen latestMarket = longShortInstance->LongShort.latestMarket;
+  let newMarketIndex = latestMarket + 1;
+
+  let%AwaitThen syntheticTokenShort =
+    deployments->Hardhat.deploy(
+      ~name="SyntheticTokenUpgradeable",
+      ~arguments={
+        "from": namedAccounts.deployer,
+        "log": true,
+        "proxy": {
+          "proxyContract": "UUPSProxy",
+          "initializer": true,
+          "args": (
+            "Float Short " ++ syntheticName,
+            "fs" ++ syntheticSymbol,
+            longShortInstance.address,
+            stakerInstance.address,
+            newMarketIndex,
+            false,
+          ),
+        },
+      },
+    );
+  let%AwaitThen syntheticTokenLong =
+    deployments->Hardhat.deploy(
+      ~name="SyntheticTokenUpgradeable",
+      ~arguments={
+        "from": namedAccounts.deployer,
+        "log": true,
+        "proxy": {
+          "proxyContract": "UUPSProxy",
+          "initializer": true,
+          "args": (
+            "Float Long " ++ syntheticName,
+            "fl" ++ syntheticSymbol,
+            longShortInstance.address,
+            stakerInstance.address,
+            newMarketIndex,
+            false,
+          ),
+        },
+      },
+    );
+
+  let%AwaitThen oracleManager =
+    OracleManagerChainlinkTestnet.make(
+      ~admin=admin.address,
+      ~maxUpdateIntervalSeconds=bnFromInt(27),
+      ~chainLinkOracle=oraclePriceFeedAddress,
+    );
+
+  let%AwaitThen yieldManager =
+    YieldManagerMock.make(
+      ~longShort=longShortInstance.address,
+      ~treasury=treasuryInstance.address,
+      ~token=paymentToken.address,
+    );
+
+  let%AwaitThen mintRole = paymentToken->ERC20Mock.mINTER_ROLE;
+
+  let%AwaitThen _ =
+    paymentToken->ERC20Mock.grantRole(
+      ~role=mintRole,
+      ~account=yieldManager.address,
+    );
+
+  let%AwaitThen _ =
+    longShortInstance
+    ->ContractHelpers.connect(~address=admin)
+    ->LongShort.createNewSyntheticMarketExternalSyntheticTokens(
+        ~syntheticName,
+        ~syntheticSymbol,
+        ~longToken=syntheticTokenLong.address,
+        ~shortToken=syntheticTokenShort.address,
+        ~paymentToken=paymentToken.address,
+        ~oracleManager=oracleManager.address,
+        ~yieldManager=yieldManager.address,
+      );
+
+  let kInitialMultiplier = bnFromString("5000000000000000000"); // 5x
+  let kPeriod = bnFromInt(864000); // 10 days
+
+  let%AwaitThen _ =
+    mintAndApprove(
+      ~paymentToken,
+      ~amount=bnFromString("2000000000000000000"),
+      ~user=admin,
+      ~approvedAddress=longShortInstance.address,
+    );
+
+  let unstakeFee_e18 = bnFromString("5000000000000000"); // 50 basis point unstake fee
+  let initialMarketSeedForEachMarketSide =
+    bnFromString("1000000000000000000");
+
+  longShortInstance
+  ->ContractHelpers.connect(~address=admin)
+  ->LongShort.initializeMarket(
+      ~marketIndex=newMarketIndex,
       ~kInitialMultiplier,
       ~kPeriod,
       ~unstakeFee_e18, // 50 basis point unstake fee

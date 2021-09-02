@@ -8,7 +8,7 @@ let testUnit =
       ~contracts: ref(Helpers.longShortUnitTestContracts),
       ~accounts as _: ref(array(Ethers.Wallet.t)),
     ) => {
-  describeUnit("createNewSyntheticMarketUpgradeable", () => {
+  describeUnit("createNewSyntheticMarketExternalSyntheticTokens", () => {
     let latestMarket = Helpers.randomJsInteger();
 
     let marketIndex = latestMarket + 1;
@@ -31,7 +31,7 @@ let testUnit =
         ->LongShortStateSetters.setLatestMarket(~latestMarket);
       createNewSyntheticMarketUpgradeableCallRef :=
         contracts.contents.longShort
-        ->LongShort.createNewSyntheticMarketUpgradeable(
+        ->LongShort.createNewSyntheticMarketExternalSyntheticTokens(
             ~syntheticName,
             ~syntheticSymbol,
             ~longToken,

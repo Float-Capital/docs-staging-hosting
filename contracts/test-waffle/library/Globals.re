@@ -63,3 +63,8 @@ let describeBoth =
   } else {
     describe;
   };
+
+let sleep = (~timeMs) =>
+  Js.Promise.make((~resolve, ~reject as _) =>
+    Js.Global.setTimeout(() => resolve(. ()->Obj.magic), timeMs)->ignore
+  );
