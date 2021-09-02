@@ -53,21 +53,6 @@ let stakeSynthLong = (~amount, ~longShort, ~marketIndex, ~user) => {
   };
 };
 
-let stakeSynthShort = (~amount, ~longShort, ~marketIndex, ~user) => {
-  let%AwaitThen shortAddress =
-    longShort->LongShort.syntheticTokens(marketIndex, false);
-  let%AwaitThen synth = SyntheticToken.at(shortAddress);
-  let%Await usersSyntheticTokenBalance =
-    synth->SyntheticToken.balanceOf(~account=user.address);
-  if (usersSyntheticTokenBalance->bnGt(bnFromString("0"))) {
-    let _ =
-      synth
-      ->ContractHelpers.connect(~address=user)
-      ->SyntheticToken.stake(~amount);
-    ();
-  };
-};
-
 let executeOnMarkets =
     (marketIndexes: array(int), functionToExecute: int => Js.Promise.t('a)) => {
   marketIndexes->Array.reduce(

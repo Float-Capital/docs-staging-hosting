@@ -937,7 +937,7 @@ export function handleStakeShifted(event: StakeShifted): void {
   }
 
   if (!longCorrect) {
-    log.critical(
+    log.warning(
       "Incorrect long user stake balance in graph. Stake in graph: {}, Stake Withdrawn in graph: {}, Stake Amount (with withdrawn stakes equal zero) in contracts: {}",
       [
         userStakeLong.amount.toString(),
@@ -948,7 +948,7 @@ export function handleStakeShifted(event: StakeShifted): void {
   }
 
   if (!shortCorrect) {
-    log.critical(
+    log.warning(
       "Incorrect short user stake balance in graph. Stake in graph: {}, Stake Withdrawn in graph: {}, Stake Amount (with withdrawn stakes equal zero) in contracts: {}",
       [
         userStakeShort.amount.toString(),

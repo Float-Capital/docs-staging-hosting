@@ -42,7 +42,7 @@ module ConfirmedTransactionModal = {
 
 @react.component
 let make = (~txStateRedeem, ~resetFormButton, ~buttonText, ~buttonDisabled, ~marketIndex) => {
-  let {showModal, hideModal: _} = ModalProvider.useModalDisplay()
+  let {showModal, hideModal} = ModalProvider.useModalDisplay()
 
   React.useEffect1(() => {
     switch txStateRedeem {
@@ -80,7 +80,7 @@ let make = (~txStateRedeem, ~resetFormButton, ~buttonText, ~buttonDisabled, ~mar
           <MessageUsOnDiscord />
         </div>,
       )
-    | _ => ()
+    | _ => hideModal()
     }
     None
   }, [txStateRedeem])

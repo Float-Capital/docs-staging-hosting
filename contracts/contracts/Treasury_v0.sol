@@ -17,9 +17,13 @@ contract Treasury_v0 is AccessControlledAndUpgradeable {
   address public paymentToken;
   address public floatToken;
 
-  function initialize(address _admin) external initializer {
+  function initialize(
+    address _admin,
+    address _paymentToken,
+    address _floatToken
+  ) external initializer {
     _AccessControlledAndUpgradeable_init(_admin);
-    // paymentToken = _paymentToken;
-    // floatToken = _floatToken;
+    paymentToken = _paymentToken;
+    floatToken = _floatToken;
   }
 }

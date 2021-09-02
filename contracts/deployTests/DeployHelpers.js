@@ -57,20 +57,6 @@ function stakeSynthLong(amount, longShort, marketIndex, user) {
               }));
 }
 
-function stakeSynthShort(amount, longShort, marketIndex, user) {
-  return LetOps.AwaitThen.let_(longShort.syntheticTokens(marketIndex, false), (function (shortAddress) {
-                return LetOps.AwaitThen.let_(SyntheticToken.at(shortAddress), (function (synth) {
-                              return LetOps.Await.let_(synth.balanceOf(user.address), (function (usersSyntheticTokenBalance) {
-                                            if (Globals.bnGt(usersSyntheticTokenBalance, Globals.bnFromString("0"))) {
-                                              synth.connect(user).stake(amount);
-                                              return ;
-                                            }
-                                            
-                                          }));
-                            }));
-              }));
-}
-
 function executeOnMarkets(marketIndexes, functionToExecute) {
   return Belt_Array.reduce(marketIndexes, Promise.resolve(undefined), (function (previousPromise, marketIndex) {
                 return LetOps.AwaitThen.let_(previousPromise, (function (param) {
@@ -184,7 +170,6 @@ exports.topupBalanceIfLow = topupBalanceIfLow;
 exports.updateSystemState = updateSystemState;
 exports.mintAndApprove = mintAndApprove;
 exports.stakeSynthLong = stakeSynthLong;
-exports.stakeSynthShort = stakeSynthShort;
 exports.executeOnMarkets = executeOnMarkets;
 exports.setOracleManagerPrice = setOracleManagerPrice;
 exports.redeemShortNextPriceWithSystemUpdate = redeemShortNextPriceWithSystemUpdate;
