@@ -85,6 +85,9 @@ let runTestTransactions =
   let shortMintAmount = longMintAmount->div(bnFromInt(2));
   let redeemShortAmount = shortMintAmount->div(bnFromInt(2));
   let longStakeAmount = longMintAmount->div(bnFromInt(2));
+  let shortStakeAmount = shortMintAmount->div(bnFromInt(2));
+
+  let bothStakeAmount = shortStakeAmount->div(bnFromInt(2));
 
   let priceAndStateUpdate = () => {
     let%AwaitThen _ =
@@ -115,6 +118,19 @@ let runTestTransactions =
       ),
     );
 
+  let%AwaitThen _ =
+    executeOnMarkets(
+      initialMarkets,
+      mintLongNextPriceWithSystemUpdate(
+        ~amount=longMintAmount,
+        ~marketIndex=_,
+        ~paymentToken,
+        ~longShort,
+        ~user=user3,
+        ~admin,
+      ),
+    );
+
   Js.log("Executing Short Mints");
   let%AwaitThen _ =
     executeOnMarkets(
@@ -125,6 +141,32 @@ let runTestTransactions =
         ~paymentToken,
         ~longShort,
         ~user=user1,
+        ~admin,
+      ),
+    );
+
+  let%AwaitThen _ =
+    executeOnMarkets(
+      initialMarkets,
+      mintShortNextPriceWithSystemUpdate(
+        ~amount=longMintAmount,
+        ~marketIndex=_,
+        ~paymentToken,
+        ~longShort,
+        ~user=user2,
+        ~admin,
+      ),
+    );
+
+  let%AwaitThen _ =
+    executeOnMarkets(
+      initialMarkets,
+      mintShortNextPriceWithSystemUpdate(
+        ~amount=longMintAmount,
+        ~marketIndex=_,
+        ~paymentToken,
+        ~longShort,
+        ~user=user3,
         ~admin,
       ),
     );
@@ -183,18 +225,113 @@ let runTestTransactions =
       ),
     );
 
+  Js.log("Staking short position");
+  let%AwaitThen _ =
+    executeOnMarkets(
+      initialMarkets,
+      stakeSynthShort(
+        ~amount=shortStakeAmount,
+        ~longShort,
+        ~marketIndex=_,
+        ~user=user2,
+      ),
+    );
+
+  Js.log("Staking in both sides");
+  let%AwaitThen _ =
+    executeOnMarkets(
+      initialMarkets,
+      stakeSynthShort(
+        ~amount=bothStakeAmount,
+        ~longShort,
+        ~marketIndex=_,
+        ~user=user3,
+      ),
+    );
+
+  let%AwaitThen _ =
+    executeOnMarkets(
+      initialMarkets,
+      stakeSynthLong(
+        ~amount=bothStakeAmount,
+        ~longShort,
+        ~marketIndex=_,
+        ~user=user3,
+      ),
+    );
+
   let%AwaitThen _ = priceAndStateUpdate();
 
-  Js.log("Shifting stake");
-  let%AwaitThen _ = executeOnMarkets(initialMarkets, (marketIndex) => {
-    staker->ContractHelpers.connect(~address=user1)->Staker.shiftTokens(~amountSyntheticTokensToShift=longStakeAmount->Ethers.BigNumber.div(CONSTANTS.twoBn), ~marketIndex, ~isShiftFromLong=true);
-  })
+  Js.log("Shifting stake long");
+  let%AwaitThen _ =
+    executeOnMarkets(initialMarkets, marketIndex => {
+      staker
+      ->ContractHelpers.connect(~address=user1)
+      ->Staker.shiftTokens(
+          ~amountSyntheticTokensToShift=longStakeAmount,
+          ~marketIndex,
+          ~isShiftFromLong=true,
+        )
+    });
+
+  Js.log("Shifting stake short");
+  let%AwaitThen _ =
+    executeOnMarkets(initialMarkets, marketIndex => {
+      staker
+      ->ContractHelpers.connect(~address=user2)
+      ->Staker.shiftTokens(
+          ~amountSyntheticTokensToShift=
+            shortStakeAmount->div(CONSTANTS.twoBn),
+          ~marketIndex,
+          ~isShiftFromLong=false,
+        )
+    });
+
+  Js.log("Shifting stake both sides");
+  let%AwaitThen _ =
+    executeOnMarkets(initialMarkets, marketIndex => {
+      staker
+      ->ContractHelpers.connect(~address=user3)
+      ->Staker.shiftTokens(
+          ~amountSyntheticTokensToShift=bothStakeAmount->div(CONSTANTS.twoBn),
+          ~marketIndex,
+          ~isShiftFromLong=false,
+        )
+    });
+
+  let%AwaitThen _ =
+    executeOnMarkets(initialMarkets, marketIndex => {
+      staker
+      ->ContractHelpers.connect(~address=user3)
+      ->Staker.shiftTokens(
+          ~amountSyntheticTokensToShift=bothStakeAmount,
+          ~marketIndex,
+          ~isShiftFromLong=true,
+        )
+    });
 
   let%AwaitThen _ = priceAndStateUpdate();
 
-  let%AwaitThen _ = executeOnMarkets(initialMarkets, (marketIndex) => {
-    staker->ContractHelpers.connect(~address=user1)->Staker.claimFloatCustom(~marketIndexes=[|marketIndex|]);
-  })
+  let%AwaitThen _ =
+    executeOnMarkets(initialMarkets, marketIndex => {
+      staker
+      ->ContractHelpers.connect(~address=user1)
+      ->Staker.claimFloatCustom(~marketIndexes=[|marketIndex|])
+    });
+
+  let%AwaitThen _ =
+    executeOnMarkets(initialMarkets, marketIndex => {
+      staker
+      ->ContractHelpers.connect(~address=user2)
+      ->Staker.claimFloatCustom(~marketIndexes=[|marketIndex|])
+    });
+
+  let%AwaitThen _ =
+    executeOnMarkets(initialMarkets, marketIndex => {
+      staker
+      ->ContractHelpers.connect(~address=user3)
+      ->Staker.claimFloatCustom(~marketIndexes=[|marketIndex|])
+    });
 
   JsPromise.resolve();
 };

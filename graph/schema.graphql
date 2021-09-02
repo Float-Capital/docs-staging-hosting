@@ -288,7 +288,19 @@ type UserCurrentNextPriceStakeAction @entity {
   currentAction: UserNextPriceStakeAction!
   user: User!
 }
-# TODL: add component - for tx history / finer-grained ui stuff
+
+type UserNextPriceStakeActionComponent @entity {
+  id: ID! # actionComponent-<userAddress>-<marketIndex>-<update-index>-<type>-<index-of-type> // the index-of-type is for the case that multiple actions of the same type occur
+  actionType: NextPriceAction!
+  marketSide: MarketSide!
+  amount: BigInt!
+  user: User!
+  updateIndex: BigInt!
+  marketIndex: BigInt!
+  timestamp: BigInt!
+  userAggregateAction: UserNextPriceStakeAction!
+  associatedBatch: BatchedNextPriceStakeAction!
+}
 
 type UserNextPriceStakeAction @entity {
   id: ID! # userAddress-marketIndex-updateIndex
@@ -300,10 +312,11 @@ type UserNextPriceStakeAction @entity {
   settledTimestamp: BigInt! # note: like mints, confirmed == settled from user's perspective.
   settled: Boolean!
   floatMintedPastSettled: Boolean!
+  nextPriceActionComponents: [UserNextPriceStakeActionComponent!]!
 }
 
 type Stake @entity {
-  id: ID! # "tokenAddressString" - "txHashString"
+  id: ID! # userAddressString-tokenAddressString-txHashString
   timestamp: BigInt!
   blockNumber: BigInt!
   creationTxHash: Bytes!

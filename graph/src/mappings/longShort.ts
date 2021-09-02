@@ -327,7 +327,6 @@ export function handleSystemStateUpdated(event: SystemStateUpdated): void {
     marketIndex.toString() + "-" + updateIndex.toString()
   );
 
-  log.warning(marketIndex.toString() + "-" + updateIndex.toString(), []);
 
   if (batchedNextPriceStakeLoad != null) {
     let batchedNextPriceStakerShifts = batchedNextPriceStakeLoad as BatchedNextPriceStakeAction;
@@ -402,7 +401,11 @@ export function handleSystemStateUpdated(event: SystemStateUpdated): void {
 
       if (!newStakeAmountLong.equals(ZERO)) {
         let stakeId =
-          syntheticMarket.syntheticLong.toString() + "-" + txHash.toHex();
+          user.id +
+          "-" +
+          syntheticMarket.syntheticLong.toString() +
+          "-" +
+          txHash.toHex();
         let stake = new Stake(stakeId);
         stake.timestamp = timestamp;
         stake.blockNumber = blockNumber;
@@ -430,7 +433,11 @@ export function handleSystemStateUpdated(event: SystemStateUpdated): void {
 
       if (!newStakeAmountShort.equals(ZERO)) {
         let stakeId =
-          syntheticMarket.syntheticShort.toString() + "-" + txHash.toHex();
+          user.id +
+          "-" +
+          syntheticMarket.syntheticShort.toString() +
+          "-" +
+          txHash.toHex();
         let stake = new Stake(stakeId);
         stake.timestamp = timestamp;
         stake.blockNumber = blockNumber;

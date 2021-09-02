@@ -62,8 +62,12 @@ import {
   GLOBAL_STATE_ID,
   TEN_TO_THE_18,
   FLOAT_ISSUANCE_FIXED_DECIMAL,
+  ACTION_SHIFT,
 } from "../CONSTANTS";
-import { generateBatchedNextPriceExecId } from "../utils/nextPrice";
+import {
+  generateBatchedNextPriceExecId,
+  createUserNextPriceStakeActionComponent,
+} from "../utils/nextPrice";
 
 export function handleStakerV1(event: StakerV1): void {
   let floatAddress = event.params.floatToken;
@@ -317,7 +321,9 @@ export function handleStakeAdded(event: StakeAdded): void {
 
   let user = getOrCreateUser(userAddress, event);
 
-  let stake = new Stake(tokenAddressString + "-" + txHash.toHex());
+  let stake = new Stake(
+    userAddressString + "-" + tokenAddressString + "-" + txHash.toHex()
+  );
   stake.timestamp = timestamp;
   stake.blockNumber = blockNumber;
   stake.creationTxHash = txHash;
@@ -399,7 +405,9 @@ export function handleStakeWithdrawn(event: StakeWithdrawn): void {
 
   // If they are not withdrawing the full amount
   if (!oldStake.amount.equals(amount)) {
-    let stake = new Stake(tokenAddressString + "-" + txHash.toHex());
+    let stake = new Stake(
+      userAddressString + "-" + tokenAddressString + "-" + txHash.toHex()
+    );
     stake.timestamp = timestamp;
     stake.blockNumber = blockNumber;
     stake.creationTxHash = txHash;
@@ -661,7 +669,7 @@ export function handleFloatMinted(event: FloatMinted): void {
 
   if (expectedTotalAmount.notEqual(amountFloatMinted)) {
     if (expectedTotalAmount.notEqual(amountFloatMinted)) {
-      log.critical(
+      log.warning(
         "Float issuance breakdown is incorrect. This is either a bug in the contracts or in the graph (more likely the graph).\nexpected amount: {}\nactual amount: {}\n    {} (amount long) + {} (amount short) \n\n\n The offending transaciton is {}",
         [
           expectedTotalAmount.toString(),
@@ -801,6 +809,20 @@ export function handleNextPriceStakeShift(event: NextPriceStakeShift): void {
 
   let userNextPriceStakeActionId =
     userAddressStr + "-" + marketIndex.toString() + "-" + userShiftIndexStr;
+
+  let batchId = userAddressStr + "-" + marketIndexStr;
+  let userNextPriceStakeActionComponent = createUserNextPriceStakeActionComponent(
+    user,
+    marketIndex,
+    userShiftIndex,
+    amount,
+    ACTION_SHIFT,
+    isShiftFromLong,
+    userNextPriceStakeActionId,
+    batchId,
+    event
+  );
+
   let userNextPriceStakeActionRetrieval = getOrInitializeUserNextPriceStakeAction(
     userNextPriceStakeActionId
   );
@@ -853,6 +875,10 @@ export function handleNextPriceStakeShift(event: NextPriceStakeShift): void {
       amount
     );
   }
+
+  userNextPriceStakeAction.nextPriceActionComponents = userNextPriceStakeAction.nextPriceActionComponents.concat(
+    [userNextPriceStakeActionComponent.id]
+  );
 
   userNextPriceStakeAction.save();
 
@@ -912,7 +938,7 @@ export function handleStakeShifted(event: StakeShifted): void {
 
   if (!longCorrect) {
     log.critical(
-      "Incorrect user stake balance in graph. Stake in graph: {}, Stake Withdrawn in graph: {}, Stake Amount (with withdrawn stakes equal zero) in contracts: {}",
+      "Incorrect long user stake balance in graph. Stake in graph: {}, Stake Withdrawn in graph: {}, Stake Amount (with withdrawn stakes equal zero) in contracts: {}",
       [
         userStakeLong.amount.toString(),
         userStakeLong.withdrawn ? "true" : "false",
@@ -923,7 +949,7 @@ export function handleStakeShifted(event: StakeShifted): void {
 
   if (!shortCorrect) {
     log.critical(
-      "Incorrect user stake balance in graph. Stake in graph: {}, Stake Withdrawn in graph: {}, Stake Amount (with withdrawn stakes equal zero) in contracts: {}",
+      "Incorrect short user stake balance in graph. Stake in graph: {}, Stake Withdrawn in graph: {}, Stake Amount (with withdrawn stakes equal zero) in contracts: {}",
       [
         userStakeShort.amount.toString(),
         userStakeShort.withdrawn ? "true" : "false",
