@@ -27,9 +27,9 @@ contract OracleManagerChainlink is IOracleManager {
   ////////////////////////////////////
   ///// CONTRACT SET-UP //////////////
   ////////////////////////////////////
-  constructor(address _admin, address _chainLinkOracle) {
+  constructor(address _admin, address _chainlinkOracle) {
     admin = _admin;
-    chainlinkOracle = AggregatorV3Interface(_chainLinkOracle);
+    chainlinkOracle = AggregatorV3Interface(_chainlinkOracle);
     oracleDecimals = chainlinkOracle.decimals();
   }
 

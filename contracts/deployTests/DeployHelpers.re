@@ -277,7 +277,7 @@ let deployMumbaiMarket =
   let%AwaitThen oracleManager =
     OracleManagerChainlink.make(
       ~admin=admin.address,
-      ~chainLinkOracle=oraclePriceFeedAddress,
+      ~chainlinkOracle=oraclePriceFeedAddress,
     );
 
   let%AwaitThen yieldManager =
@@ -363,7 +363,7 @@ let deployMumbaiMarketUpgradeable =
           "initializer": true,
           "args": (
             "Float Short " ++ syntheticName,
-            "fs" ++ syntheticSymbol,
+            "f↗️" ++ syntheticSymbol,
             longShortInstance.address,
             stakerInstance.address,
             newMarketIndex,
@@ -383,7 +383,7 @@ let deployMumbaiMarketUpgradeable =
           "initializer": true,
           "args": (
             "Float Long " ++ syntheticName,
-            "fl" ++ syntheticSymbol,
+            "f↘️" ++ syntheticSymbol,
             longShortInstance.address,
             stakerInstance.address,
             newMarketIndex,
@@ -393,32 +393,57 @@ let deployMumbaiMarketUpgradeable =
       },
     );
 
+  Js.log("a.1");
+
   let%AwaitThen oracleManager =
     OracleManagerChainlinkTestnet.make(
       ~admin=admin.address,
       ~maxUpdateIntervalSeconds=bnFromInt(27),
-      ~chainLinkOracle=oraclePriceFeedAddress,
+      ~chainlinkOracle=oraclePriceFeedAddress,
     );
+  Js.log("a.2");
 
+  let aavePoolAddressProviderMumbai = "0x178113104fEcbcD7fF8669a0150721e231F0FD4B";
+  let mumbaiADai = "0x639cB7b21ee2161DF9c882483C9D55c90c20Ca3e";
+  let mumbaiAaveIncentivesController = "0xd41aE58e803Edf4304334acCE4DC4Ec34a63C644";
+
+  Js.log("a.3");
   let%AwaitThen yieldManager =
-    YieldManagerMock.make(
-      ~longShort=longShortInstance.address,
-      ~treasury=treasuryInstance.address,
-      ~token=paymentToken.address,
+    deployments->Hardhat.deploy(
+      ~name="SyntheticTokenUpgradeable",
+      ~arguments={
+        "from": namedAccounts.deployer,
+        "log": true,
+        "proxy": {
+          "proxyContract": "UUPSProxy",
+          "initializer": true,
+          "args": (
+            // address _longShort,
+            longShortInstance.address,
+            // address _treasury,
+            treasuryInstance.address,
+            // address _paymentToken,
+            paymentToken.address,
+            // address _aToken,
+            mumbaiADai,
+            // address _lendingPoolAddressesProvider,
+            aavePoolAddressProviderMumbai,
+            // address _aaveIncentivesController,
+            mumbaiAaveIncentivesController,
+            // uint16 _aaveReferralCode,
+            0,
+            // address _admin
+            admin,
+          ),
+        },
+      },
     );
-
-  let%AwaitThen mintRole = paymentToken->ERC20Mock.mINTER_ROLE;
-
-  let%AwaitThen _ =
-    paymentToken->ERC20Mock.grantRole(
-      ~role=mintRole,
-      ~account=yieldManager.address,
-    );
+  Js.log("a.4");
 
   let%AwaitThen _ =
     longShortInstance
     ->ContractHelpers.connect(~address=admin)
-    ->LongShort.createNewSyntheticMarketExternalSyntheticTokens(
+    ->Custom.createNewSyntheticMarketExternalSyntheticTokensWithOptions(
         ~syntheticName,
         ~syntheticSymbol,
         ~longToken=syntheticTokenLong.address,
@@ -426,23 +451,20 @@ let deployMumbaiMarketUpgradeable =
         ~paymentToken=paymentToken.address,
         ~oracleManager=oracleManager.address,
         ~yieldManager=yieldManager.address,
+        ~options={"gasLimit": 10000000},
       );
+
+  Js.log("a.5");
 
   let kInitialMultiplier = bnFromString("5000000000000000000"); // 5x
   let kPeriod = bnFromInt(864000); // 10 days
 
-  let%AwaitThen _ =
-    mintAndApprove(
-      ~paymentToken,
-      ~amount=bnFromString("2000000000000000000"),
-      ~user=admin,
-      ~approvedAddress=longShortInstance.address,
-    );
-
+  Js.log("a.6");
   let unstakeFee_e18 = bnFromString("5000000000000000"); // 50 basis point unstake fee
   let initialMarketSeedForEachMarketSide =
     bnFromString("1000000000000000000");
 
+  Js.log("a.7");
   longShortInstance
   ->ContractHelpers.connect(~address=admin)
   ->LongShort.initializeMarket(

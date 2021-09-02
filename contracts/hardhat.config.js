@@ -79,32 +79,20 @@ module.exports = {
     mumbai: {
       chainId: 80001,
       url: mumbaiProviderUrl || "https://rpc-mumbai.maticvigil.com/v1",
-      accounts: { mnemonic }
+      accounts: { mnemonic },
+      gasPrice: 50
     },
   },
   paths: {
     tests: isWaffleTest ? "./test-waffle" : "./test",
   },
   namedAccounts: {
-    deployer: {
-      default: 0, // here this will by default take the first account as deployer
-      1: 0, // similarly on mainnet it will take the first account as deployer. Note though that depending on how hardhat network are configured, the account 0 on one network can be different than on another
-    },
-    admin: {
-      default: 1,
-    },
-    user1: {
-      default: 2,
-    },
-    user2: {
-      default: 3,
-    },
-    user3: {
-      default: 4,
-    },
-    user4: {
-      default: 5,
-    },
+    deployer: 0,
+    admin: 1,
+    user1: 2,
+    user2: 3,
+    user3: 4,
+    user4: 5,
   },
   gasReporter: {
     // Disabled by default for faster running of tests
