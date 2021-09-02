@@ -57,7 +57,7 @@ let runTestTransactions = ({longShort, treasury, paymentToken, staker}) => {
   let longMintAmount = bnFromString("10000000000000000000");
   let shortMintAmount = longMintAmount->div(bnFromInt(2));
   let redeemShortAmount = shortMintAmount->div(bnFromInt(2));
-  let longStakeAmount = bnFromInt(1);
+  let longStakeAmount = longMintAmount->div(bnFromInt(2));
 
   let priceAndStateUpdate = () => {
     let%AwaitThen _ =
@@ -160,11 +160,14 @@ let runTestTransactions = ({longShort, treasury, paymentToken, staker}) => {
 
   Js.log("Shifting stake");
   let%AwaitThen _ = executeOnMarkets(initialMarkets, (marketIndex) => {
-    staker->Staker.shiftTokens(~amountSyntheticTokensToShift=longStakeAmount->Ethers.BigNumber.div(CONSTANTS.twoBn), ~marketIndex, ~isShiftFromLong=true);
+    staker->ContractHelpers.connect(~address=user1)->Staker.shiftTokens(~amountSyntheticTokensToShift=longStakeAmount->Ethers.BigNumber.div(CONSTANTS.twoBn), ~marketIndex, ~isShiftFromLong=true);
   })
 
   let%AwaitThen _ = priceAndStateUpdate();
 
+  let%AwaitThen _ = executeOnMarkets(initialMarkets, (marketIndex) => {
+    staker->ContractHelpers.connect(~address=user1)->Staker.claimFloatCustom(~marketIndexes=[|marketIndex|]);
+  })
 
   JsPromise.resolve();
 };

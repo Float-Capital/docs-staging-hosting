@@ -323,10 +323,8 @@ export function handleSystemStateUpdated(event: SystemStateUpdated): void {
     batchedNextPriceExec.save();
   }
 
-  // staker update index lags behind market update index by 1.
-  let stakerUpdateIndex = marketIndex.minus(ONE).toString();
   let batchedNextPriceStakeLoad = BatchedNextPriceStakeAction.load(
-    stakerUpdateIndex.toString() + "-" + updateIndex.toString()
+    marketIndex.toString() + "-" + updateIndex.toString()
   );
 
   log.warning(marketIndex.toString() + "-" + updateIndex.toString(), []);
@@ -334,10 +332,6 @@ export function handleSystemStateUpdated(event: SystemStateUpdated): void {
   if (batchedNextPriceStakeLoad != null) {
     let batchedNextPriceStakerShifts = batchedNextPriceStakeLoad as BatchedNextPriceStakeAction;
     let blockNumber = event.block.number;
-    let accumulativeFloatIssuanceSnapshotId = generateAccumulativeFloatIssuanceSnapshotId(
-      marketIndex,
-      updateIndex
-    );
     let linkedNextPriceStakerActions =
       batchedNextPriceStakerShifts.linkedUserNextPriceStakeActions;
     for (let i = 0; i < linkedNextPriceStakerActions.length; i++) {
@@ -365,7 +359,9 @@ export function handleSystemStateUpdated(event: SystemStateUpdated): void {
       let oldStakeAmountLong = ZERO;
       let oldStakeAmountShort = ZERO;
 
-      let currentStakeLongId = syntheticMarket.syntheticLong + "-" + user.id;
+      let currentStakeLongId =
+        syntheticMarket.syntheticLong + "-" + user.id + "-currentStake";
+
       let currentStakeLong = CurrentStake.load(currentStakeLongId);
 
       if (currentStakeLong != null) {
@@ -377,7 +373,8 @@ export function handleSystemStateUpdated(event: SystemStateUpdated): void {
         }
       }
 
-      let currentStakeShortId = syntheticMarket.syntheticShort + "-" + user.id;
+      let currentStakeShortId =
+        syntheticMarket.syntheticShort + "-" + user.id + "-currentStake";
       let currentStakeShort = CurrentStake.load(currentStakeShortId);
 
       if (currentStakeShort != null) {
@@ -404,12 +401,14 @@ export function handleSystemStateUpdated(event: SystemStateUpdated): void {
       let newStakeAmountShort = oldStakeAmountShort.plus(deltaShort);
 
       if (!newStakeAmountLong.equals(ZERO)) {
-        let stake = new Stake(txHash.toString());
+        let stakeId =
+          syntheticMarket.syntheticLong.toString() + "-" + txHash.toHex();
+        let stake = new Stake(stakeId);
         stake.timestamp = timestamp;
         stake.blockNumber = blockNumber;
         stake.creationTxHash = txHash;
         stake.syntheticToken = syntheticMarket.syntheticLong;
-        stake.amount = oldStakeAmountLong.plus(deltaLong);
+        stake.amount = newStakeAmountLong;
         stake.user = userAddress.toHex();
         stake.withdrawn = false;
         stake.save();
@@ -421,20 +420,23 @@ export function handleSystemStateUpdated(event: SystemStateUpdated): void {
             syntheticMarket.syntheticLong,
             user.address,
             marketIndex,
-            accumulativeFloatIssuanceSnapshotId
+            currentStakeShort.lastMintState // currentStakeShort won't be null - if it is major problem
           );
+          user.currentStakes = user.currentStakes.concat([currentStakeLongId]);
         }
-        currentStakeLong.currentStake = txHash.toString();
+        currentStakeLong.currentStake = stakeId;
         currentStakeLong.save();
       }
 
       if (!newStakeAmountShort.equals(ZERO)) {
-        let stake = new Stake(txHash.toString());
+        let stakeId =
+          syntheticMarket.syntheticShort.toString() + "-" + txHash.toHex();
+        let stake = new Stake(stakeId);
         stake.timestamp = timestamp;
         stake.blockNumber = blockNumber;
         stake.creationTxHash = txHash;
         stake.syntheticToken = syntheticMarket.syntheticShort;
-        stake.amount = oldStakeAmountShort.plus(deltaShort);
+        stake.amount = newStakeAmountShort;
         stake.user = userAddress.toHex();
         stake.withdrawn = false;
         stake.save();
@@ -446,12 +448,14 @@ export function handleSystemStateUpdated(event: SystemStateUpdated): void {
             syntheticMarket.syntheticShort,
             user.address,
             marketIndex,
-            accumulativeFloatIssuanceSnapshotId
+            currentStakeLong.lastMintState // currentStakeLong won't be null - if it is major problem
           );
+          user.currentStakes = user.currentStakes.concat([currentStakeShortId]);
         }
-        currentStakeShort.currentStake = txHash.toString();
+        currentStakeShort.currentStake = stakeId;
         currentStakeShort.save();
       }
+      user.save();
     }
   }
 
@@ -1045,4 +1049,58 @@ function updateLatestUnderlyingPrice(
   }
 }
 
-// TODO - ADD A HANDLER FOR USER SYNTHETIC POSITION SHIFTS
+export function handleNextPriceSyntheticPositionShift(
+  event: NextPriceSyntheticPositionShift
+): void {
+  let synthShifted = event.params.synthShifted;
+  let marketIndex = event.params.marketIndex;
+  let oracleUpdateIndex = event.params.oracleUpdateIndex;
+  let isShiftFromLong = event.params.isShiftFromLong;
+  let userAddress = event.params.user;
+
+  let user = getUser(userAddress);
+  let syntheticMarket = getSyntheticMarket(marketIndex.toString());
+
+  let userNextPriceActionComponent = createUserNextPriceActionComponent(
+    user,
+    syntheticMarket,
+    oracleUpdateIndex,
+    synthShifted,
+    ACTION_SHIFT,
+    isShiftFromLong,
+    event
+  );
+
+  let batchedNextPriceExec = createOrUpdateBatchedNextPriceExec(
+    userNextPriceActionComponent
+  );
+  let userNextPriceAction = createOrUpdateUserNextPriceAction(
+    userNextPriceActionComponent,
+    syntheticMarket,
+    user
+  );
+  userNextPriceAction.confirmedTimestamp = event.block.timestamp;
+
+  userNextPriceAction.save();
+  batchedNextPriceExec.save();
+
+  saveEventToStateChange(
+    event,
+    "NextPriceSyntheticPositionShift",
+    bigIntArrayToStringArray([
+      synthShifted,
+      marketIndex,
+      oracleUpdateIndex,
+    ]).concat([isShiftFromLong ? "true" : "false", user.id]),
+    [
+      "synthShifted",
+      "marketIndex",
+      "oracleUpdateIndex",
+      "isShiftFromLong",
+      "user",
+    ],
+    ["uint256", "uint32", "uint256", "bool", "address"],
+    [userAddress],
+    []
+  );
+}

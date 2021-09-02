@@ -64,6 +64,14 @@ interface IStaker {
     uint256 userShiftIndex
   );
 
+  // only for graph validation
+  event StakeShifted(
+    address user,
+    uint32 marketIndex,
+    uint256 newAmountStakedLong,
+    uint256 newAmountStakedShort
+  );
+
   // change name
 
   function userAmountStaked(address, address) external view returns (uint256);

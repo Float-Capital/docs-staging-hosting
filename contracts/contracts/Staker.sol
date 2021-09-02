@@ -675,6 +675,8 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
       userAmountStaked[longToken][user] = amountStakedLong;
       userAmountStaked[shortToken][user] = amountStakedShort;
 
+      emit StakeShifted(user, marketIndex, amountStakedLong, amountStakedShort);
+
       floatReward += _calculateAccumulatedFloatInRange(
         marketIndex,
         amountStakedLong,
@@ -836,6 +838,7 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
       msg.sender
     )
   {
+    require(amountSyntheticTokensToShift > 0, "No zero shifts.");
     address token = syntheticTokens[marketIndex][isShiftFromLong];
     uint256 totalAmountForNextShift = amountSyntheticTokensToShift +
       userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[marketIndex][isShiftFromLong][

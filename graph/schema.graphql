@@ -303,7 +303,7 @@ type UserNextPriceStakeAction @entity {
 }
 
 type Stake @entity {
-  id: ID! # "txHashString"
+  id: ID! # "tokenAddressString" - "txHashString"
   timestamp: BigInt!
   blockNumber: BigInt!
   creationTxHash: Bytes!

@@ -37,6 +37,8 @@ dataSources:
           handler: handleNextPriceDeposit
         - event: NextPriceRedeem(uint32,bool,uint256,address,uint256)
           handler: handleNextPriceRedeem
+        - event: NextPriceSyntheticPositionShift(uint32,bool,uint256,address,uint256)
+          handler: handleNextPriceSyntheticPositionShift
         - event: OracleUpdated(uint32,address,address)
           handler: handleOracleUpdated
         - event: SyntheticMarketCreated(uint32,address,address,address,int256,string,string,address,address)
@@ -87,6 +89,8 @@ dataSources:
           handler: handleMarketLaunchIncentiveParametersChanges
         - event: StakeAdded(address,address,uint256,uint256)
           handler: handleStakeAdded
+        - event: StakeShifted(address,uint32,uint256,uint256)
+          handler: handleStakeShifted
         - event: StakeWithdrawalFeeUpdated(uint32,uint256)
           handler: handleStakeWithdrawalFeeUpdated
         - event: StakeWithdrawn(address,address,uint256)
