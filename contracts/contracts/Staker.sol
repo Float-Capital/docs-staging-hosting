@@ -362,7 +362,7 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
     uint256 initialTimestamp = accumulativeFloatPerSyntheticTokenSnapshots[marketIndex][0]
       .timestamp;
 
-    if (block.timestamp - initialTimestamp <= kPeriod) {
+    if (block.timestamp - initialTimestamp <= kPeriod && kPeriod != 0) {
       return
         kInitialMultiplier -
         (((kInitialMultiplier - 1e18) * (block.timestamp - initialTimestamp)) / kPeriod);
@@ -675,6 +675,8 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
       userAmountStaked[longToken][user] = amountStakedLong;
       userAmountStaked[shortToken][user] = amountStakedShort;
 
+      emit StakeShifted(user, marketIndex, amountStakedLong, amountStakedShort);
+
       floatReward += _calculateAccumulatedFloatInRange(
         marketIndex,
         amountStakedLong,
@@ -836,6 +838,7 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
       msg.sender
     )
   {
+    require(amountSyntheticTokensToShift > 0, "No zero shifts.");
     address token = syntheticTokens[marketIndex][isShiftFromLong];
     uint256 totalAmountForNextShift = amountSyntheticTokensToShift +
       userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[marketIndex][isShiftFromLong][
@@ -857,9 +860,16 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
       msg.sender
     ] = totalAmountForNextShift;
 
-    userNextPrice_stakedSyntheticTokenShiftIndex[marketIndex][msg.sender] =
-      latestRewardIndex[marketIndex] +
-      1;
+    uint256 userRewardIndex = latestRewardIndex[marketIndex] + 1;
+    userNextPrice_stakedSyntheticTokenShiftIndex[marketIndex][msg.sender] = userRewardIndex;
+
+    emit NextPriceStakeShift(
+      msg.sender,
+      marketIndex,
+      amountSyntheticTokensToShift,
+      isShiftFromLong,
+      userRewardIndex
+    );
   }
 
   /*╔════════════════════════════╗

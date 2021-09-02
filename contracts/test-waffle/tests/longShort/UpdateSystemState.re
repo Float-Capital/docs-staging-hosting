@@ -237,11 +237,11 @@ let testUnit =
             staker.contents
             ->StakerSmocked.pushUpdatedMarketPricesToUpdateFloatIssuanceCalculationsCallCheck({
                 marketIndex,
-                marketUpdateIndex: latestUpdateIndexForMarket,
-                longPrice: oldLongPrice,
-                shortPrice: oldShortPrice,
-                longValue: oldLongValue,
-                shortValue: oldShortValue,
+                marketUpdateIndex: latestUpdateIndexForMarket->add(oneBn),
+                longPrice: potentialNewLongPrice.contents,
+                shortPrice: potentialNewShortPrice.contents,
+                longValue:  oldLongValueAfterYield->add(valueChangeLong),
+                shortValue: oldShortValueAfterYield->add(valueChangeShort),
               });
           },
         );
