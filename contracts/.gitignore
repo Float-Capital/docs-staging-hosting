@@ -46,7 +46,7 @@ contracts/testing/generated/*
 
 contract-docs
 
-deployments
+deployments/*
 !deployments/mumbai
 
 deploymentSummary.json
