@@ -15,7 +15,10 @@ const mumbaiDaiAddress = "0x001B3B4d0F3714Ca98ba10F6042DaEbF0B1B7b6F";
 
 module.exports = async ({ getNamedAccounts, deployments }) => {
   const { deploy } = deployments;
-  const { deployer, admin } = await getNamedAccounts();
+  // const { deployer, admin } = await getNamedAccounts();
+  const accounts = await ethers.getSigners();
+  const deployer = accounts[0].address;
+  const admin = accounts[1].address;
 
   let paymentTokenAddress;
 
@@ -72,7 +75,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     log: true,
   });
 
-  await deploy(STAKER, {
+  const staker = await deploy(STAKER, {
     from: deployer,
     log: true,
     proxy: {
@@ -89,6 +92,8 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
       initializer: false,
     },
   });
+  console.log("StakerDeployed", staker.address)
+  console.log("LongShortDeployed", longShort.address)
 
   await deploy(TOKEN_FACTORY, {
     from: admin,

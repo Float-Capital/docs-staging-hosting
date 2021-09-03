@@ -354,8 +354,9 @@ let deployMumbaiMarketUpgradeable =
 
   let%AwaitThen syntheticTokenShort =
     deployments->Hardhat.deploy(
-      ~name="SyntheticTokenUpgradeable",
+      ~name="SS" ++ syntheticSymbol,
       ~arguments={
+        "contract": "SyntheticTokenUpgradeable",
         "from": namedAccounts.deployer,
         "log": true,
         "proxy": {
@@ -374,10 +375,12 @@ let deployMumbaiMarketUpgradeable =
     );
   let%AwaitThen syntheticTokenLong =
     deployments->Hardhat.deploy(
-      ~name="SyntheticTokenUpgradeable",
+      ~name="SL" ++ syntheticSymbol,
       ~arguments={
         "from": namedAccounts.deployer,
         "log": true,
+        "contract": "SyntheticTokenUpgradeable",
+        "skipIfAlreadyDeployed": false,
         "proxy": {
           "proxyContract": "UUPSProxy",
           "initializer": true,
@@ -410,9 +413,11 @@ let deployMumbaiMarketUpgradeable =
   Js.log("a.3");
   let%AwaitThen yieldManager =
     deployments->Hardhat.deploy(
-      ~name="SyntheticTokenUpgradeable",
+      ~name="YM" ++ syntheticSymbol,
       ~arguments={
         "from": namedAccounts.deployer,
+        "skipIfAlreadyDeployed": false,
+        "contract": "YieldManagerAave",
         "log": true,
         "proxy": {
           "proxyContract": "UUPSProxy",
@@ -439,11 +444,22 @@ let deployMumbaiMarketUpgradeable =
       },
     );
   Js.log("a.4");
+  let%AwaitThen yieldManagerInstance =
+    deployments->Hardhat.get(~name="YM" ++ syntheticSymbol);
+  Js.log("a.4.1");
+  let%AwaitThen longShortFromYieldManager =
+    yieldManagerInstance->YieldManagerAave.longShort;
+  Js.log((
+    longShortFromYieldManager,
+    yieldManager.address,
+    syntheticTokenLong.address,
+    syntheticTokenShort.address,
+  ));
 
   let%AwaitThen _ =
     longShortInstance
     ->ContractHelpers.connect(~address=admin)
-    ->Custom.createNewSyntheticMarketExternalSyntheticTokensWithOptions(
+    ->LongShort.createNewSyntheticMarketExternalSyntheticTokens(
         ~syntheticName,
         ~syntheticSymbol,
         ~longToken=syntheticTokenLong.address,
@@ -451,7 +467,6 @@ let deployMumbaiMarketUpgradeable =
         ~paymentToken=paymentToken.address,
         ~oracleManager=oracleManager.address,
         ~yieldManager=yieldManager.address,
-        ~options={"gasLimit": 10000000},
       );
 
   Js.log("a.5");

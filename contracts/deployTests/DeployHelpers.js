@@ -188,7 +188,8 @@ function deployMumbaiMarket(syntheticName, syntheticSymbol, longShortInstance, t
 function deployMumbaiMarketUpgradeable(syntheticName, syntheticSymbol, longShortInstance, stakerInstance, treasuryInstance, admin, paymentToken, oraclePriceFeedAddress, deployments, namedAccounts) {
   return LetOps.AwaitThen.let_(longShortInstance.latestMarket(), (function (latestMarket) {
                 var newMarketIndex = latestMarket + 1 | 0;
-                return LetOps.AwaitThen.let_(deployments.deploy("SyntheticTokenUpgradeable", {
+                return LetOps.AwaitThen.let_(deployments.deploy("SS" + syntheticSymbol, {
+                                contract: "SyntheticTokenUpgradeable",
                                 from: namedAccounts.deployer,
                                 log: true,
                                 proxy: {
@@ -204,9 +205,11 @@ function deployMumbaiMarketUpgradeable(syntheticName, syntheticSymbol, longShort
                                   ]
                                 }
                               }), (function (syntheticTokenShort) {
-                              return LetOps.AwaitThen.let_(deployments.deploy("SyntheticTokenUpgradeable", {
+                              return LetOps.AwaitThen.let_(deployments.deploy("SL" + syntheticSymbol, {
                                               from: namedAccounts.deployer,
                                               log: true,
+                                              contract: "SyntheticTokenUpgradeable",
+                                              skipIfAlreadyDeployed: false,
                                               proxy: {
                                                 proxyContract: "UUPSProxy",
                                                 initializer: true,
@@ -224,8 +227,10 @@ function deployMumbaiMarketUpgradeable(syntheticName, syntheticSymbol, longShort
                                             return LetOps.AwaitThen.let_(OracleManagerChainlinkTestnet.make(admin.address, oraclePriceFeedAddress, Globals.bnFromInt(27)), (function (oracleManager) {
                                                           console.log("a.2");
                                                           console.log("a.3");
-                                                          return LetOps.AwaitThen.let_(deployments.deploy("SyntheticTokenUpgradeable", {
+                                                          return LetOps.AwaitThen.let_(deployments.deploy("YM" + syntheticSymbol, {
                                                                           from: namedAccounts.deployer,
+                                                                          skipIfAlreadyDeployed: false,
+                                                                          contract: "YieldManagerAave",
                                                                           log: true,
                                                                           proxy: {
                                                                             proxyContract: "UUPSProxy",
@@ -243,17 +248,26 @@ function deployMumbaiMarketUpgradeable(syntheticName, syntheticSymbol, longShort
                                                                           }
                                                                         }), (function (yieldManager) {
                                                                         console.log("a.4");
-                                                                        return LetOps.AwaitThen.let_(longShortInstance.connect(admin).createNewSyntheticMarketExternalSyntheticTokens(syntheticName, syntheticSymbol, syntheticTokenLong.address, syntheticTokenShort.address, paymentToken.address, oracleManager.address, yieldManager.address, {
-                                                                                        gasLimit: 10000000
-                                                                                      }), (function (param) {
-                                                                                      console.log("a.5");
-                                                                                      var kInitialMultiplier = Globals.bnFromString("5000000000000000000");
-                                                                                      var kPeriod = Globals.bnFromInt(864000);
-                                                                                      console.log("a.6");
-                                                                                      var unstakeFee_e18 = Globals.bnFromString("5000000000000000");
-                                                                                      var initialMarketSeedForEachMarketSide = Globals.bnFromString("1000000000000000000");
-                                                                                      console.log("a.7");
-                                                                                      return longShortInstance.connect(admin).initializeMarket(newMarketIndex, kInitialMultiplier, kPeriod, unstakeFee_e18, initialMarketSeedForEachMarketSide, Globals.bnFromInt(5), Globals.bnFromInt(0), Globals.bnFromInt(1));
+                                                                        return LetOps.AwaitThen.let_(deployments.get("YM" + syntheticSymbol), (function (yieldManagerInstance) {
+                                                                                      console.log("a.4.1");
+                                                                                      return LetOps.AwaitThen.let_(yieldManagerInstance.longShort(), (function (longShortFromYieldManager) {
+                                                                                                    console.log([
+                                                                                                          longShortFromYieldManager,
+                                                                                                          yieldManager.address,
+                                                                                                          syntheticTokenLong.address,
+                                                                                                          syntheticTokenShort.address
+                                                                                                        ]);
+                                                                                                    return LetOps.AwaitThen.let_(longShortInstance.connect(admin).createNewSyntheticMarketExternalSyntheticTokens(syntheticName, syntheticSymbol, syntheticTokenLong.address, syntheticTokenShort.address, paymentToken.address, oracleManager.address, yieldManager.address), (function (param) {
+                                                                                                                  console.log("a.5");
+                                                                                                                  var kInitialMultiplier = Globals.bnFromString("5000000000000000000");
+                                                                                                                  var kPeriod = Globals.bnFromInt(864000);
+                                                                                                                  console.log("a.6");
+                                                                                                                  var unstakeFee_e18 = Globals.bnFromString("5000000000000000");
+                                                                                                                  var initialMarketSeedForEachMarketSide = Globals.bnFromString("1000000000000000000");
+                                                                                                                  console.log("a.7");
+                                                                                                                  return longShortInstance.connect(admin).initializeMarket(newMarketIndex, kInitialMultiplier, kPeriod, unstakeFee_e18, initialMarketSeedForEachMarketSide, Globals.bnFromInt(5), Globals.bnFromInt(0), Globals.bnFromInt(1));
+                                                                                                                }));
+                                                                                                  }));
                                                                                     }));
                                                                       }));
                                                         }));

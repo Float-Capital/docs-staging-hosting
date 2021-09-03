@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BUSL-1.1
+// SPDX-License-Identifier: None
 
 pragma solidity 0.8.3;
 
@@ -14,6 +14,7 @@ contract TokenFactory is ITokenFactory {
 
   /// @notice address of long short contract
   address public immutable longShort;
+  address implementation;
 
   /*╔═══════════════════════════╗
     ║         MODIFIERS         ║

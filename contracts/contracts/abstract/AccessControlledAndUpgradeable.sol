@@ -8,7 +8,7 @@ abstract contract AccessControlledAndUpgradeable is
   UUPSUpgradeable
 {
   bytes32 public constant UPGRADER_ROLE = keccak256("UPGRADER_ROLE");
-  bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
+  bytes32 public constant ADMIN_ROLE = DEFAULT_ADMIN_ROLE;
 
   /// @notice Initializes the contract when called by parent initializers.
   /// @param initialAdmin The initial admin who will hold all roles.

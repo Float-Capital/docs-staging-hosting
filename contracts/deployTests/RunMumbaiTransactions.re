@@ -24,14 +24,14 @@ let runMumbaiTransactions =
   let user2 = loadedAccounts->Array.getUnsafe(3);
   let user3 = loadedAccounts->Array.getUnsafe(4);
 
-  let%AwaitThen _ =
-    DeployHelpers.topupBalanceIfLow(~from=deployer, ~to_=admin);
-  let%AwaitThen _ =
-    DeployHelpers.topupBalanceIfLow(~from=deployer, ~to_=user1);
-  let%AwaitThen _ =
-    DeployHelpers.topupBalanceIfLow(~from=deployer, ~to_=user2);
-  let%AwaitThen _ =
-    DeployHelpers.topupBalanceIfLow(~from=deployer, ~to_=user3);
+  // let%AwaitThen _ =
+  //   DeployHelpers.topupBalanceIfLow(~from=deployer, ~to_=admin);
+  // let%AwaitThen _ =
+  //   DeployHelpers.topupBalanceIfLow(~from=deployer, ~to_=user1);
+  // let%AwaitThen _ =
+  //   DeployHelpers.topupBalanceIfLow(~from=deployer, ~to_=user2);
+  // let%AwaitThen _ =
+  //   DeployHelpers.topupBalanceIfLow(~from=deployer, ~to_=user3);
 
   Js.log("deploying markets");
 
@@ -48,6 +48,9 @@ let runMumbaiTransactions =
       ~paymentToken: ERC20Mock.t,
       ~oraclePriceFeedAddress=ChainlinkOracleAddresses.Mumbai.ethOracleChainlink,
     );
+  Js.Exn.raiseError("Deployed ETH!");
+
+  Js.log("done!!");
 
   let%AwaitThen _ =
     deployMumbaiMarketUpgradeable(
