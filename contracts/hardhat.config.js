@@ -53,6 +53,11 @@ task("accounts", "Prints the list of accounts", async () => {
   }
 });
 
+// While waiting for hardhat PR: https://github.com/nomiclabs/hardhat/pull/1542
+if (process.env.HARDHAT_FORK) {
+  process.env['HARDHAT_DEPLOY_FORK'] = process.env.HARDHAT_FORK;
+}
+
 // You have to export an object to set up your config
 // This object can have the following optional entries:
 // defaultNetwork, networks, solc, and paths.
@@ -72,6 +77,14 @@ module.exports = {
   networks: {
     hardhat: {
       allowUnlimitedContractSize: true,
+      initialBaseFeePerGas: 0, // to fix : https://github.com/sc-forks/solidity-coverage/issues/652, see https://github.com/sc-forks/solidity-coverage/issues/652#issuecomment-896330136
+      // process.env.HARDHAT_FORK will specify the network that the fork is made from.
+      // this line ensure the use of the corresponding accounts
+      forking: process.env.HARDHAT_FORK
+        ? {
+          url: "https://rpc-mumbai.maticvigil.com/v1",
+        }
+        : undefined,
     },
     ganache: {
       url: "http://localhost:8545",

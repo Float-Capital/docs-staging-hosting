@@ -47,3 +47,5 @@ contracts/testing/generated/*
 contract-docs
 
 deployments
+
+deploymentSummary.json

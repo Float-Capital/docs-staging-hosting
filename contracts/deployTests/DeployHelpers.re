@@ -156,12 +156,9 @@ let mintNextPrice =
       ~isLong,
     ) => {
   let%AwaitThen _ =
-    mintAndApprove(
-      ~paymentToken,
-      ~amount,
-      ~user,
-      ~approvedAddress=longShort.address,
-    );
+    paymentToken
+    ->ContractHelpers.connect(~address=user)
+    ->ERC20Mock.approve(~spender=longShort.address, ~amount);
 
   let mintFunction =
     isLong ? LongShort.mintLongNextPrice : LongShort.mintShortNextPrice;
@@ -361,15 +358,17 @@ let deployMumbaiMarketUpgradeable =
         "log": true,
         "proxy": {
           "proxyContract": "UUPSProxy",
-          "initializer": true,
-          "args": (
-            "Float Short " ++ syntheticName,
-            "f↗️" ++ syntheticSymbol,
-            longShortInstance.address,
-            stakerInstance.address,
-            newMarketIndex,
-            false,
-          ),
+          "execute": {
+            "methodName": "initialize",
+            "args": (
+              "Float Short " ++ syntheticName,
+              "f↗️" ++ syntheticSymbol,
+              longShortInstance.address,
+              stakerInstance.address,
+              newMarketIndex,
+              false,
+            ),
+          },
         },
       },
     );
@@ -380,31 +379,35 @@ let deployMumbaiMarketUpgradeable =
         "from": namedAccounts.deployer,
         "log": true,
         "contract": "SyntheticTokenUpgradeable",
-        "skipIfAlreadyDeployed": false,
         "proxy": {
           "proxyContract": "UUPSProxy",
-          "initializer": true,
-          "args": (
-            "Float Long " ++ syntheticName,
-            "f↘️" ++ syntheticSymbol,
-            longShortInstance.address,
-            stakerInstance.address,
-            newMarketIndex,
-            false,
-          ),
+          "execute": {
+            "args": (
+              "Float Long " ++ syntheticName,
+              "f↘️" ++ syntheticSymbol,
+              longShortInstance.address,
+              stakerInstance.address,
+              newMarketIndex,
+              true,
+            ),
+            "methodName": "initialize",
+          },
         },
       },
     );
 
-  Js.log("a.1");
-
   let%AwaitThen oracleManager =
-    OracleManagerChainlinkTestnet.make(
-      ~admin=admin.address,
-      ~maxUpdateIntervalSeconds=bnFromInt(27),
-      ~chainlinkOracle=oraclePriceFeedAddress,
+    deployments->Hardhat.deploy(
+      ~name="OracleManager" ++ syntheticSymbol,
+      ~arguments={
+        "from": namedAccounts.deployer,
+        "log": true,
+        "contract": "OracleManagerChainlinkTestnet",
+        "args": (admin.address, oraclePriceFeedAddress, bnFromInt(27)),
+      },
     );
-  Js.log("a.2");
+
+  Js.log("a.1");
 
   let aavePoolAddressProviderMumbai = "0x178113104fEcbcD7fF8669a0150721e231F0FD4B";
   let mumbaiADai = "0x639cB7b21ee2161DF9c882483C9D55c90c20Ca3e";
@@ -413,44 +416,31 @@ let deployMumbaiMarketUpgradeable =
   Js.log("a.3");
   let%AwaitThen yieldManager =
     deployments->Hardhat.deploy(
-      ~name="YM" ++ syntheticSymbol,
+      ~name="YieldManager" ++ syntheticSymbol,
       ~arguments={
         "from": namedAccounts.deployer,
-        "skipIfAlreadyDeployed": false,
         "contract": "YieldManagerAave",
         "log": true,
         "proxy": {
           "proxyContract": "UUPSProxy",
-          "initializer": true,
-          "args": (
-            // address _longShort,
-            longShortInstance.address,
-            // address _treasury,
-            treasuryInstance.address,
-            // address _paymentToken,
-            paymentToken.address,
-            // address _aToken,
-            mumbaiADai,
-            // address _lendingPoolAddressesProvider,
-            aavePoolAddressProviderMumbai,
-            // address _aaveIncentivesController,
-            mumbaiAaveIncentivesController,
-            // uint16 _aaveReferralCode,
-            0,
-            // address _admin
-            admin,
-          ),
+          "execute": {
+            "methodName": "initialize",
+            "args": (
+              longShortInstance.address,
+              treasuryInstance.address,
+              paymentToken.address,
+              mumbaiADai,
+              aavePoolAddressProviderMumbai,
+              mumbaiAaveIncentivesController,
+              0,
+              admin.address,
+            ),
+          },
         },
       },
     );
   Js.log("a.4");
-  let%AwaitThen yieldManagerInstance =
-    deployments->Hardhat.get(~name="YM" ++ syntheticSymbol);
-  Js.log("a.4.1");
-  let%AwaitThen longShortFromYieldManager =
-    yieldManagerInstance->YieldManagerAave.longShort;
   Js.log((
-    longShortFromYieldManager,
     yieldManager.address,
     syntheticTokenLong.address,
     syntheticTokenShort.address,
@@ -478,6 +468,14 @@ let deployMumbaiMarketUpgradeable =
   let unstakeFee_e18 = bnFromString("5000000000000000"); // 50 basis point unstake fee
   let initialMarketSeedForEachMarketSide =
     bnFromString("1000000000000000000");
+
+  let%AwaitThen _ =
+    paymentToken
+    ->ContractHelpers.connect(~address=admin)
+    ->ERC20Mock.approve(
+        ~spender=longShortInstance.address,
+        ~amount=initialMarketSeedForEachMarketSide->mul(bnFromInt(3)),
+      );
 
   Js.log("a.7");
   longShortInstance

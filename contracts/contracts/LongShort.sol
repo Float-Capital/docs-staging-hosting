@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: None
+// SPDX-License-Identifier: BUSL-1.1
 
 pragma solidity 0.8.3;
 
@@ -87,14 +87,6 @@ contract LongShort is ILongShort, AccessControlledAndUpgradeable {
   /*╔═════════════════════════════╗
     ║          MODIFIERS          ║
     ╚═════════════════════════════╝*/
-
-  function isAdmin(address someAddress) external view virtual returns (bool) {
-    return hasRole(ADMIN_ROLE, someAddress);
-  }
-
-  function isDefaultAdmin(address someAddress) external view virtual returns (bool) {
-    return hasRole(DEFAULT_ADMIN_ROLE, someAddress);
-  }
 
   function adminOnlyModifierLogic() internal virtual {
     _checkRole(ADMIN_ROLE, msg.sender);

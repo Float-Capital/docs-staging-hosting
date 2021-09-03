@@ -22,7 +22,6 @@ module.exports = async (hardhatDeployArguments) => {
   const { getNamedAccounts, deployments } = hardhatDeployArguments;
   const { deployer, admin } = await getNamedAccounts();
 
-
   ////////////////////////
   //Retrieve Deployments//
   ////////////////////////
@@ -70,31 +69,24 @@ module.exports = async (hardhatDeployArguments) => {
     FLOAT_CAPITAL,
     FloatCapital.address
   );
-  // ///////////////////////////
-  // //Initialize the contracts/
-  // ///////////////////////////
-  // await longShort.initialize(admin, tokenFactory.address, staker.address);
-  // console.log({ admin })
-  // console.log("5 - deployer is admin", await longShort.isAdmin(deployer));
-  // console.log("5 - is admin", await longShort.isAdmin(admin));
-  // console.log("5 - is default admin", await longShort.isDefaultAdmin(admin));
+  ///////////////////////////
+  //Initialize the contracts/
+  ///////////////////////////
+  await longShort.initialize(admin, tokenFactory.address, staker.address);
+  if (isAlphaLaunch) {
+    await floatToken.initialize("Alpha Float", "alphaFLT", staker.address, treasury.address);
+  } else {
+    await floatToken.initialize("Float", "FLT", staker.address);
+  }
+  await staker.initialize(
+    admin,
+    longShort.address,
+    floatToken.address,
+    treasury.address,
+    floatCapital.address,
+    "100000000000000", // mint an additional 0.01% for the treasury - just for testing purposes
+  );
 
-  // if (isAlphaLaunch) {
-  //   await floatToken.initialize("Alpha Float", "alphaFLT", staker.address, treasury.address);
-  // } else {
-  //   await floatToken.initialize("Float", "FLT", staker.address);
-  // }
-  // await staker.initialize(
-  //   admin,
-  //   longShort.address,
-  //   floatToken.address,
-  //   treasury.address,
-  //   floatCapital.address,
-  //   "100000000000000", // mint an additional 0.01% for the treasury - just for testing purposes
-  // );
-
-  console.log("before test txs");
-  // throw "dont deploy"
   if (network.name == "mumbai") {
     console.log("mumbai test transactions");
     await runMumbaiTransactions({
@@ -115,14 +107,3 @@ module.exports = async (hardhatDeployArguments) => {
   console.log("after test txs");
 };
 module.exports.tags = ["all", "setup"];
-
-
-/*
-(0) 0x738edd7F6a625C02030DbFca84885b4De5252903 (100 ETH)
-(1) 0x2740EA9F72B23372621D8D718F52609b80c24E61 (100 ETH)
-(2) 0xB33f20b5579f263831451401951B426ffE32Db2d (100 ETH)
-(3) 0x24B1eb0aE57C93EF71B2428661F45f3F6296E95E (100 ETH)
-(4) 0xD7aa05D92Aff145536Dc0de089852B81ad5e369C (100 ETH)
-(5) 0x7ff0C9501BBB856d7814594A770Bd2f07C428235 (100 ETH)
-
-*/

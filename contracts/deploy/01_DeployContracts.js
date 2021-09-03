@@ -13,6 +13,10 @@ const {
 } = require("../helper-hardhat-config");
 const mumbaiDaiAddress = "0x001B3B4d0F3714Ca98ba10F6042DaEbF0B1B7b6F";
 
+if (!!process.env.OVERWRITE_NETWORK_NAME) {
+  network.name = process.env.OVERWRITE_NETWORK_NAME
+}
+
 module.exports = async ({ getNamedAccounts, deployments }) => {
   const { deploy } = deployments;
   // const { deployer, admin } = await getNamedAccounts();

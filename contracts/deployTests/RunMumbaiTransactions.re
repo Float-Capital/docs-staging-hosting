@@ -18,11 +18,11 @@ let runMumbaiTransactions =
   let%AwaitThen namedAccounts = deploymentArgs.getNamedAccounts();
   let%AwaitThen loadedAccounts = Ethers.getSigners();
 
-  let deployer = loadedAccounts->Array.getUnsafe(0);
+  // let deployer = loadedAccounts->Array.getUnsafe(0);
   let admin = loadedAccounts->Array.getUnsafe(1);
   let user1 = loadedAccounts->Array.getUnsafe(2);
-  let user2 = loadedAccounts->Array.getUnsafe(3);
-  let user3 = loadedAccounts->Array.getUnsafe(4);
+  // let user2 = loadedAccounts->Array.getUnsafe(3);
+  // let user3 = loadedAccounts->Array.getUnsafe(4);
 
   // let%AwaitThen _ =
   //   DeployHelpers.topupBalanceIfLow(~from=deployer, ~to_=admin);
@@ -48,9 +48,6 @@ let runMumbaiTransactions =
       ~paymentToken: ERC20Mock.t,
       ~oraclePriceFeedAddress=ChainlinkOracleAddresses.Mumbai.ethOracleChainlink,
     );
-  Js.Exn.raiseError("Deployed ETH!");
-
-  Js.log("done!!");
 
   let%AwaitThen _ =
     deployMumbaiMarketUpgradeable(
