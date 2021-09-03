@@ -36,7 +36,7 @@ let make = () => {
             </li>
             <li>
               <span className="font-vt323 font-bold mr-2"> {">"->React.string} </span>
-              {"No fees"->React.string}
+              {"No trading fees"->React.string}
             </li>
           </ul>
           <div className="my-2 inline-block">
