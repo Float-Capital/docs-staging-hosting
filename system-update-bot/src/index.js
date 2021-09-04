@@ -1,7 +1,7 @@
 var secretsManager = require("../secretsManager.js");
 var ethers = require("ethers");
 
-const longShortContractAddress = "0x8f12a37d0cfDcD2E26735ce343acA6c8fAC3d814";
+const longShortContractAddress = "0x037c66973F5a77dA28b6014e3B67E004724bbAf0";
 const longShortAbi = [
   "function getMarketSplit(uint32 marketIndex, uint256 amount) view returns (uint256 longAmount, uint256 shortAmount) @100000",
   "function updateSystemState(uint32 marketIndex) external @400000", //TODO: Optimise the gas here
@@ -74,8 +74,8 @@ const runUpdateSystemStateMultiContinuous = async () => {
     console.log("Fail safe try catch");
     console.log(e);
   }
-  // Run every 63 seconds (max update time is 60 seconds so give some leway for network latency etc etc)
-  await sleep(63000);
+  // Run every 30 seconds (max update time is 60 seconds so give some leway for network latency etc etc)
+  await sleep(30000);
 
   // recursive call
   runUpdateSystemStateMultiContinuous();
