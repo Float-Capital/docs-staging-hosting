@@ -82,7 +82,12 @@ module.exports = {
       // this line ensure the use of the corresponding accounts
       forking: process.env.HARDHAT_FORK
         ? {
-          url: "https://rpc-mumbai.maticvigil.com/v1",
+          url: mumbaiProviderUrl || "https://rpc-mumbai.maticvigil.com/v1",
+        }
+        : undefined,
+      accounts: process.env.HARDHAT_FORK
+        ? {
+          mnemonic
         }
         : undefined,
     },
@@ -94,7 +99,7 @@ module.exports = {
       url: mumbaiProviderUrl || "https://rpc-mumbai.maticvigil.com/v1",
       accounts: { mnemonic },
       // gasPrice: 1000000000,
-      gas: 15000000,
+      // gas: 15000000,
     },
   },
   paths: {

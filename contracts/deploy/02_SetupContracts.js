@@ -17,6 +17,12 @@ const {
   TREASURY_ALPHA
 } = require("../helper-hardhat-config");
 
+let networkToUse = network.name
+
+if (!!process.env.HARDHAT_FORK) {
+  networkToUse = process.env.HARDHAT_FORK
+}
+
 module.exports = async (hardhatDeployArguments) => {
   console.log("setup contracts");
   const { getNamedAccounts, deployments } = hardhatDeployArguments;
@@ -27,9 +33,9 @@ module.exports = async (hardhatDeployArguments) => {
   ////////////////////////
   console.log("1");
   let paymentTokenAddress;
-  if (network.name == "mumbai") {
+  if (networkToUse == "mumbai") {
     paymentTokenAddress = "0x001B3B4d0F3714Ca98ba10F6042DaEbF0B1B7b6F";
-  } else if (network.name == "hardhat" || network.name == "ganache") {
+  } else if (networkToUse == "hardhat" || networkToUse == "ganache") {
     paymentTokenAddress = (await deployments.get(COLLATERAL_TOKEN)).address;
   }
   const paymentToken = await ethers.getContractAt(
@@ -87,7 +93,7 @@ module.exports = async (hardhatDeployArguments) => {
     "100000000000000", // mint an additional 0.01% for the treasury - just for testing purposes
   );
 
-  if (network.name == "mumbai") {
+  if (networkToUse == "mumbai") {
     console.log("mumbai test transactions");
     await runMumbaiTransactions({
       staker,
@@ -95,7 +101,7 @@ module.exports = async (hardhatDeployArguments) => {
       paymentToken,
       treasury,
     }, hardhatDeployArguments);
-  } else if (network.name == "hardhat" || network.name == "ganache") {
+  } else if (networkToUse == "hardhat" || networkToUse == "ganache") {
     console.log("mumbai test transactions");
     await runTestTransactions({
       staker,
