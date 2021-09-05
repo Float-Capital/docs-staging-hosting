@@ -28,10 +28,14 @@ type deployments_t
 external deploy: (deployments_t, ~name: string, ~arguments: 'a) => JsPromise.t<createdDeployment> =
   "deploy"
 
+type contractInstance
 @send
-external get: (deployments_t, ~name: string) => JsPromise.t<'a> = "get"
+external get: (deployments_t, ~name: string) => JsPromise.t<contractInstance> = "get"
 
 type hardhatDeployArgument = {
   getNamedAccounts: unit => JsPromise.t<namedAccounts>,
   deployments: deployments_t,
 }
+
+  @module("hardhat") @scope("ethers")
+  external getContractAt: (contractInstance, Ethers.ethAddress) => JsPromise.t<'a> = "getContractAt"

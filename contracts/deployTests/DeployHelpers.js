@@ -10,7 +10,6 @@ var SyntheticToken = require("../test-waffle/library/contracts/SyntheticToken.js
 var YieldManagerMock = require("../test-waffle/library/contracts/YieldManagerMock.js");
 var OracleManagerMock = require("../test-waffle/library/contracts/OracleManagerMock.js");
 var OracleManagerChainlink = require("../test-waffle/library/contracts/OracleManagerChainlink.js");
-var OracleManagerChainlinkTestnet = require("../test-waffle/library/contracts/OracleManagerChainlinkTestnet.js");
 
 var minSenderBalance = Globals.bnFromString("50000000000000000");
 
@@ -121,7 +120,7 @@ function mintLongNextPriceWithSystemUpdate(amount, marketIndex, paymentToken, lo
 }
 
 function mintNextPrice(amount, marketIndex, paymentToken, longShort, user, isLong) {
-  return LetOps.AwaitThen.let_(mintAndApprove(paymentToken, amount, user, longShort.address), (function (param) {
+  return LetOps.AwaitThen.let_(paymentToken.connect(user).approve(longShort.address, amount), (function (param) {
                 var mintFunction = isLong ? (function (prim0, prim1, prim2) {
                       return prim0.mintLongNextPrice(prim1, prim2);
                     }) : (function (prim0, prim1, prim2) {
@@ -188,51 +187,93 @@ function deployMumbaiMarket(syntheticName, syntheticSymbol, longShortInstance, t
 function deployMumbaiMarketUpgradeable(syntheticName, syntheticSymbol, longShortInstance, stakerInstance, treasuryInstance, admin, paymentToken, oraclePriceFeedAddress, deployments, namedAccounts) {
   return LetOps.AwaitThen.let_(longShortInstance.latestMarket(), (function (latestMarket) {
                 var newMarketIndex = latestMarket + 1 | 0;
-                return LetOps.AwaitThen.let_(deployments.deploy("SyntheticTokenUpgradeable", {
+                return LetOps.AwaitThen.let_(deployments.deploy("SS" + syntheticSymbol, {
+                                contract: "SyntheticTokenUpgradeable",
                                 from: namedAccounts.deployer,
                                 log: true,
                                 proxy: {
                                   proxyContract: "UUPSProxy",
-                                  initializer: true,
-                                  args: [
-                                    "Float Short " + syntheticName,
-                                    "fs" + syntheticSymbol,
-                                    longShortInstance.address,
-                                    stakerInstance.address,
-                                    newMarketIndex,
-                                    false
-                                  ]
+                                  execute: {
+                                    methodName: "initialize",
+                                    args: [
+                                      "Float Short " + syntheticName,
+                                      "f\xe2\x86\x97\xef\xb8\x8f" + syntheticSymbol,
+                                      longShortInstance.address,
+                                      stakerInstance.address,
+                                      newMarketIndex,
+                                      false
+                                    ]
+                                  }
                                 }
                               }), (function (syntheticTokenShort) {
-                              return LetOps.AwaitThen.let_(deployments.deploy("SyntheticTokenUpgradeable", {
+                              return LetOps.AwaitThen.let_(deployments.deploy("SL" + syntheticSymbol, {
                                               from: namedAccounts.deployer,
                                               log: true,
+                                              contract: "SyntheticTokenUpgradeable",
                                               proxy: {
                                                 proxyContract: "UUPSProxy",
-                                                initializer: true,
-                                                args: [
-                                                  "Float Long " + syntheticName,
-                                                  "fl" + syntheticSymbol,
-                                                  longShortInstance.address,
-                                                  stakerInstance.address,
-                                                  newMarketIndex,
-                                                  false
-                                                ]
+                                                execute: {
+                                                  args: [
+                                                    "Float Long " + syntheticName,
+                                                    "f\xe2\x86\x98\xef\xb8\x8f" + syntheticSymbol,
+                                                    longShortInstance.address,
+                                                    stakerInstance.address,
+                                                    newMarketIndex,
+                                                    true
+                                                  ],
+                                                  methodName: "initialize"
+                                                }
                                               }
                                             }), (function (syntheticTokenLong) {
-                                            return LetOps.AwaitThen.let_(OracleManagerChainlinkTestnet.make(admin.address, oraclePriceFeedAddress, Globals.bnFromInt(27)), (function (oracleManager) {
-                                                          return LetOps.AwaitThen.let_(YieldManagerMock.make(longShortInstance.address, treasuryInstance.address, paymentToken.address), (function (yieldManager) {
-                                                                        return LetOps.AwaitThen.let_(paymentToken.MINTER_ROLE(), (function (mintRole) {
-                                                                                      return LetOps.AwaitThen.let_(paymentToken.grantRole(mintRole, yieldManager.address), (function (param) {
-                                                                                                    return LetOps.AwaitThen.let_(longShortInstance.connect(admin).createNewSyntheticMarketExternalSyntheticTokens(syntheticName, syntheticSymbol, syntheticTokenLong.address, syntheticTokenShort.address, paymentToken.address, oracleManager.address, yieldManager.address), (function (param) {
-                                                                                                                  var kInitialMultiplier = Globals.bnFromString("5000000000000000000");
-                                                                                                                  var kPeriod = Globals.bnFromInt(864000);
-                                                                                                                  return LetOps.AwaitThen.let_(mintAndApprove(paymentToken, Globals.bnFromString("2000000000000000000"), admin, longShortInstance.address), (function (param) {
-                                                                                                                                var unstakeFee_e18 = Globals.bnFromString("5000000000000000");
-                                                                                                                                var initialMarketSeedForEachMarketSide = Globals.bnFromString("1000000000000000000");
-                                                                                                                                return longShortInstance.connect(admin).initializeMarket(newMarketIndex, kInitialMultiplier, kPeriod, unstakeFee_e18, initialMarketSeedForEachMarketSide, Globals.bnFromInt(5), Globals.bnFromInt(0), Globals.bnFromInt(1));
-                                                                                                                              }));
-                                                                                                                }));
+                                            return LetOps.AwaitThen.let_(deployments.deploy("OracleManager" + syntheticSymbol, {
+                                                            from: namedAccounts.deployer,
+                                                            log: true,
+                                                            contract: "OracleManagerChainlinkTestnet",
+                                                            args: [
+                                                              admin.address,
+                                                              oraclePriceFeedAddress,
+                                                              Globals.bnFromInt(27)
+                                                            ]
+                                                          }), (function (oracleManager) {
+                                                          console.log("a.1");
+                                                          console.log("a.3");
+                                                          return LetOps.AwaitThen.let_(deployments.deploy("YieldManager" + syntheticSymbol, {
+                                                                          from: namedAccounts.deployer,
+                                                                          contract: "YieldManagerAave",
+                                                                          log: true,
+                                                                          proxy: {
+                                                                            proxyContract: "UUPSProxy",
+                                                                            execute: {
+                                                                              methodName: "initialize",
+                                                                              args: [
+                                                                                longShortInstance.address,
+                                                                                treasuryInstance.address,
+                                                                                paymentToken.address,
+                                                                                "0x639cB7b21ee2161DF9c882483C9D55c90c20Ca3e",
+                                                                                "0x178113104fEcbcD7fF8669a0150721e231F0FD4B",
+                                                                                "0xd41aE58e803Edf4304334acCE4DC4Ec34a63C644",
+                                                                                0,
+                                                                                admin.address
+                                                                              ]
+                                                                            }
+                                                                          }
+                                                                        }), (function (yieldManager) {
+                                                                        console.log("a.4");
+                                                                        console.log([
+                                                                              yieldManager.address,
+                                                                              syntheticTokenLong.address,
+                                                                              syntheticTokenShort.address
+                                                                            ]);
+                                                                        return LetOps.AwaitThen.let_(longShortInstance.connect(admin).createNewSyntheticMarketExternalSyntheticTokens(syntheticName, syntheticSymbol, syntheticTokenLong.address, syntheticTokenShort.address, paymentToken.address, oracleManager.address, yieldManager.address), (function (param) {
+                                                                                      console.log("a.5");
+                                                                                      var kInitialMultiplier = Globals.bnFromString("5000000000000000000");
+                                                                                      var kPeriod = Globals.bnFromInt(864000);
+                                                                                      console.log("a.6");
+                                                                                      var unstakeFee_e18 = Globals.bnFromString("5000000000000000");
+                                                                                      var initialMarketSeedForEachMarketSide = Globals.bnFromString("1000000000000000000");
+                                                                                      return LetOps.AwaitThen.let_(paymentToken.connect(admin).approve(longShortInstance.address, Globals.mul(initialMarketSeedForEachMarketSide, Globals.bnFromInt(3))), (function (param) {
+                                                                                                    console.log("a.7");
+                                                                                                    return longShortInstance.connect(admin).initializeMarket(newMarketIndex, kInitialMultiplier, kPeriod, unstakeFee_e18, initialMarketSeedForEachMarketSide, Globals.bnFromInt(5), Globals.bnFromInt(0), Globals.bnFromInt(1));
                                                                                                   }));
                                                                                     }));
                                                                       }));

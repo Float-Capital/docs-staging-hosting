@@ -53,6 +53,11 @@ task("accounts", "Prints the list of accounts", async () => {
   }
 });
 
+// While waiting for hardhat PR: https://github.com/nomiclabs/hardhat/pull/1542
+if (process.env.HARDHAT_FORK) {
+  process.env['HARDHAT_DEPLOY_FORK'] = process.env.HARDHAT_FORK;
+}
+
 // You have to export an object to set up your config
 // This object can have the following optional entries:
 // defaultNetwork, networks, solc, and paths.
@@ -72,6 +77,14 @@ module.exports = {
   networks: {
     hardhat: {
       allowUnlimitedContractSize: true,
+      initialBaseFeePerGas: 0, // to fix : https://github.com/sc-forks/solidity-coverage/issues/652, see https://github.com/sc-forks/solidity-coverage/issues/652#issuecomment-896330136
+      // process.env.HARDHAT_FORK will specify the network that the fork is made from.
+      // this line ensure the use of the corresponding accounts
+      forking: process.env.HARDHAT_FORK
+        ? {
+          url: "https://rpc-mumbai.maticvigil.com/v1",
+        }
+        : undefined,
     },
     ganache: {
       url: "http://localhost:8545",
@@ -79,32 +92,21 @@ module.exports = {
     mumbai: {
       chainId: 80001,
       url: mumbaiProviderUrl || "https://rpc-mumbai.maticvigil.com/v1",
-      accounts: { mnemonic }
+      accounts: { mnemonic },
+      // gasPrice: 1000000000,
+      gas: 15000000,
     },
   },
   paths: {
     tests: isWaffleTest ? "./test-waffle" : "./test",
   },
   namedAccounts: {
-    deployer: {
-      default: 0, // here this will by default take the first account as deployer
-      1: 0, // similarly on mainnet it will take the first account as deployer. Note though that depending on how hardhat network are configured, the account 0 on one network can be different than on another
-    },
-    admin: {
-      default: 1,
-    },
-    user1: {
-      default: 2,
-    },
-    user2: {
-      default: 3,
-    },
-    user3: {
-      default: 4,
-    },
-    user4: {
-      default: 5,
-    },
+    deployer: 0,
+    admin: 1,
+    user1: 2,
+    user2: 3,
+    user3: 4,
+    user4: 5,
   },
   gasReporter: {
     // Disabled by default for faster running of tests
