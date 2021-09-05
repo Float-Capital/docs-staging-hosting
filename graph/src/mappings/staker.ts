@@ -23,19 +23,20 @@ import {
   BatchedNextPriceStakeAction,
   UserNextPriceStakeAction,
   UserCurrentNextPriceStakeAction,
+  UserNextPriceStakeActionComponent,
 } from "../../generated/schema";
 import {
   log,
   DataSourceContext,
   Address,
   BigInt,
-  Bytes,
+  ethereum,
 } from "@graphprotocol/graph-ts";
 import {
   bigIntArrayToStringArray,
   saveEventToStateChange,
 } from "../utils/txEventHelpers";
-import { getOrCreateUser, getUser } from "../utils/globalStateManager";
+import { getOrCreateUser } from "../utils/globalStateManager";
 import {
   generateAccumulativeFloatIssuanceSnapshotId,
   getOrInitializeAccumulativeFloatIssuanceSnapshot,
@@ -797,6 +798,52 @@ export function handleStakeWithdrawalFeeUpdate(
   );
 }
 
+function setupUserNextPriceStateAction(
+  userNextPriceStakeAction: UserNextPriceStakeAction,
+  userAddress: Address,
+  marketIndex: BigInt,
+  userShiftIndex: BigInt,
+  userNextPriceStakeActionComponent: UserNextPriceStakeActionComponent,
+  event: ethereum.Event
+): void {
+  let userAddressStr = userAddress.toHex();
+  let marketIndexStr = marketIndex.toString();
+  let userShiftIndexStr = userShiftIndex.toString();
+  userNextPriceStakeAction.user = userAddressStr;
+  userNextPriceStakeAction.marketIndex = marketIndex;
+  userNextPriceStakeAction.updateIndex = userShiftIndex;
+
+  let batchedStakeRetrieval = getOrInitializeBatchedNextPriceStakeAction(
+    marketIndexStr + "-" + userShiftIndexStr
+  );
+  let batchedStake: BatchedNextPriceStakeAction = batchedStakeRetrieval.entity;
+  if (batchedStakeRetrieval.wasCreated) {
+    batchedStake.marketIndex = marketIndex;
+    batchedStake.updateIndex = userShiftIndex;
+  }
+  batchedStake.linkedUserNextPriceStakeActions = batchedStake.linkedUserNextPriceStakeActions.concat(
+    [userNextPriceStakeActionComponent.id]
+  );
+  batchedStake.save();
+
+  let userCurrentStakeActionRetrieval = getOrInitializeUserCurrentNextPriceStakeAction(
+    userAddressStr + "-" + marketIndexStr
+  );
+  let userCurrentStakeAction = userCurrentStakeActionRetrieval.entity;
+  if (userCurrentStakeActionRetrieval.wasCreated) {
+    userCurrentStakeAction.user = userAddressStr;
+    userCurrentStakeAction.marketIndex = marketIndex;
+  }
+  userCurrentStakeAction.currentAction = userNextPriceStakeActionComponent.id;
+  userCurrentStakeAction.save();
+
+  let userObj = getOrCreateUser(userAddress, event);
+  userObj.pendingNextPriceStakeActions = userObj.pendingNextPriceStakeActions.concat(
+    [userNextPriceStakeActionComponent.id]
+  );
+  userObj.save();
+}
+
 export function handleNextPriceStakeShift(event: NextPriceStakeShift): void {
   let user = event.params.user;
   let userAddressStr = user.toHex();
@@ -830,40 +877,14 @@ export function handleNextPriceStakeShift(event: NextPriceStakeShift): void {
   let userNextPriceStakeAction = userNextPriceStakeActionRetrieval.entity;
 
   if (userNextPriceStakeActionRetrieval.wasCreated) {
-    userNextPriceStakeAction.user = userAddressStr;
-    userNextPriceStakeAction.marketIndex = marketIndex;
-    userNextPriceStakeAction.updateIndex = userShiftIndex;
-
-    let batchedStakeRetrieval = getOrInitializeBatchedNextPriceStakeAction(
-      marketIndexStr + "-" + userShiftIndexStr
+    setupUserNextPriceStateAction(
+      userNextPriceStakeAction,
+      user,
+      marketIndex,
+      userShiftIndex,
+      userNextPriceStakeActionComponent,
+      event
     );
-    let batchedStake: BatchedNextPriceStakeAction =
-      batchedStakeRetrieval.entity;
-    if (batchedStakeRetrieval.wasCreated) {
-      batchedStake.marketIndex = marketIndex;
-      batchedStake.updateIndex = userShiftIndex;
-    }
-    batchedStake.linkedUserNextPriceStakeActions = batchedStake.linkedUserNextPriceStakeActions.concat(
-      [userNextPriceStakeActionId]
-    );
-    batchedStake.save();
-
-    let userCurrentStakeActionRetrieval = getOrInitializeUserCurrentNextPriceStakeAction(
-      userAddressStr + "-" + marketIndexStr
-    );
-    let userCurrentStakeAction = userCurrentStakeActionRetrieval.entity;
-    if (userCurrentStakeActionRetrieval.wasCreated) {
-      userCurrentStakeAction.user = userAddressStr;
-      userCurrentStakeAction.marketIndex = marketIndex;
-    }
-    userCurrentStakeAction.currentAction = userNextPriceStakeActionId;
-    userCurrentStakeAction.save();
-
-    let userObj = getOrCreateUser(user, event);
-    userObj.pendingNextPriceStakeActions = userObj.pendingNextPriceStakeActions.concat(
-      [userNextPriceStakeActionId]
-    );
-    userObj.save();
   }
 
   if (isShiftFromLong) {
