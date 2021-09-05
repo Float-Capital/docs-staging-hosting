@@ -18,7 +18,7 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
     ╚═════════════════════════════╝*/
 
   /* ══════ Fixed-precision constants ══════ */
-  uint256 public constant FLOAT_ISSUANCE_FIXED_DECIMAL = 1e42;
+  uint256 public constant FLOAT_ISSUANCE_FIXED_DECIMAL = 3e44;
 
   /* ══════ Global state ══════ */
   address public floatCapital;

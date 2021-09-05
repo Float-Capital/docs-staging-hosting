@@ -1,6 +1,9 @@
 type namedAccounts = {
   admin: Ethers.ethAddress,
   deployer: Ethers.ethAddress,
+  user1: Ethers.ethAddress,
+  user2: Ethers.ethAddress,
+  user3: Ethers.ethAddress,
 }
 
 type createdDeployment = {

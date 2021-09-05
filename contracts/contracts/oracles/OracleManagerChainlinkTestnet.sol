@@ -11,9 +11,9 @@ contract OracleManagerChainlinkTestnet is OracleManagerChainlink {
 
   constructor(
     address _admin,
-    address _chainlinkOracle,
+    address _chainLinkOracle,
     uint256 _maxUpdateIntervalSeconds
-  ) OracleManagerChainlink(_admin, _chainlinkOracle) {
+  ) OracleManagerChainlink(_admin, _chainLinkOracle) {
     maxUpdateIntervalSeconds = _maxUpdateIntervalSeconds;
   }
 

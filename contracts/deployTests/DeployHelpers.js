@@ -10,6 +10,7 @@ var SyntheticToken = require("../test-waffle/library/contracts/SyntheticToken.js
 var YieldManagerMock = require("../test-waffle/library/contracts/YieldManagerMock.js");
 var OracleManagerMock = require("../test-waffle/library/contracts/OracleManagerMock.js");
 var OracleManagerChainlink = require("../test-waffle/library/contracts/OracleManagerChainlink.js");
+var OracleManagerChainlinkTestnet = require("../test-waffle/library/contracts/OracleManagerChainlinkTestnet.js");
 
 var minSenderBalance = Globals.bnFromString("50000000000000000");
 
@@ -84,6 +85,15 @@ function redeemShortNextPriceWithSystemUpdate(amount, marketIndex, longShort, us
               }));
 }
 
+function redeemNextPrice(amount, marketIndex, longShort, user, isLong) {
+  var redeemFunction = isLong ? (function (prim0, prim1, prim2) {
+        return prim0.redeemLongNextPrice(prim1, prim2);
+      }) : (function (prim0, prim1, prim2) {
+        return prim0.redeemShortNextPrice(prim1, prim2);
+      });
+  return Curry._3(redeemFunction, longShort.connect(user), marketIndex, amount);
+}
+
 function shiftFromShortNextPriceWithSystemUpdate(amount, marketIndex, longShort, user, admin) {
   return LetOps.AwaitThen.let_(longShort.connect(user).shiftPositionFromShortNextPrice(marketIndex, amount), (function (param) {
                 return LetOps.AwaitThen.let_(setOracleManagerPrice(longShort, marketIndex, admin), (function (param) {
@@ -110,6 +120,17 @@ function mintLongNextPriceWithSystemUpdate(amount, marketIndex, paymentToken, lo
               }));
 }
 
+function mintNextPrice(amount, marketIndex, paymentToken, longShort, user, isLong) {
+  return LetOps.AwaitThen.let_(mintAndApprove(paymentToken, amount, user, longShort.address), (function (param) {
+                var mintFunction = isLong ? (function (prim0, prim1, prim2) {
+                      return prim0.mintLongNextPrice(prim1, prim2);
+                    }) : (function (prim0, prim1, prim2) {
+                      return prim0.mintShortNextPrice(prim1, prim2);
+                    });
+                return Curry._3(mintFunction, longShort.connect(user), marketIndex, amount);
+              }));
+}
+
 function mintShortNextPriceWithSystemUpdate(amount, marketIndex, paymentToken, longShort, user, admin) {
   return LetOps.AwaitThen.let_(mintAndApprove(paymentToken, amount, user, longShort.address), (function (param) {
                 return LetOps.AwaitThen.let_(longShort.connect(user).mintShortNextPrice(marketIndex, amount), (function (param) {
@@ -127,8 +148,8 @@ function deployTestMarket(syntheticName, syntheticSymbol, longShortInstance, tre
                                             return LetOps.AwaitThen.let_(paymentToken.grantRole(mintRole, yieldManager.address), (function (param) {
                                                           return LetOps.AwaitThen.let_(longShortInstance.connect(admin).createNewSyntheticMarket(syntheticName, syntheticSymbol, paymentToken.address, oracleManager.address, yieldManager.address), (function (param) {
                                                                         return LetOps.AwaitThen.let_(longShortInstance.latestMarket(), (function (latestMarket) {
-                                                                                      var kInitialMultiplier = Globals.bnFromString("5000000000000000000");
-                                                                                      var kPeriod = Globals.bnFromInt(864000);
+                                                                                      var kInitialMultiplier = Globals.bnFromString("1000000000000000000");
+                                                                                      var kPeriod = Globals.bnFromInt(0);
                                                                                       return LetOps.AwaitThen.let_(mintAndApprove(paymentToken, Globals.bnFromString("2000000000000000000"), admin, longShortInstance.address), (function (param) {
                                                                                                     var unstakeFee_e18 = Globals.bnFromString("5000000000000000");
                                                                                                     var initialMarketSeedForEachMarketSide = Globals.bnFromString("1000000000000000000");
@@ -164,6 +185,63 @@ function deployMumbaiMarket(syntheticName, syntheticSymbol, longShortInstance, t
               }));
 }
 
+function deployMumbaiMarketUpgradeable(syntheticName, syntheticSymbol, longShortInstance, stakerInstance, treasuryInstance, admin, paymentToken, oraclePriceFeedAddress, deployments, namedAccounts) {
+  return LetOps.AwaitThen.let_(longShortInstance.latestMarket(), (function (latestMarket) {
+                var newMarketIndex = latestMarket + 1 | 0;
+                return LetOps.AwaitThen.let_(deployments.deploy("SyntheticTokenUpgradeable", {
+                                from: namedAccounts.deployer,
+                                log: true,
+                                proxy: {
+                                  proxyContract: "UUPSProxy",
+                                  initializer: true,
+                                  args: [
+                                    "Float Short " + syntheticName,
+                                    "fs" + syntheticSymbol,
+                                    longShortInstance.address,
+                                    stakerInstance.address,
+                                    newMarketIndex,
+                                    false
+                                  ]
+                                }
+                              }), (function (syntheticTokenShort) {
+                              return LetOps.AwaitThen.let_(deployments.deploy("SyntheticTokenUpgradeable", {
+                                              from: namedAccounts.deployer,
+                                              log: true,
+                                              proxy: {
+                                                proxyContract: "UUPSProxy",
+                                                initializer: true,
+                                                args: [
+                                                  "Float Long " + syntheticName,
+                                                  "fl" + syntheticSymbol,
+                                                  longShortInstance.address,
+                                                  stakerInstance.address,
+                                                  newMarketIndex,
+                                                  false
+                                                ]
+                                              }
+                                            }), (function (syntheticTokenLong) {
+                                            return LetOps.AwaitThen.let_(OracleManagerChainlinkTestnet.make(admin.address, oraclePriceFeedAddress, Globals.bnFromInt(27)), (function (oracleManager) {
+                                                          return LetOps.AwaitThen.let_(YieldManagerMock.make(longShortInstance.address, treasuryInstance.address, paymentToken.address), (function (yieldManager) {
+                                                                        return LetOps.AwaitThen.let_(paymentToken.MINTER_ROLE(), (function (mintRole) {
+                                                                                      return LetOps.AwaitThen.let_(paymentToken.grantRole(mintRole, yieldManager.address), (function (param) {
+                                                                                                    return LetOps.AwaitThen.let_(longShortInstance.connect(admin).createNewSyntheticMarketExternalSyntheticTokens(syntheticName, syntheticSymbol, syntheticTokenLong.address, syntheticTokenShort.address, paymentToken.address, oracleManager.address, yieldManager.address), (function (param) {
+                                                                                                                  var kInitialMultiplier = Globals.bnFromString("5000000000000000000");
+                                                                                                                  var kPeriod = Globals.bnFromInt(864000);
+                                                                                                                  return LetOps.AwaitThen.let_(mintAndApprove(paymentToken, Globals.bnFromString("2000000000000000000"), admin, longShortInstance.address), (function (param) {
+                                                                                                                                var unstakeFee_e18 = Globals.bnFromString("5000000000000000");
+                                                                                                                                var initialMarketSeedForEachMarketSide = Globals.bnFromString("1000000000000000000");
+                                                                                                                                return longShortInstance.connect(admin).initializeMarket(newMarketIndex, kInitialMultiplier, kPeriod, unstakeFee_e18, initialMarketSeedForEachMarketSide, Globals.bnFromInt(5), Globals.bnFromInt(0), Globals.bnFromInt(1));
+                                                                                                                              }));
+                                                                                                                }));
+                                                                                                  }));
+                                                                                    }));
+                                                                      }));
+                                                        }));
+                                          }));
+                            }));
+              }));
+}
+
 exports.minSenderBalance = minSenderBalance;
 exports.minRecieverBalance = minRecieverBalance;
 exports.topupBalanceIfLow = topupBalanceIfLow;
@@ -173,10 +251,13 @@ exports.stakeSynthLong = stakeSynthLong;
 exports.executeOnMarkets = executeOnMarkets;
 exports.setOracleManagerPrice = setOracleManagerPrice;
 exports.redeemShortNextPriceWithSystemUpdate = redeemShortNextPriceWithSystemUpdate;
+exports.redeemNextPrice = redeemNextPrice;
 exports.shiftFromShortNextPriceWithSystemUpdate = shiftFromShortNextPriceWithSystemUpdate;
 exports.shiftFromLongNextPriceWithSystemUpdate = shiftFromLongNextPriceWithSystemUpdate;
 exports.mintLongNextPriceWithSystemUpdate = mintLongNextPriceWithSystemUpdate;
+exports.mintNextPrice = mintNextPrice;
 exports.mintShortNextPriceWithSystemUpdate = mintShortNextPriceWithSystemUpdate;
 exports.deployTestMarket = deployTestMarket;
 exports.deployMumbaiMarket = deployMumbaiMarket;
+exports.deployMumbaiMarketUpgradeable = deployMumbaiMarketUpgradeable;
 /* minSenderBalance Not a pure module */
