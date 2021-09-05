@@ -18,7 +18,28 @@ lint the solidity code:
 yarn lint-contracts
 ```
 
+## Network forking
+
+It is sometimes useful to fork the network to test deployments that rely on other contracts etc before running those deployments on production networks. Note, network forking has only been tested with alchemy RPC API endpoints, but others may work too.
+
+To use this feature run `HARDHAT_FORK=<network name> yarn deploy`. So for example to run this on mumbai run `HARDHAT_FORK="mumbai" yarn deploy`.
+
+You can test that this is working correctly by validating some data from the blockchain such as the blocknumber or a token balance.
+
+eg you could use code like below.:
+
+```javascript
+let pTokenBalance = await paymentToken.balanceOf(accounts[2].address);
+console.log(
+  "The paymentToken balance is",
+  accounts[2].address,
+  pTokenBalance.toString()
+);
+
+let blockNumber = await accounts[0].provider.getBlockNumber();
+console.log("The balance is", blockNumber.toString());
+```
+
 ## Troubleshooting
 
-if you get the following Error: Cannot find module './secretsManager.js'
-then duplicate the relevant secrets manager folder and rename it to './secretsManager.js'
+Please add your known troubles ;)
