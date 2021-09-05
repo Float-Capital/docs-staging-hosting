@@ -17,34 +17,36 @@ function runMumbaiTransactions(param, deploymentArgs) {
                               var admin = loadedAccounts[1];
                               var user1 = loadedAccounts[2];
                               console.log("deploying markets");
-                              return LetOps.AwaitThen.let_(DeployHelpers.deployMumbaiMarketUpgradeable("MATIC Market", "MATIC", longShort, staker, treasury, admin, paymentToken, ChainlinkOracleAddresses.Mumbai.maticOracleChainlink, deploymentArgs.deployments, namedAccounts), (function (param) {
-                                            return LetOps.AwaitThen.let_(DeployHelpers.deployMumbaiMarketUpgradeable("BTC Market", "BTC", longShort, staker, treasury, admin, paymentToken, ChainlinkOracleAddresses.Mumbai.btcOracleChainlink, deploymentArgs.deployments, namedAccounts), (function (param) {
-                                                          var initialMarkets = [
-                                                            1,
-                                                            2,
-                                                            3
-                                                          ];
-                                                          var longMintAmount = Globals.bnFromString("10000000000000000000");
-                                                          var shortMintAmount = Globals.div(longMintAmount, Globals.bnFromInt(2));
-                                                          var redeemShortAmount = Globals.div(shortMintAmount, Globals.bnFromInt(2));
-                                                          var longStakeAmount = Globals.div(longMintAmount, Globals.twoBn);
-                                                          console.log("Executing Long Mints");
-                                                          return LetOps.AwaitThen.let_(DeployHelpers.executeOnMarkets(initialMarkets, (function (__x) {
-                                                                            return DeployHelpers.mintNextPrice(longMintAmount, __x, paymentToken, longShort, user1, true);
-                                                                          })), (function (param) {
-                                                                        console.log("Executing Short Mints");
+                              return LetOps.AwaitThen.let_(DeployHelpers.deployMumbaiMarketUpgradeable("ETH Market", "ETH", longShort, staker, treasury, admin, paymentToken, ChainlinkOracleAddresses.Mumbai.ethOracleChainlink, deploymentArgs.deployments, namedAccounts), (function (param) {
+                                            return LetOps.AwaitThen.let_(DeployHelpers.deployMumbaiMarketUpgradeable("MATIC Market", "MATIC", longShort, staker, treasury, admin, paymentToken, ChainlinkOracleAddresses.Mumbai.maticOracleChainlink, deploymentArgs.deployments, namedAccounts), (function (param) {
+                                                          return LetOps.AwaitThen.let_(DeployHelpers.deployMumbaiMarketUpgradeable("BTC Market", "BTC", longShort, staker, treasury, admin, paymentToken, ChainlinkOracleAddresses.Mumbai.btcOracleChainlink, deploymentArgs.deployments, namedAccounts), (function (param) {
+                                                                        var initialMarkets = [
+                                                                          1,
+                                                                          2,
+                                                                          3
+                                                                        ];
+                                                                        var longMintAmount = Globals.bnFromString("10000000000000000000");
+                                                                        var shortMintAmount = Globals.div(longMintAmount, Globals.bnFromInt(2));
+                                                                        var redeemShortAmount = Globals.div(shortMintAmount, Globals.bnFromInt(2));
+                                                                        var longStakeAmount = Globals.div(longMintAmount, Globals.twoBn);
+                                                                        console.log("Executing Long Mints");
                                                                         return LetOps.AwaitThen.let_(DeployHelpers.executeOnMarkets(initialMarkets, (function (__x) {
-                                                                                          return DeployHelpers.mintNextPrice(longMintAmount, __x, paymentToken, longShort, user1, false);
+                                                                                          return DeployHelpers.mintNextPrice(longMintAmount, __x, paymentToken, longShort, user1, true);
                                                                                         })), (function (param) {
-                                                                                      return LetOps.AwaitThen.let_(Globals.sleep(27000), (function (param) {
-                                                                                                    console.log("Executing Short Position Redeem");
-                                                                                                    return LetOps.AwaitThen.let_(DeployHelpers.executeOnMarkets(initialMarkets, (function (__x) {
-                                                                                                                      return DeployHelpers.redeemNextPrice(redeemShortAmount, __x, longShort, user1, false);
-                                                                                                                    })), (function (param) {
-                                                                                                                  return LetOps.AwaitThen.let_(Globals.sleep(27000), (function (param) {
-                                                                                                                                console.log("Staking long position");
-                                                                                                                                return DeployHelpers.executeOnMarkets(initialMarkets, (function (__x) {
-                                                                                                                                              return DeployHelpers.stakeSynthLong(longStakeAmount, longShort, __x, user1);
+                                                                                      console.log("Executing Short Mints");
+                                                                                      return LetOps.AwaitThen.let_(DeployHelpers.executeOnMarkets(initialMarkets, (function (__x) {
+                                                                                                        return DeployHelpers.mintNextPrice(longMintAmount, __x, paymentToken, longShort, user1, false);
+                                                                                                      })), (function (param) {
+                                                                                                    return LetOps.AwaitThen.let_(Globals.sleep(27000), (function (param) {
+                                                                                                                  console.log("Executing Short Position Redeem");
+                                                                                                                  return LetOps.AwaitThen.let_(DeployHelpers.executeOnMarkets(initialMarkets, (function (__x) {
+                                                                                                                                    return DeployHelpers.redeemNextPrice(redeemShortAmount, __x, longShort, user1, false);
+                                                                                                                                  })), (function (param) {
+                                                                                                                                return LetOps.AwaitThen.let_(Globals.sleep(27000), (function (param) {
+                                                                                                                                              console.log("Staking long position");
+                                                                                                                                              return DeployHelpers.executeOnMarkets(initialMarkets, (function (__x) {
+                                                                                                                                                            return DeployHelpers.stakeSynthLong(longStakeAmount, longShort, __x, user1);
+                                                                                                                                                          }));
                                                                                                                                             }));
                                                                                                                               }));
                                                                                                                 }));
