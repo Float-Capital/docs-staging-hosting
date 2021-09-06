@@ -100,6 +100,8 @@ dataSources:
           handler: handleStakerV1
         - event: SyntheticTokensShifted()
           handler: handleSyntheticTokensShifted
+        - event: NextPriceStakeShift(address,uint32,uint256,bool,uint256)
+          handler: handleNextPriceStakeShift
       file: ./src/mappings/staker.ts
 
 templates:

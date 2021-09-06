@@ -25,8 +25,11 @@ import {
   UnderlyingPrice,
   BatchedNextPriceExec,
   User,
+  Stake,
+  CurrentStake,
+  BatchedNextPriceStakeAction,
 } from "../../generated/schema";
-import { BigInt, log, Bytes, Address } from "@graphprotocol/graph-ts";
+import { BigInt, log, Bytes, Address, ethereum } from "@graphprotocol/graph-ts";
 import {
   bigIntArrayToStringArray,
   saveEventToStateChange,
@@ -79,6 +82,8 @@ import {
   getOrInitializeAccumulativeFloatIssuanceSnapshot,
   getBatchedNextPriceExec,
   getUserNextPriceActionComponent,
+  getUserNextPriceStakeAction,
+  getStake,
 } from "../generated/EntityHelpers";
 
 export function handleLongShortV1(event: LongShortV1): void {
@@ -130,6 +135,164 @@ export function handleLongShortV1(event: LongShortV1): void {
   );
 }
 
+function initializeCurrentStake(
+  currentStake: CurrentStake | null,
+  syntheticToken: string,
+  userAddress: Bytes,
+  marketIndex: BigInt,
+  accumulativeFloatIssuanceSnapshotId: string
+): void {
+  if (currentStake != null) {
+    currentStake.syntheticToken = syntheticToken;
+    currentStake.user = userAddress.toHex();
+    currentStake.userAddress = userAddress;
+    currentStake.syntheticMarket = marketIndex.toString();
+    currentStake.lastMintState = accumulativeFloatIssuanceSnapshotId;
+  }
+}
+
+function settleAllBatchedNextPriceStakerShifts(
+  event: ethereum.Event,
+  batchedNextPriceStakerShifts: BatchedNextPriceStakeAction,
+  syntheticMarket: SyntheticMarket,
+  longTokenPrice: BigInt,
+  shortTokenPrice: BigInt
+): void {
+  let blockNumber = event.block.number;
+  let linkedNextPriceStakerActions =
+    batchedNextPriceStakerShifts.linkedUserNextPriceStakeActions;
+  for (let i = 0; i < linkedNextPriceStakerActions.length; i++) {
+    let userNextPriceActionId: string = linkedNextPriceStakerActions[i];
+
+    let userNextPriceAction = getUserNextPriceStakeAction(
+      userNextPriceActionId
+    );
+    userNextPriceAction.settledTimestamp = event.block.timestamp;
+    userNextPriceAction.settled = true;
+    userNextPriceAction.save();
+
+    let userAddress = Address.fromString(userNextPriceAction.user);
+    let user = getUser(userAddress);
+
+    user.pendingNextPriceStakeActions = removeFromArrayAtIndex(
+      user.pendingNextPriceStakeActions,
+      user.pendingNextPriceStakeActions.indexOf(userNextPriceActionId)
+    );
+
+    user.settledNextPriceStakeActions = user.settledNextPriceStakeActions.concat(
+      [userNextPriceActionId]
+    );
+
+    let oldStakeAmountLong = ZERO;
+    let oldStakeAmountShort = ZERO;
+
+    let currentStakeLongId =
+      syntheticMarket.syntheticLong + "-" + user.id + "-currentStake";
+
+    let currentStakeLong = CurrentStake.load(currentStakeLongId);
+
+    if (currentStakeLong != null) {
+      let longStake = getStake(currentStakeLong.currentStake);
+      if (!longStake.withdrawn) {
+        oldStakeAmountLong = longStake.amount;
+        longStake.withdrawn = true;
+        longStake.save();
+      }
+    }
+
+    let currentStakeShortId =
+      syntheticMarket.syntheticShort + "-" + user.id + "-currentStake";
+    let currentStakeShort = CurrentStake.load(currentStakeShortId);
+
+    if (currentStakeShort != null) {
+      let shortStake = getStake(currentStakeShort.currentStake);
+      if (!shortStake.withdrawn) {
+        oldStakeAmountShort = shortStake.amount;
+        shortStake.withdrawn = true;
+        shortStake.save();
+      }
+    }
+
+    let deltaLong = userNextPriceAction.amountStakeForShiftFromShort
+      .times(shortTokenPrice)
+      .div(longTokenPrice)
+      .minus(userNextPriceAction.amountStakeForShiftFromLong);
+
+    let newStakeAmountLong = oldStakeAmountLong.plus(deltaLong);
+
+    let deltaShort = userNextPriceAction.amountStakeForShiftFromLong
+      .times(longTokenPrice)
+      .div(shortTokenPrice)
+      .minus(userNextPriceAction.amountStakeForShiftFromShort);
+
+    let newStakeAmountShort = oldStakeAmountShort.plus(deltaShort);
+
+    if (!newStakeAmountLong.equals(ZERO)) {
+      let stakeId =
+        user.id +
+        "-" +
+        syntheticMarket.syntheticLong.toString() +
+        "-" +
+        event.transaction.hash.toHex();
+      let stake = new Stake(stakeId);
+      stake.timestamp = event.block.timestamp;
+      stake.blockNumber = blockNumber;
+      stake.creationTxHash = event.transaction.hash;
+      stake.syntheticToken = syntheticMarket.syntheticLong;
+      stake.amount = newStakeAmountLong;
+      stake.user = userAddress.toHex();
+      stake.withdrawn = false;
+      stake.save();
+
+      if (currentStakeLong == null) {
+        currentStakeLong = new CurrentStake(currentStakeLongId);
+        initializeCurrentStake(
+          currentStakeLong,
+          syntheticMarket.syntheticLong,
+          user.address,
+          syntheticMarket.marketIndex,
+          currentStakeShort.lastMintState // currentStakeShort won't be null - if it is there's a major problem
+        );
+        user.currentStakes = user.currentStakes.concat([currentStakeLongId]);
+      }
+      currentStakeLong.currentStake = stakeId;
+      currentStakeLong.save();
+    }
+
+    if (!newStakeAmountShort.equals(ZERO)) {
+      let stakeId =
+        user.id +
+        "-" +
+        syntheticMarket.syntheticShort.toString() +
+        "-" +
+        event.transaction.hash.toHex();
+      let stake = new Stake(stakeId);
+      stake.timestamp = event.block.timestamp;
+      stake.blockNumber = blockNumber;
+      stake.creationTxHash = event.transaction.hash;
+      stake.syntheticToken = syntheticMarket.syntheticShort;
+      stake.amount = newStakeAmountShort;
+      stake.user = userAddress.toHex();
+      stake.withdrawn = false;
+      stake.save();
+
+      if (currentStakeShort == null) {
+        currentStakeShort = new CurrentStake(currentStakeShortId);
+        initializeCurrentStake(
+          currentStakeShort,
+          syntheticMarket.syntheticShort,
+          user.address,
+          syntheticMarket.marketIndex,
+          currentStakeLong.lastMintState // currentStakeLong won't be null - if it is there's a major problem
+        );
+        user.currentStakes = user.currentStakes.concat([currentStakeShortId]);
+      }
+      currentStakeShort.currentStake = stakeId;
+      currentStakeShort.save();
+    }
+    user.save();
+  }
+}
 export function handleSystemStateUpdated(event: SystemStateUpdated): void {
   let marketIndex = event.params.marketIndex;
   let marketIndexString = marketIndex.toString();
@@ -301,6 +464,20 @@ export function handleSystemStateUpdated(event: SystemStateUpdated): void {
     }
 
     batchedNextPriceExec.save();
+  }
+
+  let batchedNextPriceStakeLoad = BatchedNextPriceStakeAction.load(
+    marketIndex.toString() + "-" + updateIndex.toString()
+  );
+
+  if (batchedNextPriceStakeLoad != null) {
+    settleAllBatchedNextPriceStakerShifts(
+      event,
+      batchedNextPriceStakeLoad as BatchedNextPriceStakeAction,
+      syntheticMarket,
+      longTokenPrice,
+      shortTokenPrice
+    );
   }
 
   saveEventToStateChange(
@@ -891,4 +1068,60 @@ function updateLatestUnderlyingPrice(
     latestPrice.price = newPriceEntity.id;
     latestPrice.save();
   }
+}
+
+export function handleNextPriceSyntheticPositionShift(
+  event: NextPriceSyntheticPositionShift
+): void {
+  let synthShifted = event.params.synthShifted;
+  let marketIndex = event.params.marketIndex;
+  let oracleUpdateIndex = event.params.oracleUpdateIndex;
+  let isShiftFromLong = event.params.isShiftFromLong;
+  let userAddress = event.params.user;
+
+  let user = getUser(userAddress);
+  let syntheticMarket = getSyntheticMarket(marketIndex.toString());
+
+  let userNextPriceActionComponent = createUserNextPriceActionComponent(
+    user,
+    syntheticMarket,
+    oracleUpdateIndex,
+    synthShifted,
+    ACTION_SHIFT,
+    isShiftFromLong,
+    event
+  );
+
+  let batchedNextPriceExec = createOrUpdateBatchedNextPriceExec(
+    userNextPriceActionComponent
+  );
+  let userNextPriceAction = createOrUpdateUserNextPriceAction(
+    userNextPriceActionComponent,
+    syntheticMarket,
+    user
+  );
+  userNextPriceAction.confirmedTimestamp = event.block.timestamp;
+
+  userNextPriceAction.save();
+  batchedNextPriceExec.save();
+
+  saveEventToStateChange(
+    event,
+    "NextPriceSyntheticPositionShift",
+    bigIntArrayToStringArray([
+      synthShifted,
+      marketIndex,
+      oracleUpdateIndex,
+    ]).concat([isShiftFromLong ? "true" : "false", user.id]),
+    [
+      "synthShifted",
+      "marketIndex",
+      "oracleUpdateIndex",
+      "isShiftFromLong",
+      "user",
+    ],
+    ["uint256", "uint32", "uint256", "bool", "address"],
+    [userAddress],
+    []
+  );
 }
