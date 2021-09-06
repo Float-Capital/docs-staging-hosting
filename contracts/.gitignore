@@ -3,18 +3,10 @@ node_modules
 # Buidler files
 cache
 artifacts
-# Truffle
 build
 
 # Test codegen
 codegen
-
-# Openzeppelin
-.openzeppelin/.session
-.openzeppelin/unknown-*.json
-!.openzeppelin/unknown-97.json
-!.openzeppelin/unknown-321.json
-!.openzeppelin/unknown-80001.json
 
 # Secrets
 secretsManager.js
@@ -26,7 +18,6 @@ lib
 
 coverage.json
 
-coverage-truffle
 coverage-all
 coverage-unit
 coverage-integration
@@ -35,12 +26,12 @@ abis
 ast
 
 # No need to keep javascript files in contract tests
-test-waffle/**/*.js
+test/**/*.js
 
-test-waffle/library/contracts/*
-!test-waffle/library/contracts/.gitkeep
-test-waffle/library/smock/*
-!test-waffle/library/smock/.gitkeep
+test/library/contracts/*
+!test/library/contracts/.gitkeep
+test/library/smock/*
+!test/library/smock/.gitkeep
 
 contracts/testing/generated/*
 

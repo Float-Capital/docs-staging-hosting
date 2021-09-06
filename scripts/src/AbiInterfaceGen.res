@@ -188,7 +188,7 @@ let _writeFiles =
       }
 
       Node.Fs.writeFileAsUtf8Sync(
-        `../contracts/test-waffle/library/contracts/${moduleName}.res`,
+        `../contracts/test/library/contracts/${moduleName}.res`,
         `
 @@ocaml.warning("-32")
 open SmockGeneral

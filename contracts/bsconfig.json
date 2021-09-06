@@ -7,7 +7,7 @@
   ],
   "sources": [
     {
-      "dir": "test-waffle",
+      "dir": "test",
       "subdirs": true
     },
     {

@@ -5,6 +5,8 @@ require("@openzeppelin/hardhat-upgrades");
 require("./hardhat-plugins/codegen");
 require("hardhat-deploy");
 require("@nomiclabs/hardhat-ethers");
+require("./test/Setup.js").mochaSetup();
+require("@nomiclabs/hardhat-waffle");
 
 require("hardhat-docgen");
 
@@ -34,14 +36,10 @@ if (runCoverage) {
   require("hardhat-abi-exporter");
   require("hardhat-gas-reporter");
 }
-let isWaffleTest =
-  !!process.env.WAFFLE_TEST && process.env.WAFFLE_TEST.toUpperCase() == "TRUE";
-if (isWaffleTest) {
-  require("./test-waffle/Setup.js").mochaSetup();
-  require("@nomiclabs/hardhat-waffle");
-} else {
-  require("@nomiclabs/hardhat-truffle5");
-}
+// let isWaffleTest =
+//   !!process.env.WAFFLE_TEST && process.env.WAFFLE_TEST.toUpperCase() == "TRUE";
+// if (isWaffleTest) {
+
 
 // This is a sample Buidler task. To learn how to create your own go to
 // https://buidler.dev/guides/create-task.html
@@ -103,7 +101,7 @@ module.exports = {
     },
   },
   paths: {
-    tests: isWaffleTest ? "./test-waffle" : "./test",
+    tests: "./test",
   },
   namedAccounts: {
     deployer: 0,

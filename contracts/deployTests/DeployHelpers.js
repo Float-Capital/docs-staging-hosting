@@ -3,13 +3,13 @@
 
 var Curry = require("rescript/lib/js/curry.js");
 var Js_exn = require("rescript/lib/js/js_exn.js");
-var LetOps = require("../test-waffle/library/LetOps.js");
-var Globals = require("../test-waffle/library/Globals.js");
+var LetOps = require("../test/library/LetOps.js");
+var Globals = require("../test/library/Globals.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
-var SyntheticToken = require("../test-waffle/library/contracts/SyntheticToken.js");
-var YieldManagerMock = require("../test-waffle/library/contracts/YieldManagerMock.js");
-var OracleManagerMock = require("../test-waffle/library/contracts/OracleManagerMock.js");
-var OracleManagerChainlink = require("../test-waffle/library/contracts/OracleManagerChainlink.js");
+var SyntheticToken = require("../test/library/contracts/SyntheticToken.js");
+var YieldManagerMock = require("../test/library/contracts/YieldManagerMock.js");
+var OracleManagerMock = require("../test/library/contracts/OracleManagerMock.js");
+var OracleManagerChainlink = require("../test/library/contracts/OracleManagerChainlink.js");
 
 var minSenderBalance = Globals.bnFromString("50000000000000000");
 
