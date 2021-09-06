@@ -803,7 +803,6 @@ function setupUserNextPriceStateAction(
   userAddress: Address,
   marketIndex: BigInt,
   userShiftIndex: BigInt,
-  userNextPriceStakeActionComponent: UserNextPriceStakeActionComponent,
   event: ethereum.Event
 ): void {
   let userAddressStr = userAddress.toHex();
@@ -882,7 +881,6 @@ export function handleNextPriceStakeShift(event: NextPriceStakeShift): void {
       user,
       marketIndex,
       userShiftIndex,
-      userNextPriceStakeActionComponent,
       event
     );
   }

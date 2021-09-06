@@ -97,6 +97,8 @@ dataSources:
           handler: handleStakerV1
         - event: NextPriceStakeShift(address,uint32,uint256,bool,uint256)
           handler: handleNextPriceStakeShift
+        - event: StakeShifted(address,uint32,uint256,uint256)
+          handler: handleStakeShifted
       file: ./src/mappings/staker.ts
 
 templates:
