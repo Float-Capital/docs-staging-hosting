@@ -5,7 +5,11 @@ require("@openzeppelin/hardhat-upgrades");
 require("./hardhat-plugins/codegen");
 require("hardhat-deploy");
 require("@nomiclabs/hardhat-ethers");
-require("./test/Setup.js").mochaSetup();
+try {
+  require("./test/Setup.js").mochaSetup();
+} catch (e) {
+  console.warn("You need to generate the rescript contracts, this could cause tests to fail.")
+}
 require("@nomiclabs/hardhat-waffle");
 
 require("hardhat-docgen");
