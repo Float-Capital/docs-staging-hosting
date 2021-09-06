@@ -9,7 +9,6 @@ html {
   scroll-behavior: smooth;
 }
 
-
 @import url("https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap");
 
 .shine {
@@ -23,6 +22,9 @@ html {
   animation: placeholder-active 1.15s ease;
 }
 
+.pixel {
+  image-rendering: crisp-edges !important;
+}
 
 @keyframes placeholder-active {
   0% {
@@ -83,6 +85,15 @@ html {
     ),
     url("/backgrounds/car.gif");
   @apply font-default min-h-screen w-screen bg-left-bottom bg-cover bg-gray-50;
+}
+
+.bg-team {
+  background: linear-gradient(
+      rgba(255, 255, 255, 0.3),
+      rgba(255, 255, 255, 0.3)
+    ),
+    url("/backgrounds/team.png");
+  @apply font-default min-h-screen w-screen bg-right-top bg-cover bg-gray-50;
 }
 
 .custom-height-for-above-footer {

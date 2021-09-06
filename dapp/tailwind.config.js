@@ -34,9 +34,19 @@ module.exports = {
       width: {
         "1/8": "12%",
         "1/10": "10%",
+        half: "50%",
         "9/10": "90%",
         "price-width": "12rem",
         "mint-width": "38rem",
+        "frame-width": "10rem",
+      },
+      margin: {
+        "minus-12": "-3.4rem",
+        "minus-quarter": "-25%",
+        "minus-1": "-0.4rem",
+      },
+      inset: {
+        half: "50%",
       },
       height: {
         "80-percent-screen": "80vh",

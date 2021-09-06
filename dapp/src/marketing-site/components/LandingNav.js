@@ -50,6 +50,10 @@ function LandingNav(Props) {
       link: "#roadmap"
     },
     {
+      title: "Team",
+      link: "#team"
+    },
+    {
       title: "Governance",
       link: "#governance"
     },

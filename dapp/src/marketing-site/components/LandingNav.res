@@ -38,7 +38,7 @@ let make = () => {
     {title: "App", link: "app/markets"},
     {title: "What is Float?", link: "#what-is-float"},
     {title: "Roadmap", link: "#roadmap"},
-    // {title: "Team", link: "#team"}, //TODO: temporarily remove while it isnt implemented yet
+    {title: "Team", link: "#team"},
     {title: "Governance", link: "#governance"},
     {title: "Security", link: "#security"},
   ]
