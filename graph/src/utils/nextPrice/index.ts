@@ -6,6 +6,7 @@ import {
   UserNextPriceAction,
   UserNextPriceActionComponent,
   UsersCurrentNextPriceAction,
+  UserNextPriceStakeActionComponent,
 } from "../../../generated/schema";
 import { Address, BigInt, Bytes, ethereum, log } from "@graphprotocol/graph-ts";
 import { ACTION_MINT, ACTION_SHIFT, MARKET_SIDE_LONG } from "../../CONSTANTS";
@@ -222,6 +223,58 @@ export function createUserNextPriceActionComponent(
   userNextPriceActionComponent.save();
 
   return userNextPriceActionComponent as UserNextPriceActionComponent;
+}
+
+export function createUserNextPriceStakeActionComponent(
+  userAddress: Bytes,
+  marketIndex: BigInt,
+  updateIndex: BigInt,
+  amount: BigInt,
+  actionType: string,
+  isLong: bool,
+  userAggregateActionId: string,
+  batchAggregateActionId: string,
+  event: ethereum.Event
+): UserNextPriceStakeActionComponent {
+  let actionIndex = 0;
+  let hasntFoundUnititializedIndex = true;
+  let userNextPriceActionComponentId = "";
+  // The user can have multiple NextPriceActions, even within the same block or of the same type (long/shrt) - this increments the index until it finds an empty one.
+  //        Unbounded here, but the impracticality (and blockchain limitations) of the user creating many thousands of actions means this code is ok.
+  while (hasntFoundUnititializedIndex) {
+    //TODO: Make this generate unique for this component instead of reusing createUserNextPriceStakeActionComponent
+
+    //TODO: Refactor to avoid code duplication?
+    userNextPriceActionComponentId = generateUserNextPriceActionComponentId(
+      userAddress,
+      marketIndex,
+      updateIndex,
+      actionType,
+      actionIndex
+    );
+    let tempUserNextPriceActionComponent = UserNextPriceStakeActionComponent.load(
+      userNextPriceActionComponentId
+    );
+    hasntFoundUnititializedIndex = tempUserNextPriceActionComponent != null;
+    ++actionIndex;
+  }
+  let userNextPriceActionComponent = new UserNextPriceStakeActionComponent(
+    userNextPriceActionComponentId
+  );
+
+  userNextPriceActionComponent.actionType = actionType;
+  userNextPriceActionComponent.marketSide = isLong ? "Long" : "Short";
+  userNextPriceActionComponent.amount = amount;
+  userNextPriceActionComponent.timestamp = event.block.timestamp;
+  userNextPriceActionComponent.user = userAddress.toHex();
+  userNextPriceActionComponent.updateIndex = updateIndex;
+  userNextPriceActionComponent.marketIndex = marketIndex;
+  userNextPriceActionComponent.userAggregateAction = userAggregateActionId;
+  userNextPriceActionComponent.associatedBatch = batchAggregateActionId;
+
+  userNextPriceActionComponent.save();
+
+  return userNextPriceActionComponent as UserNextPriceStakeActionComponent;
 }
 
 export function createOrUpdateUserNextPriceAction(

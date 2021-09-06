@@ -8,7 +8,7 @@ install:
 
 .PHONY: configure-contract-addresses
 configure-contract-addresses:
-	node scripts/deployments.js > dapp/src/contractAddresses.json
+	cd contracts && yarn hardhat export --network mumbai --export ./deploymentSummary.json && cd .. && node scripts/deployments-hardhat.js > dapp/src/contractAddresses.json
 
 .PHONY: redeploy-testnet
 redeploy-testnet:

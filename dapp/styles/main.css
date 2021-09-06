@@ -22,10 +22,6 @@ html {
   animation: placeholder-active 1.15s ease;
 }
 
-.pixel {
-  image-rendering: crisp-edges !important;
-}
-
 @keyframes placeholder-active {
   0% {
     background-position: 100% 50%;
@@ -34,6 +30,11 @@ html {
     background-position: 0 50%;
   }
 }
+
+.pixel {
+  image-rendering: crisp-edges !important;
+}
+
 #app,
 .island {
   /* It is possible to make this a utility (https://tailwindcss.com/docs/plugins#adding-utilities)
@@ -58,16 +59,16 @@ html {
   @apply font-default min-h-screen w-screen bg-right-top bg-cover bg-gray-50;
 }
 
-.fighter-blue {
-  background: url("/backgrounds/fighter-right.gif"),
+.electric-lines {
+  background: url("/backgrounds/electric-lines.png"),
     linear-gradient(
       to bottom left,
       rgba(86, 136, 241, 0.2),
       rgba(62, 77, 167, 0.6)
     );
-  background-position: right bottom;
-  @apply font-default min-h-screen bg-right-bottom w-screen bg-cover;
+  @apply font-default min-h-screen bg-left-bottom w-screen bg-cover;
 }
+
 .ballot-box {
   background: linear-gradient(
       to bottom left,

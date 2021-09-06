@@ -136,7 +136,7 @@ const deployTestMarket = async (
     false
   );
 
-  await longShortInstance.createNewSyntheticMarketUpgradeable(
+  await longShortInstance.createNewSyntheticMarketExternalSyntheticTokens(
     syntheticName,
     syntheticSymbol,
     synthLong.address,

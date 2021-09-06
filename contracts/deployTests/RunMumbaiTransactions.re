@@ -12,64 +12,66 @@ type allContracts = {
 
 let runMumbaiTransactions =
     (
-      {longShort, treasury, paymentToken},
+      {longShort, staker, treasury, paymentToken},
       deploymentArgs: Hardhat.hardhatDeployArgument,
     ) => {
   let%AwaitThen namedAccounts = deploymentArgs.getNamedAccounts();
   let%AwaitThen loadedAccounts = Ethers.getSigners();
 
+  // let deployer = loadedAccounts->Array.getUnsafe(0);
   let admin = loadedAccounts->Array.getUnsafe(1);
   let user1 = loadedAccounts->Array.getUnsafe(2);
-  let user2 = loadedAccounts->Array.getUnsafe(3);
-  let user3 = loadedAccounts->Array.getUnsafe(4);
+  // let user2 = loadedAccounts->Array.getUnsafe(3);
+  // let user3 = loadedAccounts->Array.getUnsafe(4);
 
-  let%AwaitThen _uninitializedSyntheticToken =
-    deploymentArgs.deployments
-    ->Hardhat.deploy(
-        ~name="SyntheticTokenUpgradeable",
-        ~arguments={
-          "from": namedAccounts.deployer,
-          "log": true,
-          "proxy": {
-            "proxyContract": "UUPSProxy",
-            "initializer": false,
-          },
-        },
-      );
+  // let%AwaitThen _ =
+  //   DeployHelpers.topupBalanceIfLow(~from=deployer, ~to_=admin);
+  // let%AwaitThen _ =
+  //   DeployHelpers.topupBalanceIfLow(~from=deployer, ~to_=user1);
+  // let%AwaitThen _ =
+  //   DeployHelpers.topupBalanceIfLow(~from=deployer, ~to_=user2);
+  // let%AwaitThen _ =
+  //   DeployHelpers.topupBalanceIfLow(~from=deployer, ~to_=user3);
 
-  let%AwaitThen _ = DeployHelpers.topupBalanceIfLow(~from=admin, ~to_=user1);
-  let%AwaitThen _ = DeployHelpers.topupBalanceIfLow(~from=admin, ~to_=user2);
-  let%AwaitThen _ = DeployHelpers.topupBalanceIfLow(~from=admin, ~to_=user3);
   Js.log("deploying markets");
 
   let%AwaitThen _ =
-    deployMumbaiMarket(
+    deployMumbaiMarketUpgradeable(
       ~syntheticName="ETH Market",
-      ~syntheticSymbol="FL_ETH",
+      ~syntheticSymbol="ETH",
       ~longShortInstance=longShort,
       ~treasuryInstance=treasury,
+      ~stakerInstance=staker,
+      ~deployments=deploymentArgs.deployments,
+      ~namedAccounts,
       ~admin,
       ~paymentToken: ERC20Mock.t,
       ~oraclePriceFeedAddress=ChainlinkOracleAddresses.Mumbai.ethOracleChainlink,
     );
 
   let%AwaitThen _ =
-    deployMumbaiMarket(
+    deployMumbaiMarketUpgradeable(
       ~syntheticName="MATIC Market",
-      ~syntheticSymbol="FL_MATIC",
+      ~syntheticSymbol="MATIC",
       ~longShortInstance=longShort,
       ~treasuryInstance=treasury,
+      ~stakerInstance=staker,
+      ~deployments=deploymentArgs.deployments,
+      ~namedAccounts,
       ~admin,
       ~paymentToken: ERC20Mock.t,
       ~oraclePriceFeedAddress=ChainlinkOracleAddresses.Mumbai.maticOracleChainlink,
     );
 
   let%AwaitThen _ =
-    deployMumbaiMarket(
+    deployMumbaiMarketUpgradeable(
       ~syntheticName="BTC Market",
-      ~syntheticSymbol="FL_BTC",
+      ~syntheticSymbol="BTC",
       ~longShortInstance=longShort,
       ~treasuryInstance=treasury,
+      ~stakerInstance=staker,
+      ~deployments=deploymentArgs.deployments,
+      ~namedAccounts,
       ~admin,
       ~paymentToken: ERC20Mock.t,
       ~oraclePriceFeedAddress=ChainlinkOracleAddresses.Mumbai.btcOracleChainlink,
@@ -80,34 +82,19 @@ let runMumbaiTransactions =
   let longMintAmount = bnFromString("10000000000000000000");
   let shortMintAmount = longMintAmount->div(bnFromInt(2));
   let redeemShortAmount = shortMintAmount->div(bnFromInt(2));
-  let longStakeAmount = bnFromInt(1);
-
-  let priceAndStateUpdate = () => {
-    let%AwaitThen _ =
-      executeOnMarkets(
-        initialMarkets,
-        setOracleManagerPrice(~longShort, ~marketIndex=_, ~admin),
-      );
-
-    Js.log("Executing update system state");
-
-    executeOnMarkets(
-      initialMarkets,
-      updateSystemState(~longShort, ~admin, ~marketIndex=_),
-    );
-  };
+  let longStakeAmount = longMintAmount->div(twoBn);
 
   Js.log("Executing Long Mints");
   let%AwaitThen _ =
     executeOnMarkets(
       initialMarkets,
-      mintLongNextPriceWithSystemUpdate(
+      mintNextPrice(
         ~amount=longMintAmount,
         ~marketIndex=_,
         ~paymentToken,
         ~longShort,
         ~user=user1,
-        ~admin,
+        ~isLong=true,
       ),
     );
 
@@ -115,71 +102,41 @@ let runMumbaiTransactions =
   let%AwaitThen _ =
     executeOnMarkets(
       initialMarkets,
-      mintShortNextPriceWithSystemUpdate(
-        ~amount=shortMintAmount,
-        ~marketIndex=_,
-        ~paymentToken,
-        ~longShort,
-        ~user=user1,
-        ~admin,
-      ),
-    );
-
-  Js.log("Executing Short Position Redeem");
-  let%AwaitThen _ =
-    executeOnMarkets(
-      initialMarkets,
-      redeemShortNextPriceWithSystemUpdate(
-        ~amount=redeemShortAmount,
-        ~marketIndex=_,
-        ~longShort,
-        ~user=user1,
-        ~admin,
-      ),
-    );
-
-  let%AwaitThen _ = priceAndStateUpdate();
-
-  let%AwaitThen _ =
-    executeOnMarkets(
-      initialMarkets,
-      mintLongNextPriceWithSystemUpdate(
+      mintNextPrice(
         ~amount=longMintAmount,
         ~marketIndex=_,
         ~paymentToken,
         ~longShort,
         ~user=user1,
-        ~admin,
+        ~isLong=false,
       ),
     );
 
+  let%AwaitThen _ = sleep(~timeMs=27000);
+
+  Js.log("Executing Short Position Redeem");
   let%AwaitThen _ =
     executeOnMarkets(
       initialMarkets,
-      shiftFromShortNextPriceWithSystemUpdate(
+      redeemNextPrice(
         ~amount=redeemShortAmount,
         ~marketIndex=_,
         ~longShort,
         ~user=user1,
-        ~admin,
+        ~isLong=false,
       ),
     );
 
-  let%AwaitThen _ = priceAndStateUpdate();
+  let%AwaitThen _ = sleep(~timeMs=27000);
 
   Js.log("Staking long position");
-  let%AwaitThen _ =
-    executeOnMarkets(
-      initialMarkets,
-      stakeSynthLong(
-        ~amount=longStakeAmount,
-        ~longShort,
-        ~marketIndex=_,
-        ~user=user1,
-      ),
-    );
-
-  let%AwaitThen _ = priceAndStateUpdate();
-
-  JsPromise.resolve();
+  executeOnMarkets(
+    initialMarkets,
+    stakeSynthLong(
+      ~amount=longStakeAmount,
+      ~longShort,
+      ~marketIndex=_,
+      ~user=user1,
+    ),
+  );
 };

@@ -6,9 +6,9 @@ dataSources:
     name: LongShort
     network: mumbai
     source:
-      address: "0x6025b79dEaf8d3bddA7e3504b1EE2F5c55c95500"
+      address: "0x037c66973F5a77dA28b6014e3B67E004724bbAf0"
       abi: LongShort
-      startBlock: 17876096
+      startBlock: 18504303
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -37,23 +37,23 @@ dataSources:
           handler: handleNextPriceDeposit
         - event: NextPriceRedeem(uint32,bool,uint256,address,uint256)
           handler: handleNextPriceRedeem
-        - event: NextPriceSyntheticPositionShift(uint32,bool,uint256,address,uint256)
-          handler: handleNextPriceSyntheticPositionShift
         - event: OracleUpdated(uint32,address,address)
           handler: handleOracleUpdated
         - event: SyntheticMarketCreated(uint32,address,address,address,int256,string,string,address,address)
           handler: handleSyntheticMarketCreated
         - event: SystemStateUpdated(uint32,uint256,int256,uint256,uint256,uint256,uint256)
           handler: handleSystemStateUpdated
+        - event: NextPriceSyntheticPositionShift(uint32,bool,uint256,address,uint256)
+          handler: handleNextPriceSyntheticPositionShift
       file: ./src/mappings/longShort.ts
 
   - kind: ethereum/contract
     name: Staker
     network: mumbai
     source:
-      address: "0xb52DBc99715Cd66C437Eb63a5d0823f0aB275ABe"
+      address: "0x0a4A94Bf20DB76dEb345375a670C9bF1337903fc"
       abi: Staker
-      startBlock: 17876096
+      startBlock: 18504297
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -95,6 +95,10 @@ dataSources:
           handler: handleStakeWithdrawn
         - event: StakerV1(address,address,address,address,uint256)
           handler: handleStakerV1
+        - event: NextPriceStakeShift(address,uint32,uint256,bool,uint256)
+          handler: handleNextPriceStakeShift
+        - event: StakeShifted(address,uint32,uint256,uint256)
+          handler: handleStakeShifted
       file: ./src/mappings/staker.ts
 
 templates:

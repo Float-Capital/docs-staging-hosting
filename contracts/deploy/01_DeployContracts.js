@@ -13,25 +13,35 @@ const {
 } = require("../helper-hardhat-config");
 const mumbaiDaiAddress = "0x001B3B4d0F3714Ca98ba10F6042DaEbF0B1B7b6F";
 
+let networkToUse = network.name
+
+if (!!process.env.HARDHAT_FORK) {
+  networkToUse = process.env.HARDHAT_FORK
+}
+
 module.exports = async ({ getNamedAccounts, deployments }) => {
   const { deploy } = deployments;
-  const { deployer, admin } = await getNamedAccounts();
+  // const { deployer, admin } = await getNamedAccounts();
+  const accounts = await ethers.getSigners();
+
+  const deployer = accounts[0].address;
+  const admin = accounts[1].address;
 
   let paymentTokenAddress;
 
-  if (network.name != "mumbai") {
-    console.log(network.name);
-    paymentToken = await deploy(COLLATERAL_TOKEN, {
+  if (networkToUse != "mumbai") {
+    console.log(networkToUse);
+    let paymentToken = await deploy(COLLATERAL_TOKEN, {
       from: deployer,
       log: true,
       args: ["dai token", "DAI"],
     });
     console.log("dai address", paymentToken.address);
     paymentTokenAddress = paymentToken.address;
-  } else if (network.name === "mumbai") {
+  } else if (networkToUse === "mumbai") {
     paymentTokenAddress = mumbaiDaiAddress;
   } else {
-    throw new Error(`network ${network.name} un-accounted for`)
+    throw new Error(`network ${networkToUse} un-accounted for`)
   }
 
   console.log("Deploying contracts with the account:", deployer);
@@ -72,7 +82,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     log: true,
   });
 
-  await deploy(STAKER, {
+  const staker = await deploy(STAKER, {
     from: deployer,
     log: true,
     proxy: {
@@ -89,6 +99,8 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
       initializer: false,
     },
   });
+  console.log("StakerDeployed", staker.address)
+  console.log("LongShortDeployed", longShort.address)
 
   await deploy(TOKEN_FACTORY, {
     from: admin,
