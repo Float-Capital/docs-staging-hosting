@@ -834,7 +834,7 @@ function setupUserNextPriceStateAction(
     userCurrentStakeAction.user = userAddressStr;
     userCurrentStakeAction.marketIndex = marketIndex;
   }
-  userCurrentStakeAction.currentAction = userNextPriceStakeActionComponent.id;
+  userCurrentStakeAction.currentAction = userNextPriceStakeAction.id;
   userCurrentStakeAction.save();
 
   let userObj = getOrCreateUser(userAddress, event);
