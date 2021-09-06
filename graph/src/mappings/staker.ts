@@ -839,7 +839,7 @@ function setupUserNextPriceStateAction(
 
   let userObj = getOrCreateUser(userAddress, event);
   userObj.pendingNextPriceStakeActions = userObj.pendingNextPriceStakeActions.concat(
-    [userNextPriceStakeActionComponent.id]
+    [userNextPriceStakeAction.id]
   );
   userObj.save();
 }
