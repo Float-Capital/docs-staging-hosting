@@ -822,7 +822,7 @@ function setupUserNextPriceStateAction(
     batchedStake.updateIndex = userShiftIndex;
   }
   batchedStake.linkedUserNextPriceStakeActions = batchedStake.linkedUserNextPriceStakeActions.concat(
-    [userNextPriceStakeActionComponent.id]
+    [userNextPriceStakeAction.id]
   );
   batchedStake.save();
 
