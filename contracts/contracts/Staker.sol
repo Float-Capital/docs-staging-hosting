@@ -17,6 +17,8 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
     ║          VARIABLES          ║
     ╚═════════════════════════════╝*/
 
+  bytes32 public constant DISCOUNT_ROLE = keccak256("DISCOUNT_ROLE");
+
   /* ══════ Fixed-precision constants ══════ */
   uint256 public constant FLOAT_ISSUANCE_FIXED_DECIMAL = 3e44;
 
@@ -39,6 +41,7 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
   mapping(uint32 => mapping(bool => address)) public syntheticTokens;
 
   mapping(address => uint32) public marketIndexOfToken;
+  mapping(address => uint32) public userNonce;
 
   /* ══════ Reward specific ══════ */
   mapping(uint32 => uint256) public latestRewardIndex; // This is synced to be the same as LongShort
@@ -896,19 +899,13 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
     emit StakeWithdrawn(msg.sender, token, amount);
   }
 
-  /**
-  @notice Withdraw function. Allows users to unstake.
-  @param amount Amount to withdraw.
-  @param marketIndex Market index of staked synthetic token
-  @param isWithdrawFromLong is synthetic token to be withdrawn long or short
-  */
-  function withdraw(
+  // Note to comment function
+  function _withdrawPrepLogic(
     uint32 marketIndex,
     bool isWithdrawFromLong,
-    uint256 amount
-  ) external {
-    address token = syntheticTokens[marketIndex][isWithdrawFromLong];
-
+    uint256 amount,
+    address token
+  ) internal {
     ILongShort(longShort).updateSystemState(marketIndex);
     _mintAccumulatedFloatAndExecuteOutstandingShifts(marketIndex, msg.sender);
 
@@ -922,7 +919,21 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
       require(currentAmountStaked >= amount + amountToShiftForThisToken, "not enough to withdraw");
       userAmountStaked[token][msg.sender] = currentAmountStaked - amount;
     }
+  }
 
+  /**
+  @notice Withdraw function. Allows users to unstake.
+  @param amount Amount to withdraw.
+  @param marketIndex Market index of staked synthetic token
+  @param isWithdrawFromLong is synthetic token to be withdrawn long or short
+  */
+  function withdraw(
+    uint32 marketIndex,
+    bool isWithdrawFromLong,
+    uint256 amount
+  ) external {
+    address token = syntheticTokens[marketIndex][isWithdrawFromLong];
+    _withdrawPrepLogic(marketIndex, isWithdrawFromLong, amount, token);
     _withdraw(marketIndex, token, amount);
   }
 
@@ -945,5 +956,74 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
     userAmountStaked[token][msg.sender] = amountToShiftForThisToken;
 
     _withdraw(marketIndex, token, userAmountStakedBeforeWithdrawal - amountToShiftForThisToken);
+  }
+
+  function _hasher(
+    uint32 marketIndex,
+    bool isWithdrawFromLong,
+    address user,
+    uint256 withdrawAmount,
+    uint256 expiry,
+    uint256 nonce,
+    uint256 discountWithdrawFee
+  ) internal pure returns (bytes32) {
+    return
+      keccak256(
+        abi.encodePacked(
+          "\x19Ethereum Signed Message:\n32",
+          keccak256(
+            abi.encodePacked(
+              marketIndex,
+              isWithdrawFromLong,
+              user,
+              withdrawAmount,
+              expiry,
+              nonce,
+              discountWithdrawFee
+            )
+          )
+        )
+      );
+  }
+
+  function withdrawWithVoucher(
+    uint32 marketIndex,
+    bool isWithdrawFromLong,
+    uint256 withdrawAmount,
+    uint256 expiry,
+    uint256 nonce,
+    uint256 discountWithdrawFee,
+    uint8 v,
+    bytes32 r,
+    bytes32 s
+  ) external {
+    address voucherIssuer = ecrecover(
+      _hasher(
+        marketIndex,
+        isWithdrawFromLong,
+        msg.sender,
+        withdrawAmount,
+        expiry,
+        nonce,
+        discountWithdrawFee
+      ),
+      v,
+      r,
+      s
+    );
+    hasRole(DISCOUNT_ROLE, voucherIssuer);
+    require(block.timestamp < expiry, "coupon expired");
+    require(userNonce[msg.sender] == nonce, "invalid nonce");
+    require(discountWithdrawFee < marketUnstakeFee_e18[marketIndex], "bad discount fee");
+    userNonce[msg.sender] = userNonce[msg.sender] + 1;
+
+    address token = syntheticTokens[marketIndex][isWithdrawFromLong];
+
+    _withdrawPrepLogic(marketIndex, isWithdrawFromLong, withdrawAmount, token);
+
+    uint256 amountFees = (withdrawAmount * discountWithdrawFee) / 1e18;
+    ISyntheticToken(token).transfer(floatTreasury, amountFees);
+    ISyntheticToken(token).transfer(msg.sender, withdrawAmount - amountFees);
+    emit StakeWithdrawn(msg.sender, token, withdrawAmount);
   }
 }
