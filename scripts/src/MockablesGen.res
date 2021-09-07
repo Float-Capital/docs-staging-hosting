@@ -419,5 +419,5 @@ filesToMockInternally->Array.forEach(filePath => {
 
 /// Generate rescript smocked interfaces
 bindingsDict->HashMap.String.forEach((key, val) => {
-  Node.Fs.writeFileAsUtf8Sync(`../contracts/test-waffle/library/smock/${key}Smocked.res`, val)
+  Node.Fs.writeFileAsUtf8Sync(`../contracts/test/library/smock/${key}Smocked.res`, val)
 })

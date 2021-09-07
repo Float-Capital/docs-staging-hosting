@@ -2,8 +2,8 @@
 'use strict';
 
 var Curry = require("rescript/lib/js/curry.js");
-var LetOps = require("../test-waffle/library/LetOps.js");
-var Globals = require("../test-waffle/library/Globals.js");
+var LetOps = require("../test/library/LetOps.js");
+var Globals = require("../test/library/Globals.js");
 var DeployHelpers = require("./DeployHelpers.js");
 var ChainlinkOracleAddresses = require("./addresses/ChainlinkOracleAddresses.js");
 
