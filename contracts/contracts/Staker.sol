@@ -137,6 +137,7 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
     address _floatToken,
     address _floatTreasury,
     address _floatCapital,
+    address _discountSigner,
     uint256 _floatPercentage
   ) external virtual initializer {
     require(
@@ -154,6 +155,7 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
     floatToken = _floatToken;
 
     _AccessControlledAndUpgradeable_init(_admin);
+    _setupRole(DISCOUNT_ROLE, _discountSigner);
 
     _changeFloatPercentage(_floatPercentage);
 
@@ -997,7 +999,7 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
     bytes32 r,
     bytes32 s
   ) external {
-    address voucherIssuer = ecrecover(
+    address discountSigner = ecrecover(
       _hasher(
         marketIndex,
         isWithdrawFromLong,
@@ -1011,7 +1013,8 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
       r,
       s
     );
-    hasRole(DISCOUNT_ROLE, voucherIssuer);
+    hasRole(DISCOUNT_ROLE, discountSigner);
+
     require(block.timestamp < expiry, "coupon expired");
     require(userNonce[msg.sender] == nonce, "invalid nonce");
     require(discountWithdrawFee < marketUnstakeFee_e18[marketIndex], "bad discount fee");
