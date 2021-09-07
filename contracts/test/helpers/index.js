@@ -70,6 +70,7 @@ const initialize = async (admin) => {
     /// Using the float capital address for the
     floatCapital.address,
     floatCapital.address,
+    floatCapital.address, //LEGACY Just to make tests run
     "250000000000000000", // 25%
     {
       from: admin,
