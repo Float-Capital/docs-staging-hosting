@@ -1,8 +1,9 @@
 cd ../../contracts
 yarn
 yarn compile
-
-cp -r abis/* ../graph/abis-copy
+ 
+mkdir -p ../graph/abis-copy
+cp -rp abis/* ../graph/abis-copy
 
 cd ../graph
 
@@ -17,7 +18,7 @@ docker image prune -f
 sleep 120
 
 docker exec -ti graph-deployer sh -c "yarn graph-command create float-capital/float-capital${GRAPH_POSTFIX} --node http://graph-node:8020"
-docker exec -ti graph-deployer sh -c "yarn graph-command create float-capital/float-oracle-prices${GRAPH_POSTFIX} --node http://graph-node:8020"
+# docker exec -ti graph-deployer sh -c "yarn graph-command create float-capital/float-oracle-prices${GRAPH_POSTFIX} --node http://graph-node:8020"
 
 docker exec -ti graph-deployer sh -c "yarn graph-command deploy float-capital/float-capital${GRAPH_POSTFIX} --ipfs http://ipfs:5001 --node http://graph-node:8020 ./subgraph.mumbai.yaml"
-docker exec -ti graph-deployer sh -c "yarn graph-command deploy float-capital/float-oracle-prices${GRAPH_POSTFIX} --ipfs http://ipfs:5001 --node http://graph-node:8020 ./subgraph.priceHistory.mumbai.yaml"
+# docker exec -ti graph-deployer sh -c "yarn graph-command deploy float-capital/float-oracle-prices${GRAPH_POSTFIX} --ipfs http://ipfs:5001 --node http://graph-node:8020 ./subgraph.priceHistory.mumbai.yaml"
