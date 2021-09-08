@@ -7,8 +7,10 @@ import {
   MarketLaunchIncentiveParametersChanges,
   MarketAddedToStaker,
   StakeWithdrawalFeeUpdated,
+  NextPriceStakeShift,
   FloatPercentageUpdated,
   BalanceIncentiveParamsUpdated,
+  StakeShifted,
 } from "../../generated/Staker/Staker";
 import { erc20 } from "../../generated/templates";
 import {
@@ -18,12 +20,17 @@ import {
   CurrentStake,
   Stake,
   AccumulativeFloatIssuanceSnapshot,
+  BatchedNextPriceStakeAction,
+  UserNextPriceStakeAction,
+  UserCurrentNextPriceStakeAction,
+  UserNextPriceStakeActionComponent,
 } from "../../generated/schema";
 import {
   log,
   DataSourceContext,
   Address,
   BigInt,
+  ethereum,
 } from "@graphprotocol/graph-ts";
 import {
   bigIntArrayToStringArray,
@@ -40,7 +47,15 @@ import {
   getStake,
   getOrInitializeCurrentStake,
   getOrInitializeStake,
+  getOrInitializeBatchedNextPriceStakeAction,
+  getOrInitializeUserCurrentNextPriceStakeAction,
+  getOrInitializeUserNextPriceStakeAction,
+  getBatchedNextPriceStakeAction,
+  getUserNextPriceStakeAction,
+  getBatchedNextPriceExec,
+  getUserCurrentNextPriceStakeAction,
 } from "../generated/EntityHelpers";
+import { removeFromArrayAtIndex } from "./longShort";
 
 import {
   ZERO,
@@ -48,7 +63,12 @@ import {
   GLOBAL_STATE_ID,
   TEN_TO_THE_18,
   FLOAT_ISSUANCE_FIXED_DECIMAL,
+  ACTION_SHIFT,
 } from "../CONSTANTS";
+import {
+  generateBatchedNextPriceExecId,
+  createUserNextPriceStakeActionComponent,
+} from "../utils/nextPrice";
 
 export function handleStakerV1(event: StakerV1): void {
   let floatAddress = event.params.floatToken;
@@ -302,7 +322,9 @@ export function handleStakeAdded(event: StakeAdded): void {
 
   let user = getOrCreateUser(userAddress, event);
 
-  let stake = new Stake(txHash.toHex());
+  let stake = new Stake(
+    userAddressString + "-" + tokenAddressString + "-" + txHash.toHex()
+  );
   stake.timestamp = timestamp;
   stake.blockNumber = blockNumber;
   stake.creationTxHash = txHash;
@@ -384,7 +406,9 @@ export function handleStakeWithdrawn(event: StakeWithdrawn): void {
 
   // If they are not withdrawing the full amount
   if (!oldStake.amount.equals(amount)) {
-    let stake = new Stake(txHash.toHex());
+    let stake = new Stake(
+      userAddressString + "-" + tokenAddressString + "-" + txHash.toHex()
+    );
     stake.timestamp = timestamp;
     stake.blockNumber = blockNumber;
     stake.creationTxHash = txHash;
@@ -419,65 +443,190 @@ class FloatMintedBreakdown {
   amountFromShortStake: BigInt;
 }
 
+function calculateAccumulatedFloatInRange(
+  amountStakedLong: BigInt,
+  amountStakedShort: BigInt,
+  accumulativeFloatSnapshot_indexStart: AccumulativeFloatIssuanceSnapshot,
+  accumulativeFloatSnapshot_indexEnd: AccumulativeFloatIssuanceSnapshot
+): FloatMintedBreakdown {
+  let amountFromLongStake = ZERO;
+  let amountFromShortStake = ZERO;
+
+  if (
+    accumulativeFloatSnapshot_indexStart.index.equals(
+      accumulativeFloatSnapshot_indexEnd.index
+    )
+  ) {
+    return {
+      amountFromLongStake: ZERO,
+      amountFromShortStake: ZERO,
+    };
+  }
+
+  if (amountStakedLong.gt(ZERO)) {
+    let accumDeltaLong = accumulativeFloatSnapshot_indexEnd.accumulativeFloatPerTokenLong.minus(
+      accumulativeFloatSnapshot_indexStart.accumulativeFloatPerTokenLong
+    );
+    amountFromLongStake = accumDeltaLong
+      .times(amountStakedLong)
+      .div(FLOAT_ISSUANCE_FIXED_DECIMAL);
+  }
+
+  if (amountStakedShort.gt(ZERO)) {
+    let accumDeltaShort = accumulativeFloatSnapshot_indexEnd.accumulativeFloatPerTokenShort.minus(
+      accumulativeFloatSnapshot_indexStart.accumulativeFloatPerTokenShort
+    );
+    amountFromShortStake = accumDeltaShort
+      .times(amountStakedShort)
+      .div(FLOAT_ISSUANCE_FIXED_DECIMAL);
+  }
+
+  return {
+    amountFromLongStake,
+    amountFromShortStake,
+  };
+}
+
 function calculateAccumulatedFloatAndExecuteOutstandingShifts(
   syntheticMarket: SyntheticMarket,
   syntheticLong: SyntheticToken,
   syntheticShort: SyntheticToken,
   user: Address
 ): FloatMintedBreakdown {
-  // TODO: handle case where user has pending token shifts! #
+  let lastUserMintId_forNonzeroStake = "";
+  let amountStakedLong = ZERO;
+  let amountStakedShort = ZERO;
 
-  let currentStakeLong = CurrentStake.load(
-    syntheticLong.tokenAddress.toHex() + "-" + user.toHex() + "-currentStake"
+  let unaccountedForSettledShift: UserNextPriceStakeAction;
+
+  let userCurrentShift = UserCurrentNextPriceStakeAction.load(
+    user.toHex() + "-" + syntheticMarket.marketIndex.toString()
   );
-  let amountFromLongStake = ZERO;
-  if (currentStakeLong != null) {
-    let longStake = getStake(currentStakeLong.currentStake);
-    let lastUserMintState = getAccumulativeFloatIssuanceSnapshot(
-      currentStakeLong.lastMintState
-    );
-    let lastMarketMintState = getAccumulativeFloatIssuanceSnapshot(
-      syntheticMarket.latestAccumulativeFloatIssuanceSnapshot
-    );
-    let amountStakedLong = longStake.amount;
 
-    if (amountStakedLong.gt(ZERO)) {
-      let accumDeltaLong = lastMarketMintState.accumulativeFloatPerTokenLong.minus(
-        lastUserMintState.accumulativeFloatPerTokenLong
-      );
-      amountFromLongStake = accumDeltaLong
-        .times(amountStakedLong)
-        .div(FLOAT_ISSUANCE_FIXED_DECIMAL);
+  if (userCurrentShift != null) {
+    let lastUserShift = getUserNextPriceStakeAction(
+      userCurrentShift.currentAction
+    );
+    if (lastUserShift.settled && !lastUserShift.floatMintedPastSettled) {
+      unaccountedForSettledShift = lastUserShift;
     }
   }
+
   let currentStakeShort = CurrentStake.load(
     syntheticShort.tokenAddress.toHex() + "-" + user.toHex() + "-currentStake"
   );
 
-  let amountFromShortStake = ZERO;
-  if (currentStakeShort != null) {
-    let shortStake = getStake(currentStakeShort.currentStake);
-    let lastUserMintState = getAccumulativeFloatIssuanceSnapshot(
-      currentStakeShort.lastMintState
-    );
-    let lastMarketMintState = getAccumulativeFloatIssuanceSnapshot(
-      syntheticMarket.latestAccumulativeFloatIssuanceSnapshot
-    );
-    let amountStakedShort = shortStake.amount;
+  let currentStakeLong = CurrentStake.load(
+    syntheticLong.tokenAddress.toHex() + "-" + user.toHex() + "-currentStake"
+  );
 
-    if (amountStakedShort.gt(ZERO)) {
-      let accumDeltaShort = lastMarketMintState.accumulativeFloatPerTokenShort.minus(
-        lastUserMintState.accumulativeFloatPerTokenShort
-      );
-      amountFromShortStake = accumDeltaShort
-        .times(amountStakedShort)
-        .div(FLOAT_ISSUANCE_FIXED_DECIMAL);
+  if (currentStakeLong != null) {
+    let longStake = getStake(currentStakeLong.currentStake);
+    if (!longStake.withdrawn) {
+      lastUserMintId_forNonzeroStake = currentStakeLong.lastMintState;
+      amountStakedLong = longStake.amount;
     }
   }
-  return {
-    amountFromLongStake,
-    amountFromShortStake,
-  };
+
+  if (currentStakeShort != null) {
+    let shortStake = getStake(currentStakeShort.currentStake);
+    if (!shortStake.withdrawn) {
+      if (lastUserMintId_forNonzeroStake == "") {
+        lastUserMintId_forNonzeroStake = currentStakeShort.lastMintState;
+      } else if (
+        lastUserMintId_forNonzeroStake != currentStakeShort.lastMintState
+      ) {
+        log.warning(
+          "{} {} Nonzero long and short stakes have different mint times!",
+          [lastUserMintId_forNonzeroStake, currentStakeShort.lastMintState]
+        );
+      }
+      amountStakedShort = shortStake.amount;
+    }
+  }
+
+  if (
+    lastUserMintId_forNonzeroStake != "" &&
+    unaccountedForSettledShift == null
+  ) {
+    return calculateAccumulatedFloatInRange(
+      amountStakedLong,
+      amountStakedShort,
+      getAccumulativeFloatIssuanceSnapshot(lastUserMintId_forNonzeroStake),
+      getAccumulativeFloatIssuanceSnapshot(
+        syntheticMarket.latestAccumulativeFloatIssuanceSnapshot
+      )
+    );
+  } else if (lastUserMintId_forNonzeroStake != "") {
+    let shiftSnapshot = getAccumulativeFloatIssuanceSnapshot(
+      generateAccumulativeFloatIssuanceSnapshotId(
+        syntheticMarket.marketIndex,
+        unaccountedForSettledShift.updateIndex
+      )
+    );
+
+    let batchedNextPriceExec = getBatchedNextPriceExec(
+      generateBatchedNextPriceExecId(
+        syntheticMarket.marketIndex,
+        unaccountedForSettledShift.updateIndex
+      )
+    );
+
+    let longTokenPriceAtShift = batchedNextPriceExec.priceSnapshotLong;
+    let shortTokenPriceAtShift = batchedNextPriceExec.priceSnapshotShort;
+
+    let deltaLong = unaccountedForSettledShift.amountStakeForShiftFromShort
+      .times(shortTokenPriceAtShift)
+      .div(longTokenPriceAtShift)
+      .minus(unaccountedForSettledShift.amountStakeForShiftFromLong);
+
+    let amountStakedBeforeShiftLong = amountStakedLong.minus(deltaLong);
+
+    let deltaShort = unaccountedForSettledShift.amountStakeForShiftFromLong
+      .times(longTokenPriceAtShift)
+      .div(shortTokenPriceAtShift)
+      .minus(unaccountedForSettledShift.amountStakeForShiftFromShort);
+
+    let amountStakedBeforeShiftShort = amountStakedShort.minus(deltaShort);
+
+    let floatMintedToShift = calculateAccumulatedFloatInRange(
+      amountStakedBeforeShiftLong,
+      amountStakedBeforeShiftShort,
+      getAccumulativeFloatIssuanceSnapshot(lastUserMintId_forNonzeroStake),
+      shiftSnapshot
+    );
+
+    // TODO: Optimize by not doing this if no time has elapsed.
+    let floatMintedAfterShift = calculateAccumulatedFloatInRange(
+      amountStakedLong,
+      amountStakedShort,
+      shiftSnapshot,
+      getAccumulativeFloatIssuanceSnapshot(
+        syntheticMarket.latestAccumulativeFloatIssuanceSnapshot
+      )
+    );
+
+    unaccountedForSettledShift.floatMintedPastSettled = true;
+    unaccountedForSettledShift.save();
+
+    return {
+      amountFromLongStake: floatMintedToShift.amountFromLongStake.plus(
+        floatMintedAfterShift.amountFromLongStake
+      ),
+      amountFromShortStake: floatMintedToShift.amountFromShortStake.plus(
+        floatMintedAfterShift.amountFromShortStake
+      ),
+    };
+  } else {
+    log.warning(
+      "Shouldn't be calculating minted float for a user with no stakes!",
+      []
+    );
+    return {
+      amountFromLongStake: ZERO,
+      amountFromShortStake: ZERO,
+    };
+  }
 }
 export function handleFloatMinted(event: FloatMinted): void {
   let userAddress = event.params.user;
@@ -647,4 +796,184 @@ export function handleStakeWithdrawalFeeUpdate(
     [],
     []
   );
+}
+
+function setupUserNextPriceStateAction(
+  userNextPriceStakeAction: UserNextPriceStakeAction,
+  userAddress: Address,
+  marketIndex: BigInt,
+  userShiftIndex: BigInt,
+  event: ethereum.Event
+): void {
+  let userAddressStr = userAddress.toHex();
+  let marketIndexStr = marketIndex.toString();
+  let userShiftIndexStr = userShiftIndex.toString();
+  userNextPriceStakeAction.user = userAddressStr;
+  userNextPriceStakeAction.marketIndex = marketIndex;
+  userNextPriceStakeAction.updateIndex = userShiftIndex;
+
+  let batchedStakeRetrieval = getOrInitializeBatchedNextPriceStakeAction(
+    marketIndexStr + "-" + userShiftIndexStr
+  );
+  let batchedStake: BatchedNextPriceStakeAction = batchedStakeRetrieval.entity;
+  if (batchedStakeRetrieval.wasCreated) {
+    batchedStake.marketIndex = marketIndex;
+    batchedStake.updateIndex = userShiftIndex;
+  }
+  batchedStake.linkedUserNextPriceStakeActions = batchedStake.linkedUserNextPriceStakeActions.concat(
+    [userNextPriceStakeAction.id]
+  );
+  batchedStake.save();
+
+  let userCurrentStakeActionRetrieval = getOrInitializeUserCurrentNextPriceStakeAction(
+    userAddressStr + "-" + marketIndexStr
+  );
+  let userCurrentStakeAction = userCurrentStakeActionRetrieval.entity;
+  if (userCurrentStakeActionRetrieval.wasCreated) {
+    userCurrentStakeAction.user = userAddressStr;
+    userCurrentStakeAction.marketIndex = marketIndex;
+  }
+  userCurrentStakeAction.currentAction = userNextPriceStakeAction.id;
+  userCurrentStakeAction.save();
+
+  let userObj = getOrCreateUser(userAddress, event);
+  userObj.pendingNextPriceStakeActions = userObj.pendingNextPriceStakeActions.concat(
+    [userNextPriceStakeAction.id]
+  );
+  userObj.save();
+}
+
+export function handleNextPriceStakeShift(event: NextPriceStakeShift): void {
+  let user = event.params.user;
+  let userAddressStr = user.toHex();
+  let marketIndex = event.params.marketIndex;
+  let marketIndexStr = marketIndex.toString();
+  let isShiftFromLong = event.params.isShiftFromLong;
+  let amount = event.params.amount;
+  let userShiftIndex = event.params.userShiftIndex;
+  let userShiftIndexStr = userShiftIndex.toString();
+
+  let userNextPriceStakeActionId =
+    userAddressStr + "-" + marketIndex.toString() + "-" + userShiftIndexStr;
+
+  let batchId = userAddressStr + "-" + marketIndexStr;
+  let userNextPriceStakeActionComponent = createUserNextPriceStakeActionComponent(
+    user,
+    marketIndex,
+    userShiftIndex,
+    amount,
+    ACTION_SHIFT,
+    isShiftFromLong,
+    userNextPriceStakeActionId,
+    batchId,
+    event
+  );
+
+  let userNextPriceStakeActionRetrieval = getOrInitializeUserNextPriceStakeAction(
+    userNextPriceStakeActionId
+  );
+
+  let userNextPriceStakeAction = userNextPriceStakeActionRetrieval.entity;
+
+  if (userNextPriceStakeActionRetrieval.wasCreated) {
+    setupUserNextPriceStateAction(
+      userNextPriceStakeAction,
+      user,
+      marketIndex,
+      userShiftIndex,
+      event
+    );
+  }
+
+  if (isShiftFromLong) {
+    userNextPriceStakeAction.amountStakeForShiftFromLong = userNextPriceStakeAction.amountStakeForShiftFromLong.plus(
+      amount
+    );
+  } else {
+    userNextPriceStakeAction.amountStakeForShiftFromShort = userNextPriceStakeAction.amountStakeForShiftFromShort.plus(
+      amount
+    );
+  }
+
+  userNextPriceStakeAction.nextPriceActionComponents = userNextPriceStakeAction.nextPriceActionComponents.concat(
+    [userNextPriceStakeActionComponent.id]
+  );
+
+  userNextPriceStakeAction.save();
+
+  saveEventToStateChange(
+    event,
+    "NextPriceStakeShift",
+    [
+      userAddressStr,
+      marketIndexStr,
+      amount.toString(),
+      isShiftFromLong ? "true" : "false",
+      userShiftIndexStr,
+    ],
+    ["user", "marketIndex", "amount", "isShiftFromLong", "userShiftIndex"],
+    ["address", "uint32", "uint256", "bool", "uint256"],
+    [user],
+    []
+  );
+}
+
+export function handleStakeShifted(event: StakeShifted): void {
+  let user = event.params.user;
+  let userStr = user.toHex();
+  let marketIndex = event.params.marketIndex;
+
+  let newStakeLong = event.params.newAmountStakedLong;
+  let newStakeShort = event.params.newAmountStakedShort;
+
+  let syntheticMarket = getSyntheticMarket(marketIndex.toString());
+
+  let longCorrect = false;
+  let shortCorrect = false;
+
+  let currentStakeLong = getCurrentStake(
+    syntheticMarket.syntheticLong + "-" + userStr + "-currentStake"
+  );
+  let currentStakeShort = getCurrentStake(
+    syntheticMarket.syntheticShort + "-" + userStr + "-currentStake"
+  );
+
+  let userStakeLong = getStake(currentStakeLong.currentStake);
+  let userStakeShort = getStake(currentStakeShort.currentStake);
+
+  if (newStakeLong.gt(ZERO)) {
+    longCorrect =
+      newStakeLong.equals(userStakeLong.amount) && !userStakeLong.withdrawn;
+  } else {
+    longCorrect = userStakeLong.withdrawn;
+  }
+
+  if (newStakeShort.gt(ZERO)) {
+    shortCorrect =
+      newStakeShort.equals(userStakeShort.amount) && !userStakeShort.withdrawn;
+  } else {
+    shortCorrect = userStakeShort.withdrawn;
+  }
+
+  if (!longCorrect) {
+    log.warning(
+      "Incorrect long user stake balance in graph. Stake in graph: {}, Stake Withdrawn in graph: {}, Stake Amount (with withdrawn stakes equal zero) in contracts: {}",
+      [
+        userStakeLong.amount.toString(),
+        userStakeLong.withdrawn ? "true" : "false",
+        newStakeLong.toString(),
+      ]
+    );
+  }
+
+  if (!shortCorrect) {
+    log.warning(
+      "Incorrect short user stake balance in graph. Stake in graph: {}, Stake Withdrawn in graph: {}, Stake Amount (with withdrawn stakes equal zero) in contracts: {}",
+      [
+        userStakeShort.amount.toString(),
+        userStakeShort.withdrawn ? "true" : "false",
+        newStakeShort.toString(),
+      ]
+    );
+  }
 }
