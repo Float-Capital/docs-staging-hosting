@@ -48,12 +48,12 @@ contract XP is AccessControlledAndUpgradeable {
     }
   }
 
-  function level_up(address _user) external {
-    require(msg.sender == _user);
+  function level_up() external {
+    address _user = msg.sender;
     uint256 _level = level[_user];
     uint256 _xp_required = xp_required(_level);
     xp[_user] -= _xp_required;
     level[_user] = _level + 1;
-    emit leveled(msg.sender, _level);
+    emit leveled(_user, _level);
   }
 }
