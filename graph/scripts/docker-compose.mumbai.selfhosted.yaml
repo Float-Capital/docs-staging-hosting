@@ -44,6 +44,5 @@ services:
       - postgres
 
 volumes:
-  ganache-data:
   ipfs-data:
   postgres-data:

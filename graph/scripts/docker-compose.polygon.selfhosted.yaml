@@ -1,0 +1,59 @@
+version: "3"
+services:
+  graph-node-prod:
+    image: graphprotocol/graph-node:v0.22.0
+    ports:
+      - "8100:8000"
+      - "8101:8001"
+    depends_on:
+      - ipfs-prod
+      - postgres-prod
+    environment:
+      postgres_host: postgres-prod
+      postgres_port: 5432
+      postgres_user: graph-node
+      postgres_pass: let-me-in
+      postgres_db: graph-node
+      ipfs: "ipfs-prod:5001"
+      ethereum: "polygon:${POLYGON_RPC_ENDPOINT:-https://polygon-rpc.com}"
+      RUST_LOG: info
+    networks:
+      - prod
+
+  ipfs-prod:
+    image: ipfs/go-ipfs:v0.4.23
+    volumes:
+      - ipfs-data-prod:/data/ipfs
+    networks:
+      - prod
+
+  postgres-prod:
+    image: postgres
+    command: ["postgres", "-cshared_preload_libraries=pg_stat_statements"]
+    environment:
+      POSTGRES_USER: graph-node
+      POSTGRES_PASSWORD: let-me-in
+      POSTGRES_DB: graph-node
+    volumes:
+      - postgres-data-prod:/var/lib/postgresql/data
+    networks:
+      - prod
+
+  graph-deployer-prod:
+    build:
+      context: ../
+      dockerfile: ./scripts/Dockerfile.graph.deployer
+    container_name: graph-deployer-prod
+    depends_on:
+      - graph-node-prod
+      - ipfs-prod
+      - postgres-prod
+    networks:
+      - prod
+
+volumes:
+  ipfs-data-prod:
+  postgres-data-prod:
+
+networks:
+  prod:
