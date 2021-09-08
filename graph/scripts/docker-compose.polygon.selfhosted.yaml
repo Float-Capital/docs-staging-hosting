@@ -17,11 +17,15 @@ services:
       ipfs: "ipfs-prod:5001"
       ethereum: "polygon:${POLYGON_RPC_ENDPOINT:-https://polygon-rpc.com}"
       RUST_LOG: info
+    networks:
+      - prod
 
   ipfs-prod:
     image: ipfs/go-ipfs:v0.4.23
     volumes:
       - ipfs-data:/data/ipfs
+    networks:
+      - prod
 
   postgres-prod:
     image: postgres
@@ -32,6 +36,8 @@ services:
       POSTGRES_DB: graph-node
     volumes:
       - postgres-data:/var/lib/postgresql/data
+    networks:
+      - prod
 
   graph-deployer-prod:
     build:
@@ -42,7 +48,12 @@ services:
       - graph-node-prod
       - ipfs-prod
       - postgres-prod
+    networks:
+      - prod
 
 volumes:
   ipfs-data:
   postgres-data:
+
+networks:
+  prod:
