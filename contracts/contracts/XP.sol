@@ -19,7 +19,7 @@ contract XP is AccessControlledAndUpgradeable {
   mapping(address => uint256) public level;
   mapping(address => uint256) public lastAction;
 
-  event leveled(address indexed owner, uint256 level, uint256 summoner);
+  event leveled(address indexed owner, uint256 level);
 
   function initialize(
     address _admin,
@@ -31,10 +31,8 @@ contract XP is AccessControlledAndUpgradeable {
     _setupRole(XP_ROLE, _staker);
   }
 
-  // Say gm and get XP by performing an action in LongShort
+  // Say gm and get XP by performing an action in LongShort or Staker
   function gm(address user) external {
-    // Safer than using onlyRole modifier, as if role permission messed updates
-    // We don't want longShot and Staker to revert. Rather they simply don't increase XP
     if (hasRole(XP_ROLE, msg.sender)) {
       if (block.timestamp - lastAction[user] >= DAY) {
         xp[user] += xp_per_day;
@@ -51,11 +49,11 @@ contract XP is AccessControlledAndUpgradeable {
   }
 
   function level_up(address _user) external {
-    require(msg.sender == user);
+    require(msg.sender == _user);
     uint256 _level = level[_user];
     uint256 _xp_required = xp_required(_level);
     xp[_user] -= _xp_required;
     level[_user] = _level + 1;
-    emit leveled(msg.sender, _level, _user);
+    emit leveled(msg.sender, _level);
   }
 }
