@@ -207,6 +207,8 @@ let initialize = (~admin: Ethers.Wallet.t, ~exposeInternals: bool) => {
           ~floatCapital=floatCapital.address,
           // NOTE: for now using the floatCapital address as the float treasury
           ~floatTreasury=floatCapital.address,
+          // NOTE: for now using the admin address as the discount signer
+          ~discountSigner=admin.address,
           ~floatPercentage=bnFromString("250000000000000000"),
         ),
       ))

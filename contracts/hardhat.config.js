@@ -18,7 +18,9 @@ let config;
 try {
   config = require("./secretsManager.js");
 } catch (e) {
-  console.error("You are using the example secrets manager, please copy this file if you want to use it")
+  console.error(
+    "You are using the example secrets manager, please copy this file if you want to use it"
+  );
   config = require("./secretsManager.example.js");
 }
 
@@ -57,7 +59,7 @@ task("accounts", "Prints the list of accounts", async () => {
 
 // While waiting for hardhat PR: https://github.com/nomiclabs/hardhat/pull/1542
 if (process.env.HARDHAT_FORK) {
-  process.env['HARDHAT_DEPLOY_FORK'] = process.env.HARDHAT_FORK;
+  process.env["HARDHAT_DEPLOY_FORK"] = process.env.HARDHAT_FORK;
 }
 
 // You have to export an object to set up your config
@@ -84,13 +86,13 @@ module.exports = {
       // this line ensure the use of the corresponding accounts
       forking: process.env.HARDHAT_FORK
         ? {
-          url: mumbaiProviderUrl || "https://rpc-mumbai.maticvigil.com/v1",
-        }
+            url: mumbaiProviderUrl || "https://rpc-mumbai.maticvigil.com/v1",
+          }
         : undefined,
       accounts: process.env.HARDHAT_FORK
         ? {
-          mnemonic
-        }
+            mnemonic,
+          }
         : undefined,
     },
     ganache: {
@@ -114,6 +116,7 @@ module.exports = {
     user2: 3,
     user3: 4,
     user4: 5,
+    discountSigner: 6,
   },
   gasReporter: {
     // Disabled by default for faster running of tests

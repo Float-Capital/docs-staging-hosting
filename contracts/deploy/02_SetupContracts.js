@@ -14,19 +14,19 @@ const {
   FLOAT_CAPITAL,
   isAlphaLaunch,
   FLOAT_TOKEN_ALPHA,
-  TREASURY_ALPHA
+  TREASURY_ALPHA,
 } = require("../helper-hardhat-config");
 
-let networkToUse = network.name
+let networkToUse = network.name;
 
 if (!!process.env.HARDHAT_FORK) {
-  networkToUse = process.env.HARDHAT_FORK
+  networkToUse = process.env.HARDHAT_FORK;
 }
 
 module.exports = async (hardhatDeployArguments) => {
   console.log("setup contracts");
   const { getNamedAccounts, deployments } = hardhatDeployArguments;
-  const { deployer, admin } = await getNamedAccounts();
+  const { deployer, admin, discountSigner } = await getNamedAccounts();
 
   ////////////////////////
   //Retrieve Deployments//
@@ -42,7 +42,6 @@ module.exports = async (hardhatDeployArguments) => {
     COLLATERAL_TOKEN,
     paymentTokenAddress
   );
-
 
   console.log("2");
   const LongShort = await deployments.get(LONGSHORT);
@@ -80,7 +79,12 @@ module.exports = async (hardhatDeployArguments) => {
   ///////////////////////////
   await longShort.initialize(admin, tokenFactory.address, staker.address);
   if (isAlphaLaunch) {
-    await floatToken.initialize("Alpha Float", "alphaFLT", staker.address, treasury.address);
+    await floatToken.initialize(
+      "Alpha Float",
+      "alphaFLT",
+      staker.address,
+      treasury.address
+    );
   } else {
     await floatToken.initialize("Float", "FLT", staker.address);
   }
@@ -90,25 +94,32 @@ module.exports = async (hardhatDeployArguments) => {
     floatToken.address,
     treasury.address,
     floatCapital.address,
-    "100000000000000", // mint an additional 0.01% for the treasury - just for testing purposes
+    discountSigner,
+    "100000000000000" // mint an additional 0.01% for the treasury - just for testing purposes
   );
 
   if (networkToUse == "mumbai") {
     console.log("mumbai test transactions");
-    await runMumbaiTransactions({
-      staker,
-      longShort: longShort.connect(admin),
-      paymentToken,
-      treasury,
-    }, hardhatDeployArguments);
+    await runMumbaiTransactions(
+      {
+        staker,
+        longShort: longShort.connect(admin),
+        paymentToken,
+        treasury,
+      },
+      hardhatDeployArguments
+    );
   } else if (networkToUse == "hardhat" || networkToUse == "ganache") {
     console.log("mumbai test transactions");
-    await runTestTransactions({
-      staker,
-      longShort: longShort.connect(admin),
-      paymentToken,
-      treasury,
-    }, hardhatDeployArguments);
+    await runTestTransactions(
+      {
+        staker,
+        longShort: longShort.connect(admin),
+        paymentToken,
+        treasury,
+      },
+      hardhatDeployArguments
+    );
   }
   console.log("after test txs");
 };
