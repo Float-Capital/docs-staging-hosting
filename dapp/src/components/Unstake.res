@@ -12,57 +12,49 @@ module StakeForm = %form(
 
 let {toNumber} = module(Ethers.BigNumber)
 
-module UnstakeTxStatusModal = {
-  @react.component
-  let make = (~txStateUnstake, ~resetFormButton) => {
-    let {showModal, hideModal} = ModalProvider.useModalDisplay()
+let useUnstakeModal = (~txStateUnstake) => {
+  let {showModal, hideModal} = ModalProvider.useModalDisplay()
 
-    React.useEffect1(_ => {
-      switch txStateUnstake {
-      | ContractActions.Created =>
-        showModal(
-          <div className="text-center m-3">
-            <p> {`Confirm unstake transaction in your wallet `->React.string} </p>
-          </div>,
-        )
-      | ContractActions.SignedAndSubmitted(txHash) =>
-        showModal(
-          <div className="text-center m-3">
-            <Loader.Mini />
-            <p> {"Unstake transaction pending... "->React.string} </p>
-            <ViewOnBlockExplorer txHash />
-          </div>,
-        )
-      | ContractActions.Complete({transactionHash: _}) =>
-        showModal(
-          <div className="text-center m-3">
-            <p> {`Transaction complete 🎉`->React.string} </p> {resetFormButton()}
-          </div>,
-        )
-      | ContractActions.Failed(txHash) =>
-        showModal(
-          <div className="text-center m-3">
-            <p> {`The transaction failed.`->React.string} </p>
-            {if txHash != "" {
-              <ViewOnBlockExplorer txHash />
-            } else {
-              React.null
-            }}
-            <MessageUsOnDiscord />
-            {resetFormButton()}
-          </div>,
-        )
-      | _ => hideModal()
-      }
-      None
-    }, [txStateUnstake])
-
+  React.useEffect1(_ => {
     switch txStateUnstake {
-    | ContractActions.Declined(_) => resetFormButton()
-    | _ => React.null
+    | ContractActions.Created =>
+      showModal(
+        <div className="text-center m-3">
+          <p> {`Confirm unstake transaction in your wallet `->React.string} </p>
+        </div>,
+      )
+    | ContractActions.SignedAndSubmitted(txHash) =>
+      showModal(
+        <div className="text-center m-3">
+          <Loader.Mini />
+          <p> {"Unstake transaction pending... "->React.string} </p>
+          <ViewOnBlockExplorer txHash />
+        </div>,
+      )
+    | ContractActions.Complete({transactionHash: _}) =>
+      showModal(
+        <div className="text-center m-3">
+          <p> {`Transaction complete 🎉`->React.string} </p>
+        </div>,
+      )
+    | ContractActions.Failed(txHash) =>
+      showModal(
+        <div className="text-center m-3">
+          <p> {`The transaction failed.`->React.string} </p>
+          {if txHash != "" {
+            <ViewOnBlockExplorer txHash />
+          } else {
+            React.null
+          }}
+          <MessageUsOnDiscord />
+        </div>,
+      )
+    | _ => hideModal()
     }
-  }
+    None
+  }, [txStateUnstake])
 }
+
 module StakeFormInput = {
   @react.component
   let make = (
@@ -73,31 +65,36 @@ module StakeFormInput = {
     ~onChange=_ => (),
     ~onBlur=_ => (),
     ~onMaxClick=_ => (),
-    ~txStateModal=React.null,
+    ~resetButton=_ => React.null,
     ~buttonDisabled=false,
     ~buttonText,
-  ) =>
+    ~txState=ContractActions.UnInitialised,
+  ) => {
     <Form className="" onSubmit>
       <AmountInput value optBalance={optBalance} disabled onBlur onChange onMaxClick />
-      <Button onClick={_ => onSubmit()} disabled={buttonDisabled}> {buttonText} </Button>
-      {txStateModal}
+      {switch txState {
+      | ContractActions.UnInitialised
+      | ContractActions.Created
+      | ContractActions.Declined(_) =>
+        <Button onClick={_ => onSubmit()} disabled={buttonDisabled}> {buttonText} </Button>
+      | _ => resetButton()
+      }}
     </Form>
+  }
 }
 
 module ConnectedStakeForm = {
   @react.component
   let make = (
-    ~signer,
     ~synthetic as {
       id: tokenId,
       syntheticMarket: {marketIndex, name: syntheticMarketName},
       tokenType,
     }: Queries.SyntheticTokenInfo.t,
+    ~contractExecutionHandler,
+    ~txState: ContractActions.transactionState,
+    ~setTxState,
   ) => {
-    let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction(
-      ~signer,
-    )
-
     let user = RootProvider.useCurrentUserExn()
 
     let optTokenBalance =
@@ -212,7 +209,8 @@ module ConnectedStakeForm = {
           | _ => "0"
           },
         )}
-      txStateModal={<UnstakeTxStatusModal resetFormButton txStateUnstake=txState />}
+      resetButton={resetFormButton}
+      txState
       buttonDisabled
       buttonText
     />
@@ -220,7 +218,7 @@ module ConnectedStakeForm = {
 }
 
 @react.component
-let make = (~tokenId) => {
+let make = (~tokenId, ~contractExecutionHandler, ~txState, ~setTxState) => {
   let token = Queries.SyntheticToken.use({tokenId: tokenId})
   let (showLogin, setShowLogin) = React.useState(() => false)
   let optSigner = ContractActions.useSigner()
@@ -233,7 +231,7 @@ let make = (~tokenId) => {
   | {loading: true} => <Loader.Mini />
   | {data: Some({syntheticToken: Some(synthetic)})} =>
     switch optSigner {
-    | Some(signer) => <ConnectedStakeForm signer synthetic />
+    | Some(_) => <ConnectedStakeForm synthetic contractExecutionHandler txState setTxState />
     | None =>
       showLogin
         ? <Login />

@@ -236,7 +236,14 @@ module PendingRedeemItem = {
 
 module IncompleteWithdrawalItem = {
   @react.component
-  let make = (~marketIndex, ~updateIndex, ~amount, ~isLong) => {
+  let make = (
+    ~marketIndex,
+    ~updateIndex,
+    ~amount,
+    ~isLong,
+    ~txState,
+    ~contractExecutionHandler,
+  ) => {
     let syntheticPricesQuery = DataHooks.useBatchedSynthPrices(~marketIndex, ~updateIndex)
 
     switch syntheticPricesQuery {
@@ -260,7 +267,7 @@ module IncompleteWithdrawalItem = {
             <img src={CONSTANTS.daiDisplayToken.iconUrl} className="h-4 mr-1" />
             {daiAmount->Misc.NumberFormat.formatEther->React.string}
           </span>
-          <Withdraw marketIndex />
+          <Withdraw marketIndex txState contractExecutionHandler />
         </div>
       }
     }
@@ -272,6 +279,16 @@ module IncompleteWithdrawalsCard = {
   let make = (~userId) => {
     let usersPendingRedeemsQuery = DataHooks.useUsersPendingRedeems(~userId)
     let usersConfirmedRedeemsQuery = DataHooks.useUsersConfirmedRedeems(~userId)
+
+    let signer = ContractActions.useSigner()
+    let (contractExecutionHandler, txState, _setTxState) = ContractActions.useContractFunction(
+      ~signer=switch signer {
+      | Some(s) => s
+      | None => None->Obj.magic
+      },
+    )
+
+    let _ = WithdrawTxStatusModal.useWithdrawTxModal(~txState)
 
     <>
       {switch usersPendingRedeemsQuery {
@@ -305,7 +322,9 @@ module IncompleteWithdrawalsCard = {
               <div className=`flex flex-col`>
                 {confirmedRedeems
                 ->Array.map(({amount, marketIndex, isLong, updateIndex}) => {
-                  <IncompleteWithdrawalItem amount marketIndex updateIndex isLong />
+                  <IncompleteWithdrawalItem
+                    amount marketIndex updateIndex isLong contractExecutionHandler txState
+                  />
                 })
                 ->React.array}
               </div>

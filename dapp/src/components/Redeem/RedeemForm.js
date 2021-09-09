@@ -527,22 +527,20 @@ function isGreaterThanBalance(amount, balance) {
 }
 
 function RedeemForm$ConnectedRedeemForm(Props) {
-  var signer = Props.signer;
   var market = Props.market;
   var isLong = Props.isLong;
+  var contractExecutionHandler = Props.contractExecutionHandler;
+  var txState = Props.txState;
+  var setTxState = Props.setTxState;
   var router = Router.useRouter();
   var user = RootProvider.useCurrentUserExn(undefined);
   var longTokenBalance = Belt_Option.getWithDefault(DataHooks.Util.graphResponseToOption(DataHooks.useSyntheticTokenBalance(user, market.syntheticLong.tokenAddress)), Ethers$1.BigNumber.from("0"));
   var shortTokenBalance = Belt_Option.getWithDefault(DataHooks.Util.graphResponseToOption(DataHooks.useSyntheticTokenBalance(user, market.syntheticShort.tokenAddress)), Ethers$1.BigNumber.from("0"));
   var match = tokenRedeemPosition(market, isLong, longTokenBalance, shortTokenBalance);
   var isActuallyLong = match[0];
-  var match$1 = ContractActions.useContractFunction(signer);
-  var setTxState = match$1[2];
-  var txState = match$1[1];
-  var contractExecutionHandler = match$1[0];
   var marketIndex = market.marketIndex;
-  var match$2 = ContractHooks.useErc20BalanceRefresh(match[1]);
-  var optTokenBalance = match$2.data;
+  var match$1 = ContractHooks.useErc20BalanceRefresh(match[1]);
+  var optTokenBalance = match$1.data;
   var form = useForm({
         amount: ""
       }, (function (param, _form) {
@@ -567,14 +565,14 @@ function RedeemForm$ConnectedRedeemForm(Props) {
                 children: "Reset & Redeem Again"
               });
   };
-  var match$3 = form.amountResult;
-  var formAmount = match$3 !== undefined && match$3.TAG === /* Ok */0 ? Caml_option.some(match$3._0) : undefined;
+  var match$2 = form.amountResult;
+  var formAmount = match$2 !== undefined && match$2.TAG === /* Ok */0 ? Caml_option.some(match$2._0) : undefined;
   var position = isLong ? "long" : "short";
-  var match$4;
+  var match$3;
   var exit = 0;
   if (formAmount !== undefined && optTokenBalance !== undefined) {
     var greaterThanBalance = Caml_option.valFromOption(formAmount).gt(Caml_option.valFromOption(optTokenBalance));
-    match$4 = greaterThanBalance ? [
+    match$3 = greaterThanBalance ? [
         "Amount is greater than your balance",
         "Insufficient balance",
         true
@@ -587,7 +585,7 @@ function RedeemForm$ConnectedRedeemForm(Props) {
     exit = 1;
   }
   if (exit === 1) {
-    match$4 = [
+    match$3 = [
       undefined,
       "Redeem " + position + " " + market.name,
       true
@@ -681,9 +679,8 @@ function RedeemForm$ConnectedRedeemForm(Props) {
                 submitButton: React.createElement(RedeemSubmitButtonAndTxStatusModal.make, {
                       txStateRedeem: txState,
                       resetFormButton: resetFormButton,
-                      buttonText: match$4[1],
-                      buttonDisabled: match$4[2],
-                      marketIndex: marketIndex
+                      buttonText: match$3[1],
+                      buttonDisabled: match$3[2]
                     })
               });
   } else {
@@ -698,13 +695,18 @@ var ConnectedRedeemForm = {
 function RedeemForm$1(Props) {
   var market = Props.market;
   var isLong = Props.isLong;
+  var txState = Props.txState;
+  var setTxState = Props.setTxState;
+  var contractExecutionHandler = Props.contractExecutionHandler;
   var optSigner = ContractActions.useSigner(undefined);
   var router = Router.useRouter();
   if (optSigner !== undefined) {
     return React.createElement(RedeemForm$ConnectedRedeemForm, {
-                signer: optSigner,
                 market: market,
-                isLong: isLong
+                isLong: isLong,
+                contractExecutionHandler: contractExecutionHandler,
+                txState: txState,
+                setTxState: setTxState
               });
   } else {
     return React.createElement("div", {

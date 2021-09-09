@@ -19,6 +19,7 @@ var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
 var Router = require("next/router");
 var ContractHooks = require("../components/Testing/Admin/ContractHooks.js");
+var ContractActions = require("../ethereum/ContractActions.js");
 
 function Stake$StakeDetailsWrapper(Props) {
   var market = Props.market;
@@ -75,14 +76,16 @@ function Stake(Props) {
   var tokenId = Belt_Option.getWithDefault(Js_dict.get(router.query, "tokenId"), CONSTANTS.zeroAddressStr);
   var match = ContractHooks.useErc20Balance(Ethers.utils.getAddress(tokenId));
   var optBalance = match.data;
-  var match$1 = markets.data;
+  var signer = ContractActions.useSigner(undefined);
+  var match$1 = ContractActions.useContractFunction(Belt_Option.getWithDefault(signer, undefined));
+  var match$2 = markets.data;
   var tmp;
   if (markets.loading) {
     tmp = React.createElement(Loader.make, {});
   } else if (markets.error !== undefined) {
     tmp = "Error loading data";
-  } else if (match$1 !== undefined) {
-    var optFirstMarket = Belt_Array.get(match$1.syntheticMarkets, Belt_Option.getWithDefault(Belt_Int.fromString(marketIndex), 1) - 1 | 0);
+  } else if (match$2 !== undefined) {
+    var optFirstMarket = Belt_Array.get(match$2.syntheticMarkets, Belt_Option.getWithDefault(Belt_Int.fromString(marketIndex), 1) - 1 | 0);
     tmp = optFirstMarket !== undefined ? (
         optBalance !== undefined ? React.createElement(Stake$StakeDetailsWrapper, {
                 market: optFirstMarket,
@@ -98,7 +101,10 @@ function Stake(Props) {
                                   }),
                                 children: "Mint"
                               }))) : React.createElement(StakeForm.make, {
-                        tokenId: tokenId
+                        tokenId: tokenId,
+                        txState: match$1[1],
+                        setTxState: match$1[2],
+                        contractExecutionHandler: match$1[0]
                       })
               }) : React.createElement(Loader.Mini.make, {})
       ) : React.createElement("p", undefined, "No markets exist");
