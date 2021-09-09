@@ -901,7 +901,6 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
     emit StakeWithdrawn(msg.sender, token, amount);
   }
 
-  // Note to comment function
   function _withdrawPrepLogic(
     uint32 marketIndex,
     bool isWithdrawFromLong,
