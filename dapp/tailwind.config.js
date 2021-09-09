@@ -34,6 +34,7 @@ module.exports = {
       width: {
         "1/8": "12%",
         "1/10": "10%",
+        "slightly-less-than-half": "45%",
         half: "50%",
         "9/10": "90%",
         "price-width": "12rem",
@@ -64,6 +65,7 @@ module.exports = {
      so we added the Tailwind default values here for
      convenience */
     fontSize: {
+      xxxxs: ".4rem",
       xxxs: ".5rem",
       xxs: ".6rem",
       xs: ".75rem",

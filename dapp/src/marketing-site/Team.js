@@ -13,7 +13,9 @@ var teamMembers = [
     path: "denham",
     placardNumber: 3,
     twitter: "DenhamPreen",
-    github: "DenhamPreen"
+    github: "DenhamPreen",
+    title: "CPO",
+    studies: "BSc (Hons) Comp Sci"
   },
   {
     frameNumber: 4,
@@ -21,7 +23,9 @@ var teamMembers = [
     path: "jason",
     placardNumber: 1,
     twitter: "JasoonSmythe",
-    github: "JasoonS"
+    github: "JasoonS",
+    title: "CTO",
+    studies: "BSc (Hons) Comp Sci"
   },
   {
     frameNumber: 3,
@@ -29,7 +33,9 @@ var teamMembers = [
     path: "jonjon",
     placardNumber: 3,
     twitter: "jonjonclark",
-    github: "moose-code"
+    github: "moose-code",
+    title: "CEO",
+    studies: "MSc Data Science"
   },
   {
     frameNumber: 3,
@@ -37,7 +43,9 @@ var teamMembers = [
     path: "chris",
     placardNumber: 1,
     twitter: "chris_tritton",
-    github: "ChrisTritton"
+    github: "ChrisTritton",
+    title: "Engineer",
+    studies: "BMuz"
   },
   {
     frameNumber: 2,
@@ -45,7 +53,9 @@ var teamMembers = [
     path: "mike",
     placardNumber: 2,
     twitter: "mjyoungsta",
-    github: "MJYoung114"
+    github: "MJYoung114",
+    title: "Engineer",
+    studies: "BSc Comp Eng"
   },
   {
     frameNumber: 0,
@@ -53,7 +63,9 @@ var teamMembers = [
     path: "stent",
     placardNumber: 3,
     twitter: "",
-    github: "Stentonian"
+    github: "Stentonian",
+    title: "Engineer",
+    studies: "Anon"
   },
   {
     frameNumber: 2,
@@ -61,7 +73,9 @@ var teamMembers = [
     path: "jordyn",
     placardNumber: 2,
     twitter: "j_o_r_d_y_s",
-    github: "Jordy-Baby"
+    github: "Jordy-Baby",
+    title: "Marketer",
+    studies: "Dip"
   },
   {
     frameNumber: 35,
@@ -69,7 +83,9 @@ var teamMembers = [
     path: "woosung",
     placardNumber: 1,
     twitter: "WooSung40265546",
-    github: "WooSungD"
+    github: "WooSungD",
+    title: "Protocol Engineer",
+    studies: "BBSc Act Sci"
   },
   {
     frameNumber: 4,
@@ -77,7 +93,9 @@ var teamMembers = [
     path: "paul",
     placardNumber: 3,
     twitter: "PaulFreund18",
-    github: "paulfreund94"
+    github: "paulfreund94",
+    title: "Engineer",
+    studies: "BSc (Hons) Comp Sci"
   }
 ];
 
@@ -95,12 +113,8 @@ function Team$TeamMember(Props) {
   var width = isMobile ? Math.min(screenWidth / 4 | 0, screenHeight / 5 | 0) : Math.min(screenWidth / 8 | 0, screenHeight / 6 | 0);
   var hasTwitter = twitter !== "";
   var avatarMargin = frameNumber !== 3 ? (
-      frameNumber !== 4 ? "mb-3" : "mb-7"
-    ) : "mb-0";
-  var iconsPlacement = frameNumber !== 3 ? (
-      frameNumber !== 35 ? "right-5" : "right-7"
-    ) : "";
-  var iconsFlex = frameNumber !== 3 ? "end" : "center";
+      frameNumber !== 4 ? "mt-3" : "mt-2"
+    ) : "mt-5";
   var iconsBottom = (width / 6 | 0) + 5 | 0;
   return React.createElement("div", {
               className: "relative flex items-center",
@@ -111,36 +125,42 @@ function Team$TeamMember(Props) {
                   className: "w-full h-auto",
                   src: "/img/team/frames/frame" + String(frameNumber) + ".png"
                 }), React.createElement("div", {
-                  className: "absolute left-0 top-0 w-full h-full z-10 flex items-center justify-center"
+                  className: "absolute left-0 top-0 w-full h-full z-10 flex flex-col items-center  mt-minus-2 pb-3 justify-evenly"
                 }, React.createElement("img", {
-                      className: "w-half h-auto pixel " + avatarMargin,
+                      className: "w-slightly-less-than-half h-auto pixel " + avatarMargin,
                       src: "/img/team/avatars/" + teamMember.path + ".png"
-                    })), React.createElement("div", {
-                  className: "absolute z-10 bottom-0 w-28 left-half ml-minus-12 mb-minus-1"
-                }, React.createElement("img", {
-                      src: "/img/team/placards/placard" + String(teamMember.placardNumber) + ".png"
-                    })), React.createElement("div", {
-                  className: "absolute " + iconsPlacement + " w-full z-10",
-                  style: {
-                    bottom: String(iconsBottom) + "px"
-                  }
-                }, React.createElement("div", {
-                      className: "w-full flex justify-" + iconsFlex
+                    }), React.createElement("div", {
+                      className: "w-full z-10",
+                      style: {
+                        bottom: String(iconsBottom) + "px"
+                      }
+                    }, React.createElement("div", {
+                          className: "flex flex-col w-full h-full items-center"
+                        }, React.createElement("p", {
+                              className: "text-xxxs md:text-xxs mx-auto"
+                            }, teamMember.title), React.createElement("p", {
+                              className: "text-xxxxs md:text-xxxs mx-auto"
+                            }, teamMember.studies))), React.createElement("div", {
+                      className: "w-full flex justify-center"
                     }, React.createElement("a", {
-                          className: "mr-2 w-1/8",
+                          className: "mr-2 w-4",
                           href: "https://github.com/" + teamMember.github,
                           target: "_blank"
                         }, React.createElement("img", {
                               className: "w-full h-auto",
                               src: "/icons/github-sq.svg"
                             })), hasTwitter ? React.createElement("a", {
-                            className: "w-1/8",
+                            className: "w-4",
                             href: "https://twitter.com/" + twitter,
                             target: "_blank"
                           }, React.createElement("img", {
                                 className: "w-full h-auto",
                                 src: "/icons/twitter-sq-gray.svg"
-                              })) : null)), React.createElement("div", {
+                              })) : null), React.createElement("div", {
+                      className: "absolute z-10 bottom-0 w-28 left-half ml-minus-12 mb-minus-1"
+                    }, React.createElement("img", {
+                          src: "/img/team/placards/placard" + String(teamMember.placardNumber) + ".png"
+                        }))), React.createElement("div", {
                   className: "absolute z-10 bottom-0 w-28 left-half ml-minus-12 mb-minus-1 h-6 text-center text-white text-xxxs md:text-xxs"
                 }, teamMember.name));
 }
@@ -162,12 +182,12 @@ function Team(Props) {
                   className: "w-full h-screen"
                 }, React.createElement("div", {
                       className: "w-full flex justify-center",
-                      style: {
-                        marginTop: String(headingMargin) + "px",
-                        marginBottom: String(headingMargin) + "px"
-                      }
+                      style: screenWidth >= 768 ? ({
+                            marginTop: String(headingMargin) + "px",
+                            marginBottom: String(headingMargin) + "px"
+                          }) : ({})
                     }, React.createElement(Heading.make, {
-                          title: "team"
+                          title: "Team"
                         })), screenWidth >= 768 ? React.createElement("div", {
                         className: "w-full flex items-center justify-center"
                       }, React.createElement("div", {
