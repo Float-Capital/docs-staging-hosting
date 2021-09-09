@@ -110,7 +110,7 @@ module.exports = async (hardhatDeployArguments) => {
       hardhatDeployArguments
     );
   } else if (networkToUse == "hardhat" || networkToUse == "ganache") {
-    console.log("mumbai test transactions");
+    console.log("local test transactions");
     await runTestTransactions(
       {
         staker,

@@ -8,7 +8,9 @@ require("@nomiclabs/hardhat-ethers");
 try {
   require("./test/Setup.js").mochaSetup();
 } catch (e) {
-  console.warn("You need to generate the rescript contracts, this could cause tests to fail.")
+  console.warn(
+    "You need to generate the rescript contracts, this could cause tests to fail."
+  );
 }
 require("@nomiclabs/hardhat-waffle");
 
@@ -45,7 +47,6 @@ if (runCoverage) {
 // let isWaffleTest =
 //   !!process.env.WAFFLE_TEST && process.env.WAFFLE_TEST.toUpperCase() == "TRUE";
 // if (isWaffleTest) {
-
 
 // This is a sample Buidler task. To learn how to create your own go to
 // https://buidler.dev/guides/create-task.html
@@ -97,6 +98,7 @@ module.exports = {
     },
     ganache: {
       url: "http://localhost:8545",
+      saveDeployments: false,
     },
     mumbai: {
       chainId: 80001,
@@ -147,6 +149,7 @@ module.exports = {
       ":FloatToken$",
       ":Staker$",
       ":Treasury_v0$",
+      ":TreasuryAlpha$",
       ":OracleManager$",
       ":OracleManagerChainlink$",
       ":OracleManagerChainlinkTestnet$",

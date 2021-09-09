@@ -199,7 +199,7 @@ let deployTestMarket =
       ~syntheticName,
       ~syntheticSymbol,
       ~longShortInstance: LongShort.t,
-      ~treasuryInstance: Treasury_v0.t,
+      ~treasuryInstance: TreasuryAlpha.t,
       ~admin,
       ~paymentToken: ERC20Mock.t,
     ) => {
