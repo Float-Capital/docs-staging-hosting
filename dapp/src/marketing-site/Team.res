@@ -5,6 +5,8 @@ type teamMember = {
   placardNumber: int,
   twitter: string,
   github: string,
+  title: string,
+  studies: string,
 }
 
 let teamMembers = [
@@ -15,6 +17,8 @@ let teamMembers = [
     path: "denham",
     github: "DenhamPreen",
     twitter: "DenhamPreen",
+    title: "CPO",
+    studies: "BSc (Hons) Comp Sci",
   },
   {
     name: "Jason Smythe",
@@ -23,6 +27,8 @@ let teamMembers = [
     path: "jason",
     github: "JasoonS",
     twitter: "JasoonSmythe",
+    title: "CTO",
+    studies: "BSc (Hons) Comp Sci",
   },
   {
     name: "JonJon Clark",
@@ -31,6 +37,8 @@ let teamMembers = [
     path: "jonjon",
     github: "moose-code",
     twitter: "jonjonclark",
+    title: "CEO",
+    studies: "MSc Data Science",
   },
   {
     name: "Chris Tritton",
@@ -39,6 +47,8 @@ let teamMembers = [
     path: "chris",
     github: "ChrisTritton",
     twitter: "chris_tritton",
+    title: "Engineer",
+    studies: "BMuz",
   },
   {
     name: "Michael Young",
@@ -47,6 +57,8 @@ let teamMembers = [
     path: "mike",
     github: "MJYoung114",
     twitter: "mjyoungsta",
+    title: "Engineer",
+    studies: "BSc Comp Eng",
   },
   {
     name: "Stentonian",
@@ -55,6 +67,8 @@ let teamMembers = [
     path: "stent",
     github: "Stentonian",
     twitter: "",
+    title: "Engineer",
+    studies: "Anon",
   },
   {
     name: "Jordyn Laurier",
@@ -63,6 +77,8 @@ let teamMembers = [
     path: "jordyn",
     github: "Jordy-Baby",
     twitter: "j_o_r_d_y_s",
+    title: "Marketer",
+    studies: "Dip",
   },
   {
     name: "Woo Sung Dong",
@@ -71,6 +87,8 @@ let teamMembers = [
     path: "woosung",
     github: "WooSungD",
     twitter: "WooSung40265546",
+    title: "Protocol Engineer",
+    studies: "BBSc Act Sci",
   },
   {
     name: "Paul Freund",
@@ -79,13 +97,15 @@ let teamMembers = [
     path: "paul",
     github: "paulfreund94",
     twitter: "PaulFreund18",
+    title: "Engineer",
+    studies: "BSc (Hons) Comp Sci",
   },
 ]
 
 module TeamMember = {
   @react.component
   let make = (~teamMember, ~screenWidth, ~screenHeight) => {
-    let {frameNumber, name, path, placardNumber, github, twitter} = teamMember
+    let {frameNumber, name, path, placardNumber, github, twitter, title, studies} = teamMember
 
     let frame = ref(frameNumber)
 
@@ -96,23 +116,16 @@ module TeamMember = {
     let frameNumber = frame.contents
 
     let width = isMobile
-      ? Js.Math.min_int(screenWidth / 4, screenHeight / 5)
+      ? Js.Math.min_int(screenWidth / 5, screenHeight / 5)
       : Js.Math.min_int(screenWidth / 8, screenHeight / 6)
 
     let hasTwitter = twitter != ""
 
     let avatarMargin = switch frameNumber {
-    | 4 => "mb-7"
-    | 3 => "mb-0"
-    | _ => "mb-3"
+    | 4 => "mt-2"
+    | 3 => "mt-5"
+    | _ => "mt-3"
     }
-
-    let iconsPlacement = switch frameNumber {
-    | 35 => "right-7"
-    | 3 => ""
-    | _ => "right-5"
-    }
-    let iconsFlex = frameNumber != 3 ? "end" : "center"
 
     let iconsBottom = width / 6 + 5
 
@@ -122,26 +135,32 @@ module TeamMember = {
       <img
         src={`/img/team/frames/frame${frameNumber->Int.toString}.png`} className="w-full h-auto"
       />
-      <div className="absolute left-0 top-0 w-full h-full z-10 flex items-center justify-center">
-        <img
-          src={`/img/team/avatars/${path}.png`} className={`w-half h-auto pixel ${avatarMargin}`}
-        />
-      </div>
-      <div className="absolute z-10 bottom-0 w-28 left-half ml-minus-12 mb-minus-1">
-        <img src={`/img/team/placards/placard${placardNumber->Int.toString}.png`} />
-      </div>
       <div
-        className={`absolute ${iconsPlacement} w-full z-10`}
-        style={ReactDOM.Style.make(~bottom=`${iconsBottom->Int.toString}px`, ())}>
-        <div className={`w-full flex justify-${iconsFlex}`}>
-          <a target="_blank" href={`https://github.com/${github}`} className="mr-2 w-1/8">
+        className="absolute left-0 top-0 w-full h-full z-10 flex flex-col items-center  mt-minus-2 pb-3 justify-evenly">
+        <img
+          src={`/img/team/avatars/${path}.png`}
+          className={`w-slightly-less-than-half h-auto pixel ${avatarMargin}`}
+        />
+        <div
+          className={`w-full z-10`}
+          style={ReactDOM.Style.make(~bottom=`${iconsBottom->Int.toString}px`, ())}>
+          <div className="flex flex-col w-full h-full items-center">
+            <p className="text-xxxs md:text-xxs mx-auto"> {title->React.string} </p>
+            <p className="text-xxxxs md:text-xxxs mx-auto"> {studies->React.string} </p>
+          </div>
+        </div>
+        <div className={`w-full flex justify-center mb-2 md:mb-0`}>
+          <a target="_blank" href={`https://github.com/${github}`} className="mr-2 w-3 md:w-4">
             <img className="w-full h-auto" src="/icons/github-sq.svg" />
           </a>
           {hasTwitter
-            ? <a target="_blank" href={`https://twitter.com/${twitter}`} className="w-1/8">
+            ? <a target="_blank" href={`https://twitter.com/${twitter}`} className="w-3 md:w-4">
                 <img className="w-full h-auto" src="/icons/twitter-sq-gray.svg" />
               </a>
             : React.null}
+        </div>
+        <div className="absolute z-10 bottom-0 w-28 left-half ml-minus-12 mb-minus-1">
+          <img src={`/img/team/placards/placard${placardNumber->Int.toString}.png`} />
         </div>
       </div>
       <div
@@ -158,7 +177,7 @@ let make = () => {
 
   let teamMargin = screenHeight / 20
 
-  let headingMargin = screenHeight / 15
+  let headingMargin = screenWidth >= 768 ? screenHeight / 15 : screenHeight / 20
 
   <section
     id="team" className="min-h-screen w-screen flex flex-col items-center justify-center bg-team">
@@ -170,7 +189,7 @@ let make = () => {
           ~marginBottom=`${headingMargin->Int.toString}px`,
           (),
         )}>
-        <Heading title="team" />
+        <Heading title="Team" />
       </div>
       {if screenWidth >= 768 {
         // not mobile
