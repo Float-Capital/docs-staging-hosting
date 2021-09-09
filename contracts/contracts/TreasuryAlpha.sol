@@ -27,6 +27,8 @@ contract TreasuryAlpha is AccessControlledAndUpgradeable {
   // An aproximation of what the FLT price should be according to the yield at the time.
   uint256 public basePrice;
 
+  event BasePriceUpdated(uint256 newBasePrice);
+
   function initialize(
     address _admin,
     address _paymentToken,
@@ -61,6 +63,7 @@ contract TreasuryAlpha is AccessControlledAndUpgradeable {
     require(newBasePrice > 2e17, "base price too low");
 
     basePrice = newBasePrice;
+    emit BasePriceUpdated(newBasePrice);
   }
 
   function burnFloatForShareOfTreasury(uint256 amountOfFloatToBurn) external {

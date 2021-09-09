@@ -6,7 +6,7 @@ type allContracts = {
   staker: Staker.t,
   longShort: LongShort.t,
   paymentToken: ERC20Mock.t,
-  treasury: Treasury_v0.t,
+  treasury: TreasuryAlpha.t,
   syntheticToken: SyntheticToken.t,
 };
 
@@ -25,6 +25,7 @@ let runTestTransactions =
   let%AwaitThen _ = DeployHelpers.topupBalanceIfLow(~from=admin, ~to_=user1);
   let%AwaitThen _ = DeployHelpers.topupBalanceIfLow(~from=admin, ~to_=user2);
   let%AwaitThen _ = DeployHelpers.topupBalanceIfLow(~from=admin, ~to_=user3);
+
   Js.log("deploying markets");
 
   let%AwaitThen _ =
@@ -161,6 +162,14 @@ let runTestTransactions =
     );
 
   let%AwaitThen _ = priceAndStateUpdate();
+
+  Js.log("Update treasury base price");
+  let%AwaitThen _ =
+    treasury
+    ->ContractHelpers.connect(~address=admin)
+    ->TreasuryAlpha.updateBasePrice(
+        ~newBasePrice=bnFromString("300000000000000000"),
+      );
 
   JsPromise.resolve();
 };

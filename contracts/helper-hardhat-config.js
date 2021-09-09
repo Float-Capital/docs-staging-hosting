@@ -1,5 +1,5 @@
 const STAKER = "Staker";
-const COLLATERAL_TOKEN = "Dai";
+const COLLATERAL_TOKEN = "ERC20Mock";
 const TREASURY = "Treasury_v0";
 const TREASURY_ALPHA = "TreasuryAlpha";
 const LONGSHORT = "LongShort";
@@ -18,5 +18,5 @@ module.exports = {
   FLOAT_TOKEN_ALPHA,
   TOKEN_FACTORY,
   FLOAT_CAPITAL,
-  isAlphaLaunch
+  isAlphaLaunch,
 };

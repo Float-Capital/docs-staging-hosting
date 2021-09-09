@@ -156,6 +156,7 @@ export function getOrCreateGlobalState(): GlobalState {
     globalState.timestampLaunched = ZERO;
     globalState.txHash = ZERO_ADDRESS_BYTES;
     globalState.totalValueLocked = ZERO;
+    globalState.treasuryBasePrice = ZERO;
   }
 
   return globalState as GlobalState;

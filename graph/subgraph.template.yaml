@@ -104,6 +104,27 @@ dataSources:
           handler: handleNextPriceStakeShift
       file: ./src/mappings/staker.ts
 
+  - kind: ethereum/contract
+    name: TreasuryAlpha
+    network: <treasuryAlpha-network>
+    source:
+      address: <treasuryAlpha-address>
+      abi: TreasuryAlpha
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - BasePriceUpdated
+      abis:
+        - name: TreasuryAlpha
+          file: ./abis/TreasuryAlpha.json
+      eventHandlers:
+        - event: BasePriceUpdated(uint256)
+          handler: handleBasePriceUpdated
+      file: ./src/mappings/treasuryAlpha.ts
+
 templates:
   - kind: ethereum/contract
     name: erc20
