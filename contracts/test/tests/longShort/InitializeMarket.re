@@ -54,6 +54,7 @@ let testUnit =
               ~balanceIncentiveCurve_exponent=bnFromInt(5),
               ~balanceIncentiveCurve_equilibriumOffset=bnFromInt(0),
               ~marketTreasurySplitGradient_e18=bnFromInt(1),
+              ~marketLeverage=CONSTANTS.tenToThe18,
             );
 
         (stakerSmockedRef^)
@@ -100,6 +101,7 @@ let testUnit =
                 ~balanceIncentiveCurve_exponent=bnFromInt(5),
                 ~balanceIncentiveCurve_equilibriumOffset=bnFromInt(0),
                 ~marketTreasurySplitGradient_e18=bnFromInt(1),
+                ~marketLeverage=CONSTANTS.tenToThe18,
               ),
         );
       ();
@@ -125,6 +127,7 @@ let testUnit =
                 ~balanceIncentiveCurve_exponent=bnFromInt(5),
                 ~balanceIncentiveCurve_equilibriumOffset=bnFromInt(0),
                 ~marketTreasurySplitGradient_e18=bnFromInt(1),
+                ~marketLeverage=CONSTANTS.tenToThe18,
               ),
         );
       ();
@@ -153,6 +156,7 @@ let testIntegration =
               ~balanceIncentiveCurve_exponent=bnFromInt(5),
               ~balanceIncentiveCurve_equilibriumOffset=bnFromInt(0),
               ~marketTreasurySplitGradient_e18=bnFromInt(1),
+              ~marketLeverage=CONSTANTS.tenToThe18,
             ),
         ~reason="index too high",
       );
@@ -175,6 +179,7 @@ let testIntegration =
             ~balanceIncentiveCurve_exponent=bnFromInt(5),
             ~balanceIncentiveCurve_equilibriumOffset=bnFromInt(0),
             ~marketTreasurySplitGradient_e18=bnFromInt(1),
+            ~marketLeverage=CONSTANTS.tenToThe18,
           ),
         ~reason="already initialized",
       );
@@ -221,6 +226,7 @@ let testIntegration =
             ~balanceIncentiveCurve_exponent=bnFromInt(5),
             ~balanceIncentiveCurve_equilibriumOffset=bnFromInt(0),
             ~marketTreasurySplitGradient_e18=bnFromInt(1),
+            ~marketLeverage=CONSTANTS.tenToThe18,
           ),
         ~reason="Insufficient market seed",
       );

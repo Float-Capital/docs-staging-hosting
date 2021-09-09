@@ -84,6 +84,9 @@ contract LongShort is ILongShort, AccessControlledAndUpgradeable {
   mapping(uint32 => mapping(bool => mapping(address => uint256)))
     public userNextPrice_syntheticToken_toShiftAwayFrom_marketSide;
 
+  // NEW VARIABLES:
+  mapping(uint32 => uint256) public marketLeverage_e18;
+
   /*╔═════════════════════════════╗
     ║          MODIFIERS          ║
     ╚═════════════════════════════╝*/
@@ -309,8 +312,6 @@ contract LongShort is ILongShort, AccessControlledAndUpgradeable {
 
     marketSideValueInPaymentToken[marketIndex][true] = initialMarketSeedForEachMarketSide;
     marketSideValueInPaymentToken[marketIndex][false] = initialMarketSeedForEachMarketSide;
-
-    emit NewMarketLaunchedAndSeeded(marketIndex, initialMarketSeedForEachMarketSide);
   }
 
   /// @notice Sets a market as active once it has already been setup by createNewSyntheticMarket.
@@ -332,7 +333,8 @@ contract LongShort is ILongShort, AccessControlledAndUpgradeable {
     uint256 initialMarketSeedForEachMarketSide,
     uint256 balanceIncentiveCurve_exponent,
     int256 balanceIncentiveCurve_equilibriumOffset,
-    uint256 _marketTreasurySplitGradient_e18
+    uint256 _marketTreasurySplitGradient_e18,
+    uint256 marketLeverage
   ) external adminOnly {
     require(
       kInitialMultiplier != 0 &&
@@ -354,6 +356,8 @@ contract LongShort is ILongShort, AccessControlledAndUpgradeable {
 
     _seedMarketInitially(initialMarketSeedForEachMarketSide, marketIndex);
 
+    marketLeverage_e18[marketIndex] = marketLeverage;
+
     // Add new staker funds with fresh synthetic tokens.
     IStaker(staker).addNewStakingFund(
       marketIndex,
@@ -373,6 +377,12 @@ contract LongShort is ILongShort, AccessControlledAndUpgradeable {
       1e18,
       initialMarketSeedForEachMarketSide,
       initialMarketSeedForEachMarketSide
+    );
+
+    emit NewMarketLaunchedAndSeeded(
+      marketIndex,
+      initialMarketSeedForEachMarketSide,
+      marketLeverage
     );
   }
 
@@ -653,7 +663,9 @@ contract LongShort is ILongShort, AccessControlledAndUpgradeable {
 
     // See this equation in latex: https://ipfs.io/ipfs/QmPeJ3SZdn1GfxqCD4GDYyWTJGPMSHkjPJaxrzk2qTTPSE
     // Interact with this equation: https://www.desmos.com/calculator/t8gr6j5vsq
-    int256 valueChange = ((newAssetPrice - oldAssetPrice) * underbalancedSideValue) / oldAssetPrice;
+    int256 valueChange = ((newAssetPrice - oldAssetPrice) *
+      underbalancedSideValue *
+      int256(marketLeverage_e18[marketIndex])) / (oldAssetPrice * 1e18);
 
     if (valueChange < 0) {
       valueChange = -valueChange; // make value change positive

@@ -809,13 +809,14 @@ export function handleNewMarketLaunchedAndSeeded(
   // TODO - need to include the market seed initially
   let marketIndex = event.params.marketIndex;
   let initialSeed = event.params.initialSeed;
+  let marketLeverage = event.params.marketLeverage;
 
   saveEventToStateChange(
     event,
     "NewMarketLaunchedAndSeeded",
-    [marketIndex.toString(), initialSeed.toHex()],
-    ["marketIndex", "initialMarketSeed"],
-    ["uint32", "uint256"],
+    [marketIndex.toString(), initialSeed.toString(), marketLeverage.toString()],
+    ["marketIndex", "initialMarketSeed", "marketLeverage"],
+    ["uint32", "uint256", "uint256"],
     [],
     []
   );
