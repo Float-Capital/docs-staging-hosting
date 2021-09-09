@@ -173,13 +173,14 @@ function Navigation(Props) {
                     }), React.createElement("div", {
                       className: "hidden md:flex w-2/3 text-base items-center justify-end"
                     }, React.createElement("span", {
+                          className: "hover:bg-white",
                           onClick: (function (param) {
                               return Curry._1(clickedTradingDispatch, /* Clicked */0);
                             })
                         }, React.createElement(Link, {
                               href: "/app/markets",
                               children: React.createElement("a", {
-                                    className: "px-3 hover:bg-white " + activeHighlight("/app/markets")
+                                    className: "px-3 " + activeHighlight("/app/markets")
                                   }, "MARKETS")
                             })), React.createElement(Link, {
                           href: "/app/stake-markets",
