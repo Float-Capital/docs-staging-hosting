@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 import "./abstract/AccessControlledAndUpgradeable.sol";
 import "./interfaces/IFloatToken.sol";
+import "./interfaces/ILongShort.sol";
 
 import "@openzeppelin/contracts/utils/math/Math.sol";
 
@@ -22,17 +23,20 @@ contract TreasuryAlpha is AccessControlledAndUpgradeable {
 
   address public paymentToken;
   address public floatToken;
+  address public longShort;
   // An aproximation of what the FLT price should be according to the yield at the time.
   uint256 public basePrice;
 
   function initialize(
     address _admin,
     address _paymentToken,
-    address _floatToken
+    address _floatToken,
+    address _longShort
   ) external initializer {
     _AccessControlledAndUpgradeable_init(_admin);
     paymentToken = _paymentToken;
     floatToken = _floatToken;
+    longShort = _longShort;
   }
 
   function onlyAdminModifierLogic() internal virtual {
@@ -70,5 +74,17 @@ contract TreasuryAlpha is AccessControlledAndUpgradeable {
 
     IFloatToken(floatToken).burnFrom(msg.sender, amountOfFloatToBurn); // Can modify the core FLT token if wanted to remove the need for this step. // Currently requires user to approve treasury contract.
     IERC20(paymentToken).safeTransfer(msg.sender, amountToRecieve);
+  }
+
+  function convertSynthsToPaymentTokenNextPriceLong(uint32 marketIndex, uint256 tokens_redeem)
+    external
+  {
+    ILongShort(longShort).redeemLongNextPrice(marketIndex, tokens_redeem);
+  }
+
+  function convertSynthsToPaymentTokenNextPriceShort(uint32 marketIndex, uint256 tokens_redeem)
+    external
+  {
+    ILongShort(longShort).redeemShortNextPrice(marketIndex, tokens_redeem);
   }
 }

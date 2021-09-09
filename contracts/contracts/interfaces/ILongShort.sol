@@ -110,4 +110,8 @@ interface ILongShort {
   function mintLongNextPrice(uint32 marketIndex, uint256 amount) external;
 
   function mintShortNextPrice(uint32 marketIndex, uint256 amount) external;
+
+  function redeemLongNextPrice(uint32 marketIndex, uint256 amount) external;
+
+  function redeemShortNextPrice(uint32 marketIndex, uint256 amount) external;
 }

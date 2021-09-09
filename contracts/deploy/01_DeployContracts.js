@@ -57,19 +57,6 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     },
   });
 
-  let treasuryToUse = isAlphaLaunch ? TREASURY_ALPHA : TREASURY;
-  await deploy(treasuryToUse, {
-    from: deployer,
-    proxy: {
-      proxyContract: "UUPSProxy",
-      execute: {
-        methodName: "initialize",
-        args: [admin, paymentTokenAddress, floatToken.address],
-      },
-    },
-    log: true,
-  });
-
   await deploy(FLOAT_CAPITAL, {
     from: deployer,
     proxy: {
@@ -106,6 +93,19 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     from: admin,
     log: true,
     args: [longShort.address],
+  });
+
+  let treasuryToUse = isAlphaLaunch ? TREASURY_ALPHA : TREASURY;
+  await deploy(treasuryToUse, {
+    from: deployer,
+    proxy: {
+      proxyContract: "UUPSProxy",
+      execute: {
+        methodName: "initialize",
+        args: [admin, paymentTokenAddress, floatToken.address, longShort.address],
+      },
+    },
+    log: true,
   });
 };
 module.exports.tags = ["all", "contracts"];
