@@ -33,6 +33,7 @@ html {
 
 .pixel {
   image-rendering: crisp-edges !important;
+  image-rendering: pixelated !important;
 }
 
 #app,
