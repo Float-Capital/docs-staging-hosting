@@ -1,5 +1,5 @@
 @react.component
-let make = () => {
+let make = (~txState, ~setTxState, ~contractExecutionHandler) => {
   let router = Next.Router.useRouter()
   let markets = Queries.MarketDetails.use()
   let marketIndex = router.query->Js.Dict.get("marketIndex")->Option.getWithDefault("1")
@@ -14,7 +14,13 @@ let make = () => {
         syntheticMarkets[marketIndex->Belt.Int.fromString->Option.getWithDefault(1) - 1]
       switch optFirstMarket {
       | Some(firstMarket) =>
-        <RedeemForm market={firstMarket} isLong={actionOption->Js.String2.toLowerCase == "long"} />
+        <RedeemForm
+          txState
+          setTxState
+          contractExecutionHandler
+          market={firstMarket}
+          isLong={actionOption->Js.String2.toLowerCase == "long"}
+        />
       | None => <p> {"No markets exist"->React.string} </p>
       }
     | {data: None, error: None, loading: false} =>

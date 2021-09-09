@@ -258,6 +258,7 @@ let deployTestMarket =
       ~balanceIncentiveCurve_exponent=bnFromInt(5),
       ~balanceIncentiveCurve_equilibriumOffset=bnFromInt(0),
       ~marketTreasurySplitGradient_e18=bnFromInt(1),
+      ~marketLeverage=CONSTANTS.tenToThe18,
     );
 };
 
@@ -330,6 +331,7 @@ let deployMumbaiMarket =
       ~balanceIncentiveCurve_exponent=bnFromInt(5),
       ~balanceIncentiveCurve_equilibriumOffset=bnFromInt(0),
       ~marketTreasurySplitGradient_e18=bnFromInt(1),
+      ~marketLeverage=CONSTANTS.tenToThe18,
     );
 };
 
@@ -489,5 +491,6 @@ let deployMumbaiMarketUpgradeable =
       ~balanceIncentiveCurve_exponent=bnFromInt(5),
       ~balanceIncentiveCurve_equilibriumOffset=bnFromInt(0),
       ~marketTreasurySplitGradient_e18=bnFromInt(1),
+      ~marketLeverage=CONSTANTS.tenToThe18,
     );
 };

@@ -30,6 +30,18 @@ html {
     background-position: 0 50%;
   }
 }
+
+.pixel {
+  image-rendering: crisp-edges !important;
+  image-rendering: optimizeSpeed; /*                     */
+  image-rendering: -moz-crisp-edges; /* Firefox             */
+  image-rendering: -o-crisp-edges; /* Opera               */
+  image-rendering: -webkit-optimize-contrast; /* Chrome (and Safari) */
+  image-rendering: pixelated; /* Chrome as of 2019   */
+  image-rendering: optimize-contrast; /* CSS3 Proposed       */
+  -ms-interpolation-mode: nearest-neighbor; /* IE8+                */
+}
+
 #app,
 .island {
   /* It is possible to make this a utility (https://tailwindcss.com/docs/plugins#adding-utilities)
@@ -81,6 +93,15 @@ html {
     ),
     url("/backgrounds/car.gif");
   @apply font-default min-h-screen w-screen bg-left-bottom bg-cover bg-gray-50;
+}
+
+.bg-team {
+  background: linear-gradient(
+      rgba(255, 255, 255, 0.3),
+      rgba(255, 255, 255, 0.3)
+    ),
+    url("/backgrounds/team.png");
+  @apply font-default min-h-screen w-screen bg-right-top bg-cover bg-gray-50;
 }
 
 .custom-height-for-above-footer {

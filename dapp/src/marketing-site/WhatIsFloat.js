@@ -37,7 +37,7 @@ function WhatIsFloat(Props) {
                                       className: "font-vt323 font-bold mr-2"
                                     }, ">"), "No front-running"), React.createElement("li", undefined, React.createElement("span", {
                                       className: "font-vt323 font-bold mr-2"
-                                    }, ">"), "No fees")), React.createElement("div", {
+                                    }, ">"), "No trading fees")), React.createElement("div", {
                               className: "my-2 inline-block"
                             }, React.createElement("a", {
                                   href: "https://docs.float.capital/docs/",

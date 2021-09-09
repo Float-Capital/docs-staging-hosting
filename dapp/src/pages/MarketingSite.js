@@ -2,6 +2,7 @@
 'use strict';
 
 var TVL = require("../marketing-site/components/TVL.js");
+var Team = require("../marketing-site/Team.js");
 var React = require("react");
 var Landing = require("../marketing-site/Landing.js");
 var Roadmap = require("../marketing-site/Roadmap.js");
@@ -10,7 +11,7 @@ var Governance = require("../marketing-site/Governance.js");
 var WhatIsFloat = require("../marketing-site/WhatIsFloat.js");
 
 function MarketingSite$MarketingSite(Props) {
-  return React.createElement(React.Fragment, undefined, React.createElement(Landing.make, {}), React.createElement(WhatIsFloat.make, {}), React.createElement(Roadmap.make, {}), React.createElement(Governance.make, {}), React.createElement(Security.make, {}), React.createElement(TVL.make, {}));
+  return React.createElement(React.Fragment, undefined, React.createElement(Landing.make, {}), React.createElement(WhatIsFloat.make, {}), React.createElement(Roadmap.make, {}), React.createElement(Team.make, {}), React.createElement(Governance.make, {}), React.createElement(Security.make, {}), React.createElement(TVL.make, {}));
 }
 
 var MarketingSite = {

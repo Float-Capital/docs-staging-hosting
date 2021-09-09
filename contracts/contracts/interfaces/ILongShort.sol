@@ -57,7 +57,7 @@ interface ILongShort {
 
   event OracleUpdated(uint32 marketIndex, address oldOracleAddress, address newOracleAddress);
 
-  event NewMarketLaunchedAndSeeded(uint32 marketIndex, uint256 initialSeed);
+  event NewMarketLaunchedAndSeeded(uint32 marketIndex, uint256 initialSeed, uint256 marketLeverage);
 
   event ExecuteNextPriceSettlementsUser(address user, uint32 marketIndex);
 

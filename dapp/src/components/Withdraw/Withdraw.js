@@ -11,22 +11,17 @@ var Queries = require("../../data/Queries.js");
 var Contracts = require("../../ethereum/Contracts.js");
 var RootProvider = require("../../libraries/RootProvider.js");
 var ToastProvider = require("../UI/ToastProvider.js");
-var ContractActions = require("../../ethereum/ContractActions.js");
-var WithdrawTxStatusModal = require("./WithdrawTxStatusModal.js");
 
 function Withdraw(Props) {
   var marketIndex = Props.marketIndex;
-  var signer = ContractActions.useSignerExn(undefined);
-  var match = ContractActions.useContractFunction(signer);
-  var txState = match[1];
-  var contractExecutionHandler = match[0];
+  var txState = Props.txState;
+  var contractExecutionHandler = Props.contractExecutionHandler;
   var user = RootProvider.useCurrentUserExn(undefined);
   var toastDispatch = React.useContext(ToastProvider.DispatchToastContext.context);
   var client = Client.useApolloClient(undefined);
   var reqVariables = {
     userId: Ethers.Utils.ethAdrToLowerStr(user)
   };
-  WithdrawTxStatusModal.useWithdrawTxModal(txState);
   React.useEffect((function () {
           if (typeof txState === "number") {
             if (txState !== /* UnInitialised */0) {

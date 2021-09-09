@@ -36,3 +36,14 @@ let setYieldManager = (longShort, ~marketIndex: int, ~yieldManager: Ethers.ethAd
     ~value=createValueAtKey(marketIndex, yieldManager),
   )
 }
+
+let setMarketLeverage_e18 = (
+  longShort,
+  ~marketIndex: int,
+  ~marketLeverage_e18: Ethers.BigNumber.t,
+) => {
+  longShort->LongShort.setVariable(
+    ~name="marketLeverage_e18",
+    ~value=createValueAtKey(marketIndex, marketLeverage_e18),
+  )
+}

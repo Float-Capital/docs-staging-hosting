@@ -1,4 +1,4 @@
-let useStakeTxModal = (~txStateStake, ~resetFormButton, ~tokenToStake) => {
+let useStakeTxModal = (~txStateStake, ~tokenToStake) => {
   let stakeTweetMessages = [
     `Hey Siri, play “Celebrate” by Kool and The Gang 🥳, because I just staked my @float_capital synthetic assets to earn FLOAT tokens! 🌊`,
     `Stake that @float_capital! 🌊 I just staked my synthetic assets to earn FLOAT tokens! 🥳`,
@@ -37,7 +37,6 @@ let useStakeTxModal = (~txStateStake, ~resetFormButton, ~tokenToStake) => {
           <TweetButton message={randomStakeTweetMessage} />
           <ViewProfileButton />
         </div>
-        {resetFormButton()}
       </>)
 
     | ContractActions.Declined(_message) =>
@@ -45,7 +44,6 @@ let useStakeTxModal = (~txStateStake, ~resetFormButton, ~tokenToStake) => {
         <div className="text-center m-3">
           <p> {`The transaction was rejected by your wallet`->React.string} </p>
           <MessageUsOnDiscord />
-          {resetFormButton()}
         </div>,
       )
     | ContractActions.Failed(txHash) =>
@@ -54,7 +52,6 @@ let useStakeTxModal = (~txStateStake, ~resetFormButton, ~tokenToStake) => {
           <h1> {`The transaction failed.`->React.string} </h1>
           <ViewOnBlockExplorer txHash />
           <MessageUsOnDiscord />
-          {resetFormButton()}
         </div>,
       )
     | _ => hideModal()

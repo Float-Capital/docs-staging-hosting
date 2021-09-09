@@ -119,13 +119,14 @@ let createSyntheticMarket = (
     ->JsPromise.then(marketIndex => {
       longShort->LongShort.initializeMarket(
         ~marketIndex,
-        ~kInitialMultiplier=Ethers.BigNumber.fromUnsafe("1000000000000000000"),
+        ~kInitialMultiplier=CONSTANTS.tenToThe18,
         ~kPeriod=Ethers.BigNumber.fromInt(0),
         ~unstakeFee_e18=Ethers.BigNumber.fromInt(50),
         ~initialMarketSeedForEachMarketSide,
         ~balanceIncentiveCurve_exponent=bnFromInt(5),
         ~balanceIncentiveCurve_equilibriumOffset=bnFromInt(0),
         ~marketTreasurySplitGradient_e18=bnFromInt(1),
+        ~marketLeverage=CONSTANTS.tenToThe18,
       )
     })
   })

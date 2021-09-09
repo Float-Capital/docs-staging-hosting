@@ -43,7 +43,6 @@ describe("All Tests", ({beforeAll, testAsync}) => {
               adminAddress,
               longShort: {id: _idLongShort}, // TODO: test that this is the same as the address that emitted this event
               totalFloatMinted,
-              totalTxs,              
               totalUsers,
               timestampLaunched,
               txHash,
@@ -51,8 +50,7 @@ describe("All Tests", ({beforeAll, testAsync}) => {
             expectEqual(contractVersion->BN.toString, "1")
             expectEqual(latestMarketIndex->BN.toString, "0")
             expectEqual(totalFloatMinted->BN.toString, "0")
-            expectEqual(totalTxs->BN.toString, "1") // Should the initializiation of the contract count as a transaction? Currently it is.
-            expectEqual(totalUsers->BN.toString, "1") // THIS IS A BUG - should be zero to start            
+            expectEqual(totalUsers->BN.toString, "1") // THIS IS A BUG - should be zero to start
             expectEqual(timestampLaunched->BN.toString, timestamp->Int.toString)
             expectEqual(addressStaker, staker)
             expectEqual(addressTokenFactory, tokenFactory)
