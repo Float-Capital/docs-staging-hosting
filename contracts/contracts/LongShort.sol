@@ -886,14 +886,14 @@ contract LongShort is ILongShort, AccessControlledAndUpgradeable {
   /// @notice  Allows users to redeem long synthetic assets for a market. To prevent front-running these redeems are executed on the next price update from the oracle.
   /// @param marketIndex An uint32 which uniquely identifies a market.
   /// @param tokens_redeem Amount in wei of synth tokens to redeem at the next oracle price.
-  function redeemLongNextPrice(uint32 marketIndex, uint256 tokens_redeem) external {
+  function redeemLongNextPrice(uint32 marketIndex, uint256 tokens_redeem) external override {
     _redeemNextPrice(marketIndex, tokens_redeem, true);
   }
 
   /// @notice  Allows users to redeem short synthetic assets for a market. To prevent front-running these redeems are executed on the next price update from the oracle.
   /// @param marketIndex An uint32 which uniquely identifies a market.
   /// @param tokens_redeem Amount in wei of synth tokens to redeem at the next oracle price.
-  function redeemShortNextPrice(uint32 marketIndex, uint256 tokens_redeem) external {
+  function redeemShortNextPrice(uint32 marketIndex, uint256 tokens_redeem) external override {
     _redeemNextPrice(marketIndex, tokens_redeem, false);
   }
 
