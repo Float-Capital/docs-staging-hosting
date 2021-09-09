@@ -412,9 +412,7 @@ function toNumber(prim) {
   return prim.toNumber();
 }
 
-function Unstake$UnstakeTxStatusModal(Props) {
-  var txStateUnstake = Props.txStateUnstake;
-  var resetFormButton = Props.resetFormButton;
+function useUnstakeModal(txStateUnstake) {
   var match = ModalProvider.useModalDisplay(undefined);
   var hideModal = match.hideModal;
   var showModal = match.showModal;
@@ -442,7 +440,7 @@ function Unstake$UnstakeTxStatusModal(Props) {
               case /* Complete */2 :
                   Curry._1(showModal, React.createElement("div", {
                             className: "text-center m-3"
-                          }, React.createElement("p", undefined, "Transaction complete 🎉"), Curry._1(resetFormButton, undefined)));
+                          }, React.createElement("p", undefined, "Transaction complete 🎉")));
                   break;
               case /* Failed */3 :
                   var txHash = txStateUnstake._0;
@@ -450,23 +448,15 @@ function Unstake$UnstakeTxStatusModal(Props) {
                             className: "text-center m-3"
                           }, React.createElement("p", undefined, "The transaction failed."), txHash !== "" ? React.createElement(ViewOnBlockExplorer.make, {
                                   txHash: txHash
-                                }) : null, React.createElement(MessageUsOnDiscord.make, {}), Curry._1(resetFormButton, undefined)));
+                                }) : null, React.createElement(MessageUsOnDiscord.make, {})));
                   break;
               
             }
           }
           
         }), [txStateUnstake]);
-  if (typeof txStateUnstake === "number" || txStateUnstake.TAG !== /* Declined */1) {
-    return null;
-  } else {
-    return Curry._1(resetFormButton, undefined);
-  }
+  
 }
-
-var UnstakeTxStatusModal = {
-  make: Unstake$UnstakeTxStatusModal
-};
 
 function Unstake$StakeFormInput(Props) {
   var onSubmitOpt = Props.onSubmit;
@@ -476,9 +466,10 @@ function Unstake$StakeFormInput(Props) {
   var onChangeOpt = Props.onChange;
   var onBlurOpt = Props.onBlur;
   var onMaxClickOpt = Props.onMaxClick;
-  var txStateModalOpt = Props.txStateModal;
+  var resetButtonOpt = Props.resetButton;
   var buttonDisabledOpt = Props.buttonDisabled;
   var buttonText = Props.buttonText;
+  var txStateOpt = Props.txState;
   var onSubmit = onSubmitOpt !== undefined ? onSubmitOpt : (function (param) {
         
       });
@@ -494,8 +485,27 @@ function Unstake$StakeFormInput(Props) {
   var onMaxClick = onMaxClickOpt !== undefined ? onMaxClickOpt : (function (param) {
         
       });
-  var txStateModal = txStateModalOpt !== undefined ? Caml_option.valFromOption(txStateModalOpt) : null;
+  var resetButton = resetButtonOpt !== undefined ? resetButtonOpt : (function (param) {
+        return null;
+      });
   var buttonDisabled = buttonDisabledOpt !== undefined ? buttonDisabledOpt : false;
+  var txState = txStateOpt !== undefined ? txStateOpt : /* UnInitialised */0;
+  var tmp;
+  var exit = 0;
+  if (typeof txState === "number" || txState.TAG === /* Declined */1) {
+    exit = 1;
+  } else {
+    tmp = Curry._1(resetButton, undefined);
+  }
+  if (exit === 1) {
+    tmp = React.createElement(Button.make, {
+          onClick: (function (param) {
+              return Curry._1(onSubmit, undefined);
+            }),
+          children: buttonText,
+          disabled: buttonDisabled
+        });
+  }
   return React.createElement(Form.make, {
               className: "",
               onSubmit: onSubmit,
@@ -507,13 +517,7 @@ function Unstake$StakeFormInput(Props) {
                   onBlur: onBlur,
                   onChange: onChange,
                   onMaxClick: onMaxClick
-                }), React.createElement(Button.make, {
-                  onClick: (function (param) {
-                      return Curry._1(onSubmit, undefined);
-                    }),
-                  children: buttonText,
-                  disabled: buttonDisabled
-                }), txStateModal);
+                }), tmp);
 }
 
 var StakeFormInput = {
@@ -521,16 +525,14 @@ var StakeFormInput = {
 };
 
 function Unstake$ConnectedStakeForm(Props) {
-  var signer = Props.signer;
   var param = Props.synthetic;
+  var contractExecutionHandler = Props.contractExecutionHandler;
+  var txState = Props.txState;
+  var setTxState = Props.setTxState;
   var match = param.syntheticMarket;
   var marketIndex = match.marketIndex;
   var tokenType = param.tokenType;
   var tokenId = param.id;
-  var match$1 = ContractActions.useContractFunction(signer);
-  var setTxState = match$1[2];
-  var txState = match$1[1];
-  var contractExecutionHandler = match$1[0];
   var user = RootProvider.useCurrentUserExn(undefined);
   var optTokenBalance = Belt_Option.flatMap(DataHooks.Util.graphResponseToOption(DataHooks.useStakesForUser(Ethers.Utils.ethAdrToLowerStr(user))), (function (a) {
           return Belt_Option.flatMap(Belt_Array.get(Belt_Array.keep(a, (function (param) {
@@ -617,13 +619,13 @@ function Unstake$ConnectedStakeForm(Props) {
                 children: "Reset & Unstake Again"
               });
   };
-  var match$2 = form.amountResult;
-  var formAmount = match$2 !== undefined && match$2.TAG === /* Ok */0 ? Caml_option.some(match$2._0) : undefined;
+  var match$1 = form.amountResult;
+  var formAmount = match$1 !== undefined && match$1.TAG === /* Ok */0 ? Caml_option.some(match$1._0) : undefined;
   var defaultButtonText = "Unstake " + tokenType + " " + match.name;
-  var match$3;
+  var match$2;
   if (formAmount !== undefined && optTokenBalance !== undefined) {
     var greaterThanBalance = Caml_option.valFromOption(formAmount).gt(Caml_option.valFromOption(optTokenBalance));
-    match$3 = greaterThanBalance ? [
+    match$2 = greaterThanBalance ? [
         "Amount is greater than your balance",
         "Insufficient balance",
         true
@@ -633,7 +635,7 @@ function Unstake$ConnectedStakeForm(Props) {
         form.submitting || !Curry._1(form.valid, undefined)
       ];
   } else {
-    match$3 = [
+    match$2 = [
       undefined,
       defaultButtonText,
       true
@@ -661,12 +663,10 @@ function Unstake$ConnectedStakeForm(Props) {
                                       };
                               }), optTokenBalance !== undefined ? Ethers.Utils.formatEther(Caml_option.valFromOption(optTokenBalance)) : "0");
                 }),
-              txStateModal: React.createElement(Unstake$UnstakeTxStatusModal, {
-                    txStateUnstake: txState,
-                    resetFormButton: resetFormButton
-                  }),
-              buttonDisabled: match$3[2],
-              buttonText: match$3[1]
+              resetButton: resetFormButton,
+              buttonDisabled: match$2[2],
+              buttonText: match$2[1],
+              txState: txState
             });
 }
 
@@ -676,6 +676,9 @@ var ConnectedStakeForm = {
 
 function Unstake(Props) {
   var tokenId = Props.tokenId;
+  var contractExecutionHandler = Props.contractExecutionHandler;
+  var txState = Props.txState;
+  var setTxState = Props.setTxState;
   var token = Curry.app(Queries.SyntheticToken.use, [
         undefined,
         undefined,
@@ -714,8 +717,10 @@ function Unstake(Props) {
   if (synthetic !== undefined) {
     if (optSigner !== undefined) {
       return React.createElement(Unstake$ConnectedStakeForm, {
-                  signer: optSigner,
-                  synthetic: synthetic
+                  synthetic: synthetic,
+                  contractExecutionHandler: contractExecutionHandler,
+                  txState: txState,
+                  setTxState: setTxState
                 });
     } else if (match[0]) {
       return React.createElement(Login.make, {});
@@ -740,7 +745,7 @@ var make = Unstake;
 
 exports.StakeForm = StakeForm;
 exports.toNumber = toNumber;
-exports.UnstakeTxStatusModal = UnstakeTxStatusModal;
+exports.useUnstakeModal = useUnstakeModal;
 exports.StakeFormInput = StakeFormInput;
 exports.ConnectedStakeForm = ConnectedStakeForm;
 exports.make = make;

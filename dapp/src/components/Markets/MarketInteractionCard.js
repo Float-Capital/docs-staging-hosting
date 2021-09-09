@@ -22,7 +22,11 @@ var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
 var Router = require("next/router");
 var RootProvider = require("../../libraries/RootProvider.js");
+var ContractActions = require("../../ethereum/ContractActions.js");
 var LongOrShortSelect = require("../UI/LongOrShortSelect.js");
+var StakeTxStatusModal = require("../Stake/StakeTxStatusModal.js");
+var WithdrawTxStatusModal = require("../Withdraw/WithdrawTxStatusModal.js");
+var RedeemSubmitButtonAndTxStatusModal = require("../Redeem/RedeemSubmitButtonAndTxStatusModal.js");
 
 function MarketInteractionCard$Tab(Props) {
   var selectedOpt = Props.selected;
@@ -218,7 +222,8 @@ function useMarketInfo(param) {
                           marketName: market.name,
                           marketSymbol: market.symbol,
                           longAddress: match$1.tokenAddress,
-                          shortAddress: match.tokenAddress
+                          shortAddress: match.tokenAddress,
+                          marketIndex: market.marketIndex
                         },
                         [Symbol.for("name")]: "Response"
                       };
@@ -309,8 +314,12 @@ function determineDisplay(user, userHasPositions, isLong, marketInfo) {
           };
   }
   var match = marketInfo._0;
+  var marketIndex = match.marketIndex;
   var shortId = match.shortId;
   var longId = match.longId;
+  var tokenName = (
+    isLong ? "Long" : "Short"
+  ) + " " + match.marketName;
   var chosenTokenId = isLong ? longId : shortId;
   if (userHasPositions !== undefined) {
     if (userHasPositions.hasLong) {
@@ -319,6 +328,8 @@ function determineDisplay(user, userHasPositions, isLong, marketInfo) {
                 TAG: 0,
                 selectOptions: /* Show */0,
                 tokenId: chosenTokenId,
+                tokenName: tokenName,
+                marketIndex: marketIndex,
                 [Symbol.for("name")]: "Form"
               };
       } else {
@@ -326,6 +337,8 @@ function determineDisplay(user, userHasPositions, isLong, marketInfo) {
                 TAG: 0,
                 selectOptions: /* DontShow */1,
                 tokenId: longId,
+                tokenName: tokenName,
+                marketIndex: marketIndex,
                 [Symbol.for("name")]: "Form"
               };
       }
@@ -334,6 +347,8 @@ function determineDisplay(user, userHasPositions, isLong, marketInfo) {
               TAG: 0,
               selectOptions: /* DontShow */1,
               tokenId: shortId,
+              tokenName: tokenName,
+              marketIndex: marketIndex,
               [Symbol.for("name")]: "Form"
             };
     } else {
@@ -344,15 +359,19 @@ function determineDisplay(user, userHasPositions, isLong, marketInfo) {
   }
 }
 
-function MarketInteractionCard$UnstakeOrStakeInteractionWrapper(Props) {
+function MarketInteractionCard$UnstakeInteractionWrapper(Props) {
   var isLong = Props.isLong;
   var marketInfo = Props.marketInfo;
   var user = Props.user;
   var userHasPositions = Props.userHasPositions;
   var form = Props.form;
   var $$default = Props.default;
+  var signer = ContractActions.useSigner(undefined);
+  var match = ContractActions.useContractFunction(Belt_Option.getWithDefault(signer, undefined));
+  var txState = match[1];
   var optMarketInfo = DataHooks.Util.graphResponseToOption(marketInfo);
   var display = determineDisplay(user, userHasPositions, isLong, marketInfo);
+  Unstake.useUnstakeModal(txState);
   if (typeof display === "number") {
     if (display === /* Loading */0) {
       return React.createElement(Loader.Mini.make, {});
@@ -364,7 +383,10 @@ function MarketInteractionCard$UnstakeOrStakeInteractionWrapper(Props) {
                       isLong: isLong,
                       marketInfo: optMarketInfo
                     }), wrapper(React.createElement(form, {
-                        tokenId: display.tokenId
+                        tokenId: display.tokenId,
+                        txState: txState,
+                        setTxState: match[2],
+                        contractExecutionHandler: match[0]
                       })));
   } else {
     return React.createElement("div", {
@@ -373,9 +395,90 @@ function MarketInteractionCard$UnstakeOrStakeInteractionWrapper(Props) {
   }
 }
 
-var UnstakeOrStakeInteractionWrapper = {
-  determineDisplay: determineDisplay,
-  make: MarketInteractionCard$UnstakeOrStakeInteractionWrapper
+var UnstakeInteractionWrapper = {
+  make: MarketInteractionCard$UnstakeInteractionWrapper
+};
+
+function MarketInteractionCard$StakeInteractionWrapper(Props) {
+  var isLong = Props.isLong;
+  var marketInfo = Props.marketInfo;
+  var user = Props.user;
+  var userHasPositions = Props.userHasPositions;
+  var form = Props.form;
+  var $$default = Props.default;
+  var signer = ContractActions.useSigner(undefined);
+  var match = ContractActions.useContractFunction(Belt_Option.getWithDefault(signer, undefined));
+  var txState = match[1];
+  var optMarketInfo = DataHooks.Util.graphResponseToOption(marketInfo);
+  var display = determineDisplay(user, userHasPositions, isLong, marketInfo);
+  var tmp;
+  tmp = typeof display === "number" || display.TAG !== /* Form */0 ? "" : display.tokenName;
+  StakeTxStatusModal.useStakeTxModal(txState, tmp);
+  if (typeof display === "number") {
+    if (display === /* Loading */0) {
+      return React.createElement(Loader.Mini.make, {});
+    } else {
+      return $$default;
+    }
+  } else if (display.TAG === /* Form */0) {
+    return React.createElement(React.Fragment, undefined, display.selectOptions ? null : React.createElement(MarketInteractionCard$SelectOptions, {
+                      isLong: isLong,
+                      marketInfo: optMarketInfo
+                    }), wrapper(React.createElement(form, {
+                        tokenId: display.tokenId,
+                        txState: txState,
+                        setTxState: match[2],
+                        contractExecutionHandler: match[0]
+                      })));
+  } else {
+    return React.createElement("div", {
+                className: "p-6"
+              }, display._0);
+  }
+}
+
+var StakeInteractionWrapper = {
+  make: MarketInteractionCard$StakeInteractionWrapper
+};
+
+function MarketInteractionCard$RedeemInteractionWrapper(Props) {
+  var marketInfo = Props.marketInfo;
+  var userHasBalances = Props.userHasBalances;
+  var user = Props.user;
+  var longSelected = Props.longSelected;
+  var setSelected = Props.setSelected;
+  var signerOpt = ContractActions.useSigner(undefined);
+  var signer = Belt_Option.getWithDefault(signerOpt, undefined);
+  var display = determineDisplay(user, userHasBalances, longSelected, marketInfo);
+  var match = ContractActions.useContractFunction(signer);
+  var txState = match[1];
+  var match$1 = ContractActions.useContractFunction(signer);
+  var txStateWithdraw = match$1[1];
+  WithdrawTxStatusModal.useWithdrawTxModal(txStateWithdraw);
+  var tmp;
+  tmp = typeof marketInfo === "number" || marketInfo.TAG === /* GraphError */0 ? CONSTANTS.oneBN : marketInfo._0.marketIndex;
+  RedeemSubmitButtonAndTxStatusModal.useRedeemModal(txState, tmp, txStateWithdraw, match$1[0]);
+  if (display !== /* Default */1) {
+    return wrapper(React.createElement(Redeem.make, {
+                    txState: txState,
+                    setTxState: match[2],
+                    contractExecutionHandler: match[0]
+                  }));
+  } else {
+    return React.createElement(MarketInteractionCard$NoBalancesView, {
+                interaction: (function (param) {
+                    return Curry._1(setSelected, (function (param) {
+                                  return /* Mint */0;
+                                }));
+                  }),
+                text: "No tokens for this market.",
+                buttonText: "Mint"
+              });
+  }
+}
+
+var RedeemInteractionWrapper = {
+  make: MarketInteractionCard$RedeemInteractionWrapper
 };
 
 function MarketInteractionCard(Props) {
@@ -400,19 +503,16 @@ function MarketInteractionCard(Props) {
             });
         break;
     case /* Redeem */1 :
-        var display = determineDisplay(user, userHasBalances, longSelected, marketInfo);
-        tmp = display !== /* Default */1 ? wrapper(React.createElement(Redeem.make, {})) : React.createElement(MarketInteractionCard$NoBalancesView, {
-                interaction: (function (param) {
-                    return Curry._1(setSelected, (function (param) {
-                                  return /* Mint */0;
-                                }));
-                  }),
-                text: "No tokens for this market.",
-                buttonText: "Mint"
-              });
+        tmp = React.createElement(MarketInteractionCard$RedeemInteractionWrapper, {
+              marketInfo: marketInfo,
+              userHasBalances: userHasBalances,
+              user: user,
+              longSelected: longSelected,
+              setSelected: setSelected
+            });
         break;
     case /* Stake */2 :
-        tmp = React.createElement(MarketInteractionCard$UnstakeOrStakeInteractionWrapper, {
+        tmp = React.createElement(MarketInteractionCard$StakeInteractionWrapper, {
               isLong: longSelected,
               marketInfo: marketInfo,
               user: user,
@@ -426,12 +526,13 @@ function MarketInteractionCard(Props) {
                       }),
                     text: "No tokens for this market.",
                     buttonText: "Mint"
-                  })
+                  }),
+              key: "stake"
             });
         break;
     case /* Unstake */3 :
         var userHasNoStakesAndNoBalances = user !== undefined && !(userHasBalances !== undefined && !(userHasBalances.hasLong || userHasBalances.hasShort)) ? false : true;
-        tmp = React.createElement(MarketInteractionCard$UnstakeOrStakeInteractionWrapper, {
+        tmp = React.createElement(MarketInteractionCard$UnstakeInteractionWrapper, {
               isLong: longSelected,
               marketInfo: marketInfo,
               user: user,
@@ -451,7 +552,8 @@ function MarketInteractionCard(Props) {
                       }),
                     text: userHasNoStakesAndNoBalances ? "No tokens or stakes for this market." : "No stakes for this market.",
                     buttonText: userHasNoStakesAndNoBalances ? "MINT" : "STAKE"
-                  })
+                  }),
+              key: "unstake"
             });
         break;
     
@@ -503,6 +605,9 @@ exports.header = header;
 exports.SelectOptions = SelectOptions;
 exports.wrapper = wrapper;
 exports.NoBalancesView = NoBalancesView;
-exports.UnstakeOrStakeInteractionWrapper = UnstakeOrStakeInteractionWrapper;
+exports.determineDisplay = determineDisplay;
+exports.UnstakeInteractionWrapper = UnstakeInteractionWrapper;
+exports.StakeInteractionWrapper = StakeInteractionWrapper;
+exports.RedeemInteractionWrapper = RedeemInteractionWrapper;
 exports.make = make;
 /* Mint Not a pure module */

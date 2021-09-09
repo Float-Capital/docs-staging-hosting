@@ -13,6 +13,9 @@ var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var Router = require("next/router");
 
 function Redeem(Props) {
+  var txState = Props.txState;
+  var setTxState = Props.setTxState;
+  var contractExecutionHandler = Props.contractExecutionHandler;
   var router = Router.useRouter();
   var markets = Curry.app(Queries.MarketDetails.use, [
         undefined,
@@ -42,7 +45,10 @@ function Redeem(Props) {
     var optFirstMarket = Belt_Array.get(match.syntheticMarkets, Belt_Option.getWithDefault(Belt_Int.fromString(marketIndex), 1) - 1 | 0);
     tmp = optFirstMarket !== undefined ? React.createElement(RedeemForm.make, {
             market: optFirstMarket,
-            isLong: actionOption.toLowerCase() === "long"
+            isLong: actionOption.toLowerCase() === "long",
+            txState: txState,
+            setTxState: setTxState,
+            contractExecutionHandler: contractExecutionHandler
           }) : React.createElement("p", undefined, "No markets exist");
   } else {
     tmp = "You might think this is impossible, but depending on the situation it might not be!";

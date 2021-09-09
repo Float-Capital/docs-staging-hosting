@@ -36,6 +36,11 @@ let make = () => {
     ~erc20Address=tokenId->Ethers.Utils.getAddressUnsafe,
   )
 
+  let signer = ContractActions.useSigner()
+  let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction(
+    ~signer=signer->Option.getWithDefault(None->Obj.magic),
+  )
+
   <section className="h-full px-6">
     {switch markets {
     | {loading: true} => <Loader />
@@ -63,7 +68,7 @@ let make = () => {
                     </Button>
                   </div>
                 </div>
-              : <StakeForm tokenId />}
+              : <StakeForm tokenId txState setTxState contractExecutionHandler />}
           </StakeDetailsWrapper>
         | None => <Loader.Mini />
         }

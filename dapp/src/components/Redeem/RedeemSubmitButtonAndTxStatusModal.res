@@ -1,6 +1,6 @@
 module ConfirmedTransactionModal = {
   @react.component
-  let make = (~marketIndex) => {
+  let make = (~marketIndex, ~txStateWithdraw, ~contractExecutionHandlerWithdraw) => {
     let lastOracleTimestamp = DataHooks.useOracleLastUpdate(
       ~marketIndex=marketIndex->Ethers.BigNumber.toString,
     )
@@ -31,7 +31,11 @@ module ConfirmedTransactionModal = {
                 oracleHeartBeat}
               setTimerFinished
             />
-          : <Withdraw marketIndex />
+          : <Withdraw
+              marketIndex
+              txState=txStateWithdraw
+              contractExecutionHandler=contractExecutionHandlerWithdraw
+            />
       | GraphError(error) => <p> {error->React.string} </p>
       | Loading => <Loader.Tiny />
       }}
@@ -40,8 +44,12 @@ module ConfirmedTransactionModal = {
   }
 }
 
-@react.component
-let make = (~txStateRedeem, ~resetFormButton, ~buttonText, ~buttonDisabled, ~marketIndex) => {
+let useRedeemModal = (
+  ~txStateRedeem,
+  ~marketIndex,
+  ~txStateWithdraw,
+  ~contractExecutionHandlerWithdraw,
+) => {
   let {showModal, hideModal} = ModalProvider.useModalDisplay()
 
   React.useEffect1(() => {
@@ -64,7 +72,10 @@ let make = (~txStateRedeem, ~resetFormButton, ~buttonText, ~buttonDisabled, ~mar
           <ViewOnBlockExplorer txHash />
         </div>,
       )
-    | ContractActions.Complete(_) => showModal(<ConfirmedTransactionModal marketIndex />)
+    | ContractActions.Complete(_) =>
+      showModal(
+        <ConfirmedTransactionModal marketIndex txStateWithdraw contractExecutionHandlerWithdraw />,
+      )
     | ContractActions.Declined(_message) =>
       showModal(
         <div className="text-center m-3">
@@ -84,8 +95,12 @@ let make = (~txStateRedeem, ~resetFormButton, ~buttonText, ~buttonDisabled, ~mar
     }
     None
   }, [txStateRedeem])
+}
 
+@react.component
+let make = (~txStateRedeem, ~resetFormButton, ~buttonText, ~buttonDisabled) => {
   switch txStateRedeem {
+  | ContractActions.Complete(_)
   | ContractActions.Declined(_)
   | ContractActions.Failed(_) =>
     resetFormButton()

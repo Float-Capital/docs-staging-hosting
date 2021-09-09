@@ -12,7 +12,7 @@ var ViewProfileButton = require("../UI/ViewProfileButton.js");
 var MessageUsOnDiscord = require("../Ethereum/MessageUsOnDiscord.js");
 var ViewOnBlockExplorer = require("../Ethereum/ViewOnBlockExplorer.js");
 
-function useStakeTxModal(txStateStake, resetFormButton, tokenToStake) {
+function useStakeTxModal(txStateStake, tokenToStake) {
   var stakeTweetMessages = [
     "Hey Siri, play “Celebrate” by Kool and The Gang 🥳, because I just staked my @float_capital synthetic assets to earn FLOAT tokens! 🌊",
     "Stake that @float_capital! 🌊 I just staked my synthetic assets to earn FLOAT tokens! 🥳",
@@ -47,21 +47,21 @@ function useStakeTxModal(txStateStake, resetFormButton, tokenToStake) {
               case /* Declined */1 :
                   Curry._1(showModal, React.createElement("div", {
                             className: "text-center m-3"
-                          }, React.createElement("p", undefined, "The transaction was rejected by your wallet"), React.createElement(MessageUsOnDiscord.make, {}), Curry._1(resetFormButton, undefined)));
+                          }, React.createElement("p", undefined, "The transaction was rejected by your wallet"), React.createElement(MessageUsOnDiscord.make, {})));
                   break;
               case /* Complete */2 :
                   Curry._1(showModal, React.createElement(React.Fragment, undefined, React.createElement("div", {
                                 className: "text-center m-3"
                               }, React.createElement(Tick.make, {}), React.createElement("p", undefined, "Transaction complete 🎉"), React.createElement(TweetButton.make, {
                                     message: randomStakeTweetMessage
-                                  }), React.createElement(ViewProfileButton.make, {})), Curry._1(resetFormButton, undefined)));
+                                  }), React.createElement(ViewProfileButton.make, {}))));
                   break;
               case /* Failed */3 :
                   Curry._1(showModal, React.createElement("div", {
                             className: "text-center m-3"
                           }, React.createElement("h1", undefined, "The transaction failed."), React.createElement(ViewOnBlockExplorer.make, {
                                 txHash: txStateStake._0
-                              }), React.createElement(MessageUsOnDiscord.make, {}), Curry._1(resetFormButton, undefined)));
+                              }), React.createElement(MessageUsOnDiscord.make, {})));
                   break;
               
             }

@@ -62,6 +62,7 @@ type marketInfo = {
   marketSymbol: string,
   longAddress: Ethers.ethAddress,
   shortAddress: Ethers.ethAddress,
+  marketIndex: Ethers.BigNumber.t,
 }
 
 type userHasPositionsForMarket = {
@@ -150,6 +151,7 @@ let useMarketInfo = () => {
           },
           market => {
             let {
+              marketIndex,
               name: marketName,
               symbol: marketSymbol,
               syntheticLong: {id: longId, tokenAddress: longAddress},
@@ -162,6 +164,7 @@ let useMarketInfo = () => {
               marketSymbol: marketSymbol,
               longAddress: longAddress,
               shortAddress: shortAddress,
+              marketIndex: marketIndex,
             })
           },
         )
@@ -215,42 +218,78 @@ module NoBalancesView = {
   </>
 }
 
-module UnstakeOrStakeInteractionWrapper = {
-  type showable = Show | DontShow
+type showable = Show | DontShow
 
-  type display =
-    Loading | Default | Form({selectOptions: showable, tokenId: string}) | Error(string)
+type display =
+  | Loading
+  | Default
+  | Form({
+      selectOptions: showable,
+      tokenId: string,
+      tokenName: string,
+      marketIndex: Ethers.BigNumber.t,
+    })
+  | Error(string)
 
-  let determineDisplay = (
-    ~user,
-    ~userHasPositions,
-    ~isLong,
-    ~marketInfo: DataHooks.graphResponse<marketInfo>,
-  ) => {
-    switch user {
-    | Some(_) =>
-      switch marketInfo {
-      | Response({longId, shortId}) => {
-          let chosenTokenId = isLong ? longId : shortId
-          switch userHasPositions {
-          | Some(positions) =>
-            switch positions {
-            | {hasLong: true, hasShort: true} => Form({selectOptions: Show, tokenId: chosenTokenId})
-            | {hasLong: false, hasShort: false} => Default
-            | {hasLong: true, hasShort: false} => Form({tokenId: longId, selectOptions: DontShow})
-            | {hasLong: false, hasShort: true} => Form({tokenId: shortId, selectOptions: DontShow})
-            }
-          | None => Loading
+let determineDisplay = (
+  ~user,
+  ~userHasPositions,
+  ~isLong,
+  ~marketInfo: DataHooks.graphResponse<marketInfo>,
+) => {
+  switch user {
+  | Some(_) =>
+    switch marketInfo {
+    | Response({longId, shortId, marketName, marketIndex}) => {
+        let tokenName = `${isLong ? "Long" : "Short"} ${marketName}`
+        let chosenTokenId = isLong ? longId : shortId
+
+        switch userHasPositions {
+        | Some(positions) =>
+          switch positions {
+          | {hasLong: true, hasShort: true} =>
+            Form({
+              selectOptions: Show,
+              tokenId: chosenTokenId,
+              tokenName: tokenName,
+              marketIndex: marketIndex,
+            })
+          | {hasLong: false, hasShort: false} => Default
+          | {hasLong: true, hasShort: false} =>
+            Form({
+              tokenId: longId,
+              selectOptions: DontShow,
+              tokenName: tokenName,
+              marketIndex: marketIndex,
+            })
+          | {hasLong: false, hasShort: true} =>
+            Form({
+              tokenId: shortId,
+              selectOptions: DontShow,
+              tokenName: tokenName,
+              marketIndex: marketIndex,
+            })
           }
+        | None => Loading
         }
-      | Loading => Loading
-      | GraphError(s) => Error(s)
       }
-    | None => Default
+    | Loading => Loading
+    | GraphError(s) => Error(s)
     }
+  | None => Default
   }
+}
 
-  type formProps = {"tokenId": string}
+module UnstakeInteractionWrapper = {
+  type formProps = {
+    "tokenId": string,
+    "txState": ContractActions.transactionState,
+    "setTxState": (ContractActions.transactionState => ContractActions.transactionState) => unit,
+    "contractExecutionHandler": (
+      ~makeContractInstance: (~providerOrSigner: Ethers.providerOrSigner) => Contracts.Synth.t,
+      ~contractFunction: (~contract: Contracts.Synth.t) => JsPromise.t<Ethers.txSubmitted>,
+    ) => unit,
+  }
   @react.component
   let make = (
     ~isLong,
@@ -260,19 +299,143 @@ module UnstakeOrStakeInteractionWrapper = {
     ~form: React.component<formProps>,
     ~default: React.element,
   ) => {
+    let signer = ContractActions.useSigner()
+    let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction(
+      ~signer=signer->Option.getWithDefault(None->Obj.magic),
+    )
+
     let optMarketInfo = marketInfo->DataHooks.Util.graphResponseToOption
     let display = determineDisplay(~user, ~userHasPositions, ~marketInfo, ~isLong)
+
+    let _ = Unstake.useUnstakeModal(~txStateUnstake=txState)
     switch display {
     | Form({selectOptions, tokenId}) => <>
         {switch selectOptions {
         | Show => <SelectOptions isLong marketInfo=optMarketInfo />
         | DontShow => React.null
         }}
-        {wrapper(~children=React.createElement(form, {"tokenId": tokenId}))}
+        {wrapper(
+          ~children=React.createElement(
+            form,
+            {
+              "tokenId": tokenId,
+              "txState": txState,
+              "setTxState": setTxState,
+              "contractExecutionHandler": contractExecutionHandler,
+            },
+          ),
+        )}
       </>
     | Default => default
     | Loading => <Loader.Mini />
     | Error(s) => <div className="p-6"> {s->React.string} </div>
+    }
+  }
+}
+
+module StakeInteractionWrapper = {
+  type formProps = {
+    "tokenId": string,
+    "txState": ContractActions.transactionState,
+    "setTxState": (ContractActions.transactionState => ContractActions.transactionState) => unit,
+    "contractExecutionHandler": (
+      ~makeContractInstance: (~providerOrSigner: Ethers.providerOrSigner) => Contracts.Synth.t,
+      ~contractFunction: (~contract: Contracts.Synth.t) => JsPromise.t<Ethers.txSubmitted>,
+    ) => unit,
+  }
+  @react.component
+  let make = (
+    ~isLong,
+    ~marketInfo: DataHooks.graphResponse<marketInfo>,
+    ~user,
+    ~userHasPositions,
+    ~form: React.component<formProps>,
+    ~default: React.element,
+  ) => {
+    let signer = ContractActions.useSigner()
+    let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction(
+      ~signer=signer->Option.getWithDefault(None->Obj.magic),
+    )
+
+    let optMarketInfo = marketInfo->DataHooks.Util.graphResponseToOption
+    let display = determineDisplay(~user, ~userHasPositions, ~marketInfo, ~isLong)
+
+    let _ = StakeTxStatusModal.useStakeTxModal(
+      ~txStateStake=txState,
+      ~tokenToStake=switch display {
+      | Form({tokenName}) => tokenName
+      | _ => ""
+      },
+    )
+    switch display {
+    | Form({selectOptions, tokenId}) => <>
+        {switch selectOptions {
+        | Show => <SelectOptions isLong marketInfo=optMarketInfo />
+        | DontShow => React.null
+        }}
+        {wrapper(
+          ~children=React.createElement(
+            form,
+            {
+              "tokenId": tokenId,
+              "txState": txState,
+              "setTxState": setTxState,
+              "contractExecutionHandler": contractExecutionHandler,
+            },
+          ),
+        )}
+      </>
+    | Default => default
+    | Loading => <Loader.Mini />
+    | Error(s) => <div className="p-6"> {s->React.string} </div>
+    }
+  }
+}
+
+module RedeemInteractionWrapper = {
+  @react.component
+  let make = (~marketInfo, ~userHasBalances, ~user, ~longSelected, ~setSelected) => {
+    let signerOpt = ContractActions.useSigner()
+
+    let signer = signerOpt->Option.getWithDefault(None->Obj.magic)
+
+    let display = determineDisplay(
+      ~marketInfo,
+      ~userHasPositions=userHasBalances,
+      ~user,
+      ~isLong=longSelected,
+    )
+
+    let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction(
+      ~signer,
+    )
+
+    let (
+      contractExecutionHandlerWithdraw,
+      txStateWithdraw,
+      _setTxStateWithdraw,
+    ) = ContractActions.useContractFunction(~signer)
+
+    let _ = WithdrawTxStatusModal.useWithdrawTxModal(~txState=txStateWithdraw)
+
+    let _ = RedeemSubmitButtonAndTxStatusModal.useRedeemModal(
+      ~txStateRedeem=txState,
+      ~marketIndex=switch marketInfo {
+      | Response({marketIndex}) => marketIndex
+      | _ => CONSTANTS.oneBN
+      },
+      ~txStateWithdraw,
+      ~contractExecutionHandlerWithdraw,
+    )
+
+    if display !== Default {
+      wrapper(~children=<Redeem txState setTxState contractExecutionHandler />)
+    } else {
+      <NoBalancesView
+        text="No tokens for this market."
+        interaction={_ => setSelected(_ => Mint)}
+        buttonText={"Mint"}
+      />
     }
   }
 }
@@ -287,6 +450,7 @@ let make = () => {
   let actionOption = router.query->Js.Dict.get("actionOption")->Option.getWithDefault("short")
   let longSelected = actionOption->Js.String.toLowerCase == "long"
   let marketInfo = useMarketInfo()
+
   let userHasBalances = useUserHasBalances(
     ~user,
     ~marketInfo=marketInfo->DataHooks.Util.graphResponseToOption,
@@ -317,30 +481,15 @@ let make = () => {
       {header(~marketInfo)}
       {switch selected {
       | Mint => <Mint withHeader={false} />
-      | Redeem => {
-          let {determineDisplay} = module(UnstakeOrStakeInteractionWrapper)
-          let display = determineDisplay(
-            ~marketInfo,
-            ~userHasPositions=userHasBalances,
-            ~user,
-            ~isLong=longSelected,
-          )
-          if display !== Default {
-            wrapper(~children=<Redeem />)
-          } else {
-            <NoBalancesView
-              text="No tokens for this market."
-              interaction={_ => setSelected(_ => Mint)}
-              buttonText={"Mint"}
-            />
-          }
-        }
+      | Redeem =>
+        <RedeemInteractionWrapper userHasBalances longSelected marketInfo setSelected user={user} />
       | Stake =>
-        <UnstakeOrStakeInteractionWrapper
+        <StakeInteractionWrapper
           userHasPositions={userHasBalances}
           isLong=longSelected
           marketInfo
           user
+          key="stake"
           form={StakeForm.make}
           default={<NoBalancesView
             text="No tokens for this market."
@@ -355,10 +504,11 @@ let make = () => {
           | _ => false
           }
 
-          <UnstakeOrStakeInteractionWrapper
+          <UnstakeInteractionWrapper
             userHasPositions={userHasStakes}
             isLong=longSelected
             marketInfo
+            key="unstake"
             default={<NoBalancesView
               text={userHasNoStakesAndNoBalances
                 ? "No tokens or stakes for this market."

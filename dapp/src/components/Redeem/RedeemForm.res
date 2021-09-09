@@ -101,7 +101,13 @@ let isGreaterThanBalance = (~amount, ~balance) => {
 
 module ConnectedRedeemForm = {
   @react.component
-  let make = (~signer, ~market: Queries.SyntheticMarketInfo.t, ~isLong) => {
+  let make = (
+    ~market: Queries.SyntheticMarketInfo.t,
+    ~isLong,
+    ~contractExecutionHandler,
+    ~txState,
+    ~setTxState,
+  ) => {
     let router = Next.Router.useRouter()
 
     let user = RootProvider.useCurrentUserExn()
@@ -121,10 +127,6 @@ module ConnectedRedeemForm = {
       ~isLong,
       ~longTokenBalance,
       ~shortTokenBalance,
-    )
-
-    let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction(
-      ~signer,
     )
 
     let initialInput: RedeemForm.input = {
@@ -179,7 +181,7 @@ module ConnectedRedeemForm = {
 
     React.useEffect1(() => {
       switch txState {
-      | Created =>
+      | ContractActions.Created =>
         toastDispatch(
           ToastProvider.Show(`Confirm the transaction to redeem tokens`, "", ToastProvider.Info),
         )
@@ -240,7 +242,7 @@ module ConnectedRedeemForm = {
           isLong={isActuallyLong}
           hasBothTokens
           submitButton={<RedeemSubmitButtonAndTxStatusModal
-            buttonText resetFormButton txStateRedeem=txState buttonDisabled marketIndex
+            buttonText resetFormButton txStateRedeem=txState buttonDisabled
           />}
         />
       : <p> {"No tokens in this market to redeem"->React.string} </p>
@@ -248,12 +250,18 @@ module ConnectedRedeemForm = {
 }
 
 @react.component
-let make = (~market: Queries.SyntheticMarketInfo.t, ~isLong) => {
+let make = (
+  ~market: Queries.SyntheticMarketInfo.t,
+  ~isLong,
+  ~txState,
+  ~setTxState,
+  ~contractExecutionHandler,
+) => {
   let optSigner = ContractActions.useSigner()
   let router = Next.Router.useRouter()
 
   switch optSigner {
-  | Some(signer) => <ConnectedRedeemForm signer market isLong />
+  | Some(_) => <ConnectedRedeemForm market isLong txState setTxState contractExecutionHandler />
   | None =>
     <div onClick={_ => router->Next.Router.push(`/app/login?nextPath=${router.asPath}`)}>
       <RedeemFormInput isLong hasBothTokens={false} />

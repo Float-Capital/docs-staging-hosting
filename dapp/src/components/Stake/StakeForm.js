@@ -18,7 +18,6 @@ var Caml_option = require("rescript/lib/js/caml_option.js");
 var RootProvider = require("../../libraries/RootProvider.js");
 var ToastProvider = require("../UI/ToastProvider.js");
 var ContractActions = require("../../ethereum/ContractActions.js");
-var StakeTxStatusModal = require("./StakeTxStatusModal.js");
 var Formality__ReactUpdate = require("re-formality/src/Formality__ReactUpdate.js");
 
 var validators = {
@@ -417,9 +416,7 @@ function StakeForm$StakeFormInput(Props) {
   var onBlurOpt = Props.onBlur;
   var onMaxClickOpt = Props.onMaxClick;
   var synthetic = Props.synthetic;
-  var txStatusModalsOpt = Props.txStatusModals;
   var resetFormButtonOpt = Props.resetFormButton;
-  var tokenToStakeOpt = Props.tokenToStake;
   var txStateStakeOpt = Props.txStateStake;
   var onSubmit = onSubmitOpt !== undefined ? onSubmitOpt : (function (param) {
         
@@ -437,13 +434,10 @@ function StakeForm$StakeFormInput(Props) {
   var onMaxClick = onMaxClickOpt !== undefined ? onMaxClickOpt : (function (param) {
         
       });
-  var txStatusModals = txStatusModalsOpt !== undefined ? Caml_option.valFromOption(txStatusModalsOpt) : null;
   var resetFormButton = resetFormButtonOpt !== undefined ? resetFormButtonOpt : (function (param) {
         return null;
       });
-  var tokenToStake = tokenToStakeOpt !== undefined ? tokenToStakeOpt : "";
   var txStateStake = txStateStakeOpt !== undefined ? txStateStakeOpt : /* UnInitialised */0;
-  StakeTxStatusModal.useStakeTxModal(txStateStake, resetFormButton, tokenToStake);
   return React.createElement(Form.make, {
               className: "mx-auto w-full",
               onSubmit: onSubmit,
@@ -455,13 +449,13 @@ function StakeForm$StakeFormInput(Props) {
                   onBlur: onBlur,
                   onChange: onChange,
                   onMaxClick: onMaxClick
-                }), React.createElement(Button.make, {
-                  onClick: (function (param) {
-                      
-                    }),
-                  children: "Stake " + synthetic.tokenType + " " + synthetic.syntheticMarket.name,
-                  disabled: buttonDisabled
-                }), txStatusModals);
+                }), typeof txStateStake === "number" ? React.createElement(Button.make, {
+                    onClick: (function (param) {
+                        
+                      }),
+                    children: "Stake " + synthetic.tokenType + " " + synthetic.syntheticMarket.name,
+                    disabled: buttonDisabled
+                  }) : Curry._1(resetFormButton, undefined));
 }
 
 var StakeFormInput = {
@@ -470,12 +464,10 @@ var StakeFormInput = {
 
 function StakeForm$ConnectedStakeForm(Props) {
   var tokenId = Props.tokenId;
-  var signer = Props.signer;
   var synthetic = Props.synthetic;
-  var match = ContractActions.useContractFunction(signer);
-  var setTxState = match[2];
-  var txState = match[1];
-  var contractExecutionHandler = match[0];
+  var txState = Props.txState;
+  var setTxState = Props.setTxState;
+  var contractExecutionHandler = Props.contractExecutionHandler;
   var user = RootProvider.useCurrentUserExn(undefined);
   var optTokenBalance = DataHooks.Util.graphResponseToOption(DataHooks.useSyntheticTokenBalance(user, synthetic.tokenAddress));
   var toastDispatch = React.useContext(ToastProvider.DispatchToastContext.context);
@@ -538,8 +530,8 @@ function StakeForm$ConnectedStakeForm(Props) {
                         return param.stake(amount);
                       }));
         }));
-  var match$1 = form.amountResult;
-  var formAmount = match$1 !== undefined && match$1.TAG === /* Ok */0 ? Caml_option.some(match$1._0) : undefined;
+  var match = form.amountResult;
+  var formAmount = match !== undefined && match.TAG === /* Ok */0 ? Caml_option.some(match._0) : undefined;
   var baseFormDisabled = form.submitting || !Curry._1(form.valid, undefined);
   var buttonDisabled;
   if (formAmount !== undefined && optTokenBalance !== undefined) {
@@ -548,7 +540,6 @@ function StakeForm$ConnectedStakeForm(Props) {
   } else {
     buttonDisabled = baseFormDisabled;
   }
-  var tokenToStake = synthetic.tokenType + " " + synthetic.syntheticMarket.name;
   var resetFormButton = function (param) {
     return React.createElement(Button.make, {
                 onClick: (function (param) {
@@ -585,7 +576,6 @@ function StakeForm$ConnectedStakeForm(Props) {
                 }),
               synthetic: synthetic,
               resetFormButton: resetFormButton,
-              tokenToStake: tokenToStake,
               txStateStake: txState
             });
 }
@@ -596,6 +586,9 @@ var ConnectedStakeForm = {
 
 function StakeForm$1(Props) {
   var tokenId = Props.tokenId;
+  var txState = Props.txState;
+  var setTxState = Props.setTxState;
+  var contractExecutionHandler = Props.contractExecutionHandler;
   var token = Curry.app(Queries.SyntheticToken.use, [
         undefined,
         undefined,
@@ -635,8 +628,10 @@ function StakeForm$1(Props) {
     if (optSigner !== undefined) {
       return React.createElement(StakeForm$ConnectedStakeForm, {
                   tokenId: tokenId,
-                  signer: optSigner,
-                  synthetic: synthetic
+                  synthetic: synthetic,
+                  txState: txState,
+                  setTxState: setTxState,
+                  contractExecutionHandler: contractExecutionHandler
                 });
     } else if (match[0]) {
       return React.createElement(Login.make, {});

@@ -18,6 +18,8 @@ var ViewOnBlockExplorer = require("../Ethereum/ViewOnBlockExplorer.js");
 
 function RedeemSubmitButtonAndTxStatusModal$ConfirmedTransactionModal(Props) {
   var marketIndex = Props.marketIndex;
+  var txStateWithdraw = Props.txStateWithdraw;
+  var contractExecutionHandlerWithdraw = Props.contractExecutionHandlerWithdraw;
   var lastOracleTimestamp = DataHooks.useOracleLastUpdate(marketIndex.toString());
   var match = React.useState(function () {
         return false;
@@ -30,7 +32,9 @@ function RedeemSubmitButtonAndTxStatusModal$ConfirmedTransactionModal(Props) {
   tmp = typeof lastOracleTimestamp === "number" ? React.createElement(Loader.Tiny.make, {}) : (
       lastOracleTimestamp.TAG === /* GraphError */0 ? React.createElement("p", undefined, lastOracleTimestamp._0) : (
           match[0] ? React.createElement(Withdraw.make, {
-                  marketIndex: marketIndex
+                  marketIndex: marketIndex,
+                  txState: txStateWithdraw,
+                  contractExecutionHandler: contractExecutionHandlerWithdraw
                 }) : React.createElement(ProgressBar.make, {
                   txConfirmedTimestamp: match$1[0] | 0,
                   nextPriceUpdateTimestamp: lastOracleTimestamp._0.toNumber() + oracleHeartBeat | 0,
@@ -49,12 +53,7 @@ var ConfirmedTransactionModal = {
   make: RedeemSubmitButtonAndTxStatusModal$ConfirmedTransactionModal
 };
 
-function RedeemSubmitButtonAndTxStatusModal(Props) {
-  var txStateRedeem = Props.txStateRedeem;
-  var resetFormButton = Props.resetFormButton;
-  var buttonText = Props.buttonText;
-  var buttonDisabled = Props.buttonDisabled;
-  var marketIndex = Props.marketIndex;
+function useRedeemModal(txStateRedeem, marketIndex, txStateWithdraw, contractExecutionHandlerWithdraw) {
   var match = ModalProvider.useModalDisplay(undefined);
   var hideModal = match.hideModal;
   var showModal = match.showModal;
@@ -87,7 +86,9 @@ function RedeemSubmitButtonAndTxStatusModal(Props) {
                   break;
               case /* Complete */2 :
                   Curry._1(showModal, React.createElement(RedeemSubmitButtonAndTxStatusModal$ConfirmedTransactionModal, {
-                            marketIndex: marketIndex
+                            marketIndex: marketIndex,
+                            txStateWithdraw: txStateWithdraw,
+                            contractExecutionHandlerWithdraw: contractExecutionHandlerWithdraw
                           }));
                   break;
               case /* Failed */3 :
@@ -102,9 +103,18 @@ function RedeemSubmitButtonAndTxStatusModal(Props) {
           }
           
         }), [txStateRedeem]);
+  
+}
+
+function RedeemSubmitButtonAndTxStatusModal(Props) {
+  var txStateRedeem = Props.txStateRedeem;
+  var resetFormButton = Props.resetFormButton;
+  var buttonText = Props.buttonText;
+  var buttonDisabled = Props.buttonDisabled;
   if (typeof txStateRedeem !== "number") {
     switch (txStateRedeem.TAG | 0) {
       case /* Declined */1 :
+      case /* Complete */2 :
       case /* Failed */3 :
           return Curry._1(resetFormButton, undefined);
       default:
@@ -123,5 +133,6 @@ function RedeemSubmitButtonAndTxStatusModal(Props) {
 var make = RedeemSubmitButtonAndTxStatusModal;
 
 exports.ConfirmedTransactionModal = ConfirmedTransactionModal;
+exports.useRedeemModal = useRedeemModal;
 exports.make = make;
 /* Tick Not a pure module */

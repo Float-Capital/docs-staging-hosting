@@ -1,11 +1,9 @@
 @react.component
-let make = (~marketIndex) => {
-  let signer = ContractActions.useSignerExn()
-
-  let (contractExecutionHandler, txState, _setTxState) = ContractActions.useContractFunction(
-    ~signer,
-  )
-
+let make = (
+  ~marketIndex,
+  ~txState: ContractActions.transactionState,
+  ~contractExecutionHandler,
+) => {
   let user = RootProvider.useCurrentUserExn()
 
   let toastDispatch = React.useContext(ToastProvider.DispatchToastContext.context)
@@ -14,8 +12,6 @@ let make = (~marketIndex) => {
   let reqVariables = {
     Queries.UsersConfirmedRedeems.userId: user->Ethers.Utils.ethAdrToLowerStr,
   }
-
-  let _ = WithdrawTxStatusModal.useWithdrawTxModal(~txState)
 
   React.useEffect1(() => {
     switch txState {

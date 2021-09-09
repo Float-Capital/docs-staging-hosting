@@ -25,7 +25,9 @@ var Router = require("next/router");
 var RootProvider = require("../libraries/RootProvider.js");
 var ContractHooks = require("../components/Testing/Admin/ContractHooks.js");
 var DisplayAddress = require("../components/UI/Base/DisplayAddress.js");
+var ContractActions = require("../ethereum/ContractActions.js");
 var Format = require("date-fns/format").default;
+var WithdrawTxStatusModal = require("../components/Withdraw/WithdrawTxStatusModal.js");
 
 function add(prim0, prim1) {
   return prim0.add(prim1);
@@ -289,6 +291,8 @@ function User$IncompleteWithdrawalItem(Props) {
   var updateIndex = Props.updateIndex;
   var amount = Props.amount;
   var isLong = Props.isLong;
+  var txState = Props.txState;
+  var contractExecutionHandler = Props.contractExecutionHandler;
   var syntheticPricesQuery = DataHooks.useBatchedSynthPrices(marketIndex, updateIndex);
   if (typeof syntheticPricesQuery === "number") {
     return React.createElement("div", {
@@ -310,7 +314,9 @@ function User$IncompleteWithdrawalItem(Props) {
                       className: "h-4 mr-1",
                       src: CONSTANTS.daiDisplayToken.iconUrl
                     }), Misc.NumberFormat.formatEther(undefined, daiAmount)), React.createElement(Withdraw.make, {
-                  marketIndex: marketIndex
+                  marketIndex: marketIndex,
+                  txState: txState,
+                  contractExecutionHandler: contractExecutionHandler
                 }));
 }
 
@@ -322,6 +328,11 @@ function User$IncompleteWithdrawalsCard(Props) {
   var userId = Props.userId;
   var usersPendingRedeemsQuery = DataHooks.useUsersPendingRedeems(userId);
   var usersConfirmedRedeemsQuery = DataHooks.useUsersConfirmedRedeems(userId);
+  var signer = ContractActions.useSigner(undefined);
+  var match = ContractActions.useContractFunction(signer !== undefined ? signer : undefined);
+  var txState = match[1];
+  var contractExecutionHandler = match[0];
+  WithdrawTxStatusModal.useWithdrawTxModal(txState);
   var tmp;
   if (typeof usersPendingRedeemsQuery === "number") {
     tmp = React.createElement("div", {
@@ -364,7 +375,9 @@ function User$IncompleteWithdrawalsCard(Props) {
                                   marketIndex: param.marketIndex,
                                   updateIndex: param.updateIndex,
                                   amount: param.amount,
-                                  isLong: param.isLong
+                                  isLong: param.isLong,
+                                  txState: txState,
+                                  contractExecutionHandler: contractExecutionHandler
                                 });
                     })))) : null;
   }

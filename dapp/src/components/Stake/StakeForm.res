@@ -26,29 +26,32 @@ module StakeFormInput = {
     ~onBlur=_ => (),
     ~onMaxClick=_ => (),
     ~synthetic: Queries.SyntheticTokenInfo.t,
-    ~txStatusModals=React.null,
     ~resetFormButton=_ => React.null,
-    ~tokenToStake="",
     ~txStateStake=ContractActions.UnInitialised,
   ) => {
-    let _ = StakeTxStatusModal.useStakeTxModal(~txStateStake, ~resetFormButton, ~tokenToStake)
     <Form className="mx-auto w-full" onSubmit>
       <AmountInput value optBalance disabled onBlur onChange onMaxClick />
-      <Button disabled=buttonDisabled onClick={_ => ()}>
-        {`Stake ${synthetic.tokenType->Obj.magic} ${synthetic.syntheticMarket.name}`}
-      </Button>
-      {txStatusModals}
+      {switch txStateStake {
+      | ContractActions.Created
+      | ContractActions.UnInitialised =>
+        <Button disabled=buttonDisabled onClick={_ => ()}>
+          {`Stake ${synthetic.tokenType->Obj.magic} ${synthetic.syntheticMarket.name}`}
+        </Button>
+      | _ => resetFormButton()
+      }}
     </Form>
   }
 }
 
 module ConnectedStakeForm = {
   @react.component
-  let make = (~tokenId, ~signer, ~synthetic: Queries.SyntheticTokenInfo.t) => {
-    let (contractExecutionHandler, txState, setTxState) = ContractActions.useContractFunction(
-      ~signer,
-    )
-
+  let make = (
+    ~tokenId,
+    ~synthetic: Queries.SyntheticTokenInfo.t,
+    ~txState: ContractActions.transactionState,
+    ~setTxState,
+    ~contractExecutionHandler,
+  ) => {
     let user = RootProvider.useCurrentUserExn()
     let optTokenBalance =
       DataHooks.useSyntheticTokenBalance(
@@ -110,8 +113,6 @@ module ConnectedStakeForm = {
       }
     }
 
-    let tokenToStake = `${synthetic.tokenType->Obj.magic} ${synthetic.syntheticMarket.name}`
-
     let resetFormButton = () =>
       <Button
         onClick={_ => {
@@ -143,13 +144,12 @@ module ConnectedStakeForm = {
         )}
       synthetic
       resetFormButton
-      tokenToStake
       txStateStake=txState
     />
   }
 }
 @react.component
-let make = (~tokenId) => {
+let make = (~tokenId, ~txState, ~setTxState, ~contractExecutionHandler) => {
   let token = Queries.SyntheticToken.use({tokenId: tokenId})
   let (showLogin, setShowLogin) = React.useState(() => false)
   let optSigner = ContractActions.useSigner()
@@ -162,7 +162,8 @@ let make = (~tokenId) => {
   | {loading: true} => <Loader.Mini />
   | {data: Some({syntheticToken: Some(synthetic)})} =>
     switch optSigner {
-    | Some(signer) => <ConnectedStakeForm signer tokenId synthetic />
+    | Some(_) =>
+      <ConnectedStakeForm tokenId synthetic txState setTxState contractExecutionHandler />
     | None =>
       showLogin
         ? <Login />
