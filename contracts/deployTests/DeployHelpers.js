@@ -5,6 +5,7 @@ var Curry = require("rescript/lib/js/curry.js");
 var Js_exn = require("rescript/lib/js/js_exn.js");
 var LetOps = require("../test/library/LetOps.js");
 var Globals = require("../test/library/Globals.js");
+var CONSTANTS = require("../test/CONSTANTS.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var SyntheticToken = require("../test/library/contracts/SyntheticToken.js");
 var YieldManagerMock = require("../test/library/contracts/YieldManagerMock.js");
@@ -152,7 +153,7 @@ function deployTestMarket(syntheticName, syntheticSymbol, longShortInstance, tre
                                                                                       return LetOps.AwaitThen.let_(mintAndApprove(paymentToken, Globals.bnFromString("2000000000000000000"), admin, longShortInstance.address), (function (param) {
                                                                                                     var unstakeFee_e18 = Globals.bnFromString("5000000000000000");
                                                                                                     var initialMarketSeedForEachMarketSide = Globals.bnFromString("1000000000000000000");
-                                                                                                    return longShortInstance.connect(admin).initializeMarket(latestMarket, kInitialMultiplier, kPeriod, unstakeFee_e18, initialMarketSeedForEachMarketSide, Globals.bnFromInt(5), Globals.bnFromInt(0), Globals.bnFromInt(1));
+                                                                                                    return longShortInstance.connect(admin).initializeMarket(latestMarket, kInitialMultiplier, kPeriod, unstakeFee_e18, initialMarketSeedForEachMarketSide, Globals.bnFromInt(5), Globals.bnFromInt(0), Globals.bnFromInt(1), CONSTANTS.tenToThe18);
                                                                                                   }));
                                                                                     }));
                                                                       }));
@@ -174,7 +175,7 @@ function deployMumbaiMarket(syntheticName, syntheticSymbol, longShortInstance, t
                                                                                       return LetOps.AwaitThen.let_(mintAndApprove(paymentToken, Globals.bnFromString("2000000000000000000"), admin, longShortInstance.address), (function (param) {
                                                                                                     var unstakeFee_e18 = Globals.bnFromString("5000000000000000");
                                                                                                     var initialMarketSeedForEachMarketSide = Globals.bnFromString("1000000000000000000");
-                                                                                                    return longShortInstance.connect(admin).initializeMarket(latestMarket, kInitialMultiplier, kPeriod, unstakeFee_e18, initialMarketSeedForEachMarketSide, Globals.bnFromInt(5), Globals.bnFromInt(0), Globals.bnFromInt(1));
+                                                                                                    return longShortInstance.connect(admin).initializeMarket(latestMarket, kInitialMultiplier, kPeriod, unstakeFee_e18, initialMarketSeedForEachMarketSide, Globals.bnFromInt(5), Globals.bnFromInt(0), Globals.bnFromInt(1), CONSTANTS.tenToThe18);
                                                                                                   }));
                                                                                     }));
                                                                       }));
@@ -273,7 +274,7 @@ function deployMumbaiMarketUpgradeable(syntheticName, syntheticSymbol, longShort
                                                                                       var initialMarketSeedForEachMarketSide = Globals.bnFromString("1000000000000000000");
                                                                                       return LetOps.AwaitThen.let_(paymentToken.connect(admin).approve(longShortInstance.address, Globals.mul(initialMarketSeedForEachMarketSide, Globals.bnFromInt(3))), (function (param) {
                                                                                                     console.log("a.7");
-                                                                                                    return longShortInstance.connect(admin).initializeMarket(newMarketIndex, kInitialMultiplier, kPeriod, unstakeFee_e18, initialMarketSeedForEachMarketSide, Globals.bnFromInt(5), Globals.bnFromInt(0), Globals.bnFromInt(1));
+                                                                                                    return longShortInstance.connect(admin).initializeMarket(newMarketIndex, kInitialMultiplier, kPeriod, unstakeFee_e18, initialMarketSeedForEachMarketSide, Globals.bnFromInt(5), Globals.bnFromInt(0), Globals.bnFromInt(1), CONSTANTS.tenToThe18);
                                                                                                   }));
                                                                                     }));
                                                                       }));

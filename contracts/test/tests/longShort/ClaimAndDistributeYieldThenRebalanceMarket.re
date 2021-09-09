@@ -29,6 +29,13 @@ let testUnit =
             ~marketIndex,
             ~assetPrice=oldAssetPrice,
           );
+      let%AwaitThen _ =
+        contracts.contents.longShort
+        ->LongShortStateSetters.setMarketLeverage_e18(
+            ~marketLeverage_e18=CONSTANTS.tenToThe18,
+            ~marketIndex,
+          );
+
       contracts.contents.longShort
       ->LongShort.Exposed._claimAndDistributeYieldThenRebalanceMarketExposedCall(
           ~marketIndex,
