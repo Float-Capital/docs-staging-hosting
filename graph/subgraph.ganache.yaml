@@ -31,7 +31,7 @@ dataSources:
           handler: handleExecuteNextPriceSettlementsUser
         - event: LongShortV1(address,address,address)
           handler: handleLongShortV1
-        - event: NewMarketLaunchedAndSeeded(uint32,uint256)
+        - event: NewMarketLaunchedAndSeeded(uint32,uint256,uint256)
           handler: handleNewMarketLaunchedAndSeeded
         - event: NextPriceDeposit(uint32,bool,uint256,address,uint256)
           handler: handleNextPriceDeposit
