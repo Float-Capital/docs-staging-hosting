@@ -98,7 +98,6 @@ module.exports = {
     },
     ganache: {
       url: "http://localhost:8545",
-      saveDeployments: false,
     },
     mumbai: {
       chainId: 80001,

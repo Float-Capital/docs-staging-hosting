@@ -6,7 +6,7 @@ dataSources:
     name: LongShort
     network: ganache
     source:
-      address: "0x0023153EcF2344f72A4599278e9dD3A885D1D3C1"
+      address: "0x514ad48aC013aB586c8C12b180Ed82f961210d3e"
       abi: LongShort
       startBlock: 0
     mapping:
@@ -51,7 +51,7 @@ dataSources:
     name: Staker
     network: ganache
     source:
-      address: "0x514ad48aC013aB586c8C12b180Ed82f961210d3e"
+      address: "0x43dc5423d4621f60EE24c8f1A33Bb30Eef7e472C"
       abi: Staker
       startBlock: 0
     mapping:
@@ -105,7 +105,7 @@ dataSources:
     name: TreasuryAlpha
     network: ganache
     source:
-      address: "0xe745E3dd2a7c6d0FBDAa8401622fb7e854dAb9Ff"
+      address: "0x0023153EcF2344f72A4599278e9dD3A885D1D3C1"
       abi: TreasuryAlpha
       startBlock: 0
     mapping:
