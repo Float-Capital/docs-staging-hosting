@@ -8,7 +8,7 @@ function Heading(Props) {
   var suffixEmojiOpt = Props.suffixEmoji;
   var suffixEmoji = suffixEmojiOpt !== undefined ? suffixEmojiOpt : "";
   return React.createElement("h3", {
-              className: "my-2 text-3xl md:text-5xl uppercase font-arimo font-extrabold flex items-center"
+              className: "my-2 text-3xl md:text-5xl font-arimo font-extrabold flex items-center"
             }, React.createElement("span", {
                   className: "text-3xl md:text-5xl font-vt323 animate-pulse font-bold mx-2"
                 }, ">"), React.createElement("span", {

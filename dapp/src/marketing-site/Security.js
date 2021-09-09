@@ -14,7 +14,7 @@ function Security(Props) {
                 }, React.createElement("div", {
                       className: "max-w-5xl flex flex-col justify-evenly items-center mx-auto"
                     }, React.createElement(Heading.make, {
-                          title: "security",
+                          title: "Security",
                           suffixEmoji: "🔐"
                         }), React.createElement("div", {
                           className: "grid grid-cols-1 md:grid-cols-3 gap-10 items-center justify-center my-4"

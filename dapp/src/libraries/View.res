@@ -5,6 +5,9 @@ external addWindowEventListener: (string, unit => unit) => unit = "addEventListe
 @scope("window") @val
 external removeWindowEventListener: (string, unit => unit) => unit = "removeEventListener"
 
+@scope("window") @val
+external windowInnerHeight: int = "innerHeight"
+
 let useViewport = () => {
   let (width, setWidth) = React.useState(_ => windowInnerWidth)
 
@@ -16,6 +19,36 @@ let useViewport = () => {
   })
 
   width
+}
+
+type dimensions = {width: int, height: int}
+let useViewDimensions = () => {
+  let (dimensions, setDimensions) = React.useState(_ => {
+    width: 1000,
+    height: 1000,
+  })
+
+  React.useEffect0(() => {
+    Misc.onlyExecuteClientSide(() => {
+      setDimensions(_ => {
+        width: windowInnerWidth,
+        height: windowInnerHeight,
+      })
+    })
+    let handleWindowResize = () => {
+      Misc.onlyExecuteClientSide(() => {
+        setDimensions(_ => {
+          width: windowInnerWidth,
+          height: windowInnerHeight,
+        })
+      })
+    }
+    addWindowEventListener("resize", handleWindowResize)
+
+    Some(() => removeWindowEventListener("resize", handleWindowResize))
+  })
+
+  dimensions
 }
 
 let useIsTailwindMobile = () => {

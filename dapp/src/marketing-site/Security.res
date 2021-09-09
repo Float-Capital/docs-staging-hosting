@@ -4,7 +4,7 @@ let make = () => {
     <div
       className=" flex flex-col items-center justify-center pb-16 custom-height-for-above-footer">
       <div className="max-w-5xl flex flex-col justify-evenly items-center mx-auto">
-        <Heading title="security" suffixEmoji=`🔐` />
+        <Heading title="Security" suffixEmoji=`🔐` />
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 items-center justify-center my-4">
           <div className="mx-4 order-3 md:order-1 bg-white bg-opacity-70 md:p-4 p-1 rounded w-46">
             <a

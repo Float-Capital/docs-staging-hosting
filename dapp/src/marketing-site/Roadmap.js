@@ -12,7 +12,7 @@ function Roadmap(Props) {
             }, React.createElement("div", {
                   className: "mb-2"
                 }, React.createElement(Heading.make, {
-                      title: "roadmap",
+                      title: "Roadmap",
                       suffixEmoji: "🗺️"
                     })), React.createElement(Timeline.make, {}));
 }
