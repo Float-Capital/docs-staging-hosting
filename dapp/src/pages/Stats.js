@@ -89,7 +89,7 @@ function totalValueCard(totalValueLocked) {
                 }, "$" + Misc.NumberFormat.formatEther(undefined, totalValueLocked)));
 }
 
-function floatProtocolCard(liveSince, totalTxs, totalUsers, txHash, numberOfSynths) {
+function floatProtocolCard(liveSince, totalUsers, txHash, numberOfSynths) {
   var dateObj = FromUnixTime(liveSince.toNumber());
   return React.createElement(Masonry.Card.make, {
               children: null
@@ -99,7 +99,6 @@ function floatProtocolCard(liveSince, totalTxs, totalUsers, txHash, numberOfSynt
                   list: [
                     StatsLi.Props.createStatsLiProps(undefined, "🗓️ Live since:", Format(dateObj, "do MMM ''yy"), Config.blockExplorer + "/tx/" + txHash, undefined),
                     StatsLi.Props.createStatsLiProps(undefined, "📅 Days live:", FormatDistanceToNow(dateObj), undefined, undefined),
-                    StatsLi.Props.createStatsLiProps(undefined, "📈 No. txs:", totalTxs.toString(), undefined, undefined),
                     StatsLi.Props.createStatsLiProps(undefined, "👯‍♀️ No. users:", totalUsers.toString(), undefined, undefined),
                     StatsLi.Props.createStatsLiProps(undefined, "👷‍♀️ No. synths:", numberOfSynths, undefined, undefined)
                   ]
@@ -234,7 +233,7 @@ function Stats(Props) {
             }, totalValueCard(totalValueLocked), React.createElement(Masonry.Container.make, {
                   children: null
                 }, React.createElement(Masonry.Divider.make, {
-                      children: floatProtocolCard($$global.timestampLaunched, $$global.totalTxs, $$global.totalUsers, $$global.txHash, numberOfSynths)
+                      children: floatProtocolCard($$global.timestampLaunched, $$global.totalUsers, $$global.txHash, numberOfSynths)
                     }), React.createElement(Masonry.Divider.make, {
                       children: null
                     }, syntheticAssetsCard(totalSynthValue), floatTokenCard($$global.totalFloatMinted)), React.createElement(Masonry.Divider.make, {

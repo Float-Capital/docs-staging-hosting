@@ -77,13 +77,9 @@ function txStateChangeHelper(
     if (toFloatContracts) {
       // Order important here since getOrCreateUser loads and saves global state for a new user
       let user = getOrCreateUser(event.transaction.from, event);
-      let globalState = getOrCreateGlobalState();
 
       user.numberOfTransactions = user.numberOfTransactions.plus(ONE);
 
-      globalState.totalTxs = globalState.totalTxs.plus(ONE);
-
-      globalState.save();
       user.save();
     }
   }

@@ -375,7 +375,6 @@ type GlobalState @entity {
   tokenFactory: TokenFactory!
   longShort: LongShortContract!
   totalFloatMinted: BigInt!
-  totalTxs: BigInt!
   totalUsers: BigInt!
   timestampLaunched: BigInt!
   txHash: Bytes!
