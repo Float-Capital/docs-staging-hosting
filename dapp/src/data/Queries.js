@@ -1206,7 +1206,6 @@ var query$15 = (require("@apollo/client").gql`
   fragment GlobalStateInfo on GlobalState   {
     __typename
     totalFloatMinted
-    totalTxs
     totalUsers
     timestampLaunched
     txHash
@@ -1217,7 +1216,6 @@ function parse$15(value) {
   return {
           __typename: value.__typename,
           totalFloatMinted: GqlConverters.$$BigInt.parse(value.totalFloatMinted),
-          totalTxs: GqlConverters.$$BigInt.parse(value.totalTxs),
           totalUsers: GqlConverters.$$BigInt.parse(value.totalUsers),
           timestampLaunched: GqlConverters.$$BigInt.parse(value.timestampLaunched),
           txHash: GqlConverters.Bytes.parse(value.txHash)
@@ -1231,15 +1229,12 @@ function serialize$15(value) {
   var value$4 = GqlConverters.$$BigInt.serialize(value$3);
   var value$5 = value.totalUsers;
   var value$6 = GqlConverters.$$BigInt.serialize(value$5);
-  var value$7 = value.totalTxs;
+  var value$7 = value.totalFloatMinted;
   var value$8 = GqlConverters.$$BigInt.serialize(value$7);
-  var value$9 = value.totalFloatMinted;
-  var value$10 = GqlConverters.$$BigInt.serialize(value$9);
-  var value$11 = value.__typename;
+  var value$9 = value.__typename;
   return {
-          __typename: value$11,
-          totalFloatMinted: value$10,
-          totalTxs: value$8,
+          __typename: value$9,
+          totalFloatMinted: value$8,
           totalUsers: value$6,
           timestampLaunched: value$4,
           txHash: value$2

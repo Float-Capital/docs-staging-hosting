@@ -212,8 +212,7 @@ fragment CurrentStakeDetailed on CurrentStake {
 # Used in:
 #   Queries: GlobalState
 fragment GlobalStateInfo on GlobalState {
-  totalFloatMinted,
-  totalTxs,
+  totalFloatMinted,  
   totalUsers,  
   timestampLaunched,
   txHash @ppxCustom(module: "Bytes")
