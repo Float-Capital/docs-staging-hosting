@@ -116,7 +116,7 @@ module TeamMember = {
     let frameNumber = frame.contents
 
     let width = isMobile
-      ? Js.Math.min_int(screenWidth / 4, screenHeight / 5)
+      ? Js.Math.min_int(screenWidth / 5, screenHeight / 5)
       : Js.Math.min_int(screenWidth / 8, screenHeight / 6)
 
     let hasTwitter = twitter != ""
@@ -149,12 +149,12 @@ module TeamMember = {
             <p className="text-xxxxs md:text-xxxs mx-auto"> {studies->React.string} </p>
           </div>
         </div>
-        <div className={`w-full flex justify-center`}>
-          <a target="_blank" href={`https://github.com/${github}`} className="mr-2 w-4">
+        <div className={`w-full flex justify-center mb-2 md:mb-0`}>
+          <a target="_blank" href={`https://github.com/${github}`} className="mr-2 w-3 md:w-4">
             <img className="w-full h-auto" src="/icons/github-sq.svg" />
           </a>
           {hasTwitter
-            ? <a target="_blank" href={`https://twitter.com/${twitter}`} className="w-4">
+            ? <a target="_blank" href={`https://twitter.com/${twitter}`} className="w-3 md:w-4">
                 <img className="w-full h-auto" src="/icons/twitter-sq-gray.svg" />
               </a>
             : React.null}
@@ -177,20 +177,18 @@ let make = () => {
 
   let teamMargin = screenHeight / 20
 
-  let headingMargin = screenHeight / 15
+  let headingMargin = screenWidth >= 768 ? screenHeight / 15 : screenHeight / 20
 
   <section
     id="team" className="min-h-screen w-screen flex flex-col items-center justify-center bg-team">
     <div className="w-full h-screen">
       <div
         className="w-full flex justify-center"
-        style={screenWidth >= 768
-          ? ReactDOM.Style.make(
-              ~marginTop=`${headingMargin->Int.toString}px`,
-              ~marginBottom=`${headingMargin->Int.toString}px`,
-              (),
-            )
-          : ReactDOM.Style.make()}>
+        style={ReactDOM.Style.make(
+          ~marginTop=`${headingMargin->Int.toString}px`,
+          ~marginBottom=`${headingMargin->Int.toString}px`,
+          (),
+        )}>
         <Heading title="Team" />
       </div>
       {if screenWidth >= 768 {

@@ -110,7 +110,7 @@ function Team$TeamMember(Props) {
     frame = 4;
   }
   var frameNumber = frame;
-  var width = isMobile ? Math.min(screenWidth / 4 | 0, screenHeight / 5 | 0) : Math.min(screenWidth / 8 | 0, screenHeight / 6 | 0);
+  var width = isMobile ? Math.min(screenWidth / 5 | 0, screenHeight / 5 | 0) : Math.min(screenWidth / 8 | 0, screenHeight / 6 | 0);
   var hasTwitter = twitter !== "";
   var avatarMargin = frameNumber !== 3 ? (
       frameNumber !== 4 ? "mt-3" : "mt-2"
@@ -141,16 +141,16 @@ function Team$TeamMember(Props) {
                             }, teamMember.title), React.createElement("p", {
                               className: "text-xxxxs md:text-xxxs mx-auto"
                             }, teamMember.studies))), React.createElement("div", {
-                      className: "w-full flex justify-center"
+                      className: "w-full flex justify-center mb-2 md:mb-0"
                     }, React.createElement("a", {
-                          className: "mr-2 w-4",
+                          className: "mr-2 w-3 md:w-4",
                           href: "https://github.com/" + teamMember.github,
                           target: "_blank"
                         }, React.createElement("img", {
                               className: "w-full h-auto",
                               src: "/icons/github-sq.svg"
                             })), hasTwitter ? React.createElement("a", {
-                            className: "w-4",
+                            className: "w-3 md:w-4",
                             href: "https://twitter.com/" + twitter,
                             target: "_blank"
                           }, React.createElement("img", {
@@ -174,7 +174,7 @@ function Team(Props) {
   var screenHeight = match.height;
   var screenWidth = match.width;
   var teamMargin = screenHeight / 20 | 0;
-  var headingMargin = screenHeight / 15 | 0;
+  var headingMargin = screenWidth >= 768 ? screenHeight / 15 | 0 : screenHeight / 20 | 0;
   return React.createElement("section", {
               className: "min-h-screen w-screen flex flex-col items-center justify-center bg-team",
               id: "team"
@@ -182,10 +182,10 @@ function Team(Props) {
                   className: "w-full h-screen"
                 }, React.createElement("div", {
                       className: "w-full flex justify-center",
-                      style: screenWidth >= 768 ? ({
-                            marginTop: String(headingMargin) + "px",
-                            marginBottom: String(headingMargin) + "px"
-                          }) : ({})
+                      style: {
+                        marginTop: String(headingMargin) + "px",
+                        marginBottom: String(headingMargin) + "px"
+                      }
                     }, React.createElement(Heading.make, {
                           title: "Team"
                         })), screenWidth >= 768 ? React.createElement("div", {
