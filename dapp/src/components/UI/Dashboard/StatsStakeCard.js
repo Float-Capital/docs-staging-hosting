@@ -18,7 +18,6 @@ function mapVal(apy) {
 function StatsStakeCard(Props) {
   var marketName = Props.marketName;
   var isLong = Props.isLong;
-  var $$yield = Props.yield;
   var rewards = Props.rewards;
   var stakeYield = Props.stakeYield;
   return React.createElement(Link, {
@@ -34,10 +33,6 @@ function StatsStakeCard(Props) {
                       }, React.createElement("div", undefined, React.createElement("div", undefined, React.createElement("span", {
                                     className: "text-xs font-bold mr-2"
                                   }, "Float rewards:"), mapVal(rewards)), React.createElement("div", {
-                                className: "mt-2"
-                              }, React.createElement("span", {
-                                    className: "text-xs font-bold mr-2"
-                                  }, "Synthetic Yield:"), mapVal($$yield)), React.createElement("div", {
                                 className: "mt-2"
                               }, React.createElement("span", {
                                     className: "text-xs font-bold mr-2"

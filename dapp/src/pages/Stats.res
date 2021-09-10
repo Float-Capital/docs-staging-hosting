@@ -23,11 +23,10 @@ module TrendingStakes = {
               ~bnApy,
             )
             trendingStakes
-            ->Array.map(({marketName, isLong, apy, floatApy, stakeApy}) =>
+            ->Array.map(({marketName, isLong, floatApy, stakeApy}) =>
               <StatsStakeCard
                 marketName={marketName}
                 isLong={isLong}
-                yield={apy}
                 rewards={floatApy}
                 stakeYield={stakeApy}
                 key={marketName ++ (isLong ? "-long" : "-short")}
