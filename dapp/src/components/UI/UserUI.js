@@ -672,7 +672,7 @@ function UserUI$UserFloatCard(Props) {
     var floatBalances$1 = match[0];
     var floatBalance = Misc.NumberFormat.formatEther(6, floatBalances$1.floatBalance);
     var floatMinted = Misc.NumberFormat.formatEther(6, floatBalances$1.floatMinted);
-    var floatAccrued = Misc.NumberFormat.formatEther(6, match$1[0].add(match$1[1]));
+    var floatAccrued = Misc.NumberFormat.formatEther(6, match$1[0].add(match$1[1]).div(CONSTANTS.twoBN));
     tmp = React.createElement("div", {
           className: "w-11/12 px-2 mx-auto mb-2 border-2 border-light-purple rounded-lg z-10 shadow"
         }, React.createElement(UserUI$UserColumnTextList, {
