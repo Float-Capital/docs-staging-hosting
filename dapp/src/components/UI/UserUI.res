@@ -552,9 +552,11 @@ module UserFloatCard = {
       | Response((floatBalances, (totalClaimable, totalPredicted))) => {
           let floatBalance = floatBalances.floatBalance->Misc.NumberFormat.formatEther(~digits=6)
           let floatMinted = floatBalances.floatMinted->Misc.NumberFormat.formatEther(~digits=6)
+
           let floatAccrued =
             totalClaimable
             ->Ethers.BigNumber.add(totalPredicted)
+            ->Ethers.BigNumber.div(CONSTANTS.twoBN) // TODO: Hackiest hack of hacks temp solution to ensure its understated.
             ->Misc.NumberFormat.formatEther(~digits=6)
 
           <div
