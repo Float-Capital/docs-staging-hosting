@@ -395,6 +395,26 @@ function User$UserProfileCard(Props) {
   var txStr = userInfo.transactionCount.toString();
   var match = ContractHooks.useErc20BalanceRefresh(Config.config.contracts.Dai);
   var optDaiBalance = match.data;
+  var usersGems = DataHooks.useUserGems(userInfo.id);
+  var tmp;
+  if (typeof usersGems === "number") {
+    tmp = React.createElement("div", {
+          className: "m-auto"
+        }, React.createElement(Loader.Tiny.make, {}));
+  } else if (usersGems.TAG === /* GraphError */0) {
+    console.log(usersGems._0);
+    tmp = React.createElement(React.Fragment, undefined);
+  } else {
+    var match$1 = usersGems._0;
+    tmp = React.createElement(React.Fragment, undefined, React.createElement(UserUI.UserColumnText.make, {
+              icon: "/img/gem.gif",
+              head: "Gems collected",
+              body: Misc.NumberFormat.formatEther(2, match$1.balance)
+            }), React.createElement(UserUI.UserColumnText.make, {
+              head: "⚡ Gem streak",
+              body: match$1.streak.toString() + " days"
+            }));
+  }
   return React.createElement(UserUI.UserColumnCard.make, {
               children: null
             }, React.createElement(UserUI.UserProfileHeader.make, {
@@ -409,7 +429,7 @@ function User$UserProfileCard(Props) {
                               icon: CONSTANTS.daiDisplayToken.iconUrl,
                               head: "DAI balance",
                               body: "$" + Misc.NumberFormat.formatEther(2, Caml_option.valFromOption(optDaiBalance))
-                            }) : null, React.createElement(UserUI.UserColumnText.make, {
+                            }) : null, tmp, React.createElement(UserUI.UserColumnText.make, {
                             head: "🎉 Joined",
                             body: joinedStr
                           }), React.createElement(UserUI.UserColumnText.make, {

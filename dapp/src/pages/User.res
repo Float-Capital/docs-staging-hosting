@@ -337,7 +337,7 @@ module IncompleteWithdrawalsCard = {
 
 module UserProfileCard = {
   @react.component
-  let make = (~userInfo) => {
+  let make = (~userInfo: DataHooks.basicUserInfo) => {
     let addressStr = DisplayAddress.ellipsifyMiddle(
       ~inputString=userInfo.id,
       ~maxLength=8,
@@ -348,6 +348,8 @@ module UserProfileCard = {
     let {Swr.data: optDaiBalance} = ContractHooks.useErc20BalanceRefresh(
       ~erc20Address=Config.config.contracts.dai,
     )
+
+    let usersGems = DataHooks.useUserGems(~userId=userInfo.id)
 
     <UserColumnCard>
       <UserProfileHeader address={addressStr} />
@@ -362,6 +364,23 @@ module UserProfileCard = {
               body={`$${daiBalance->Misc.NumberFormat.formatEther(~digits=2)}`}
             />
           | None => React.null
+          }}
+          {switch usersGems {
+          | Loading => <div className="m-auto"> <Loader.Tiny /> </div>
+          | GraphError(string) => {
+              Js.log(string)
+              <> </>
+            }
+          | Response({balance, streak}) => <>
+              <UserColumnText
+                icon="/img/gem.gif"
+                head=`Gems collected`
+                body={balance->Misc.NumberFormat.formatEther(~digits=2)}
+              />
+              <UserColumnText
+                head=`⚡ Gem streak` body={`${streak->Ethers.BigNumber.toString} days`}
+              />
+            </>
           }}
           <UserColumnText head=`🎉 Joined` body={joinedStr} />
           <UserColumnText head=`🏃 No. txs` body={txStr} />

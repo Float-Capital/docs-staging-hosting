@@ -465,6 +465,34 @@ let useBasicUserInfo = (~userId) => {
   }
 }
 
+type userGems = {
+  id: string,
+  balance: Ethers.BigNumber.t,
+  streak: Ethers.BigNumber.t,
+  streakActive: bool,
+}
+@ocaml.doc(`Returns basic user info for the given user.`)
+let useUserGems = (~userId) => {
+  let userQuery = Queries.UsersGems.use({
+    userId: userId,
+  })
+
+  switch userQuery {
+  | {data: Some({user: Some({gems: {id, balance, streak, lastUpdated}})})} =>
+    let streakActive = lastUpdated->Ethers.BigNumber.toNumberFloat >= Js.Date.now()
+    Response({
+      id: id,
+      balance: balance,
+      streak: streak,
+      streakActive: streakActive,
+    })
+  | {data: Some({user: None})} =>
+    Response({id: "", balance: CONSTANTS.zeroBN, streak: CONSTANTS.zeroBN, streakActive: false})
+  | {error: Some({message})} => GraphError(message)
+  | _ => Loading
+  }
+}
+
 let useSyntheticTokenBalance = (~user, ~tokenAddress) => {
   let syntheticBalanceQuery = Queries.UsersBalance.use({
     userId: user->ethAdrToLowerStr,
