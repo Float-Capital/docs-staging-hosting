@@ -131,7 +131,7 @@ let calculateFloatMintedOverPeriod = (~dollarFloatPerSecond, ~amount, ~period, ~
   ->div(CONSTANTS.tenToThe18)
   ->mul(period)
   ->mul(amount)
-  ->div(CONSTANTS.tenToThe42)
+  ->div(CONSTANTS.threeE44)
 }
 
 let calculateStakeAPYS = (

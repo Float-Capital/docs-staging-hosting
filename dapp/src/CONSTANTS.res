@@ -14,7 +14,7 @@ let oneHundredThousandInWei = tenToThe18->Ethers.BigNumber.mul(tenToThe5)
 let fiveHundredThousandInWei =
   tenToThe18->Ethers.BigNumber.mul(tenToThe6)->Ethers.BigNumber.div(twoBN)
 let oneMillionInWei = tenToThe18->Ethers.BigNumber.mul(tenToThe6)
-let tenToThe42 = tenToThe6->Ethers.BigNumber.mul(tenToThe18)->Ethers.BigNumber.mul(tenToThe18)
+let threeE44 = Ethers.BigNumber.fromUnsafe("300000000000000000000000000000000000000000000")
 let oneHundredEth = Ethers.BigNumber.fromUnsafe("100000000000000000000") // 10 ^ 20
 let oneThousandInWei = Ethers.BigNumber.fromUnsafe("1000000000000000000000") // 10 ^ 21
 

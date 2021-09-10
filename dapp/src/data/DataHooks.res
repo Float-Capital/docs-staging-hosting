@@ -107,7 +107,7 @@ let useTotalClaimableFloatForUser = (~userId, ~synthTokens) => {
             let claimableFloat =
               Ethers.BigNumber.sub(accumulativeFloatPerToken, lastAccumulativeFloatPerToken)
               ->Ethers.BigNumber.mul(amount)
-              ->Ethers.BigNumber.div(CONSTANTS.tenToThe42)
+              ->Ethers.BigNumber.div(CONSTANTS.threeE44)
               ->Ethers.BigNumber.add(totalClaimable)
 
             // The amount of float the user is predicted to earn between the last
@@ -117,7 +117,7 @@ let useTotalClaimableFloatForUser = (~userId, ~synthTokens) => {
               Ethers.BigNumber.sub(currentTimestamp, timestamp)
               ->Ethers.BigNumber.mul(floatRatePerTokenOverInterval)
               ->Ethers.BigNumber.mul(amount)
-              ->Ethers.BigNumber.div(CONSTANTS.tenToThe42)
+              ->Ethers.BigNumber.div(CONSTANTS.threeE44)
               ->Ethers.BigNumber.add(totalPredicted)
 
             Response((claimableFloat, predictedFloat))
