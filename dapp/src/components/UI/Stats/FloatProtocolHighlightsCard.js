@@ -17,7 +17,7 @@ function FloatProtocolHighlightsCard(Props) {
               className: "bg-white w-full bg-opacity-75 rounded-lg shadow-lg mb-2 md:mb-5 p-6"
             }, React.createElement("h1", {
                   className: "font-bold text-center text-lg font-alphbeta mb-2"
-                }, "Float Capital Protocol 🏗️"), React.createElement("ul", undefined, React.createElement("a", {
+                }, "🌊🌊 Float Capital Protocol 🌊🌊"), React.createElement("ul", undefined, React.createElement("a", {
                       className: "mt-2",
                       href: Config.blockExplorer + "/tx/" + txHash
                     }, React.createElement("li", undefined, React.createElement("span", {

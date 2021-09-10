@@ -1,9 +1,12 @@
 @react.component
 let make = (~totalFloatMinted) =>
   <div className={"bg-white w-full bg-opacity-75 rounded-lg shadow-lg mb-2 md:mb-5 p-6"}>
-    <h1 className="font-bold text-center text-lg font-alphbeta">
-      {`🌊🌊 alphaFloat Token 🌊🌊`->React.string}
-    </h1>
+    <div className="flex flex-row items-center justify-center">
+      <h1 className="font-bold text-center text-lg font-alphbeta">
+        {`alphaFloat Token`->React.string}
+      </h1>
+      <img src="/img/F-float-token.svg" className="ml-2 h-4" />
+    </div>
     <ul className="my-2 text-center">
       <li>
         <span className="text-sm mr-2"> {`🗳 alphaFloat supply:`->React.string} </span>

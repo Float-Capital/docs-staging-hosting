@@ -8,9 +8,14 @@ function FloatTokenHighlightCard(Props) {
   var totalFloatMinted = Props.totalFloatMinted;
   return React.createElement("div", {
               className: "bg-white w-full bg-opacity-75 rounded-lg shadow-lg mb-2 md:mb-5 p-6"
-            }, React.createElement("h1", {
-                  className: "font-bold text-center text-lg font-alphbeta"
-                }, "🌊🌊 alphaFloat Token 🌊🌊"), React.createElement("ul", {
+            }, React.createElement("div", {
+                  className: "flex flex-row items-center justify-center"
+                }, React.createElement("h1", {
+                      className: "font-bold text-center text-lg font-alphbeta"
+                    }, "alphaFloat Token"), React.createElement("img", {
+                      className: "ml-2 h-4",
+                      src: "/img/F-float-token.svg"
+                    })), React.createElement("ul", {
                   className: "my-2 text-center"
                 }, React.createElement("li", undefined, React.createElement("span", {
                           className: "text-sm mr-2"

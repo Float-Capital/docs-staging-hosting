@@ -4,7 +4,7 @@ let make = (~liveSince, ~totalUsers, ~txHash, ~numberOfSynths) => {
 
   <div className={"bg-white w-full bg-opacity-75 rounded-lg shadow-lg mb-2 md:mb-5 p-6"}>
     <h1 className="font-bold text-center text-lg font-alphbeta mb-2">
-      {`Float Capital Protocol 🏗️`->React.string}
+      {`🌊🌊 Float Capital Protocol 🌊🌊`->React.string}
     </h1>
     <ul>
       <a href={`${Config.blockExplorer}/tx/${txHash}`} className="mt-2">

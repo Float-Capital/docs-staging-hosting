@@ -76,7 +76,7 @@ function StakeCard(Props) {
   return React.createElement(Link, {
               href: "/app/markets?marketIndex=" + marketIndex.toString() + "&tab=stake",
               children: React.createElement("div", {
-                    className: "p-1 mb-8 rounded-lg flex flex-col bg-light-gold bg-opacity-75 hover:bg-opacity-60 cursor-pointer my-5 shadow-lg"
+                    className: "p-1 mb-8 rounded-lg flex flex-col bg-white bg-opacity-75 hover:bg-opacity-60 cursor-pointer my-5 shadow-lg"
                   }, React.createElement("div", {
                         className: "flex justify-center w-full my-1"
                       }, React.createElement("h1", {

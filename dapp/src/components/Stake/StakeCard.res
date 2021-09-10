@@ -116,7 +116,7 @@ let make = (
 
   <Next.Link href={`/app/markets?marketIndex=${marketIndex->Ethers.BigNumber.toString}&tab=stake`}>
     <div
-      className="p-1 mb-8 rounded-lg flex flex-col bg-light-gold bg-opacity-75 hover:bg-opacity-60 cursor-pointer my-5 shadow-lg">
+      className="p-1 mb-8 rounded-lg flex flex-col bg-white bg-opacity-75 hover:bg-opacity-60 cursor-pointer my-5 shadow-lg">
       <div className="flex justify-center w-full my-1">
         <h1 className="font-bold text-xl font-alphbeta"> {marketName->React.string} </h1>
       </div>
