@@ -10,6 +10,7 @@ import "./interfaces/IFloatToken.sol";
 import "./interfaces/ILongShort.sol";
 import "./interfaces/IStaker.sol";
 import "./interfaces/ISyntheticToken.sol";
+import "./GEMS.sol";
 import "hardhat/console.sol";
 
 contract Staker is IStaker, AccessControlledAndUpgradeable {
@@ -65,6 +66,9 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
   mapping(uint32 => mapping(bool => mapping(address => uint256)))
     public userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom;
 
+  // NEW VARIABLES:
+  address public gems;
+
   /*╔═════════════════════════════╗
     ║          MODIFIERS          ║
     ╚═════════════════════════════╝*/
@@ -117,6 +121,11 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
     _;
   }
 
+  modifier gemCollecting(address user) {
+    GEMS(gems).gm(user);
+    _;
+  }
+
   /*╔═════════════════════════════╗
     ║       CONTRACT SET-UP       ║
     ╚═════════════════════════════╝*/
@@ -138,7 +147,8 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
     address _floatTreasury,
     address _floatCapital,
     address _discountSigner,
-    uint256 _floatPercentage
+    uint256 _floatPercentage,
+    address _gems
   ) external virtual initializer {
     require(
       _admin != address(0) &&
@@ -146,6 +156,7 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
         _floatToken != address(0) &&
         _floatTreasury != address(0) &&
         _floatCapital != address(0) &&
+        _gems != address(0) &&
         _floatPercentage != 0
     );
 
@@ -153,6 +164,7 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
     floatTreasury = _floatTreasury;
     longShort = _longShort;
     floatToken = _floatToken;
+    gems = _gems;
 
     _AccessControlledAndUpgradeable_init(_admin);
     _setupRole(DISCOUNT_ROLE, _discountSigner);

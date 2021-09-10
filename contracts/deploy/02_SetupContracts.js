@@ -15,6 +15,7 @@ const {
   isAlphaLaunch,
   FLOAT_TOKEN_ALPHA,
   TREASURY_ALPHA,
+  GEMS,
 } = require("../helper-hardhat-config");
 
 let networkToUse = network.name;
@@ -43,7 +44,9 @@ module.exports = async (hardhatDeployArguments) => {
     paymentTokenAddress
   );
 
-  console.log("2");
+  const Gems = await deployments.get(GEMS);
+  const gems = await ethers.getContractAt(GEMS, Gems.address);
+
   const LongShort = await deployments.get(LONGSHORT);
   const longShort = await ethers.getContractAt(LONGSHORT, LongShort.address);
 
@@ -77,7 +80,12 @@ module.exports = async (hardhatDeployArguments) => {
   ///////////////////////////
   //Initialize the contracts/
   ///////////////////////////
-  await longShort.initialize(admin, tokenFactory.address, staker.address);
+  await longShort.initialize(
+    admin,
+    tokenFactory.address,
+    staker.address,
+    gems.address
+  );
   if (isAlphaLaunch) {
     await floatToken.initialize(
       "Alpha Float",
@@ -95,8 +103,11 @@ module.exports = async (hardhatDeployArguments) => {
     treasury.address,
     floatCapital.address,
     discountSigner,
-    "100000000000000" // mint an additional 0.01% for the treasury - just for testing purposes
+    "100000000000000", // mint an additional 0.01% for the treasury - just for testing purposes
+    gems.address
   );
+
+  await gems.initialize(admin, longShort.address, staker.address);
 
   if (networkToUse == "mumbai") {
     console.log("mumbai test transactions");

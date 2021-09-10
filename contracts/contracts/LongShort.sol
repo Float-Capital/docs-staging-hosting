@@ -13,6 +13,7 @@ import "./interfaces/ILongShort.sol";
 import "./interfaces/IYieldManager.sol";
 import "./interfaces/IOracleManager.sol";
 import "./abstract/AccessControlledAndUpgradeable.sol";
+import "./GEMS.sol";
 import "hardhat/console.sol";
 
 /**
@@ -86,6 +87,7 @@ contract LongShort is ILongShort, AccessControlledAndUpgradeable {
 
   // NEW VARIABLES:
   mapping(uint32 => uint256) public marketLeverage_e18;
+  address public gems;
 
   /*╔═════════════════════════════╗
     ║          MODIFIERS          ║
@@ -118,6 +120,13 @@ contract LongShort is ILongShort, AccessControlledAndUpgradeable {
     _;
   }
 
+  modifier gemCollecting() {
+    if (msg.sender != staker) {
+      GEMS(gems).gm(msg.sender);
+    }
+    _;
+  }
+
   /*╔═════════════════════════════╗
     ║       CONTRACT SET-UP       ║
     ╚═════════════════════════════╝*/
@@ -130,12 +139,19 @@ contract LongShort is ILongShort, AccessControlledAndUpgradeable {
   function initialize(
     address _admin,
     address _tokenFactory,
-    address _staker
+    address _staker,
+    address _gems
   ) external virtual initializer {
-    require(_admin != address(0) && _tokenFactory != address(0) && _staker != address(0));
+    require(
+      _admin != address(0) &&
+        _tokenFactory != address(0) &&
+        _staker != address(0) &&
+        _gems != address(0)
+    );
     _AccessControlledAndUpgradeable_init(_admin);
     tokenFactory = _tokenFactory;
     staker = _staker;
+    gems = _gems;
 
     emit LongShortV1(_admin, _tokenFactory, _staker);
   }
@@ -837,6 +853,7 @@ contract LongShort is ILongShort, AccessControlledAndUpgradeable {
     internal
     virtual
     updateSystemStateMarketAndExecuteOutstandingNextPriceSettlements(msg.sender, marketIndex)
+    gemCollecting
   {
     _transferPaymentTokensFromUserToYieldManager(marketIndex, amount);
 
@@ -879,6 +896,7 @@ contract LongShort is ILongShort, AccessControlledAndUpgradeable {
     internal
     virtual
     updateSystemStateMarketAndExecuteOutstandingNextPriceSettlements(msg.sender, marketIndex)
+    gemCollecting
   {
     ISyntheticToken(syntheticTokens[marketIndex][isLong]).transferFrom(
       msg.sender,
@@ -927,6 +945,7 @@ contract LongShort is ILongShort, AccessControlledAndUpgradeable {
     virtual
     override
     updateSystemStateMarketAndExecuteOutstandingNextPriceSettlements(msg.sender, marketIndex)
+    gemCollecting
   {
     require(
       ISyntheticToken(syntheticTokens[marketIndex][isShiftFromLong]).transferFrom(
