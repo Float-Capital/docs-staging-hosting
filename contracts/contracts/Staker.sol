@@ -121,8 +121,12 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
     _;
   }
 
-  modifier gemCollecting(address user) {
+  function gemCollectingModifierLogic(address user) internal virtual {
     GEMS(gems).gm(user);
+  }
+
+  modifier gemCollecting(address user) {
+    gemCollectingModifierLogic(user);
     _;
   }
 

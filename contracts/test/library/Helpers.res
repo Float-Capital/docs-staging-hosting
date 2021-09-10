@@ -277,7 +277,7 @@ let initializeStakerUnit = () => {
     floatTokenSmocked,
     syntheticTokenSmocked,
     floatCapitalSmocked,
-    gems,
+    _gems,
   )) =>
     staker
     ->Staker.setVariable(~name="longShort", ~value=longShortSmocked.address)
@@ -287,7 +287,6 @@ let initializeStakerUnit = () => {
       floatTokenSmocked: floatTokenSmocked,
       syntheticTokenSmocked: syntheticTokenSmocked,
       floatCapitalSmocked: floatCapitalSmocked,
-      gems: gems,
     })
   )
 }
@@ -344,7 +343,7 @@ let initializeLongShortUnit = () => {
     tokenFactorySmocked,
     yieldManagerSmocked,
     oracleManagerSmocked,
-    gems,
+    _gems,
   )) => {
     {
       longShort: longShort,
@@ -355,7 +354,6 @@ let initializeLongShortUnit = () => {
       syntheticToken1Smocked: syntheticToken1Smocked,
       syntheticToken2Smocked: syntheticToken2Smocked,
       tokenFactorySmocked: tokenFactorySmocked,
-      gems: gems,
     }
   })
 }

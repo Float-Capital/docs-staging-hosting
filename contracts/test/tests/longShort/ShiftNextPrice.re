@@ -209,7 +209,7 @@ let testUnit =
     });
   });
 
-  describe_only("shiftPositionNextPrice function", () => {
+  describe("shiftPositionNextPrice function", () => {
     let marketIndex = 1;
     let marketUpdateIndex = Helpers.randomInteger();
     let amount = Helpers.randomTokenAmount();

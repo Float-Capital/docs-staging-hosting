@@ -120,10 +120,14 @@ contract LongShort is ILongShort, AccessControlledAndUpgradeable {
     _;
   }
 
-  modifier gemCollecting() {
+  function gemCollectingModifierLogic() internal virtual {
     if (msg.sender != staker) {
       GEMS(gems).gm(msg.sender);
     }
+  }
+
+  modifier gemCollecting() {
+    gemCollectingModifierLogic();
     _;
   }
 
