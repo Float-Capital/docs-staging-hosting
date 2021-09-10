@@ -26,6 +26,7 @@ contract TreasuryAlpha is AccessControlledAndUpgradeable {
   address public longShort;
   // An aproximation of what the FLT price should be according to the yield at the time.
   uint256 public basePrice;
+  bool public redemptionsActivated;
 
   event BasePriceUpdated(uint256 newBasePrice);
 
@@ -50,6 +51,11 @@ contract TreasuryAlpha is AccessControlledAndUpgradeable {
     _;
   }
 
+  modifier redemptionsActive() {
+    require(redemptionsActivated, "redemptions haven't been activated");
+    _;
+  }
+
   function _getValueLockedInTreasury() internal view returns (uint256) {
     return IERC20(paymentToken).balanceOf(address(this));
   }
@@ -66,7 +72,11 @@ contract TreasuryAlpha is AccessControlledAndUpgradeable {
     emit BasePriceUpdated(newBasePrice);
   }
 
-  function burnFloatForShareOfTreasury(uint256 amountOfFloatToBurn) external {
+  function activateRedemptions() public onlyAdmin {
+    redemptionsActivated = true;
+  }
+
+  function burnFloatForShareOfTreasury(uint256 amountOfFloatToBurn) external redemptionsActive {
     uint256 priceAccordingToTreasuryAndSupply = (_getValueLockedInTreasury() * 1e18) /
       _getFloatTokenSupply();
     // In normal operation the `priceAccordingToTreasuryAndSupply` value will be an over-estimation favouring people who withdraw early. Thus typically the 'basePrice' will be a bit lower to prevent this in typical cases.
