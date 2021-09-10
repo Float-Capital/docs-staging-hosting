@@ -157,6 +157,7 @@ module.exports = {
       ":LendingPoolAddressesProviderMock$",
       ":AaveIncentivesControllerMock$",
       "Mockable$",
+      ":GEMS$",
     ],
     spacing: 2,
   },

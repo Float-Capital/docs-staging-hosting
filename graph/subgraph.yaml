@@ -122,6 +122,27 @@ dataSources:
           handler: handleBasePriceUpdated
       file: ./src/mappings/treasuryAlpha.ts
 
+  - kind: ethereum/contract
+    name: GEMS
+    network: goerli
+    source:
+      address: "0x43dc5423d4621f60EE24c8f1A33Bb30Eef7e472C"
+      abi: GEMS
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - GemsCollected
+      abis:
+        - name: GEMS
+          file: ./abis/GEMS.json
+      eventHandlers:
+        - event: GemsCollected(address,uint256,uint256)
+          handler: handleGemsCollected
+      file: ./src/mappings/gems.ts
+
 templates:
   - kind: ethereum/contract
     name: erc20
