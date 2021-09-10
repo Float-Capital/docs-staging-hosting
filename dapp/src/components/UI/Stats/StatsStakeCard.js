@@ -24,7 +24,7 @@ function StatsStakeCard(Props) {
   return React.createElement(Link, {
               href: "/app/stake-markets",
               children: React.createElement("div", {
-                    className: "mb-5 flex w-11/12 mx-auto border-2 border-light-purple rounded-lg z-10 shadow cursor-pointer"
+                    className: "my-2 flex w-full mx-auto border-2 border-light-purple rounded-lg z-10 shadow cursor-pointer"
                   }, React.createElement("div", {
                         className: "my-2 ml-5 text-sm"
                       }, marketName, React.createElement("br", {

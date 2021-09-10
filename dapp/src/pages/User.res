@@ -1,6 +1,5 @@
 open UserUI
 open DataHooks
-open Masonry
 
 let {add, mul, div, toNumber, eq, toString} = module(Ethers.BigNumber)
 
@@ -386,21 +385,21 @@ let onQueryError = (msg: string) => {
 
 let onQuerySuccess = (data: userData) => {
   <UserContainer>
-    <Container>
-      <Divider>
+    <div className={"w-full flex flex-col md:flex-row justify-between"}>
+      <div className={"w-full md:w-1/3 px-3 md:px-0 m-0 md:m-4"}>
         <UserProfileCard userInfo={data.userInfo} />
         <IncompleteWithdrawalsCard userId={data.user} />
         <UserFloatCard userId={data.user} stakes={data.stakes} />
-      </Divider>
-      <Divider>
+      </div>
+      <div className={"w-full md:w-1/3 px-3 md:px-0 m-0 md:m-4"}>
         <UserTotalInvestedCard stakes={data.stakes} userId={data.user} />
         <UserBalancesCard userId={data.user} />
-      </Divider>
-      <Divider>
+      </div>
+      <div className={"w-full md:w-1/3 px-3 md:px-0 m-0 md:m-4"}>
         <UserTotalStakedCard stakes={data.stakes} />
         <UserStakesCard stakes={data.stakes} userId={data.user} />
-      </Divider>
-    </Container>
+      </div>
+    </div>
   </UserContainer>
 }
 

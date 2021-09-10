@@ -7,7 +7,7 @@ let mapVal = apy =>
 let make = (~marketName, ~isLong, ~yield, ~rewards, ~stakeYield) =>
   <Next.Link href="/app/stake-markets">
     <div
-      className="mb-5 flex w-11/12 mx-auto border-2 border-light-purple rounded-lg z-10 shadow cursor-pointer">
+      className="my-2 flex w-full mx-auto border-2 border-light-purple rounded-lg z-10 shadow cursor-pointer">
       <div className="my-2 ml-5 text-sm">
         {marketName->React.string}
         <br className="mt-1" />
