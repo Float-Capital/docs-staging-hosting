@@ -70,7 +70,7 @@ function calculateFloatAPY(longVal, shortVal, kperiod, kmultiplier, initialTimes
 }
 
 function calculateFloatMintedOverPeriod(dollarFloatPerSecond, amount, period, price) {
-  return dollarFloatPerSecond.mul(price).div(CONSTANTS.tenToThe18).mul(period).mul(amount).div(CONSTANTS.tenToThe42);
+  return dollarFloatPerSecond.mul(price).div(CONSTANTS.tenToThe18).mul(period).mul(amount).div(CONSTANTS.threeE44);
 }
 
 function calculateStakeAPYS(syntheticMarkets, $$global, apy) {
