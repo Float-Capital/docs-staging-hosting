@@ -66,7 +66,7 @@ module SubmitButtonAndTxTracker = {
 
     let {showModal, hideModal} = ModalProvider.useModalDisplay()
 
-    React.useEffect1(_ => {
+    React.useEffect2(_ => {
       switch (txStateApprove, txStateMint) {
       | (ContractActions.Created, _) =>
         showModal(
@@ -156,12 +156,15 @@ module SubmitButtonAndTxTracker = {
       | _ => hideModal()
       }
       None
-    }, [txStateMint])
+    }, (txStateMint, txStateApprove))
 
     switch (txStateApprove, txStateMint) {
-    | (_, ContractActions.Complete({transactionHash: _})) => React.null
-    | (_, ContractActions.Declined(_)) => resetFormButton()
-    | (_, ContractActions.Failed(_)) => resetFormButton()
+    | (ContractActions.Declined(_), _)
+    | (ContractActions.Failed(_), _)
+    | (_, ContractActions.Complete({transactionHash: _}))
+    | (_, ContractActions.Declined(_))
+    | (_, ContractActions.Failed(_)) =>
+      resetFormButton()
     | _ => <Button disabled=buttonDisabled onClick={_ => ()}> {buttonText} </Button>
     }
   }
