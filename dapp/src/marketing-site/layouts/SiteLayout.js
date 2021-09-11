@@ -2,8 +2,8 @@
 'use strict';
 
 var React = require("react");
+var Banner = require("../../components/Banner.js");
 var SiteNav = require("./SiteNav.js");
-var ComingSoon = require("../../components/ComingSoon.js");
 
 function SiteLayout(Props) {
   var children = Props.children;
@@ -13,7 +13,7 @@ function SiteLayout(Props) {
                   className: "w-full text-gray-900 font-base"
                 }, React.createElement("div", {
                       className: "flex flex-col"
-                    }, React.createElement(ComingSoon.make, {}), React.createElement(SiteNav.make, {}), React.createElement("div", {
+                    }, React.createElement(Banner.make, {}), React.createElement(SiteNav.make, {}), React.createElement("div", {
                           className: "m-auto w-full"
                         }, children))));
 }
