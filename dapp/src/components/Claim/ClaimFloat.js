@@ -76,7 +76,7 @@ function ClaimFloat(Props) {
                                 return param.claimFloatCustom(marketIndexes);
                               }));
                 }),
-              children: "Claim Float"
+              children: "Claim alphaFloat"
             });
 }
 

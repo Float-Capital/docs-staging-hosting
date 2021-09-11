@@ -32,8 +32,8 @@ function StatsStakeCard(Props) {
                           }), isLong ? "Long↗️" : "Short↘️"), React.createElement("div", {
                         className: "flex-1 my-2 text-sm flex flex-col items-center"
                       }, React.createElement("div", undefined, React.createElement("div", undefined, React.createElement("span", {
-                                    className: "text-xs font-bold mr-2"
-                                  }, "Float rewards:"), mapVal(rewards)), React.createElement("div", {
+                                    className: "text-xxs font-bold mr-2"
+                                  }, "alphaFloat rewards:"), mapVal(rewards)), React.createElement("div", {
                                 className: "mt-2"
                               }, React.createElement("span", {
                                     className: "text-xs font-bold mr-2"

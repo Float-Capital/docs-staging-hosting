@@ -5,7 +5,7 @@ let make = (~totalFloatMinted) =>
       <h1 className="font-bold text-center text-lg font-alphbeta">
         {`alphaFloat Token`->React.string}
       </h1>
-      <img src="/img/F-float-token.svg" className="ml-2 h-4" />
+      <img src="/icons/alpha-float-token.svg" className="ml-2 h-4" />
     </div>
     <ul className="my-2 text-center">
       <li>

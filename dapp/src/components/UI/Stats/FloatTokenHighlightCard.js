@@ -14,7 +14,7 @@ function FloatTokenHighlightCard(Props) {
                       className: "font-bold text-center text-lg font-alphbeta"
                     }, "alphaFloat Token"), React.createElement("img", {
                       className: "ml-2 h-4",
-                      src: "/img/F-float-token.svg"
+                      src: "/icons/alpha-float-token.svg"
                     })), React.createElement("ul", {
                   className: "my-2 text-center"
                 }, React.createElement("li", undefined, React.createElement("span", {
