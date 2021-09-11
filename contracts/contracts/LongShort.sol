@@ -50,16 +50,22 @@ contract LongShort is ILongShort, AccessControlledAndUpgradeable {
 
   address public staker;
   address public tokenFactory;
+  address public gems;
+
   uint256[45] private __globalStateGap;
 
   /* ══════ Market specific ══════ */
   mapping(uint32 => bool) public marketExists;
+
   mapping(uint32 => int256) public assetPrice;
   mapping(uint32 => uint256) public override marketUpdateIndex;
+  mapping(uint32 => uint256) public marketTreasurySplitGradient_e18;
+  mapping(uint32 => uint256) public marketLeverage_e18;
+
   mapping(uint32 => address) public paymentTokens;
   mapping(uint32 => address) public yieldManagers;
   mapping(uint32 => address) public oracleManagers;
-  mapping(uint32 => uint256) public marketTreasurySplitGradient_e18;
+  uint256[45] private __marketStateGap;
 
   /* ══════ Market + position (long/short) specific ══════ */
   mapping(uint32 => mapping(bool => address)) public override syntheticTokens;
@@ -74,6 +80,7 @@ contract LongShort is ILongShort, AccessControlledAndUpgradeable {
   mapping(uint32 => mapping(bool => uint256)) public batched_amountSyntheticToken_redeem;
   mapping(uint32 => mapping(bool => uint256))
     public batched_amountSyntheticToken_toShiftAwayFrom_marketSide;
+  uint256[45] private __marketPositonStateGap;
 
   /* ══════ User specific ══════ */
   mapping(uint32 => mapping(address => uint256)) public userNextPrice_currentUpdateIndex;
@@ -84,10 +91,6 @@ contract LongShort is ILongShort, AccessControlledAndUpgradeable {
     public userNextPrice_syntheticToken_redeemAmount;
   mapping(uint32 => mapping(bool => mapping(address => uint256)))
     public userNextPrice_syntheticToken_toShiftAwayFrom_marketSide;
-
-  // NEW VARIABLES:
-  mapping(uint32 => uint256) public marketLeverage_e18;
-  address public gems;
 
   /*╔═════════════════════════════╗
     ║          MODIFIERS          ║
