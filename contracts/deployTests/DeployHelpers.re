@@ -383,6 +383,7 @@ let deployMumbaiMarketUpgradeable =
         "contract": "SyntheticTokenUpgradeable",
         "proxy": {
           "proxyContract": "UUPSProxy",
+<<<<<<< Updated upstream
           "execute": {
             "args": (
               "Float Long " ++ syntheticName,
@@ -394,6 +395,17 @@ let deployMumbaiMarketUpgradeable =
             ),
             "methodName": "initialize",
           },
+=======
+          "initializer": true,
+          "args": (
+            "Float Long " ++ syntheticName,
+            "f↘️" ++ syntheticSymbol,
+            longShortInstance.address,
+            stakerInstance.address,
+            newMarketIndex,
+            true,
+          ),
+>>>>>>> Stashed changes
         },
       },
     );
@@ -441,12 +453,27 @@ let deployMumbaiMarketUpgradeable =
         },
       },
     );
+<<<<<<< Updated upstream
   Js.log("a.4");
   Js.log((
     yieldManager.address,
     syntheticTokenLong.address,
     syntheticTokenShort.address,
   ));
+=======
+  // Js.log("a.4");
+  // let%AwaitThen yieldManagerInstance =
+  //   deployments->Hardhat.get(~name="YM" ++ syntheticSymbol);
+  // Js.log("a.4.1");
+  // let%AwaitThen longShortFromYieldManager =
+  //   yieldManagerInstance->YieldManagerAave.longShort;
+  // Js.log((
+  //   longShortFromYieldManager,
+  //   yieldManager.address,
+  //   syntheticTokenLong.address,
+  //   syntheticTokenShort.address,
+  // ));
+>>>>>>> Stashed changes
 
   let%AwaitThen _ =
     longShortInstance
