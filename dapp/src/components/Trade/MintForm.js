@@ -588,14 +588,29 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
             
           }
           
-        }), [txStateMint]);
-  if (typeof txStateMint !== "number") {
-    switch (txStateMint.TAG | 0) {
-      case /* Complete */2 :
-          return null;
+        }), [
+        txStateMint,
+        txStateApprove
+      ]);
+  var exit = 0;
+  if (typeof txStateApprove === "number") {
+    exit = 2;
+  } else {
+    switch (txStateApprove.TAG | 0) {
       case /* Declined */1 :
       case /* Failed */3 :
           return Curry._1(resetFormButton, undefined);
+      default:
+        exit = 2;
+    }
+  }
+  if (exit === 2 && typeof txStateMint !== "number") {
+    switch (txStateMint.TAG | 0) {
+      case /* Declined */1 :
+      case /* Complete */2 :
+          return Curry._1(resetFormButton, undefined);
+      case /* Failed */3 :
+          break;
       default:
         
     }
