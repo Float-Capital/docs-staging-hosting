@@ -5,6 +5,7 @@ var Misc = require("../../libraries/Misc.js");
 var React = require("react");
 var Button = require("../UI/Base/Button.js");
 var Ethers = require("../../ethereum/Ethers.js");
+var Backend = require("../../mockBackend/Backend.js");
 var CONSTANTS = require("../../CONSTANTS.js");
 var MarketBar = require("../UI/MarketCard/MarketBar.js");
 var Link = require("next/link").default;
@@ -78,8 +79,11 @@ function StakeCard(Props) {
               children: React.createElement("div", {
                     className: "p-1 mb-8 rounded-lg flex flex-col bg-white bg-opacity-75 hover:bg-opacity-60 cursor-pointer my-5 shadow-lg"
                   }, React.createElement("div", {
-                        className: "flex justify-center w-full my-1"
-                      }, React.createElement("h1", {
+                        className: "flex justify-center items-center w-full my-1"
+                      }, React.createElement("img", {
+                            className: "h-6 mr-2",
+                            src: Backend.getMarketInfoUnsafe(marketIndex.toNumber()).icon
+                          }), React.createElement("h1", {
                             className: "font-bold text-xl font-alphbeta"
                           }, param.name)), React.createElement("div", {
                         className: "flex flex-wrap justify-center w-full"
