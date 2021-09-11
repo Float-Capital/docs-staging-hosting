@@ -8,11 +8,14 @@ var InjectedConnector$1 = {};
 
 var WalletConnectConnector = {};
 
+var TorusConnector = {};
+
 var injected = new InjectedConnector.InjectedConnector({
       supportedChainIds: [Config.networkId]
     });
 
 exports.InjectedConnector = InjectedConnector$1;
 exports.WalletConnectConnector = WalletConnectConnector;
+exports.TorusConnector = TorusConnector;
 exports.injected = injected;
 /* injected Not a pure module */

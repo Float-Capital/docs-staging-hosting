@@ -16,6 +16,8 @@ var networkId = config.networkId;
 
 var networkName = config.networkName;
 
+var torusName = config.torusName;
+
 var networkCurrencyName = config.networkCurrencyName;
 
 var networkCurrencySymbol = config.networkCurrencySymbol;
@@ -50,6 +52,7 @@ exports.priceHistoryGraphEndpoint = priceHistoryGraphEndpoint;
 exports.aaveGraphEndpoint = aaveGraphEndpoint;
 exports.networkId = networkId;
 exports.networkName = networkName;
+exports.torusName = torusName;
 exports.networkCurrencyName = networkCurrencyName;
 exports.networkCurrencySymbol = networkCurrencySymbol;
 exports.rpcEndopint = rpcEndopint;
