@@ -4,6 +4,7 @@
   "aaveGraphEndpoint": "https://api.thegraph.com/subgraphs/name/aave/aave-v2-matic",
   "networkId": 80001,
   "networkName": "mumbai testnet",
+  "torusName": "mumbai",
   "networkCurrencyName": "Test MATIC",
   "networkCurrencySymbol": "MATIC",
   "rpcEndopint": "https://rpc-endpoints.superfluid.dev/mumbai",
