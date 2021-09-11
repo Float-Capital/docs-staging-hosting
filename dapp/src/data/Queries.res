@@ -237,6 +237,19 @@ query ($userId: String!, $tokenAdr: String!) {
   }
 }`)
 
+// Used externally in: UserUI.res,
+module UsersGems = %graphql(`
+query ($userId: String!) {
+  user (id: $userId) {
+    gems {
+      id
+      balance
+      streak
+      lastUpdated
+    }
+  }
+}`)
+
 // Used externally in: useUsersBalances (datahook), User.res, StakeList.res
 module UsersBalances = %graphql(`
 query ($userId: String!) {

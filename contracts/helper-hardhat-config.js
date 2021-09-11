@@ -7,6 +7,7 @@ const FLOAT_TOKEN = "FloatToken";
 const FLOAT_TOKEN_ALPHA = "AlphaTestFLT";
 const TOKEN_FACTORY = "TokenFactory";
 const FLOAT_CAPITAL = "FloatCapital_v0";
+const GEMS = "GEMS";
 const isAlphaLaunch = true;
 module.exports = {
   STAKER,
@@ -18,5 +19,6 @@ module.exports = {
   FLOAT_TOKEN_ALPHA,
   TOKEN_FACTORY,
   FLOAT_CAPITAL,
+  GEMS,
   isAlphaLaunch,
 };

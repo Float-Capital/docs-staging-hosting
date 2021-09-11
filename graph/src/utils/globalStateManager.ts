@@ -182,6 +182,7 @@ export function getOrCreateUser(address: Bytes, event: ethereum.Event): User {
     user.settledNextPriceActions = [];
     user.pendingNextPriceStakeActions = [];
     user.settledNextPriceStakeActions = [];
+    user.gems = "UNITITIALIZED - Gems";
 
     let globalState = GlobalState.load(GLOBAL_STATE_ID);
     globalState.totalUsers = globalState.totalUsers.plus(ONE);

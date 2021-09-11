@@ -19,6 +19,8 @@ contract GEMS is AccessControlledAndUpgradeable {
   mapping(address => uint256) public streak;
   mapping(address => uint256) public lastAction;
 
+  event GemsCollected(address user, uint256 gems, uint256 streak);
+
   function initialize(
     address _admin,
     address _longShort,
@@ -48,6 +50,7 @@ contract GEMS is AccessControlledAndUpgradeable {
 
         lastAction[user] = blocktimestamp;
       }
+      emit GemsCollected(user, gems[user], streak[user]);
     }
   }
 }

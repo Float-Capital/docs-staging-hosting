@@ -103,7 +103,7 @@ dataSources:
 
   - kind: ethereum/contract
     name: TreasuryAlpha
-    network: ganache
+    network: mumbai
     source:
       address: "0x515F0dd05D3Ead8d74E4A5aD3EAbb939b8388a13"
       abi: TreasuryAlpha
@@ -121,6 +121,27 @@ dataSources:
         - event: BasePriceUpdated(uint256)
           handler: handleBasePriceUpdated
       file: ./src/mappings/treasuryAlpha.ts
+
+  - kind: ethereum/contract
+    name: GEMS
+    network: mumbai
+    source:
+      address: ""
+      abi: GEMS
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - GemsCollected
+      abis:
+        - name: GEMS
+          file: ./abis/GEMS.json
+      eventHandlers:
+        - event: GemsCollected(address,uint256,uint256)
+          handler: handleGemsCollected
+      file: ./src/mappings/gems.ts
 
 templates:
   - kind: ethereum/contract

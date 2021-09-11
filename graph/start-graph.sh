@@ -88,6 +88,7 @@ function start {
     done
 
     echo "####### DEPLOYING CONTRACTS #######"
+    rm -rf contracts/deployments/ganache
     cd ../contracts && yarn clean && yarn deploy --network ganache
     if [ "$?" -ne 0 ];
     then
