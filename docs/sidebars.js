@@ -1,7 +1,7 @@
 module.exports = {
   someSidebar: {
     "Float Capital": ["welcome", "faqs", "security"],
-    alpha: ["alpha"],
+    Alpha: ["alpha"],
     Protocol: [
       "overview",
       "synthetic-asset-tokens",
