@@ -2,6 +2,8 @@ module StartTradingStorage = {
   type state = Rendering | Rendered
 
   let useStartTradingStorage = () => {
+    let numberOfTimesShown = 1
+
     let (hasVisitedEnoughTimes, setHasVisitedEnoughTimes) = React.useState(_ => false)
     let (isPartOfActiveSession, setIsPartOfActiveSession) = React.useState(_ => false)
     let (state, setState) = React.useState(_ => Rendering)
@@ -15,7 +17,7 @@ module StartTradingStorage = {
       | Some(numberOfVisits) => numberOfVisits->Int.fromString->Option.getWithDefault(0) + 1
       | None => 0
       }
-      setHasVisitedEnoughTimes(_ => numberOfVisits >= 6)
+      setHasVisitedEnoughTimes(_ => numberOfVisits >= numberOfTimesShown)
       localStorage->Dom.Storage2.setItem(key, numberOfVisits->Int.toString)
 
       // update session storage
