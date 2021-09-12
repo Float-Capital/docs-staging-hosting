@@ -72,12 +72,10 @@ contract StakerInternalStateSetters is Staker {
     address user,
     uint256 shiftAmountLong,
     uint256 shiftAmountShort,
-    uint256 _userNextPrice_stakedSyntheticTokenShiftIndex,
+    uint256 _userNextPrice_stakedActionIndex,
     uint256 _latestRewardIndex
   ) public {
-    userNextPrice_stakedSyntheticTokenShiftIndex[marketIndex][
-      user
-    ] = _userNextPrice_stakedSyntheticTokenShiftIndex;
+    userNextPrice_stakedActionIndex[marketIndex][user] = _userNextPrice_stakedActionIndex;
     userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[marketIndex][true][
       user
     ] = shiftAmountLong;
@@ -94,13 +92,11 @@ contract StakerInternalStateSetters is Staker {
     address user,
     uint256 amountSyntheticTokensToShift,
     uint256 _userAmountStaked,
-    uint256 _userNextPrice_stakedSyntheticTokenShiftIndex,
+    uint256 _userNextPrice_stakedActionIndex,
     uint256 _latestRewardIndex,
     address syntheticToken
   ) public {
-    userNextPrice_stakedSyntheticTokenShiftIndex[marketIndex][
-      user
-    ] = _userNextPrice_stakedSyntheticTokenShiftIndex;
+    userNextPrice_stakedActionIndex[marketIndex][user] = _userNextPrice_stakedActionIndex;
     latestRewardIndex[marketIndex] = _latestRewardIndex;
 
     if (isShiftFromLong) {
@@ -234,7 +230,7 @@ contract StakerInternalStateSetters is Staker {
     address user,
     uint256 amountStaked,
     address token,
-    uint256 _userNextPrice_stakedSyntheticTokenShiftIndex,
+    uint256 _userNextPrice_stakedActionIndex,
     address _syntheticTokens,
     uint256 _userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_long,
     uint256 _userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_short
@@ -242,9 +238,7 @@ contract StakerInternalStateSetters is Staker {
     marketIndexOfToken[token] = marketIndex;
     longShort = _longShort;
     userAmountStaked[token][user] = amountStaked;
-    userNextPrice_stakedSyntheticTokenShiftIndex[marketIndex][
-      user
-    ] = _userNextPrice_stakedSyntheticTokenShiftIndex;
+    userNextPrice_stakedActionIndex[marketIndex][user] = _userNextPrice_stakedActionIndex;
     syntheticTokens[marketIndex][true] = _syntheticTokens;
     userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom[marketIndex][true][
       user

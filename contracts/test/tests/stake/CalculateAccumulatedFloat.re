@@ -165,10 +165,8 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
       let rewardBeforeShiftInterval = Helpers.randomTokenAmount();
       let rewardAfterShiftInterval = Helpers.randomTokenAmount();
       let amountToShift = Helpers.randomTokenAmount();
-      let userNextPrice_stakedSyntheticTokenShiftIndex =
-        Helpers.randomInteger();
-      let latestRewardIndex =
-        userNextPrice_stakedSyntheticTokenShiftIndex->add(oneBn);
+      let userNextPrice_stakedActionIndex = Helpers.randomInteger();
+      let latestRewardIndex = userNextPrice_stakedActionIndex->add(oneBn);
       let newLatestRewardIndex =
         latestRewardIndex->add(Helpers.randomInteger());
 
@@ -208,7 +206,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
             ~user,
             ~shiftAmountLong=isShiftFromLong ? amountToShift : zeroBn,
             ~shiftAmountShort=isShiftFromLong ? zeroBn : amountToShift,
-            ~userNextPrice_stakedSyntheticTokenShiftIndex,
+            ~userNextPrice_stakedActionIndex,
             ~latestRewardIndex,
           );
         let%AwaitThen longShortSmocked = LongShortSmocked.make();
@@ -262,7 +260,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
               amountStakedLong: amountStakedBothSidesInitially,
               amountStakedShort: amountStakedBothSidesInitially,
               rewardIndexFrom: usersLatestClaimedReward,
-              rewardIndexTo: userNextPrice_stakedSyntheticTokenShiftIndex,
+              rewardIndexTo: userNextPrice_stakedActionIndex,
             });
           StakerSmocked.InternalMock._calculateAccumulatedFloatInRangeCallCheck({
             marketIndex,
@@ -270,7 +268,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
               isShiftFromLong ? stakeDecreasedSide : stakeIncreasedSide,
             amountStakedShort:
               isShiftFromLong ? stakeIncreasedSide : stakeDecreasedSide,
-            rewardIndexFrom: userNextPrice_stakedSyntheticTokenShiftIndex,
+            rewardIndexFrom: userNextPrice_stakedActionIndex,
             rewardIndexTo: latestRewardIndex,
           });
         });
@@ -284,7 +282,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
                 marketIndex,
                 amountSyntheticToken_redeemOnOriginSide: amountToShift,
                 isShiftFromLong,
-                priceSnapshotIndex: userNextPrice_stakedSyntheticTokenShiftIndex,
+                priceSnapshotIndex: userNextPrice_stakedActionIndex,
               });
           },
         );
@@ -327,8 +325,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
       );
 
       it(
-        "it should reset the users userNextPrice_stakedSyntheticTokenShiftIndex to zero",
-        () => {
+        "it should reset the users userNextPrice_stakedActionIndex to zero", () => {
         let%Await _ = setup(~isShiftFromLong=true);
 
         // the setup function only simulates the call, it doesn't execute it, execute it here.
@@ -341,10 +338,7 @@ let test = (~contracts: ref(Helpers.coreContracts)) =>
 
         let%Await usersShiftIndex =
           contracts.contents.staker
-          ->Staker.userNextPrice_stakedSyntheticTokenShiftIndex(
-              marketIndex,
-              user,
-            );
+          ->Staker.userNextPrice_stakedActionIndex(marketIndex, user);
 
         Chai.bnEqual(usersShiftIndex, zeroBn);
       });
