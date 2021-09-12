@@ -14,6 +14,7 @@ type coreContracts = {
   floatToken: FloatToken.t,
   staker: Staker.t,
   longShort: LongShort.t,
+  gems: GEMS.t,
   markets: array<markets>,
 }
 
@@ -248,6 +249,7 @@ let initialize = (~admin: Ethers.Wallet.t, ~exposeInternals: bool) => {
         treasury: treasury,
         markets: markets,
         floatCapital_v0: floatCapital,
+        gems: gems,
       })
     })
   })
