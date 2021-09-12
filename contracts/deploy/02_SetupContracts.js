@@ -2,6 +2,9 @@ const { runTestTransactions } = require("../deployTests/RunTestTransactions");
 const {
   runMumbaiTransactions,
 } = require("../deployTests/RunMumbaiTransactions");
+const {
+  launchPolygonMarkets,
+} = require("../deployTests/PolygonTransactions");
 const { ethers } = require("hardhat");
 
 const {
@@ -34,7 +37,9 @@ module.exports = async (hardhatDeployArguments) => {
   ////////////////////////
   console.log("1");
   let paymentTokenAddress;
-  if (networkToUse == "mumbai") {
+  if (networkToUse == "polygon") {
+    paymentTokenAddress = "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063";
+  } else if (networkToUse == "mumbai") {
     paymentTokenAddress = "0x001B3B4d0F3714Ca98ba10F6042DaEbF0B1B7b6F";
   } else if (networkToUse == "hardhat" || networkToUse == "ganache") {
     paymentTokenAddress = (await deployments.get(COLLATERAL_TOKEN)).address;
@@ -110,6 +115,17 @@ module.exports = async (hardhatDeployArguments) => {
   await gems.initialize(admin, longShort.address, staker.address);
 
   if (networkToUse == "mumbai") {
+    console.log("mumbai test transactions");
+    await launchPolygonMarkets(
+      {
+        staker,
+        longShort: longShort.connect(admin),
+        paymentToken,
+        treasury,
+      },
+      hardhatDeployArguments
+    );
+  } else if (networkToUse == "mumbai") {
     console.log("mumbai test transactions");
     await runMumbaiTransactions(
       {
