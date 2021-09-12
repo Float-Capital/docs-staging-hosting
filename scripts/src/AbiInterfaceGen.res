@@ -19,10 +19,12 @@ let getMmoduleName = fileName => fileName->Js.String2.split(".")->Array.getUnsaf
 let getRescriptType = typeString =>
   switch typeString {
   | #"uint32[]" => "array<int>"
-  | #uint8 => "int"
-  | #uint16 => "int"
+  | #uint8
+  | #uint16
   | #uint32 => "int"
-  | #uint256 => "Ethers.BigNumber.t"
+  | #uint256
+  | #uint80
+  | #uint128
   | #int256 => "Ethers.BigNumber.t"
   | #string => "string"
   | #address => "Ethers.ethAddress"

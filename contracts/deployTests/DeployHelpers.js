@@ -284,6 +284,106 @@ function deployMumbaiMarketUpgradeable(syntheticName, syntheticSymbol, longShort
               }));
 }
 
+function deployFlipp3ningPolygon(longShortInstance, stakerInstance, treasuryInstance, admin, paymentToken, ethMarketCapOraclePriceFeedAddress, btcMarketCapOraclePriceFeedAddress, deployments, namedAccounts) {
+  var syntheticName = "Flipp3ning";
+  var syntheticSymbol = "F3";
+  return LetOps.AwaitThen.let_(longShortInstance.latestMarket(), (function (latestMarket) {
+                var newMarketIndex = latestMarket + 1 | 0;
+                return LetOps.AwaitThen.let_(deployments.deploy("SSF3", {
+                                contract: "SyntheticTokenUpgradeable",
+                                from: namedAccounts.deployer,
+                                log: true,
+                                proxy: {
+                                  proxyContract: "UUPSProxy",
+                                  execute: {
+                                    methodName: "initialize",
+                                    args: [
+                                      "Float Short Flipp3ning",
+                                      "f\xe2\x86\x97\xef\xb8\x8fF3",
+                                      longShortInstance.address,
+                                      stakerInstance.address,
+                                      newMarketIndex,
+                                      false
+                                    ]
+                                  }
+                                }
+                              }), (function (syntheticTokenShort) {
+                              return LetOps.AwaitThen.let_(deployments.deploy("SLF3", {
+                                              from: namedAccounts.deployer,
+                                              log: true,
+                                              contract: "SyntheticTokenUpgradeable",
+                                              proxy: {
+                                                proxyContract: "UUPSProxy",
+                                                execute: {
+                                                  args: [
+                                                    "Float Long Flipp3ning",
+                                                    "f\xe2\x86\x98\xef\xb8\x8fF3",
+                                                    longShortInstance.address,
+                                                    stakerInstance.address,
+                                                    newMarketIndex,
+                                                    true
+                                                  ],
+                                                  methodName: "initialize"
+                                                }
+                                              }
+                                            }), (function (syntheticTokenLong) {
+                                            return LetOps.AwaitThen.let_(deployments.deploy("OracleManagerF3", {
+                                                            from: namedAccounts.deployer,
+                                                            log: true,
+                                                            contract: "OracleManagerFlipp3ning",
+                                                            args: [
+                                                              ethMarketCapOraclePriceFeedAddress,
+                                                              btcMarketCapOraclePriceFeedAddress
+                                                            ]
+                                                          }), (function (oracleManager) {
+                                                          console.log("a.1");
+                                                          console.log("a.3");
+                                                          return LetOps.AwaitThen.let_(deployments.deploy("YieldManagerF3", {
+                                                                          from: namedAccounts.deployer,
+                                                                          contract: "YieldManagerAave",
+                                                                          log: true,
+                                                                          proxy: {
+                                                                            proxyContract: "UUPSProxy",
+                                                                            execute: {
+                                                                              methodName: "initialize",
+                                                                              args: [
+                                                                                longShortInstance.address,
+                                                                                treasuryInstance.address,
+                                                                                paymentToken.address,
+                                                                                "0x27F8D03b3a2196956ED754baDc28D73be8830A6e",
+                                                                                "0xd05e3E715d945B59290df0ae8eF85c1BdB684744",
+                                                                                "0x357D51124f59836DeD84c8a1730D72B749d8BC23",
+                                                                                0,
+                                                                                admin.address
+                                                                              ]
+                                                                            }
+                                                                          }
+                                                                        }), (function (yieldManager) {
+                                                                        console.log("a.4");
+                                                                        console.log([
+                                                                              yieldManager.address,
+                                                                              syntheticTokenLong.address,
+                                                                              syntheticTokenShort.address
+                                                                            ]);
+                                                                        return LetOps.AwaitThen.let_(longShortInstance.connect(admin).createNewSyntheticMarketExternalSyntheticTokens(syntheticName, syntheticSymbol, syntheticTokenLong.address, syntheticTokenShort.address, paymentToken.address, oracleManager.address, yieldManager.address), (function (param) {
+                                                                                      console.log("a.5");
+                                                                                      var kInitialMultiplier = Globals.bnFromString("5000000000000000000");
+                                                                                      var kPeriod = Globals.bnFromInt(864000);
+                                                                                      console.log("a.6");
+                                                                                      var unstakeFee_e18 = Globals.bnFromString("5000000000000000");
+                                                                                      var initialMarketSeedForEachMarketSide = Globals.bnFromString("1000000000000000000");
+                                                                                      return LetOps.AwaitThen.let_(paymentToken.connect(admin).approve(longShortInstance.address, Globals.mul(initialMarketSeedForEachMarketSide, Globals.bnFromInt(3))), (function (param) {
+                                                                                                    console.log("a.7");
+                                                                                                    return longShortInstance.connect(admin).initializeMarket(newMarketIndex, kInitialMultiplier, kPeriod, unstakeFee_e18, initialMarketSeedForEachMarketSide, Globals.bnFromInt(5), Globals.bnFromInt(0), Globals.bnFromInt(1), Globals.mul(Globals.bnFromInt(3), CONSTANTS.tenToThe18));
+                                                                                                  }));
+                                                                                    }));
+                                                                      }));
+                                                        }));
+                                          }));
+                            }));
+              }));
+}
+
 exports.minSenderBalance = minSenderBalance;
 exports.minRecieverBalance = minRecieverBalance;
 exports.topupBalanceIfLow = topupBalanceIfLow;
@@ -302,4 +402,5 @@ exports.mintShortNextPriceWithSystemUpdate = mintShortNextPriceWithSystemUpdate;
 exports.deployTestMarket = deployTestMarket;
 exports.deployMumbaiMarket = deployMumbaiMarket;
 exports.deployMumbaiMarketUpgradeable = deployMumbaiMarketUpgradeable;
+exports.deployFlipp3ningPolygon = deployFlipp3ningPolygon;
 /* minSenderBalance Not a pure module */
