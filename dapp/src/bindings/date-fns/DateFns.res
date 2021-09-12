@@ -30,6 +30,9 @@ type durationTimeFormat = {
   seconds: int,
 }
 
+@module("date-fns/formatRelative")
+external formatRelative: (Js.Date.t, Js.Date.t) => string = "default"
+
 type durationFormatOutput = {format: array<string>}
 
 @module("date-fns/formatDuration")

@@ -19,6 +19,7 @@ var CONSTANTS = require("../CONSTANTS.js");
 var DataHooks = require("../data/DataHooks.js");
 var Link = require("next/link").default;
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
+var PendingBar = require("../components/UI/Base/PendingBar.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
 var ProgressBar = require("../components/UI/Base/ProgressBar.js");
 var Router = require("next/router");
@@ -165,7 +166,7 @@ function User$UserBalancesCard(Props) {
               children: null
             }, React.createElement(UserUI.UserColumnHeader.make, {
                   children: "Synthetic assets"
-                }), tmp, tmp$1);
+                }), React.createElement(PendingBar.make, {}), tmp, tmp$1);
 }
 
 var UserBalancesCard = {

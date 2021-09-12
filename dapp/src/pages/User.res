@@ -85,6 +85,7 @@ module UserBalancesCard = {
 
     <UserColumnCard>
       <UserColumnHeader> {`Synthetic assets`->React.string} </UserColumnHeader>
+      <PendingBar />
       {switch usersPendingMintsQuery {
       | Loading => <div className="mx-auto"> <Loader.Mini /> </div>
       | GraphError(string) => string->React.string
