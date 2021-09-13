@@ -261,6 +261,7 @@ type stakerUnitTestContracts = {
   floatTokenSmocked: FloatTokenSmocked.t,
   syntheticTokenSmocked: SyntheticTokenSmocked.t,
   floatCapitalSmocked: FloatCapital_v0.t,
+  gems: GEMS.t,
 }
 
 let initializeStakerUnit = () => {
@@ -279,16 +280,18 @@ let initializeStakerUnit = () => {
     floatTokenSmocked,
     syntheticTokenSmocked,
     floatCapitalSmocked,
-    _gems,
+    gems,
   )) =>
     staker
     ->Staker.setVariable(~name="longShort", ~value=longShortSmocked.address)
+    ->JsPromise.map(_ => staker->Staker.setVariable(~name="gems", ~value=gems.address))
     ->JsPromise.map(_ => {
       staker: staker,
       longShortSmocked: longShortSmocked,
       floatTokenSmocked: floatTokenSmocked,
       syntheticTokenSmocked: syntheticTokenSmocked,
       floatCapitalSmocked: floatCapitalSmocked,
+      gems: gems,
     })
   )
 }
