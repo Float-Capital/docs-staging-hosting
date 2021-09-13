@@ -12,7 +12,7 @@
   "blockExplorer": "https://polygonscan.com/",
   "blockExplorerName": "polygonscan",
   "discordInviteLink": "https://discord.gg/dqDwgrVYcU",
-  "polygonBridgeLink": "https://wallet.matic.network/bridge/",
+  "polygonBridgeLink": "https://wallet.polygon.technology/bridge",
   "web3PollingInterval": 8000,
   "apolloConnectToDevTools": false,
   "contracts": {
