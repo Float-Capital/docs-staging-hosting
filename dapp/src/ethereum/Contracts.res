@@ -11,6 +11,7 @@ module LongShort = {
       "function redeemShortNextPrice(uint32 marketIndex,uint256 tokensToRedeem) @1100000",
       "function executeOutstandingNextPriceSettlementsUser(address user,uint32 marketIndex) @130000",
       "function updateSystemState()",
+      "function updateSystemStateMulti(uint32[] marketIndexes)",
     ]->Ethers.makeAbi
 
   let make = (~address, ~providerOrSigner): t =>
@@ -47,8 +48,13 @@ module LongShort = {
     ~marketIndex: Ethers.BigNumber.t,
   ) => JsPromise.t<Ethers.txSubmitted> = "executeOutstandingNextPriceSettlementsUser"
   @send
-  external _updateSystemState: (~contract: t) => JsPromise.t<Ethers.txSubmitted> =
-    "_updateSystemState"
+  external updateSystemState: (~contract: t) => JsPromise.t<Ethers.txSubmitted> =
+    "updateSystemState"
+  @send
+  external updateSystemStateMulti: (
+    ~contract: t,
+    ~marketIndexes: array<Ethers.BigNumber.t>,
+  ) => JsPromise.t<Ethers.txSubmitted> = "updateSystemStateMulti"
 }
 
 module Staker = {

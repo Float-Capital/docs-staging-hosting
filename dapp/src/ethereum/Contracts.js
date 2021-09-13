@@ -9,7 +9,8 @@ var abi = Ethers.makeAbi([
       "function redeemLongNextPrice(uint32 marketIndex,uint256 tokensToRedeem) @1100000",
       "function redeemShortNextPrice(uint32 marketIndex,uint256 tokensToRedeem) @1100000",
       "function executeOutstandingNextPriceSettlementsUser(address user,uint32 marketIndex) @130000",
-      "function updateSystemState()"
+      "function updateSystemState()",
+      "function updateSystemStateMulti(uint32[] marketIndexes)"
     ]);
 
 function make(address, providerOrSigner) {

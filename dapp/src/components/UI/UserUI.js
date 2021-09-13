@@ -9,7 +9,6 @@ var Config = require("../../config/Config.js");
 var Ethers = require("../../ethereum/Ethers.js");
 var Loader = require("./Base/Loader.js");
 var Ethers$1 = require("ethers");
-var Backend = require("../../mockBackend/Backend.js");
 var Globals = require("../../libraries/Globals.js");
 var Js_dict = require("rescript/lib/js/js_dict.js");
 var Tooltip = require("./Base/Tooltip.js");
@@ -20,10 +19,10 @@ var CONSTANTS = require("../../CONSTANTS.js");
 var DataHooks = require("../../data/DataHooks.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var ClaimFloat = require("../Claim/ClaimFloat.js");
+var PendingBar = require("./Base/PendingBar.js");
 var Pervasives = require("rescript/lib/js/pervasives.js");
 var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
-var ProgressBar = require("./Base/ProgressBar.js");
 var Router = require("next/router");
 var RootProvider = require("../../libraries/RootProvider.js");
 var Belt_SetString = require("rescript/lib/js/belt_SetString.js");
@@ -446,35 +445,25 @@ function UserUI$UserPendingBox(Props) {
   var name = Props.name;
   var isLong = Props.isLong;
   var daiSpend = Props.daiSpend;
-  var txConfirmedTimestamp = Props.txConfirmedTimestamp;
   var marketIndex = Props.marketIndex;
-  var setTimerFinished = Props.setTimerFinished;
-  var lastOracleTimestamp = DataHooks.useOracleLastUpdate(marketIndex.toString());
-  var oracleHeartbeatForMarket = Backend.getMarketInfoUnsafe(marketIndex.toNumber()).oracleHeartbeat;
-  if (typeof lastOracleTimestamp === "number") {
-    return React.createElement(Loader.Tiny.make, {});
-  } else if (lastOracleTimestamp.TAG === /* GraphError */0) {
-    return React.createElement("p", undefined, lastOracleTimestamp._0);
-  } else {
-    return React.createElement("div", {
-                className: "flex flex-col justify-between w-11/12 mx-auto p-2 mb-2 border-2 border-primary rounded-lg shadow relative"
-              }, React.createElement("div", {
-                    className: "flex flex-row justify-between"
-                  }, React.createElement("div", {
-                        className: " text-sm self-center"
-                      }, name), React.createElement("div", {
-                        className: " text-sm self-center"
-                      }, isLong ? "Long" : "Short"), React.createElement("div", {
-                        className: "flex  text-sm self-center"
-                      }, React.createElement("img", {
-                            className: "h-5 pr-1",
-                            src: CONSTANTS.daiDisplayToken.iconUrl
-                          }), Ethers.Utils.formatEther(daiSpend))), React.createElement(ProgressBar.make, {
-                    txConfirmedTimestamp: txConfirmedTimestamp,
-                    nextPriceUpdateTimestamp: lastOracleTimestamp._0.toNumber() + oracleHeartbeatForMarket | 0,
-                    setTimerFinished: setTimerFinished
-                  }));
-  }
+  var refetchCallback = Props.refetchCallback;
+  return React.createElement("div", {
+              className: "flex flex-col justify-between w-11/12 mx-auto p-2 mb-2 border-2 border-primary rounded-lg shadow relative"
+            }, React.createElement("div", {
+                  className: "flex flex-row justify-between"
+                }, React.createElement("div", {
+                      className: " text-sm self-center"
+                    }, name), React.createElement("div", {
+                      className: " text-sm self-center"
+                    }, isLong ? "Long" : "Short"), React.createElement("div", {
+                      className: "flex  text-sm self-center"
+                    }, React.createElement("img", {
+                          className: "h-5 pr-1",
+                          src: CONSTANTS.daiDisplayToken.iconUrl
+                        }), Ethers.Utils.formatEther(daiSpend))), React.createElement(PendingBar.make, {
+                  marketIndex: marketIndex,
+                  refetchCallback: refetchCallback
+                }));
 }
 
 var UserPendingBox = {

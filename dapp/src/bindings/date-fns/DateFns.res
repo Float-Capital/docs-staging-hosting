@@ -1,5 +1,6 @@
 @ocaml.doc(`Please add additional useful formats:
 
+hh:mm:ss         | 00:00:00
 do MMM ''yy      | 1st Jan '21
 ha do MMM ''yy   | 8PM 1st Jan '21
 ha               | 8PM
@@ -8,6 +9,7 @@ iii MMM          | Tues Jan
 MMM              | Jan
 `)
 type dateFormats = [
+  | #"HH:mm:ss"
   | #"do MMM ''yy"
   | #"ha do MMM ''yy"
   | #ha

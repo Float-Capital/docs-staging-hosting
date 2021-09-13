@@ -16,44 +16,10 @@ let getUsersTotalTokenBalance = (balancesResponse: array<Queries.UserTokenBalanc
 module UserPendingMintItem = {
   @react.component
   let make = (~userId, ~pendingMint) => {
-    let (timerFinished, setTimerFinished) = React.useState(_ => false)
+    let (refetchAttempt, setRefetchAttempt) = React.useState(_ => 0.)
 
-    let client = Client.useApolloClient()
-    let reqVariables = {
-      Queries.UsersConfirmedMints.userId: userId,
-    }
-
-    React.useEffect1(() => {
-      let timeForGraphToUpdate = 1000 // Give the graph a chance to capture the data before making the request
-      let timeout = Js.Global.setTimeout(() => {
-        let _ = client.query(
-          ~query=module(Queries.UsersConfirmedMints),
-          ~fetchPolicy=NetworkOnly,
-          reqVariables,
-        )->JsPromise.map(queryResult => {
-          switch queryResult {
-          | Ok({data: {user}}) =>
-            switch user {
-            | Some(usr) => {
-                let _ = client.writeQuery(
-                  ~query=module(Queries.UsersConfirmedMints),
-                  ~data={
-                    user: Some({
-                      __typename: usr.__typename,
-                      confirmedNextPriceActions: usr.confirmedNextPriceActions,
-                    }),
-                  },
-                )
-              }
-            | None => ()
-            }
-
-          | _ => ()
-          }
-        })
-      }, timeForGraphToUpdate)
-      Some(() => Js.Global.clearTimeout(timeout))
-    }, [timerFinished])
+    let _ = Refetchers.useRefetchConfirmedSynths(~userId, ~stateForRefetchExecution=refetchAttempt)
+    let _ = Refetchers.useRefetchPendingSynths(~userId, ~stateForRefetchExecution=refetchAttempt)
 
     <>
       {pendingMint->Array.length > 0
@@ -62,14 +28,13 @@ module UserPendingMintItem = {
           </UserColumnTextCenter>
         : React.null}
       {pendingMint
-      ->Array.map(({marketIndex, isLong, amount, confirmedTimestamp}) =>
+      ->Array.map(({marketIndex, isLong, amount, confirmedTimestamp: _}) =>
         <UserPendingBox
           name={(marketIndex->toNumber->Backend.getMarketInfoUnsafe).name}
           isLong
           daiSpend=amount
           marketIndex
-          txConfirmedTimestamp={confirmedTimestamp->toNumber}
-          setTimerFinished
+          refetchCallback=setRefetchAttempt
         />
       )
       ->React.array}
@@ -85,7 +50,6 @@ module UserBalancesCard = {
 
     <UserColumnCard>
       <UserColumnHeader> {`Synthetic assets`->React.string} </UserColumnHeader>
-      <PendingBar />
       {switch usersPendingMintsQuery {
       | Loading => <div className="mx-auto"> <Loader.Mini /> </div>
       | GraphError(string) => string->React.string

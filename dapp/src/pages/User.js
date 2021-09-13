@@ -19,7 +19,7 @@ var CONSTANTS = require("../CONSTANTS.js");
 var DataHooks = require("../data/DataHooks.js");
 var Link = require("next/link").default;
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
-var PendingBar = require("../components/UI/Base/PendingBar.js");
+var Refetchers = require("../libraries/Refetchers.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
 var ProgressBar = require("../components/UI/Base/ProgressBar.js");
 var Router = require("next/router");
@@ -64,41 +64,12 @@ function User$UserPendingMintItem(Props) {
   var userId = Props.userId;
   var pendingMint = Props.pendingMint;
   var match = React.useState(function () {
-        return false;
+        return 0;
       });
-  var setTimerFinished = match[1];
-  var client = Client.useApolloClient(undefined);
-  var reqVariables = {
-    userId: userId
-  };
-  React.useEffect((function () {
-          var timeout = setTimeout((function (param) {
-                  Curry._6(client.rescript_query, {
-                          query: Queries.UsersConfirmedMints.query,
-                          Raw: Queries.UsersConfirmedMints.Raw,
-                          parse: Queries.UsersConfirmedMints.parse,
-                          serialize: Queries.UsersConfirmedMints.serialize,
-                          serializeVariables: Queries.UsersConfirmedMints.serializeVariables
-                        }, undefined, undefined, /* NetworkOnly */2, undefined, reqVariables).then(function (queryResult) {
-                        if (queryResult.TAG === /* Ok */0 && queryResult._0.data.user !== undefined) {
-                          Curry._1(client.rescript_writeQuery, {
-                                query: Queries.UsersConfirmedMints.query,
-                                Raw: Queries.UsersConfirmedMints.Raw,
-                                parse: Queries.UsersConfirmedMints.parse,
-                                serialize: Queries.UsersConfirmedMints.serialize,
-                                serializeVariables: Queries.UsersConfirmedMints.serializeVariables
-                              });
-                          return ;
-                        }
-                        
-                      });
-                  
-                }), 1000);
-          return (function (param) {
-                    clearTimeout(timeout);
-                    
-                  });
-        }), [match[0]]);
+  var setRefetchAttempt = match[1];
+  var refetchAttempt = match[0];
+  Refetchers.useRefetchConfirmedSynths(userId, refetchAttempt);
+  Refetchers.useRefetchPendingSynths(userId, refetchAttempt);
   return React.createElement(React.Fragment, undefined, pendingMint.length !== 0 ? React.createElement(UserUI.UserColumnTextCenter.make, {
                     children: null
                   }, React.createElement(UserUI.UserColumnText.make, {
@@ -110,9 +81,8 @@ function User$UserPendingMintItem(Props) {
                                 name: Backend.getMarketInfoUnsafe(marketIndex.toNumber()).name,
                                 isLong: param.isLong,
                                 daiSpend: param.amount,
-                                txConfirmedTimestamp: param.confirmedTimestamp.toNumber(),
                                 marketIndex: marketIndex,
-                                setTimerFinished: setTimerFinished
+                                refetchCallback: setRefetchAttempt
                               });
                   })));
 }
@@ -166,7 +136,7 @@ function User$UserBalancesCard(Props) {
               children: null
             }, React.createElement(UserUI.UserColumnHeader.make, {
                   children: "Synthetic assets"
-                }), React.createElement(PendingBar.make, {}), tmp, tmp$1);
+                }), tmp, tmp$1);
 }
 
 var UserBalancesCard = {
