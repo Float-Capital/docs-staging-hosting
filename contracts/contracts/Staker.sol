@@ -128,8 +128,8 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
     _;
   }
 
-  modifier gemCollecting() {
-    GEMS(gems).gm(msg.sender);
+  modifier gemCollecting(address user) {
+    GEMS(gems).gm(user);
     _;
   }
 
@@ -820,7 +820,7 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
     virtual
     override
     onlyValidSynthetic(msg.sender)
-    gemCollecting
+    gemCollecting(from)
   {
     uint32 marketIndex = marketIndexOfToken[msg.sender];
     ILongShort(longShort).updateSystemState(marketIndex);
@@ -862,7 +862,7 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
       marketIndex,
       msg.sender
     )
-    gemCollecting
+    gemCollecting(msg.sender)
   {
     require(amountSyntheticTokensToShift > 0, "No zero shifts.");
     address token = syntheticTokens[marketIndex][isShiftFromLong];
@@ -913,7 +913,7 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
     uint32 marketIndex,
     address token,
     uint256 amount
-  ) internal virtual gemCollecting {
+  ) internal virtual gemCollecting(msg.sender) {
     uint256 amountFees = (amount * marketUnstakeFee_e18[marketIndex]) / 1e18;
 
     ISyntheticToken(token).transfer(floatTreasury, amountFees);
@@ -1018,7 +1018,7 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
     uint8 v,
     bytes32 r,
     bytes32 s
-  ) external gemCollecting {
+  ) external gemCollecting(msg.sender) {
     address discountSigner = ecrecover(
       _hasher(
         marketIndex,
