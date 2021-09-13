@@ -39,5 +39,6 @@ contract-docs
 
 deployments/*
 !deployments/mumbai
+!deployments/polygon
 
 deploymentSummary.json

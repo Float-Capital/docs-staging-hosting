@@ -88,7 +88,7 @@ module.exports = {
       // this line ensure the use of the corresponding accounts
       forking: process.env.HARDHAT_FORK
         ? {
-          url: mumbaiProviderUrl || "https://rpc-mumbai.maticvigil.com/v1",
+          url: process.env.HARDHAT_FORK == "polygon" ? polygonProviderUrl : mumbaiProviderUrl || "https://rpc-mumbai.maticvigil.com/v1",
         }
         : undefined,
       accounts: process.env.HARDHAT_FORK
@@ -107,8 +107,8 @@ module.exports = {
       // "https://matic-mainnet.chainstacklabs.com",
       url: polygonProviderUrl || "https://matic-mainnet-full-rpc.bwarelabs.com/",
       accounts: { mnemonic },
-      // gasPrice: 1000000000,
-      // gas: 15000000,
+      gasPrice: 10000000000,
+      gas: 10000000,
     },
     mumbai: {
       chainId: 80001,
