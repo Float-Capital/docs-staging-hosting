@@ -85,34 +85,34 @@ module.exports = async (hardhatDeployArguments) => {
   ///////////////////////////
   //Initialize the contracts/
   ///////////////////////////
-  // await longShort.initialize(
-  //   admin,
-  //   tokenFactory.address,
-  //   staker.address,
-  //   gems.address
-  // );
-  // if (isAlphaLaunch) {
-  //   await floatToken.initialize(
-  //     "Alpha Float",
-  //     "alphaFLT",
-  //     staker.address,
-  //     treasury.address
-  //   );
-  // } else {
-  //   await floatToken.initialize("Float", "FLT", staker.address);
-  // }
-  // await staker.initialize(
-  //   admin,
-  //   longShort.address,
-  //   floatToken.address,
-  //   treasury.address,
-  //   floatCapital.address,
-  //   discountSigner,
-  //   "333333333333333333", // 25% for flt (33.333/133.333 ~= 0.25)
-  //   gems.address
-  // );
+  await longShort.initialize(
+    admin,
+    tokenFactory.address,
+    staker.address,
+    gems.address
+  );
+  if (isAlphaLaunch) {
+    await floatToken.initialize(
+      "Alpha Float",
+      "alphaFLT",
+      staker.address,
+      treasury.address
+    );
+  } else {
+    await floatToken.initialize("Float", "FLT", staker.address);
+  }
+  await staker.initialize(
+    admin,
+    longShort.address,
+    floatToken.address,
+    treasury.address,
+    floatCapital.address,
+    discountSigner,
+    "333333333333333333", // 25% for flt (33.333/133.333 ~= 0.25)
+    gems.address
+  );
 
-  // await gems.initialize(admin, longShort.address, staker.address);
+  await gems.initialize(admin, longShort.address, staker.address);
 
   if (networkToUse == "polygon") {
     console.log("polygon test transactions");
