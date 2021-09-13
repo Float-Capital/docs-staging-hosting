@@ -525,7 +525,7 @@ let deployFlipp3ningPolygon =
             "methodName": "initialize",
             "args": (
               "Float Short " ++ syntheticName,
-              "f↗️" ++ syntheticSymbol,
+              "fs" ++ syntheticSymbol,
               longShortInstance.address,
               stakerInstance.address,
               newMarketIndex,
@@ -547,7 +547,7 @@ let deployFlipp3ningPolygon =
           "execute": {
             "args": (
               "Float Long " ++ syntheticName,
-              "f↘️" ++ syntheticSymbol,
+              "fl" ++ syntheticSymbol,
               longShortInstance.address,
               stakerInstance.address,
               newMarketIndex,
@@ -630,8 +630,8 @@ let deployFlipp3ningPolygon =
 
   Js.log("a.5");
 
-  let kInitialMultiplier = bnFromString("5000000000000000000"); // 5x
-  let kPeriod = bnFromInt(864000); // 10 days
+  let kInitialMultiplier = bnFromString("2000000000000000000"); // 5x
+  let kPeriod = bnFromInt(5184000); // 60 days
 
   Js.log("a.6");
   let unstakeFee_e18 = bnFromString("5000000000000000"); // 50 basis point unstake fee
