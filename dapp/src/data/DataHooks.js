@@ -218,7 +218,7 @@ function useTotalClaimableFloatForUser(userId, synthTokens) {
                           };
                   }
                   var amount = stake.currentStake.amount;
-                  var timestamp = stake.lastMintState.timestamp;
+                  var timestamp = stake.syntheticMarket.latestAccumulativeFloatIssuanceSnapshot.timestamp;
                   var isLong = stake.syntheticToken.id === stake.lastMintState.longToken.id;
                   var lastAccumulativeFloatPerToken = isLong ? stake.lastMintState.accumulativeFloatPerTokenLong : stake.lastMintState.accumulativeFloatPerTokenShort;
                   var accumulativeFloatPerToken = isLong ? stake.syntheticMarket.latestAccumulativeFloatIssuanceSnapshot.accumulativeFloatPerTokenLong : stake.syntheticMarket.latestAccumulativeFloatIssuanceSnapshot.accumulativeFloatPerTokenShort;
