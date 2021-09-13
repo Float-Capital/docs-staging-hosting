@@ -35,7 +35,7 @@ let getProvider = urls =>
     providers->Providers.FallbackProvider.make(~quorum=1)
   })
 
-let defaultOptions: Contracts.txOptions = {gasPrice: 85000000000} // 85 gwei should be fast enough in most cases
+let defaultOptions: Contracts.txOptions = {gasPrice: Ethers.BigNumber.fromUnsafe("85000000000")} // 85 gwei should be fast enough in most cases
 
 let wallet: ref<Ethers.Wallet.t> = ref(None->Obj.magic)
 let provider: ref<Ethers.Providers.t> = ref(None->Obj.magic)
@@ -57,6 +57,7 @@ let runUpdateSystemStateMulti = (~marketsToUpdate) => {
       ~providerOrSigner=wallet.contents->getSigner,
     )
 
+    Js.log2(marketsToUpdate, defaultOptions)
     contract
     ->LongShort.updateSystemStateMulti(~marketIndexes=marketsToUpdate, ~gasOptions=defaultOptions)
     ->JsPromise.then(update => {

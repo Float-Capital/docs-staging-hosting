@@ -1,4 +1,4 @@
-type txOptions = {gasPrice: int}
+type txOptions = {gasPrice: Ethers.BigNumber.t}
 
 module Oracle = {
   type t = Ethers.Contract.t

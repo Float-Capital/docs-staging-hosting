@@ -6,11 +6,7 @@
   ],
   "chainlinkOracleAddresses": {
     "0x67935f65D1577ced9f4929D3679A157E95C1c02c": {
-      "linkedMarketIds": [
-        1
-      ]
-    },
-    "0x18E4058491C3F58bC2f747A9E64cA256Ed6B318d": {
+      "NOTE": "Here we only use the ETH market cap oracle to determine when to use the oracle",
       "linkedMarketIds": [
         1
       ]
