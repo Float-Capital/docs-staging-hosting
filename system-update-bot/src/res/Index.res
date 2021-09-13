@@ -22,7 +22,11 @@ let mapWalletBalance = (wallet, fn) =>
   wallet->Wallet.getBalance->JsPromise.map(balance => fn(balance))
 
 let getJsonProviders = providerUrls =>
-  JsPromise.all(providerUrls->Array.map(url => url->Providers.JsonRpcProvider.make(~chainId=80001)))
+  JsPromise.all(
+    providerUrls->Array.map(url =>
+      url->Providers.JsonRpcProvider.make(~chainId=config.chainId->Option.getWithDefault(80001))
+    ),
+  )
 
 let getProvider = urls =>
   urls
@@ -83,6 +87,7 @@ let runUpdateSystemStateMulti = (~marketsToUpdate) => {
 let setup = () => {
   JsPromise.all2((secrets.providerUrls->getProvider, secrets.mnemonic->Wallet.fromMnemonic))
   ->JsPromise.then(((_provider, unconnectedWallet)) => {
+    Js.log("Got network.")
     provider := _provider
     wallet := unconnectedWallet->Wallet.connect(_provider)
 

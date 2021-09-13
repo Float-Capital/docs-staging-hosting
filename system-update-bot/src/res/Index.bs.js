@@ -7,6 +7,7 @@ var Ethers = require("./library/Ethers.bs.js");
 var Ethers$1 = require("ethers");
 var Contracts = require("./library/Contracts.bs.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
+var Belt_Option = require("rescript/lib/js/belt_Option.js");
 
 function getAggregatorAddresses(chainlinkOracleAddresses, wallet) {
   var signer = Ethers.getSigner(wallet);
@@ -25,7 +26,7 @@ function mapWalletBalance(wallet, fn) {
 
 function getJsonProviders(providerUrls) {
   return Promise.all(Belt_Array.map(providerUrls, (function (url) {
-                    return new (Ethers$1.providers.JsonRpcProvider)(url, 80001);
+                    return new (Ethers$1.providers.JsonRpcProvider)(url, Belt_Option.getWithDefault(Config.config.chainId, 80001));
                   })));
 }
 
@@ -91,6 +92,7 @@ function setup(param) {
                     new (Ethers$1.Wallet.fromMnemonic)(Config.secrets.mnemonic)
                   ]).then(function (param) {
                   var _provider = param[0];
+                  console.log("Got network.");
                   provider.contents = _provider;
                   wallet.contents = param[1].connect(_provider);
                   console.log("Initial update system state");

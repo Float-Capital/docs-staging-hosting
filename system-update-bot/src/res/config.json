@@ -1,4 +1,5 @@
 {
+  "chainId": 137,
   "longShortContractAddress": "0x168a5d1217AEcd258b03018d5bF1A1677A07b733",
   "defaultMarkets": [
     1
