@@ -37,7 +37,7 @@ function getProvider(urls) {
 }
 
 var defaultOptions = {
-  gasPrice: 1000000000
+  gasPrice: -899345920
 };
 
 var wallet = {
