@@ -108,14 +108,14 @@ module.exports = async (hardhatDeployArguments) => {
     treasury.address,
     floatCapital.address,
     discountSigner,
-    "100000000000000", // mint an additional 0.01% for the treasury - just for testing purposes
+    "333333333333333333", // 25% for flt (33.333/133.333 ~= 0.25)
     gems.address
   );
 
   await gems.initialize(admin, longShort.address, staker.address);
 
-  if (networkToUse == "mumbai") {
-    console.log("mumbai test transactions");
+  if (networkToUse == "polygon") {
+    console.log("polygon test transactions");
     await launchPolygonMarkets(
       {
         staker,

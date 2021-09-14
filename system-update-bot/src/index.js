@@ -1,7 +1,7 @@
 var secretsManager = require("../secretsManager.js");
 var ethers = require("ethers");
 
-const longShortContractAddress = "0x037c66973F5a77dA28b6014e3B67E004724bbAf0";
+const longShortContractAddress = "0x51565F132c5B25BC9EA6e4D112ab6A680d553d2A";
 const longShortAbi = [
   "function getMarketSplit(uint32 marketIndex, uint256 amount) view returns (uint256 longAmount, uint256 shortAmount) @100000",
   "function updateSystemState(uint32 marketIndex) external @400000", //TODO: Optimise the gas here

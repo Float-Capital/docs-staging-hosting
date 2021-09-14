@@ -265,7 +265,7 @@ module UserProfileCard = {
       ~erc20Address=Config.config.contracts.dai,
     )
 
-    // let usersGems = DataHooks.useUserGems(~userId=userInfo.id)
+    let usersGems = DataHooks.useUserGems(~userId=userInfo.id)
 
     <UserColumnCard>
       <UserProfileHeader address={addressStr} />
@@ -281,7 +281,7 @@ module UserProfileCard = {
             />
           | None => React.null
           }}
-          /* {switch usersGems {
+          {switch usersGems {
           | Loading => <div className="m-auto"> <Loader.Tiny /> </div>
           | GraphError(string) => {
               Js.log(string)
@@ -297,7 +297,7 @@ module UserProfileCard = {
                 head=`⚡ Gem streak` body={`${streak->Ethers.BigNumber.toString} days`}
               />
             </>
-          }} */
+          }}
           <UserColumnText head=`🎉 Joined` body={joinedStr} />
           <UserColumnText head=`🏃 No. txs` body={txStr} />
         </div>
