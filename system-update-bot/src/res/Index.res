@@ -22,7 +22,11 @@ let mapWalletBalance = (wallet, fn) =>
   wallet->Wallet.getBalance->JsPromise.map(balance => fn(balance))
 
 let getJsonProviders = providerUrls =>
-  JsPromise.all(providerUrls->Array.map(url => url->Providers.JsonRpcProvider.make(~chainId=80001)))
+  JsPromise.all(
+    providerUrls->Array.map(url =>
+      url->Providers.JsonRpcProvider.make(~chainId=config.chainId->Option.getWithDefault(80001))
+    ),
+  )
 
 let getProvider = urls =>
   urls
@@ -31,7 +35,7 @@ let getProvider = urls =>
     providers->Providers.FallbackProvider.make(~quorum=1)
   })
 
-let defaultOptions: Contracts.txOptions = {gasPrice: 1000000000}
+let defaultOptions: Contracts.txOptions = {gasPrice: Ethers.BigNumber.fromUnsafe("85000000000")} // 85 gwei should be fast enough in most cases
 
 let wallet: ref<Ethers.Wallet.t> = ref(None->Obj.magic)
 let provider: ref<Ethers.Providers.t> = ref(None->Obj.magic)
@@ -53,6 +57,7 @@ let runUpdateSystemStateMulti = (~marketsToUpdate) => {
       ~providerOrSigner=wallet.contents->getSigner,
     )
 
+    Js.log2(marketsToUpdate, defaultOptions)
     contract
     ->LongShort.updateSystemStateMulti(~marketIndexes=marketsToUpdate, ~gasOptions=defaultOptions)
     ->JsPromise.then(update => {
@@ -83,6 +88,7 @@ let runUpdateSystemStateMulti = (~marketsToUpdate) => {
 let setup = () => {
   JsPromise.all2((secrets.providerUrls->getProvider, secrets.mnemonic->Wallet.fromMnemonic))
   ->JsPromise.then(((_provider, unconnectedWallet)) => {
+    Js.log("Got network.")
     provider := _provider
     wallet := unconnectedWallet->Wallet.connect(_provider)
 

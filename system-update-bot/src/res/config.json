@@ -1,24 +1,14 @@
 {
-  "longShortContractAddress": "0xa9d25B772f5AA249DA6bAee7Ea1F05524b0f0973",
+  "chainId": 137,
+  "longShortContractAddress": "0x168a5d1217AEcd258b03018d5bF1A1677A07b733",
   "defaultMarkets": [
-    1,
-    2,
-    3
+    1
   ],
   "chainlinkOracleAddresses": {
-    "0x0FCAa9c899EC5A91eBc3D5Dd869De833b06fB046": {
+    "0x67935f65D1577ced9f4929D3679A157E95C1c02c": {
+      "NOTE": "Here we only use the ETH market cap oracle to determine when to use the oracle",
       "linkedMarketIds": [
         1
-      ]
-    },
-    "0x0715A7794a1dc8e42615F059dD6e406A6594651A": {
-      "linkedMarketIds": [
-        2
-      ]
-    },
-    "0xd0D5e3DB44DE05E9F294BB0a3bEEaF030DE24Ada": {
-      "linkedMarketIds": [
-        3
       ]
     }
   }

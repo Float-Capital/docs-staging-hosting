@@ -7,6 +7,7 @@ type oraclesToWatch = {linkedMarketIds: array<int>}
 
 type c = {
   longShortContractAddress: Ethers.ethAddress,
+  chainId: option<int>,
   chainlinkOracleAddresses: Js.Dict.t<oraclesToWatch>,
   defaultMarkets: array<int>,
 }
