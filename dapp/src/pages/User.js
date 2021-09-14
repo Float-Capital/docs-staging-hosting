@@ -356,6 +356,26 @@ function User$UserProfileCard(Props) {
   var addressStr = DisplayAddress.ellipsifyMiddle(userInfo.id, 8, 3);
   var joinedStr = Format(userInfo.joinedAt, "do MMM ''yy");
   var txStr = userInfo.transactionCount.toString();
+  var usersGems = DataHooks.useUserGems(userInfo.id);
+  var tmp;
+  if (typeof usersGems === "number") {
+    tmp = React.createElement("div", {
+          className: "m-auto"
+        }, React.createElement(Loader.Tiny.make, {}));
+  } else if (usersGems.TAG === /* GraphError */0) {
+    console.log(usersGems._0);
+    tmp = React.createElement(React.Fragment, undefined);
+  } else {
+    var match = usersGems._0;
+    tmp = React.createElement(React.Fragment, undefined, React.createElement(UserUI.UserColumnText.make, {
+              icon: "/img/gem.gif",
+              head: "Gems collected",
+              body: Misc.NumberFormat.formatEther(2, match.balance)
+            }), React.createElement(UserUI.UserColumnText.make, {
+              head: "⚡ Gem streak",
+              body: match.streak.toString() + " days"
+            }));
+  }
   return React.createElement(UserUI.UserColumnCard.make, {
               children: null
             }, React.createElement(UserUI.UserProfileHeader.make, {
@@ -366,7 +386,7 @@ function User$UserProfileCard(Props) {
                       }, React.createElement(UserUI.UserColumnText.make, {
                             head: "📮 Address",
                             body: addressStr
-                          }), React.createElement(UserUI.UserColumnText.make, {
+                          }), tmp, React.createElement(UserUI.UserColumnText.make, {
                             head: "🎉 Joined",
                             body: joinedStr
                           }), React.createElement(UserUI.UserColumnText.make, {
