@@ -16,6 +16,61 @@ var Refetchers = require("../../../libraries/Refetchers.js");
 var ContractActions = require("../../../ethereum/ContractActions.js");
 var Format = require("date-fns/format").default;
 
+function PendingBar$SystemUpdateTxState(Props) {
+  var txState = Props.txState;
+  var updateSystemStateCall = Props.updateSystemStateCall;
+  var refetchCallback = Props.refetchCallback;
+  var tmp;
+  var exit = 0;
+  if (typeof txState === "number") {
+    if (txState === /* UnInitialised */0) {
+      exit = 1;
+    } else {
+      tmp = React.createElement(Loader.Ellipses.make, {});
+    }
+  } else {
+    switch (txState.TAG | 0) {
+      case /* SignedAndSubmitted */0 :
+          tmp = React.createElement(Loader.Mini.make, {});
+          break;
+      case /* Declined */1 :
+          exit = 1;
+          break;
+      case /* Complete */2 :
+          Curry._1(refetchCallback, (function (param) {
+                  return 1;
+                }));
+          tmp = React.createElement("p", {
+                className: "text-xxxxs text-right text-green-500 "
+              }, "✅ Success");
+          break;
+      case /* Failed */3 :
+          tmp = React.createElement("p", {
+                className: "text-xxxxs text-right text-red-500 "
+              }, "Update tx failed");
+          break;
+      
+    }
+  }
+  if (exit === 1) {
+    tmp = React.createElement("div", undefined, React.createElement("p", {
+              className: "text-xxxxs text-right text-yellow-500 "
+            }, "⚠️ Keeper down ⚠️"), React.createElement(Button.Tiny.make, {
+              onClick: (function (param) {
+                  return Curry._1(updateSystemStateCall, undefined);
+                }),
+              children: "Update Price"
+            }));
+  }
+  return React.createElement("div", {
+              className: "flex flex-row items-center"
+            }, tmp);
+}
+
+var SystemUpdateTxState = {
+  make: PendingBar$SystemUpdateTxState
+};
+
 function PendingBar$PendingBarInner(Props) {
   var lastOracleUpdateTimestamp = Props.lastOracleUpdateTimestamp;
   var oracleHeartbeat = Props.oracleHeartbeat;
@@ -46,58 +101,17 @@ function PendingBar$PendingBarInner(Props) {
             }, "Est next", React.createElement("br", undefined), "update"));
   } else {
     var anUnreasonablyLongWait = (estimatedNextUpdateTimestamp + 10 | 0) > (now | 0);
-    if (anUnreasonablyLongWait) {
-      tmp = React.createElement("div", {
+    tmp = anUnreasonablyLongWait ? React.createElement("div", {
             className: "flex flex-col justify-center"
           }, React.createElement("div", {
                 className: "mx-auto text-xs"
               }, React.createElement(Loader.Tiny.make, {})), React.createElement("p", {
                 className: "text-xxxxs"
-              }, "checking for", React.createElement("br", undefined), "price update"));
-    } else {
-      var tmp$1;
-      var exit = 0;
-      if (typeof txState === "number") {
-        if (txState === /* UnInitialised */0) {
-          exit = 1;
-        } else {
-          tmp$1 = React.createElement(Loader.Ellipses.make, {});
-        }
-      } else {
-        switch (txState.TAG | 0) {
-          case /* SignedAndSubmitted */0 :
-              tmp$1 = React.createElement(Loader.Ellipses.make, {});
-              break;
-          case /* Declined */1 :
-              exit = 1;
-              break;
-          case /* Complete */2 :
-              tmp$1 = React.createElement("p", {
-                    className: "text-xxxxs text-right text-green-500 "
-                  }, "✅ Success");
-              break;
-          case /* Failed */3 :
-              tmp$1 = React.createElement("p", {
-                    className: "text-xxxxs text-right text-red-500 "
-                  }, "Update tx failed");
-              break;
-          
-        }
-      }
-      if (exit === 1) {
-        tmp$1 = React.createElement("div", undefined, React.createElement("p", {
-                  className: "text-xxxxs text-right text-yellow-500 "
-                }, "⚠️ Keeper down ⚠️"), React.createElement(Button.Tiny.make, {
-                  onClick: (function (param) {
-                      return Curry._1(updateSystemStateCall, undefined);
-                    }),
-                  children: "Update Price"
-                }));
-      }
-      tmp = React.createElement("div", {
-            className: "flex flex-row items-center"
-          }, tmp$1);
-    }
+              }, "checking for", React.createElement("br", undefined), "price update")) : React.createElement(PendingBar$SystemUpdateTxState, {
+            txState: txState,
+            updateSystemStateCall: updateSystemStateCall,
+            refetchCallback: refetchCallback
+          });
   }
   return React.createElement("div", {
               className: "flex flex-row justify-between text-xxxs"
@@ -158,7 +172,7 @@ function PendingBar$PendingBarWrapper(Props) {
   return React.createElement("div", {
               className: "relative pt-1"
             }, React.createElement("div", {
-                  className: "text-xxs text-center mx-4"
+                  className: "text-xxs text-center mx-4 text-gray-600"
                 }, "Your transaction will be processed with the next price update ", React.createElement(Tooltip.make, {
                       tip: "To ensure fairness and security your position will be opened on the next oracle price update"
                     })), tmp, React.createElement("div", {
@@ -187,6 +201,7 @@ function PendingBar(Props) {
 
 var make = PendingBar;
 
+exports.SystemUpdateTxState = SystemUpdateTxState;
 exports.PendingBarInner = PendingBarInner;
 exports.PendingBarWrapper = PendingBarWrapper;
 exports.make = make;

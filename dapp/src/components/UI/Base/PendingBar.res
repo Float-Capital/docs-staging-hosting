@@ -1,3 +1,28 @@
+module SystemUpdateTxState = {
+  @react.component
+  let make = (~txState, ~updateSystemStateCall, ~refetchCallback) => {
+    <div className="flex flex-row items-center">
+      {switch txState {
+      | ContractActions.Created => <Loader.Ellipses />
+      | SignedAndSubmitted(_) => <Loader.Mini />
+      | Complete(_) => {
+          refetchCallback(_ => 1.)
+          <p className="text-xxxxs text-right text-green-500 "> {`✅ Success`->React.string} </p>
+        }
+      | Failed(_) =>
+        <p className="text-xxxxs text-right text-red-500 "> {`Update tx failed`->React.string} </p>
+      | _ =>
+        <div>
+          <p className="text-xxxxs text-right text-yellow-500 ">
+            {`⚠️ Keeper down ⚠️`->React.string}
+          </p>
+          <Button.Tiny onClick={_ => updateSystemStateCall()}> {"Update Price"} </Button.Tiny>
+        </div>
+      }}
+    </div>
+  }
+}
+
 module PendingBarInner = {
   @react.component
   let make = (
@@ -53,29 +78,7 @@ module PendingBarInner = {
               </p>
             </div>
           } else {
-            <div className="flex flex-row items-center">
-              {switch txState {
-              | ContractActions.Created => <Loader.Ellipses />
-              | SignedAndSubmitted(_) => <Loader.Ellipses />
-              | Complete(_) =>
-                <p className="text-xxxxs text-right text-green-500 ">
-                  {`✅ Success`->React.string}
-                </p>
-              | Failed(_) =>
-                <p className="text-xxxxs text-right text-red-500 ">
-                  {`Update tx failed`->React.string}
-                </p>
-              | _ =>
-                <div>
-                  <p className="text-xxxxs text-right text-yellow-500 ">
-                    {`⚠️ Keeper down ⚠️`->React.string}
-                  </p>
-                  <Button.Tiny onClick={_ => updateSystemStateCall()}>
-                    {"Update Price"}
-                  </Button.Tiny>
-                </div>
-              }}
-            </div>
+            <SystemUpdateTxState txState updateSystemStateCall refetchCallback />
           }
         }
       }
@@ -115,7 +118,7 @@ module PendingBarWrapper = {
 
     {
       <div className="relative pt-1">
-        <div className="text-xxs text-center mx-4">
+        <div className="text-xxs text-center mx-4 text-gray-600">
           {`Your transaction will be processed with the next price update `->React.string}
           <Tooltip
             tip="To ensure fairness and security your position will be opened on the next oracle price update"

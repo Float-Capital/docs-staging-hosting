@@ -2,10 +2,8 @@
 'use strict';
 
 var Misc = require("../libraries/Misc.js");
-var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
 var Button = require("../components/UI/Base/Button.js");
-var Client = require("../data/Client.js");
 var Config = require("../config/Config.js");
 var Ethers = require("../ethereum/Ethers.js");
 var Loader = require("../components/UI/Base/Loader.js");
@@ -13,15 +11,14 @@ var UserUI = require("../components/UI/UserUI.js");
 var Backend = require("../mockBackend/Backend.js");
 var Js_dict = require("rescript/lib/js/js_dict.js");
 var Masonry = require("../components/UI/Masonry.js");
-var Queries = require("../data/Queries.js");
 var Withdraw = require("../components/Withdraw/Withdraw.js");
 var CONSTANTS = require("../CONSTANTS.js");
 var DataHooks = require("../data/DataHooks.js");
 var Link = require("next/link").default;
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
+var PendingBar = require("../components/UI/Base/PendingBar.js");
 var Refetchers = require("../libraries/Refetchers.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
-var ProgressBar = require("../components/UI/Base/ProgressBar.js");
 var Router = require("next/router");
 var RootProvider = require("../libraries/RootProvider.js");
 var ContractHooks = require("../components/Testing/Admin/ContractHooks.js");
@@ -199,57 +196,17 @@ var UserTotalStakedCard = {
 };
 
 function User$PendingRedeemItem(Props) {
-  var pendingRedeem = Props.pendingRedeem;
+  var marketIndex = Props.marketIndex;
   var userId = Props.userId;
-  var marketIndex = pendingRedeem.marketIndex;
   var match = React.useState(function () {
-        return false;
+        return 0;
       });
-  var client = Client.useApolloClient(undefined);
-  var reqVariables = {
-    userId: userId
-  };
-  React.useEffect((function () {
-          var timeout = setTimeout((function (param) {
-                  Curry._6(client.rescript_query, {
-                          query: Queries.UsersConfirmedRedeems.query,
-                          Raw: Queries.UsersConfirmedRedeems.Raw,
-                          parse: Queries.UsersConfirmedRedeems.parse,
-                          serialize: Queries.UsersConfirmedRedeems.serialize,
-                          serializeVariables: Queries.UsersConfirmedRedeems.serializeVariables
-                        }, undefined, undefined, /* NetworkOnly */2, undefined, reqVariables).then(function (queryResult) {
-                        if (queryResult.TAG === /* Ok */0 && queryResult._0.data.user !== undefined) {
-                          Curry._1(client.rescript_writeQuery, {
-                                query: Queries.UsersConfirmedRedeems.query,
-                                Raw: Queries.UsersConfirmedRedeems.Raw,
-                                parse: Queries.UsersConfirmedRedeems.parse,
-                                serialize: Queries.UsersConfirmedRedeems.serialize,
-                                serializeVariables: Queries.UsersConfirmedRedeems.serializeVariables
-                              });
-                          return ;
-                        }
-                        
-                      });
-                  
-                }), 1000);
-          return (function (param) {
-                    clearTimeout(timeout);
-                    
-                  });
-        }), [match[0]]);
-  var lastOracleTimestamp = DataHooks.useOracleLastUpdate(marketIndex.toString());
-  var oracleHeartbeatForMarket = Backend.getMarketInfoUnsafe(marketIndex.toNumber()).oracleHeartbeat;
-  if (typeof lastOracleTimestamp === "number") {
-    return React.createElement(Loader.Tiny.make, {});
-  }
-  if (lastOracleTimestamp.TAG === /* GraphError */0) {
-    return React.createElement("p", undefined, lastOracleTimestamp._0);
-  }
-  var nextPriceUpdate = lastOracleTimestamp._0.toNumber() + oracleHeartbeatForMarket | 0;
-  return React.createElement(ProgressBar.make, {
-              txConfirmedTimestamp: pendingRedeem.confirmedTimestamp.toNumber(),
-              nextPriceUpdateTimestamp: nextPriceUpdate,
-              setTimerFinished: match[1]
+  var refetchAttempt = match[0];
+  Refetchers.useRefetchPendingRedeems(userId, refetchAttempt);
+  Refetchers.useRefetchConfirmedRedeems(userId, refetchAttempt);
+  return React.createElement(PendingBar.make, {
+              marketIndex: marketIndex,
+              refetchCallback: match[1]
             });
 }
 
@@ -303,6 +260,13 @@ function User$IncompleteWithdrawalsCard(Props) {
   var match = ContractActions.useContractFunction(signer !== undefined ? signer : undefined);
   var txState = match[1];
   var contractExecutionHandler = match[0];
+  var match$1 = React.useState(function () {
+        return 0;
+      });
+  var setRefetchAttempt = match$1[1];
+  var refetchAttempt = match$1[0];
+  Refetchers.useRefetchPendingRedeems(userId, refetchAttempt);
+  Refetchers.useRefetchConfirmedRedeems(userId, refetchAttempt);
   WithdrawTxStatusModal.useWithdrawTxModal(txState);
   var tmp;
   if (typeof usersPendingRedeemsQuery === "number") {
@@ -320,9 +284,9 @@ function User$IncompleteWithdrawalsCard(Props) {
               }, "Pending redeems"), React.createElement("div", {
                 className: "flex flex-col"
               }, Belt_Array.map(pendingRedeems, (function (pendingRedeem) {
-                      return React.createElement(User$PendingRedeemItem, {
-                                  pendingRedeem: pendingRedeem,
-                                  userId: userId
+                      return React.createElement(PendingBar.make, {
+                                  marketIndex: pendingRedeem.marketIndex,
+                                  refetchCallback: setRefetchAttempt
                                 });
                     })))) : null;
   }

@@ -116,7 +116,81 @@ function useRefetchPendingSynths(userId, stateForRefetchExecution) {
   
 }
 
+function useRefetchPendingRedeems(userId, stateForRefetchExecution) {
+  var client = Client.useApolloClient(undefined);
+  var reqVariables = {
+    userId: userId
+  };
+  React.useEffect((function () {
+          var timeout = setTimeout((function (param) {
+                  Curry._6(client.rescript_query, {
+                          query: Queries.UsersPendingRedeems.query,
+                          Raw: Queries.UsersPendingRedeems.Raw,
+                          parse: Queries.UsersPendingRedeems.parse,
+                          serialize: Queries.UsersPendingRedeems.serialize,
+                          serializeVariables: Queries.UsersPendingRedeems.serializeVariables
+                        }, undefined, undefined, /* NetworkOnly */2, undefined, reqVariables).then(function (queryResult) {
+                        if (queryResult.TAG === /* Ok */0 && queryResult._0.data.user !== undefined) {
+                          Curry._1(client.rescript_writeQuery, {
+                                query: Queries.UsersPendingRedeems.query,
+                                Raw: Queries.UsersPendingRedeems.Raw,
+                                parse: Queries.UsersPendingRedeems.parse,
+                                serialize: Queries.UsersPendingRedeems.serialize,
+                                serializeVariables: Queries.UsersPendingRedeems.serializeVariables
+                              });
+                          return ;
+                        }
+                        
+                      });
+                  
+                }), 1000);
+          return (function (param) {
+                    clearTimeout(timeout);
+                    
+                  });
+        }), [stateForRefetchExecution]);
+  
+}
+
+function useRefetchConfirmedRedeems(userId, stateForRefetchExecution) {
+  var client = Client.useApolloClient(undefined);
+  var reqVariables = {
+    userId: userId
+  };
+  React.useEffect((function () {
+          var timeout = setTimeout((function (param) {
+                  Curry._6(client.rescript_query, {
+                          query: Queries.UsersConfirmedRedeems.query,
+                          Raw: Queries.UsersConfirmedRedeems.Raw,
+                          parse: Queries.UsersConfirmedRedeems.parse,
+                          serialize: Queries.UsersConfirmedRedeems.serialize,
+                          serializeVariables: Queries.UsersConfirmedRedeems.serializeVariables
+                        }, undefined, undefined, /* NetworkOnly */2, undefined, reqVariables).then(function (queryResult) {
+                        if (queryResult.TAG === /* Ok */0 && queryResult._0.data.user !== undefined) {
+                          Curry._1(client.rescript_writeQuery, {
+                                query: Queries.UsersConfirmedRedeems.query,
+                                Raw: Queries.UsersConfirmedRedeems.Raw,
+                                parse: Queries.UsersConfirmedRedeems.parse,
+                                serialize: Queries.UsersConfirmedRedeems.serialize,
+                                serializeVariables: Queries.UsersConfirmedRedeems.serializeVariables
+                              });
+                          return ;
+                        }
+                        
+                      });
+                  
+                }), 1000);
+          return (function (param) {
+                    clearTimeout(timeout);
+                    
+                  });
+        }), [stateForRefetchExecution]);
+  
+}
+
 exports.useRefetchLastOracleTimestamp = useRefetchLastOracleTimestamp;
 exports.useRefetchConfirmedSynths = useRefetchConfirmedSynths;
 exports.useRefetchPendingSynths = useRefetchPendingSynths;
+exports.useRefetchPendingRedeems = useRefetchPendingRedeems;
+exports.useRefetchConfirmedRedeems = useRefetchConfirmedRedeems;
 /* react Not a pure module */

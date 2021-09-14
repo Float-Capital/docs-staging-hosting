@@ -109,3 +109,81 @@ let useRefetchPendingSynths = (~userId, ~stateForRefetchExecution) => {
     Some(() => Js.Global.clearTimeout(timeout))
   }, [stateForRefetchExecution])
 }
+
+let useRefetchPendingRedeems = (~userId, ~stateForRefetchExecution) => {
+  let client = Client.useApolloClient()
+  let reqVariables = {
+    Queries.UsersPendingRedeems.userId: userId,
+  }
+
+  React.useEffect1(() => {
+    let timeForGraphToUpdate = 1000 // Give the graph a chance to capture the data before making the request
+    let timeout = Js.Global.setTimeout(() => {
+      let _ = client.query(
+        ~query=module(Queries.UsersPendingRedeems),
+        ~fetchPolicy=NetworkOnly,
+        reqVariables,
+      )->JsPromise.map(queryResult => {
+        switch queryResult {
+        | Ok({data: {user}}) =>
+          switch user {
+          | Some(usr) => {
+              let _ = client.writeQuery(
+                ~query=module(Queries.UsersPendingRedeems),
+                ~data={
+                  user: Some({
+                    __typename: usr.__typename,
+                    pendingNextPriceActions: usr.pendingNextPriceActions,
+                  }),
+                },
+              )
+            }
+          | None => ()
+          }
+
+        | _ => ()
+        }
+      })
+    }, timeForGraphToUpdate)
+    Some(() => Js.Global.clearTimeout(timeout))
+  }, [stateForRefetchExecution])
+}
+
+let useRefetchConfirmedRedeems = (~userId, ~stateForRefetchExecution) => {
+  let client = Client.useApolloClient()
+  let reqVariables = {
+    Queries.UsersConfirmedRedeems.userId: userId,
+  }
+
+  React.useEffect1(() => {
+    let timeForGraphToUpdate = 1000 // Give the graph a chance to capture the data before making the request
+    let timeout = Js.Global.setTimeout(() => {
+      let _ = client.query(
+        ~query=module(Queries.UsersConfirmedRedeems),
+        ~fetchPolicy=NetworkOnly,
+        reqVariables,
+      )->JsPromise.map(queryResult => {
+        switch queryResult {
+        | Ok({data: {user}}) =>
+          switch user {
+          | Some(usr) => {
+              let _ = client.writeQuery(
+                ~query=module(Queries.UsersConfirmedRedeems),
+                ~data={
+                  user: Some({
+                    __typename: usr.__typename,
+                    confirmedNextPriceActions: usr.confirmedNextPriceActions,
+                  }),
+                },
+              )
+            }
+          | None => ()
+          }
+
+        | _ => ()
+        }
+      })
+    }, timeForGraphToUpdate)
+    Some(() => Js.Global.clearTimeout(timeout))
+  }, [stateForRefetchExecution])
+}
