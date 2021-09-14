@@ -13,6 +13,7 @@ var Loader = require("../UI/Base/Loader.js");
 var Ethers$1 = require("ethers");
 var Globals = require("../../libraries/Globals.js");
 var Js_math = require("rescript/lib/js/js_math.js");
+var Tooltip = require("../UI/Base/Tooltip.js");
 var Metamask = require("../UI/Base/Metamask.js");
 var CONSTANTS = require("../../CONSTANTS.js");
 var Contracts = require("../../ethereum/Contracts.js");
@@ -461,6 +462,94 @@ function isGreaterThanBalance(amount, balance) {
   return amount.gt(balance);
 }
 
+function useIsAccreditedStorage(param) {
+  var key = "isAccredited";
+  var match = React.useState(function () {
+        return Belt_Option.getWithDefault(Caml_option.null_to_opt(localStorage.getItem(key)), "") === "true";
+      });
+  var setIsAccredited = match[1];
+  var setAsAccredited = function (param) {
+    Curry._1(setIsAccredited, (function (param) {
+            return true;
+          }));
+    localStorage.setItem(key, "true");
+    
+  };
+  return [
+          match[0],
+          setAsAccredited
+        ];
+}
+
+function MintForm$AccreditedModal(Props) {
+  var contractFunction = Props.contractFunction;
+  var match = React.useState(function () {
+        return false;
+      });
+  var setIsWizard = match[1];
+  var isWizard = match[0];
+  var match$1 = React.useState(function () {
+        return false;
+      });
+  var setIsntUs = match$1[1];
+  var isntUs = match$1[0];
+  return React.createElement("div", {
+              className: "text-sm w-full flex flex-col space-y-3 mb-4"
+            }, React.createElement("label", {
+                  className: "inline-flex items-center space-x-3 cursor-pointer",
+                  onClick: (function (e) {
+                      e.preventDefault();
+                      return Curry._1(setIsWizard, (function (a) {
+                                    return !a;
+                                  }));
+                    })
+                }, React.createElement("input", {
+                      key: isWizard ? "1" : "0",
+                      className: "form-tick cursor-pointer appearance-none h-6 min-w-6 w-6 border border-gray-300 rounded-md checked:bg-primary-light checked:border-transparent focus:outline-none",
+                      checked: isWizard,
+                      type: "checkbox",
+                      value: isWizard ? "1" : "0"
+                    }), React.createElement("span", undefined, React.createElement("span", {
+                          className: "mr-1"
+                        }, "I am a DeFi Wizard"), React.createElement("span", {
+                          className: "text-lg mr-1"
+                        }, "🧙"), React.createElement(Tooltip.make, {
+                          tip: "I am a professional investor and I am familiar with decentralized finance."
+                        }))), React.createElement("label", {
+                  className: "inline-flex items-center space-x-3 cursor-pointer",
+                  onClick: (function (e) {
+                      e.preventDefault();
+                      return Curry._1(setIsntUs, (function (isntUs) {
+                                    return !isntUs;
+                                  }));
+                    })
+                }, React.createElement("input", {
+                      key: isntUs ? "1" : "0",
+                      className: "form-tick cursor-pointer appearance-none h-6 w-6 min-w-6 border border-gray-300 rounded-md checked:bg-primary-light checked:border-transparent focus:outline-none",
+                      checked: isntUs,
+                      type: "checkbox",
+                      value: isntUs ? "1" : "0"
+                    }), React.createElement("span", undefined, "I confirm that I am not a resident or citizen of the US")), React.createElement("div", {
+                  className: "w-full flex justify-center h-12"
+                }, React.createElement("button", {
+                      className: "\n            w-44 h-12 text-sm my-2 shadow-md rounded-lg border-2 focus:outline-none border-gray-200 hover:bg-gray-200\n            flex justify-center items-center mx-auto\n            " + (
+                        !isWizard || !isntUs ? "bg-gray-300 hover:bg-gray-300 shadow-none border-none cursor-auto" : ""
+                      ) + "\n            ",
+                      onClick: isWizard && isntUs ? (function (e) {
+                            e.preventDefault();
+                            return Curry._1(contractFunction, undefined);
+                          }) : (function (param) {
+                            
+                          })
+                    }, React.createElement("span", {
+                          className: "mx-2"
+                        }, "Confirmed"))));
+}
+
+var AccreditedModal = {
+  make: MintForm$AccreditedModal
+};
+
 function MintForm$SubmitButtonAndTxTracker(Props) {
   var txStateApprove = Props.txStateApprove;
   var txStateMint = Props.txStateMint;
@@ -470,6 +559,8 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
   var tokenToMint = Props.tokenToMint;
   var buttonText = Props.buttonText;
   var buttonDisabled = Props.buttonDisabled;
+  var needsToBeAccredited = Props.needsToBeAccredited;
+  var contractFunction = Props.contractFunction;
   var randomMintTweetMessage = function (isLong, marketName) {
     var position = isLong ? "long" : "short";
     var possibleTweetMessages = [
@@ -484,7 +575,11 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
   var showModal = match.showModal;
   React.useEffect((function () {
           var exit = 0;
-          if (typeof txStateApprove === "number") {
+          if (needsToBeAccredited) {
+            Curry._1(showModal, React.createElement(MintForm$AccreditedModal, {
+                      contractFunction: contractFunction
+                    }));
+          } else if (typeof txStateApprove === "number") {
             if (txStateApprove === /* UnInitialised */0) {
               exit = 1;
             } else {
@@ -560,7 +655,17 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
                     case /* Complete */2 :
                         Curry._1(showModal, React.createElement("div", {
                                   className: "text-center m-3"
-                                }, React.createElement(Tick.make, {}), React.createElement("p", undefined, "Transaction complete 🎉"), React.createElement(TweetButton.make, {
+                                }, React.createElement(Tick.make, {}), React.createElement("p", undefined, "Transaction complete 🎉"), React.createElement("div", {
+                                      className: "w-full flex justify-center"
+                                    }, React.createElement("p", {
+                                          className: "w-48 text-xs text-center mb-2"
+                                        }, React.createElement("span", {
+                                              className: "text-green-600 "
+                                            }, "It may take a few minutes for the tokens to show in your wallet"), React.createElement("span", {
+                                              className: "ml-1"
+                                            }, React.createElement(Tooltip.make, {
+                                                  tip: "To ensure fairness and security your position will be opened on the next oracle price update"
+                                                })))), React.createElement(TweetButton.make, {
                                       message: randomMintTweetMessage(isLong, marketName)
                                     }), React.createElement(Metamask.AddTokenButton.make, {
                                       token: Config.config.contracts.FloatToken,
@@ -589,10 +694,14 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
           }
           
         }), [
+        needsToBeAccredited,
         txStateMint,
         txStateApprove
       ]);
   var exit = 0;
+  if (needsToBeAccredited) {
+    return Curry._1(resetFormButton, undefined);
+  }
   if (typeof txStateApprove === "number") {
     exit = 2;
   } else {
@@ -604,15 +713,13 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
         exit = 2;
     }
   }
-  if (exit === 2 && typeof txStateMint !== "number") {
-    switch (txStateMint.TAG | 0) {
-      case /* Declined */1 :
-      case /* Complete */2 :
-      case /* Failed */3 :
-          return Curry._1(resetFormButton, undefined);
-      default:
-        
+  if (exit === 2) {
+    if (typeof txStateMint === "number") {
+      txStateMint === /* UnInitialised */0;
+    } else if (txStateMint.TAG !== /* SignedAndSubmitted */0) {
+      return Curry._1(resetFormButton, undefined);
     }
+    
   }
   return React.createElement(Button.make, {
               onClick: (function (param) {
@@ -719,49 +826,70 @@ function MintForm$MintFormSignedIn(Props) {
       });
   var setContractActionToCallAfterApproval = match$2[1];
   var contractActionToCallAfterApproval = match$2[0];
-  var match$3 = useBalanceAndApproved(Config.dai, Config.longShort);
-  var optDaiAmountApproved = match$3[1];
-  var optDaiBalance = match$3[0];
-  var form = useForm(initialInput, (function (param, _form) {
-          var amount = param.amount;
-          var mintFunction = function (param) {
-            var tmp;
-            if (isLong) {
-              var arg = market.marketIndex;
-              tmp = (function (param) {
-                  return param.mintLongNextPrice(arg, amount);
-                });
-            } else {
-              var arg$1 = market.marketIndex;
-              tmp = (function (param) {
-                  return param.mintShortNextPrice(arg$1, amount);
-                });
-            }
-            return Curry._2(contractExecutionHandler, (function (param) {
-                          return Contracts.LongShort.make(Config.longShort, param);
-                        }), tmp);
-          };
-          var needsToApprove = amount.gt(Belt_Option.getWithDefault(optDaiAmountApproved, Ethers$1.BigNumber.from("0")));
-          if (needsToApprove) {
-            Curry._1(setContractActionToCallAfterApproval, (function (param) {
-                    return mintFunction;
+  var match$3 = useIsAccreditedStorage(undefined);
+  var setAsAccredited = match$3[1];
+  var isAccredited = match$3[0];
+  var match$4 = React.useState(function () {
+        return false;
+      });
+  var setsWantToBeAccredited = match$4[1];
+  var match$5 = useBalanceAndApproved(Config.dai, Config.longShort);
+  var optDaiAmountApproved = match$5[1];
+  var optDaiBalance = match$5[0];
+  var makeContractFunction = function (amount, param) {
+    if (!isAccredited) {
+      Curry._1(setAsAccredited, undefined);
+    }
+    var mintFunction = function (param) {
+      var tmp;
+      if (isLong) {
+        var arg = market.marketIndex;
+        tmp = (function (param) {
+            return param.mintLongNextPrice(arg, amount);
+          });
+      } else {
+        var arg$1 = market.marketIndex;
+        tmp = (function (param) {
+            return param.mintShortNextPrice(arg$1, amount);
+          });
+      }
+      return Curry._2(contractExecutionHandler, (function (param) {
+                    return Contracts.LongShort.make(Config.longShort, param);
+                  }), tmp);
+    };
+    var needsToApprove = amount.gt(Belt_Option.getWithDefault(optDaiAmountApproved, Ethers$1.BigNumber.from("0")));
+    if (needsToApprove) {
+      Curry._1(setContractActionToCallAfterApproval, (function (param) {
+              return mintFunction;
+            }));
+      var arg = Globals.amountForApproval(amount);
+      return Curry._2(contractExecutionHandlerApprove, (function (param) {
+                    return Contracts.Erc20.make(Config.dai, param);
+                  }), (function (param) {
+                    return param.approve(Config.longShort, arg);
                   }));
-            var arg = Globals.amountForApproval(amount);
-            return Curry._2(contractExecutionHandlerApprove, (function (param) {
-                          return Contracts.Erc20.make(Config.dai, param);
-                        }), (function (param) {
-                          return param.approve(Config.longShort, arg);
-                        }));
+    } else {
+      return mintFunction(undefined);
+    }
+  };
+  var form = useForm(initialInput, (function (param, _form) {
+          if (isAccredited) {
+            return makeContractFunction(param.amount, undefined);
           } else {
-            return mintFunction(undefined);
+            return Curry._1(setsWantToBeAccredited, (function (param) {
+                          return true;
+                        }));
           }
         }));
-  var match$4 = form.amountResult;
-  var formAmount = match$4 !== undefined && match$4.TAG === /* Ok */0 ? Caml_option.some(match$4._0) : undefined;
+  var match$6 = form.amountResult;
+  var formAmount = match$6 !== undefined && match$6.TAG === /* Ok */0 ? Caml_option.some(match$6._0) : undefined;
   var resetFormButton = function (param) {
     return React.createElement(Button.make, {
                 onClick: (function (param) {
                     Curry._1(form.reset, undefined);
+                    Curry._1(setsWantToBeAccredited, (function (param) {
+                            return false;
+                          }));
                     Curry._1(setTxStateApprove, (function (param) {
                             return /* UnInitialised */0;
                           }));
@@ -774,13 +902,13 @@ function MintForm$MintFormSignedIn(Props) {
   };
   var tokenToMint = isLong ? "long " + market.name : "short " + market.name;
   var position = isLong ? "long" : "short";
-  var match$5;
+  var match$7;
   var exit = 0;
   if (formAmount !== undefined && optDaiBalance !== undefined && optDaiAmountApproved !== undefined) {
     var amount = Caml_option.valFromOption(formAmount);
     var needsToApprove = amount.gt(Caml_option.valFromOption(optDaiAmountApproved));
     var greaterThanBalance = amount.gt(Caml_option.valFromOption(optDaiBalance));
-    match$5 = greaterThanBalance ? [
+    match$7 = greaterThanBalance ? [
         "Amount is greater than your balance",
         "Insufficient balance",
         true
@@ -793,7 +921,7 @@ function MintForm$MintFormSignedIn(Props) {
     exit = 1;
   }
   if (exit === 1) {
-    match$5 = [
+    match$7 = [
       undefined,
       "Mint " + position + " position",
       true
@@ -905,6 +1033,7 @@ function MintForm$MintFormSignedIn(Props) {
           }
           
         }), [txState]);
+  var partial_arg = Belt_Option.getWithDefault(formAmount, CONSTANTS.zeroBN);
   return React.createElement(MintForm$MintFormInput, {
               onSubmit: form.submit,
               onChangeSide: (function (newPosition) {
@@ -935,7 +1064,7 @@ function MintForm$MintFormSignedIn(Props) {
                                       };
                               }), optDaiBalance !== undefined ? Ethers.Utils.formatEther(Caml_option.valFromOption(optDaiBalance)) : "0");
                 }),
-              optErrorMessage: match$5[0],
+              optErrorMessage: match$7[0],
               disabled: form.submitting,
               submitButton: React.createElement(MintForm$SubmitButtonAndTxTracker, {
                     txStateApprove: txStateApprove,
@@ -944,8 +1073,12 @@ function MintForm$MintFormSignedIn(Props) {
                     isLong: isLong,
                     marketName: market.name,
                     tokenToMint: tokenToMint,
-                    buttonText: match$5[1],
-                    buttonDisabled: match$5[2]
+                    buttonText: match$7[1],
+                    buttonDisabled: match$7[2],
+                    needsToBeAccredited: !isAccredited && match$4[0],
+                    contractFunction: (function (param) {
+                        return makeContractFunction(partial_arg, param);
+                      })
                   })
             });
 }
@@ -984,6 +1117,8 @@ exports.initialInput = initialInput;
 exports.useBalanceAndApproved = useBalanceAndApproved;
 exports.isGreaterThanApproval = isGreaterThanApproval;
 exports.isGreaterThanBalance = isGreaterThanBalance;
+exports.useIsAccreditedStorage = useIsAccreditedStorage;
+exports.AccreditedModal = AccreditedModal;
 exports.SubmitButtonAndTxTracker = SubmitButtonAndTxTracker;
 exports.MintFormInput = MintFormInput;
 exports.MintFormSignedIn = MintFormSignedIn;
