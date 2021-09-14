@@ -35,45 +35,45 @@ let runMumbaiTransactions =
 
   Js.log("deploying markets");
 
-  // let%AwaitThen _ =
-  //   deployMumbaiMarketUpgradeable(
-  //     ~syntheticName="ETH Market",
-  //     ~syntheticSymbol="ETH",
-  //     ~longShortInstance=longShort,
-  //     ~treasuryInstance=treasury,
-  //     ~stakerInstance=staker,
-  //     ~deployments=deploymentArgs.deployments,
-  //     ~namedAccounts,
-  //     ~admin,
-  //     ~paymentToken: ERC20Mock.t,
-  //     ~oraclePriceFeedAddress=ChainlinkOracleAddresses.Mumbai.ethOracleChainlink,
-  //   );
-  // let%AwaitThen _ =
-  //   deployMumbaiMarketUpgradeable(
-  //     ~syntheticName="MATIC Market",
-  //     ~syntheticSymbol="MATIC",
-  //     ~longShortInstance=longShort,
-  //     ~treasuryInstance=treasury,
-  //     ~stakerInstance=staker,
-  //     ~deployments=deploymentArgs.deployments,
-  //     ~namedAccounts,
-  //     ~admin,
-  //     ~paymentToken: ERC20Mock.t,
-  //     ~oraclePriceFeedAddress=ChainlinkOracleAddresses.Mumbai.maticOracleChainlink,
-  //   );
-  // let%AwaitThen _ =
-  //   deployMumbaiMarketUpgradeable(
-  //     ~syntheticName="BTC Market",
-  //     ~syntheticSymbol="BTC",
-  //     ~longShortInstance=longShort,
-  //     ~treasuryInstance=treasury,
-  //     ~stakerInstance=staker,
-  //     ~deployments=deploymentArgs.deployments,
-  //     ~namedAccounts,
-  //     ~admin,
-  //     ~paymentToken: ERC20Mock.t,
-  //     ~oraclePriceFeedAddress=ChainlinkOracleAddresses.Mumbai.btcOracleChainlink,
-  //   );
+  let%AwaitThen _ =
+    deployMumbaiMarketUpgradeable(
+      ~syntheticName="ETH Market",
+      ~syntheticSymbol="ETH",
+      ~longShortInstance=longShort,
+      ~treasuryInstance=treasury,
+      ~stakerInstance=staker,
+      ~deployments=deploymentArgs.deployments,
+      ~namedAccounts,
+      ~admin,
+      ~paymentToken: ERC20Mock.t,
+      ~oraclePriceFeedAddress=ChainlinkOracleAddresses.Mumbai.ethOracleChainlink,
+    );
+  let%AwaitThen _ =
+    deployMumbaiMarketUpgradeable(
+      ~syntheticName="MATIC Market",
+      ~syntheticSymbol="MATIC",
+      ~longShortInstance=longShort,
+      ~treasuryInstance=treasury,
+      ~stakerInstance=staker,
+      ~deployments=deploymentArgs.deployments,
+      ~namedAccounts,
+      ~admin,
+      ~paymentToken: ERC20Mock.t,
+      ~oraclePriceFeedAddress=ChainlinkOracleAddresses.Mumbai.maticOracleChainlink,
+    );
+  let%AwaitThen _ =
+    deployMumbaiMarketUpgradeable(
+      ~syntheticName="BTC Market",
+      ~syntheticSymbol="BTC",
+      ~longShortInstance=longShort,
+      ~treasuryInstance=treasury,
+      ~stakerInstance=staker,
+      ~deployments=deploymentArgs.deployments,
+      ~namedAccounts,
+      ~admin,
+      ~paymentToken: ERC20Mock.t,
+      ~oraclePriceFeedAddress=ChainlinkOracleAddresses.Mumbai.btcOracleChainlink,
+    );
   let initialMarkets = [|1, 2, 3|];
   let longMintAmount = bnFromString("10000000000000000000");
   let shortMintAmount = longMintAmount->div(bnFromInt(2));
@@ -129,5 +129,4 @@ let runMumbaiTransactions =
       ~user=user1,
     ),
   );
-  // Js.log("DONE!");
 };
