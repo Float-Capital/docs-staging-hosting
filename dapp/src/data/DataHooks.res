@@ -90,7 +90,7 @@ let useTotalClaimableFloatForUser = (~userId, ~synthTokens) => {
             Response((totalClaimable, totalPredicted))
           } else {
             let amount = stake.currentStake.amount
-            let timestamp = stake.lastMintState.timestamp
+            let timestamp = stake.syntheticMarket.latestAccumulativeFloatIssuanceSnapshot.timestamp
             let isLong = stake.syntheticToken.id == stake.lastMintState.longToken.id
             let lastAccumulativeFloatPerToken = isLong
               ? stake.lastMintState.accumulativeFloatPerTokenLong
