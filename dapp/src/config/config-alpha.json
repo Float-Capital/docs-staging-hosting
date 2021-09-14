@@ -1,0 +1,28 @@
+{
+  "graphEndpoint": "https://graph.float.capital/subgraphs/name/float-capital/float-capital-alpha",
+  "priceHistoryGraphEndpoint": "https://api.thegraph.com/subgraphs/name/float-capital/testnet-price-history-alpha",
+  "aaveGraphEndpoint": "https://api.thegraph.com/subgraphs/name/aave/aave-v2-matic",
+  "networkId": 137,
+  "networkName": "polygon network (matic)",
+  "torusName": "matic",
+  "networkCurrencyName": "MATIC",
+  "networkCurrencySymbol": "MATIC",
+  "rpcEndopint": "https://rpc-endpoints.superfluid.dev/matic",
+  "paymentTokenName": "(PoS) DAI",
+  "blockExplorer": "https://polygonscan.com/",
+  "blockExplorerName": "polygonscan",
+  "discordInviteLink": "https://discord.gg/dqDwgrVYcU",
+  "polygonBridgeLink": "https://wallet.polygon.technology/bridge",
+  "web3PollingInterval": 8000,
+  "apolloConnectToDevTools": false,
+  "contracts": {
+    "FloatToken": "0x01309A1Ec476871760D9Ea454628500BCcc1E011",
+    "FloatCapital_v0": "0xEe0c19f26b3B3A4fb82f466a6023DcD979c27a2F",
+    "GEMS": "0x756218A9476bF7C75a887d9c7aB916DE15AB5Ddf",
+    "LongShort": "0x168a5d1217AEcd258b03018d5bF1A1677A07b733",
+    "Staker": "0xe7C89eb987c415B4233789E5ceC0eE7407d2C47F",
+    "TokenFactory": "0x809C2619a27c58334CAac07470899e4dd0574AEC",
+    "Treasury_v0": "0xeb1bB399997463d8Fd0cb85C89Da0fc958006441",
+    "Dai": "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063"
+  }
+}

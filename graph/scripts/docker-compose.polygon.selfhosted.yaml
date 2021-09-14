@@ -15,7 +15,7 @@ services:
       postgres_pass: let-me-in
       postgres_db: graph-node
       ipfs: "ipfs-prod:5001"
-      ethereum: "polygon:${POLYGON_RPC_ENDPOINT:-https://polygon-rpc.com}"
+      ethereum: "matic:${POLYGON_RPC_ENDPOINT:-https://polygon-rpc.com}"
       RUST_LOG: info
     networks:
       - prod

@@ -7,6 +7,7 @@ var Ethers = require("./library/Ethers.bs.js");
 var Ethers$1 = require("ethers");
 var Contracts = require("./library/Contracts.bs.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
+var Belt_Option = require("rescript/lib/js/belt_Option.js");
 
 function getAggregatorAddresses(chainlinkOracleAddresses, wallet) {
   var signer = Ethers.getSigner(wallet);
@@ -25,7 +26,7 @@ function mapWalletBalance(wallet, fn) {
 
 function getJsonProviders(providerUrls) {
   return Promise.all(Belt_Array.map(providerUrls, (function (url) {
-                    return new (Ethers$1.providers.JsonRpcProvider)(url, 80001);
+                    return new (Ethers$1.providers.JsonRpcProvider)(url, Belt_Option.getWithDefault(Config.config.chainId, 80001));
                   })));
 }
 
@@ -36,7 +37,7 @@ function getProvider(urls) {
 }
 
 var defaultOptions = {
-  gasPrice: 1000000000
+  gasPrice: Ethers$1.BigNumber.from("85000000000")
 };
 
 var wallet = {
@@ -63,6 +64,7 @@ function runUpdateSystemStateMulti(marketsToUpdate) {
                     
                   })).then(function (param) {
                 var contract = Contracts.LongShort.make(Config.config.longShortContractAddress, Ethers.getSigner(wallet.contents));
+                console.log(marketsToUpdate, defaultOptions);
                 return contract.functions.updateSystemStateMulti(marketsToUpdate, defaultOptions).then(function (update) {
                                 console.log("submitted transaction", update.hash);
                                 return update.wait();
@@ -91,6 +93,7 @@ function setup(param) {
                     new (Ethers$1.Wallet.fromMnemonic)(Config.secrets.mnemonic)
                   ]).then(function (param) {
                   var _provider = param[0];
+                  console.log("Got network.");
                   provider.contents = _provider;
                   wallet.contents = param[1].connect(_provider);
                   console.log("Initial update system state");
@@ -138,4 +141,4 @@ exports.provider = provider;
 exports.updateCounter = updateCounter;
 exports.runUpdateSystemStateMulti = runUpdateSystemStateMulti;
 exports.setup = setup;
-/*  Not a pure module */
+/* defaultOptions Not a pure module */
