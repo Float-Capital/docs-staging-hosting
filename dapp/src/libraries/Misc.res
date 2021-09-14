@@ -52,6 +52,26 @@ module Time = {
     }, [delay])
   }
 
+  // Useful for preventing race conditions where the txState changes but the graph hasnt updated yet
+  @ocaml.doc(`Delay the display execution`)
+  module DelayedDisplay = {
+    @react.component
+    let make = (~delay=1000, ~children) => {
+      let (show, setShow) = React.useState(_ => false)
+
+      React.useEffect1(() => {
+        let timeout = Js.Global.setTimeout(_ => setShow(_ => true), delay)
+        Some(_ => Js.Global.clearTimeout(timeout))
+      }, [])
+
+      if show {
+        children
+      } else {
+        <img src="/img/mini-loading.gif" className="w-6 mx-auto" />
+      }
+    }
+  }
+
   @ocaml.doc(`Runs a callback on an interval predictably with a limit.`)
   let useIntervalFixed = (callback: unit => unit, ~delay, ~numIterations) => {
     let savedCallback: React.ref<unit => unit> = React.useRef(callback)

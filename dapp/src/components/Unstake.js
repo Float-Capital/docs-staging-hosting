@@ -22,6 +22,7 @@ var RootProvider = require("../libraries/RootProvider.js");
 var ModalProvider = require("../libraries/ModalProvider.js");
 var ToastProvider = require("./UI/ToastProvider.js");
 var ContractActions = require("../ethereum/ContractActions.js");
+var ViewProfileButton = require("./UI/ViewProfileButton.js");
 var MessageUsOnDiscord = require("./Ethereum/MessageUsOnDiscord.js");
 var ViewOnBlockExplorer = require("./Ethereum/ViewOnBlockExplorer.js");
 var Formality__ReactUpdate = require("re-formality/src/Formality__ReactUpdate.js");
@@ -440,7 +441,9 @@ function useUnstakeModal(txStateUnstake) {
               case /* Complete */2 :
                   Curry._1(showModal, React.createElement("div", {
                             className: "text-center m-3"
-                          }, React.createElement("p", undefined, "Transaction complete 🎉")));
+                          }, React.createElement("p", undefined, "Transaction complete 🎉"), React.createElement(ViewOnBlockExplorer.make, {
+                                txHash: txStateUnstake._0.transactionHash
+                              }), React.createElement(ViewProfileButton.make, {})));
                   break;
               case /* Failed */3 :
                   var txHash = txStateUnstake._0;

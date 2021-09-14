@@ -63,6 +63,39 @@ function useInterval(callback, delay) {
   
 }
 
+function Misc$Time$DelayedDisplay(Props) {
+  var delayOpt = Props.delay;
+  var children = Props.children;
+  var delay = delayOpt !== undefined ? delayOpt : 1000;
+  var match = React.useState(function () {
+        return false;
+      });
+  var setShow = match[1];
+  React.useEffect((function () {
+          var timeout = setTimeout((function (param) {
+                  return Curry._1(setShow, (function (param) {
+                                return true;
+                              }));
+                }), delay);
+          return (function (param) {
+                    clearTimeout(timeout);
+                    
+                  });
+        }), []);
+  if (match[0]) {
+    return children;
+  } else {
+    return React.createElement("img", {
+                className: "w-6 mx-auto",
+                src: "/img/mini-loading.gif"
+              });
+  }
+}
+
+var DelayedDisplay = {
+  make: Misc$Time$DelayedDisplay
+};
+
 function useIntervalFixed(callback, delay, numIterations) {
   var savedCallback = React.useRef(callback);
   var idRef = React.useRef(undefined);
@@ -99,6 +132,7 @@ var Time = {
   useCurrentTime: useCurrentTime,
   useCurrentTimeBN: useCurrentTimeBN,
   useInterval: useInterval,
+  DelayedDisplay: DelayedDisplay,
   useIntervalFixed: useIntervalFixed
 };
 

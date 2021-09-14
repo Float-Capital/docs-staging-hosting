@@ -31,10 +31,12 @@ let useUnstakeModal = (~txStateUnstake) => {
           <ViewOnBlockExplorer txHash />
         </div>,
       )
-    | ContractActions.Complete({transactionHash: _}) =>
+    | ContractActions.Complete({transactionHash}) =>
       showModal(
         <div className="text-center m-3">
           <p> {`Transaction complete 🎉`->React.string} </p>
+          <ViewOnBlockExplorer txHash=transactionHash />
+          <ViewProfileButton />
         </div>,
       )
     | ContractActions.Failed(txHash) =>

@@ -608,9 +608,8 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
     switch (txStateMint.TAG | 0) {
       case /* Declined */1 :
       case /* Complete */2 :
-          return Curry._1(resetFormButton, undefined);
       case /* Failed */3 :
-          break;
+          return Curry._1(resetFormButton, undefined);
       default:
         
     }

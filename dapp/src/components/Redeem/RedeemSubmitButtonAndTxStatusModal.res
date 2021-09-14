@@ -1,20 +1,16 @@
 module ConfirmedTransactionModal = {
   @react.component
   let make = (~marketIndex, ~txStateWithdraw, ~contractExecutionHandlerWithdraw) => {
-    let lastOracleTimestamp = DataHooks.useOracleLastUpdate(
-      ~marketIndex=marketIndex->Ethers.BigNumber.toString,
-    )
+    let user = RootProvider.useCurrentUserExn()
 
-    let (timerFinished, setTimerFinished) = React.useState(_ => false)
+    let userId = user->Ethers.Utils.ethAdrToLowerStr
 
-    let oracleHeartBeat = Backend.getMarketInfoUnsafe(
-      marketIndex->Ethers.BigNumber.toNumber,
-    ).oracleHeartbeat
+    let usersPendingRedeemsQuery = DataHooks.useUsersPendingRedeems(~userId)
 
-    let milisecondsInSecond = 1000.
-    let (completeTimestamp, _setCompleteTimestamp) = React.useState(_ =>
-      Js.Date.now() /. milisecondsInSecond
-    )
+    let (refetchAttempt, setRefetchAttempt) = React.useState(_ => 0.)
+
+    let _ = Refetchers.useRefetchPendingRedeems(~userId, ~stateForRefetchExecution=refetchAttempt)
+    let _ = Refetchers.useRefetchConfirmedRedeems(~userId, ~stateForRefetchExecution=refetchAttempt)
 
     <div className="text-center m-3">
       <Tick />
@@ -22,20 +18,15 @@ module ConfirmedTransactionModal = {
       <p className="text-xxs text-gray-700">
         {`You can withdraw your ${Config.paymentTokenName} on the next oracle price update`->React.string}
       </p>
-      {switch lastOracleTimestamp {
-      | Response(lastOracleUpdateTimestamp) =>
-        !timerFinished
-          ? <ProgressBar
-              txConfirmedTimestamp={completeTimestamp->Belt.Int.fromFloat}
-              nextPriceUpdateTimestamp={lastOracleUpdateTimestamp->Ethers.BigNumber.toNumber +
-                oracleHeartBeat}
-              setTimerFinished
-            />
-          : <Withdraw
+      {switch usersPendingRedeemsQuery {
+      | Response(usersPendingRedeems) =>
+        usersPendingRedeems->Array.length == 0
+          ? <Withdraw
               marketIndex
               txState=txStateWithdraw
               contractExecutionHandler=contractExecutionHandlerWithdraw
             />
+          : <PendingBar marketIndex refetchCallback=setRefetchAttempt />
       | GraphError(error) => <p> {error->React.string} </p>
       | Loading => <Loader.Tiny />
       }}
@@ -74,7 +65,13 @@ let useRedeemModal = (
       )
     | ContractActions.Complete(_) =>
       showModal(
-        <ConfirmedTransactionModal marketIndex txStateWithdraw contractExecutionHandlerWithdraw />,
+        <div>
+          <Misc.Time.DelayedDisplay delay=500>
+            <ConfirmedTransactionModal
+              marketIndex txStateWithdraw contractExecutionHandlerWithdraw
+            />
+          </Misc.Time.DelayedDisplay>
+        </div>,
       )
     | ContractActions.Declined(_message) =>
       showModal(

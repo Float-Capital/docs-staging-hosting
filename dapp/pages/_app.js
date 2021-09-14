@@ -1,4 +1,5 @@
 import "styles/main.css";
+import "styles/pending-bar.css";
 
 // Note:
 // Just renaming $$default to ResApp alone
