@@ -505,7 +505,7 @@ function MintForm$AccreditedModal(Props) {
                     })
                 }, React.createElement("input", {
                       key: isWizard ? "1" : "0",
-                      className: "form-tick appearance-none h-6 min-w-6 w-6 border border-gray-300 rounded-md checked:bg-primary-light checked:border-transparent focus:outline-none",
+                      className: "form-tick cursor-pointer appearance-none h-6 min-w-6 w-6 border border-gray-300 rounded-md checked:bg-primary-light checked:border-transparent focus:outline-none",
                       checked: isWizard,
                       type: "checkbox",
                       value: isWizard ? "1" : "0"
@@ -524,7 +524,8 @@ function MintForm$AccreditedModal(Props) {
                                   }));
                     })
                 }, React.createElement("input", {
-                      className: "form-tick appearance-none h-6 w-6 min-w-6 border border-gray-300 rounded-md checked:bg-primary-light checked:border-transparent focus:outline-none",
+                      key: isntUs ? "1" : "0",
+                      className: "form-tick cursor-pointer appearance-none h-6 w-6 min-w-6 border border-gray-300 rounded-md checked:bg-primary-light checked:border-transparent focus:outline-none",
                       checked: isntUs,
                       type: "checkbox",
                       value: isntUs ? "1" : "0"

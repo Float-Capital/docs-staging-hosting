@@ -70,7 +70,7 @@ module AccreditedModal = {
           setIsWizard(a => !a)
         }}>
         <input
-          className="form-tick appearance-none h-6 min-w-6 w-6 border border-gray-300 rounded-md checked:bg-primary-light checked:border-transparent focus:outline-none"
+          className="form-tick cursor-pointer appearance-none h-6 min-w-6 w-6 border border-gray-300 rounded-md checked:bg-primary-light checked:border-transparent focus:outline-none"
           type_="checkbox"
           key={isWizard ? "1" : "0"}
           value={isWizard ? "1" : "0"}
@@ -91,9 +91,10 @@ module AccreditedModal = {
           setIsntUs(isntUs => !isntUs)
         }}>
         <input
-          className="form-tick appearance-none h-6 w-6 min-w-6 border border-gray-300 rounded-md checked:bg-primary-light checked:border-transparent focus:outline-none"
+          className="form-tick cursor-pointer appearance-none h-6 w-6 min-w-6 border border-gray-300 rounded-md checked:bg-primary-light checked:border-transparent focus:outline-none"
           type_="checkbox"
           value={isntUs ? "1" : "0"}
+          key={isntUs ? "1" : "0"}
           checked={isntUs}
         />
         <span> {"I confirm that I am not a resident or citizen of the US"->React.string} </span>
