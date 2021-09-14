@@ -291,14 +291,14 @@ module UserProfileCard = {
     let joinedStr = userInfo.joinedAt->DateFns.format(#"do MMM ''yy")
     let txStr = userInfo.transactionCount->toString
 
-    // let usersGems = DataHooks.useUserGems(~userId=userInfo.id)
+    let usersGems = DataHooks.useUserGems(~userId=userInfo.id)
 
     <UserColumnCard>
       <UserProfileHeader address={addressStr} />
       <UserColumnTextList>
         <div className="px-4">
           <UserColumnText head=`📮 Address` body={addressStr} />
-          /* {switch usersGems {
+          {switch usersGems {
           | Loading => <div className="m-auto"> <Loader.Tiny /> </div>
           | GraphError(string) => {
               Js.log(string)
@@ -314,7 +314,7 @@ module UserProfileCard = {
                 head=`⚡ Gem streak` body={`${streak->Ethers.BigNumber.toString} days`}
               />
             </>
-          }} */
+          }}
           <UserColumnText head=`🎉 Joined` body={joinedStr} />
           <UserColumnText head=`🏃 No. txs` body={txStr} />
         </div>

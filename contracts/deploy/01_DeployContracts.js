@@ -13,6 +13,7 @@ const {
   isAlphaLaunch,
 } = require("../helper-hardhat-config");
 const mumbaiDaiAddress = "0x001B3B4d0F3714Ca98ba10F6042DaEbF0B1B7b6F";
+const polygonDaiAddress = "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063";
 
 let networkToUse = network.name;
 
@@ -30,7 +31,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
 
   let paymentTokenAddress;
 
-  if (networkToUse != "mumbai") {
+  if (networkToUse != "mumbai" && networkToUse != "polygon") {
     console.log(networkToUse);
     let paymentToken = await deploy(COLLATERAL_TOKEN, {
       from: deployer,
@@ -39,6 +40,8 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     });
     console.log("dai address", paymentToken.address);
     paymentTokenAddress = paymentToken.address;
+  } else if (networkToUse === "polygon") {
+    paymentTokenAddress = polygonDaiAddress;
   } else if (networkToUse === "mumbai") {
     paymentTokenAddress = mumbaiDaiAddress;
   } else {

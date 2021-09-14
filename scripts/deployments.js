@@ -19,7 +19,8 @@ let uiContracts = [
   "Staker",
   "TokenFactory",
   "Treasury_v0",
-  "Dai"
+  "Dai",
+  "GEMS"
 ]
 
 let renames = {

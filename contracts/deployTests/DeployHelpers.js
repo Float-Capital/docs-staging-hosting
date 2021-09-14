@@ -299,7 +299,7 @@ function deployFlipp3ningPolygon(longShortInstance, stakerInstance, treasuryInst
                                     methodName: "initialize",
                                     args: [
                                       "Float Short Flipp3ning",
-                                      "f\xe2\x86\x97\xef\xb8\x8fF3",
+                                      "fsF3",
                                       longShortInstance.address,
                                       stakerInstance.address,
                                       newMarketIndex,
@@ -317,7 +317,7 @@ function deployFlipp3ningPolygon(longShortInstance, stakerInstance, treasuryInst
                                                 execute: {
                                                   args: [
                                                     "Float Long Flipp3ning",
-                                                    "f\xe2\x86\x98\xef\xb8\x8fF3",
+                                                    "flF3",
                                                     longShortInstance.address,
                                                     stakerInstance.address,
                                                     newMarketIndex,
@@ -367,8 +367,8 @@ function deployFlipp3ningPolygon(longShortInstance, stakerInstance, treasuryInst
                                                                             ]);
                                                                         return LetOps.AwaitThen.let_(longShortInstance.connect(admin).createNewSyntheticMarketExternalSyntheticTokens(syntheticName, syntheticSymbol, syntheticTokenLong.address, syntheticTokenShort.address, paymentToken.address, oracleManager.address, yieldManager.address), (function (param) {
                                                                                       console.log("a.5");
-                                                                                      var kInitialMultiplier = Globals.bnFromString("5000000000000000000");
-                                                                                      var kPeriod = Globals.bnFromInt(864000);
+                                                                                      var kInitialMultiplier = Globals.bnFromString("2000000000000000000");
+                                                                                      var kPeriod = Globals.bnFromInt(5184000);
                                                                                       console.log("a.6");
                                                                                       var unstakeFee_e18 = Globals.bnFromString("5000000000000000");
                                                                                       var initialMarketSeedForEachMarketSide = Globals.bnFromString("1000000000000000000");

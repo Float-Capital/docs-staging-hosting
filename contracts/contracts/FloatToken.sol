@@ -55,13 +55,15 @@ contract FloatToken is
 
     renounceRole(DEFAULT_ADMIN_ROLE, msg.sender);
     renounceRole(MINTER_ROLE, msg.sender);
-    renounceRole(PAUSER_ROLE, msg.sender);
 
     _setupRole(DEFAULT_ADMIN_ROLE, stakerAddress);
     _setupRole(MINTER_ROLE, stakerAddress);
-    _setupRole(PAUSER_ROLE, stakerAddress);
+    _setupRole(PAUSER_ROLE, msg.sender);
 
     _setupRole(UPGRADER_ROLE, msg.sender);
+
+    // Token starts as paused
+    _pause();
   }
 
   /*╔═══════════════════════════════════════════════════════════════════╗
