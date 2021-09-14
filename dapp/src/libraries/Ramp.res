@@ -13,7 +13,7 @@ let useRamp = () => {
   let (onramp, setOnramp) = React.useState(_ => emptyRampSDK)
 
   let userAddress = RootProvider.useCurrentUser()
-  React.useEffect(_ => {
+  React.useEffect1(_ => {
     Misc.onlyExecuteClientSide(_ =>
       setOnramp(_ =>
         ramp({
@@ -28,6 +28,6 @@ let useRamp = () => {
       )
     )
     None
-  })
+  }, [])
   onramp
 }

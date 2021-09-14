@@ -2,6 +2,19 @@ open Globals
 
 let {add, mul, div, toNumber, eq, toString} = module(Ethers.BigNumber)
 
+let getUsersTotalStakeValue = (~stakes) => {
+  let totalStakedValue = ref(CONSTANTS.zeroBN)
+
+  Array.forEach(stakes, (stake: Queries.CurrentStakeDetailed.t) => {
+    let syntheticToken = stake.currentStake.syntheticToken
+    let price = syntheticToken.latestPrice.price.price
+    let value = stake.currentStake.amount->mul(price)->div(CONSTANTS.tenToThe18)
+    totalStakedValue := totalStakedValue.contents->add(value)
+  })
+
+  totalStakedValue
+}
+
 module UserContainer = {
   @react.component
   let make = (~children) => {
@@ -11,13 +24,19 @@ module UserContainer = {
 
 module UserTotalValue = {
   @react.component
-  let make = (~totalValueNameSup, ~totalValueNameSub, ~totalValue, ~tokenIconUrl=None) => {
+  let make = (
+    ~totalValueNameSup,
+    ~totalValueNameSub,
+    ~totalValue,
+    ~tokenIconUrl=None,
+    ~children=React.null,
+  ) => {
     let isABaller = totalValue->Ethers.BigNumber.gte(CONSTANTS.oneHundredThousandInWei) // in the 100 000+ range
     let isAWhale = totalValue->Ethers.BigNumber.gte(CONSTANTS.oneMillionInWei) // in the 1 000 000+ range
     let shouldBeSmallerText = isABaller
     let shouldntHaveDecimals = isAWhale
     <div
-      className=`p-5 mb-5 flex items-center justify-between bg-white bg-opacity-75 rounded-lg shadow-lg`>
+      className=`relative p-5 mb-5 flex items-center justify-between bg-white bg-opacity-75 rounded-lg shadow-lg`>
       <div className="flex flex-col">
         <span className=`text-lg font-bold leading-tight`> {totalValueNameSup->React.string} </span>
         <span className=`text-lg font-bold leading-tight`> {totalValueNameSub->React.string} </span>
@@ -31,11 +50,12 @@ module UserTotalValue = {
               ~digits={shouldntHaveDecimals ? 1 : 2},
             )}`->React.string}
           {switch tokenIconUrl {
-          | Some(iconUrl) => <img src={iconUrl} className="h-6 pr-1" />
+          | Some(iconUrl) => <img src={iconUrl} className="h-6 pl-1" />
           | None => React.null
           }}
         </span>
       </div>
+      {children}
     </div>
   }
 }
@@ -485,8 +505,17 @@ module UserStakesCard = {
       </UserStakeBox>
     }, stakes)->React.array
 
+    let totalStakedValue = getUsersTotalStakeValue(~stakes)
+
     <UserColumnCard>
-      <UserColumnHeader> {`Staked assets 🔐`->React.string} </UserColumnHeader> {stakeBoxes}
+      <UserColumnHeader> {`Staked assets`->React.string} </UserColumnHeader>
+      <UserColumnTextCenter>
+        <UserColumnText
+          head=`🔐 Staked value`
+          body={`$${totalStakedValue.contents->Misc.NumberFormat.formatEther}`}
+        />
+      </UserColumnTextCenter>
+      {stakeBoxes}
     </UserColumnCard>
   }
 }

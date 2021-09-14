@@ -120,6 +120,35 @@ module UserTotalInvestedCard = {
   }
 }
 
+module UserTotalDaiCard = {
+  @react.component
+  let make = () => {
+    let {Swr.data: optDaiBalance} = ContractHooks.useErc20BalanceRefresh(
+      ~erc20Address=Config.config.contracts.dai,
+    )
+
+    let onramp: Ramp.rampInstantSDK = Ramp.useRamp()
+
+    switch optDaiBalance {
+    | Some(daiBalance) =>
+      <UserTotalValue
+        tokenIconUrl=Some(CONSTANTS.daiDisplayToken.iconUrl)
+        totalValueNameSup=`DAI`
+        totalValueNameSub=`Balance`
+        totalValue=daiBalance>
+        {Config.networkId == CONSTANTS.polygon.chainId
+          ? <p
+              className="absolute bottom-0 right-0 pb-1 pr-3 custom-cursor text-xxs text-right underline "
+              onClick={_ => onramp.show()}>
+              {"Buy more DAI"->React.string}
+            </p>
+          : React.null}
+      </UserTotalValue>
+    | None => React.null
+    }
+  }
+}
+
 module UserTotalStakedCard = {
   @react.component
   let make = (~stakes) => {
@@ -261,9 +290,6 @@ module UserProfileCard = {
     )
     let joinedStr = userInfo.joinedAt->DateFns.format(#"do MMM ''yy")
     let txStr = userInfo.transactionCount->toString
-    let {Swr.data: optDaiBalance} = ContractHooks.useErc20BalanceRefresh(
-      ~erc20Address=Config.config.contracts.dai,
-    )
 
     // let usersGems = DataHooks.useUserGems(~userId=userInfo.id)
 
@@ -272,15 +298,6 @@ module UserProfileCard = {
       <UserColumnTextList>
         <div className="px-4">
           <UserColumnText head=`📮 Address` body={addressStr} />
-          {switch optDaiBalance {
-          | Some(daiBalance) =>
-            <UserColumnText
-              icon=CONSTANTS.daiDisplayToken.iconUrl
-              head=`DAI balance`
-              body={`$${daiBalance->Misc.NumberFormat.formatEther(~digits=2)}`}
-            />
-          | None => React.null
-          }}
           /* {switch usersGems {
           | Loading => <div className="m-auto"> <Loader.Tiny /> </div>
           | GraphError(string) => {
@@ -332,8 +349,7 @@ let onQuerySuccess = (data: userData) => {
         <UserBalancesCard userId={data.user} />
       </Divider>
       <Divider>
-        <UserTotalStakedCard stakes={data.stakes} />
-        <UserStakesCard stakes={data.stakes} userId={data.user} />
+        <UserTotalDaiCard /> <UserStakesCard stakes={data.stakes} userId={data.user} />
       </Divider>
     </Container>
   </UserContainer>

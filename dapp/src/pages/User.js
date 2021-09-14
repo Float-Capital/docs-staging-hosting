@@ -2,6 +2,8 @@
 'use strict';
 
 var Misc = require("../libraries/Misc.js");
+var Ramp = require("../libraries/Ramp.js");
+var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
 var Button = require("../components/UI/Base/Button.js");
 var Config = require("../config/Config.js");
@@ -181,6 +183,32 @@ var UserTotalInvestedCard = {
   make: User$UserTotalInvestedCard
 };
 
+function User$UserTotalDaiCard(Props) {
+  var match = ContractHooks.useErc20BalanceRefresh(Config.config.contracts.Dai);
+  var optDaiBalance = match.data;
+  var onramp = Ramp.useRamp(undefined);
+  if (optDaiBalance !== undefined) {
+    return React.createElement(UserUI.UserTotalValue.make, {
+                totalValueNameSup: "DAI",
+                totalValueNameSub: "Balance",
+                totalValue: Caml_option.valFromOption(optDaiBalance),
+                tokenIconUrl: CONSTANTS.daiDisplayToken.iconUrl,
+                children: Config.networkId === CONSTANTS.polygon.chainId ? React.createElement("p", {
+                        className: "absolute bottom-0 right-0 pb-1 pr-3 custom-cursor text-xxs text-right underline ",
+                        onClick: (function (param) {
+                            return Curry._1(onramp.show, undefined);
+                          })
+                      }, "Buy more DAI") : null
+              });
+  } else {
+    return null;
+  }
+}
+
+var UserTotalDaiCard = {
+  make: User$UserTotalDaiCard
+};
+
 function User$UserTotalStakedCard(Props) {
   var stakes = Props.stakes;
   var totalStakedValue = getUsersTotalStakeValue(stakes);
@@ -328,8 +356,6 @@ function User$UserProfileCard(Props) {
   var addressStr = DisplayAddress.ellipsifyMiddle(userInfo.id, 8, 3);
   var joinedStr = Format(userInfo.joinedAt, "do MMM ''yy");
   var txStr = userInfo.transactionCount.toString();
-  var match = ContractHooks.useErc20BalanceRefresh(Config.config.contracts.Dai);
-  var optDaiBalance = match.data;
   return React.createElement(UserUI.UserColumnCard.make, {
               children: null
             }, React.createElement(UserUI.UserProfileHeader.make, {
@@ -340,11 +366,7 @@ function User$UserProfileCard(Props) {
                       }, React.createElement(UserUI.UserColumnText.make, {
                             head: "📮 Address",
                             body: addressStr
-                          }), optDaiBalance !== undefined ? React.createElement(UserUI.UserColumnText.make, {
-                              icon: CONSTANTS.daiDisplayToken.iconUrl,
-                              head: "DAI balance",
-                              body: "$" + Misc.NumberFormat.formatEther(2, Caml_option.valFromOption(optDaiBalance))
-                            }) : null, React.createElement(UserUI.UserColumnText.make, {
+                          }), React.createElement(UserUI.UserColumnText.make, {
                             head: "🎉 Joined",
                             body: joinedStr
                           }), React.createElement(UserUI.UserColumnText.make, {
@@ -388,9 +410,7 @@ function onQuerySuccess(data) {
                             userId: data.user
                           })), React.createElement(Masonry.Divider.make, {
                         children: null
-                      }, React.createElement(User$UserTotalStakedCard, {
-                            stakes: data.stakes
-                          }), React.createElement(UserUI.UserStakesCard.make, {
+                      }, React.createElement(User$UserTotalDaiCard, {}), React.createElement(UserUI.UserStakesCard.make, {
                             stakes: data.stakes,
                             userId: data.user
                           })))
@@ -470,6 +490,7 @@ exports.UserPendingMintItem = UserPendingMintItem;
 exports.UserBalancesCard = UserBalancesCard;
 exports.getUsersTotalStakeValue = getUsersTotalStakeValue;
 exports.UserTotalInvestedCard = UserTotalInvestedCard;
+exports.UserTotalDaiCard = UserTotalDaiCard;
 exports.UserTotalStakedCard = UserTotalStakedCard;
 exports.PendingRedeemItem = PendingRedeemItem;
 exports.IncompleteWithdrawalItem = IncompleteWithdrawalItem;
