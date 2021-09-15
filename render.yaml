@@ -1,9 +1,22 @@
 services:
-  - type: pserv
-    name: mumbai-system-update-bot
+  - name: mumbai-system-update-bot
+    type: pserv
     env: node
+    region: frankfurt
     buildCommand: cd system-update-bot && yarn
     startCommand: cd system-update-bot && yarn start-testnet
+    envVars:
+      - key: PROVIDER_URL
+        sync: false # placeholder for a value to be added in the dashboard
+      - key: MNEMONIC
+        sync: false # placeholder for a value to be added in the dashboard
+
+  - name: alhpa-system-update-bot
+    type: pserv
+    env: node
+    region: frankfurt
+    buildCommand: cd system-update-bot && yarn && yarn res:build
+    startCommand: cd system-update-bot && yarn start
     envVars:
       - key: PROVIDER_URL
         sync: false # placeholder for a value to be added in the dashboard
