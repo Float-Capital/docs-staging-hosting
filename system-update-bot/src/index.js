@@ -12,12 +12,15 @@ let provider;
 
 let wallet;
 
+const providerUrl = process.env.PROVIDER_URL || secretsManager.providerUrl;
+const mnemonic = process.env.MNEMONIC || secretsManager.mnemonic;
+
 const setup = async () => {
   provider = await new ethers.providers.JsonRpcProvider(
-    secretsManager.providerUrl
+    providerUrl
   );
 
-  wallet = await new ethers.Wallet.fromMnemonic(secretsManager.mnemonic);
+  wallet = await new ethers.Wallet.fromMnemonic(mnemonic);
 
   wallet = wallet.connect(provider);
 };

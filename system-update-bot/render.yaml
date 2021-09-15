@@ -1,0 +1,12 @@
+services:
+  - type: pserv
+    name: mumbai-system-update-bot
+    env: node
+    repo: https://github.com/Float-Capital/monorepo/
+    buildCommand: yarn
+    startCommand: yarn start
+    envVars:
+      - key: PROVIDER_URL
+        sync: false # placeholder for a value to be added in the dashboard
+      - key: MNEMONIC
+        sync: false # placeholder for a value to be added in the dashboard
