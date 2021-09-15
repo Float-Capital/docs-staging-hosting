@@ -51,10 +51,11 @@ let hotAPYThreshold = 0.15
 let multiplierHotAPYThreshold = 1.0
 
 // TODO: Pull the hardcoded values in from graph
-let kperiodHardcode = Ethers.BigNumber.fromUnsafe("1664000") // ~20 days
-let kmultiplierHardcode = Ethers.BigNumber.fromUnsafe("5000000000000000000")
+let unstakeFeeHardCode = Ethers.BigNumber.fromUnsafe("5000000000000000")
+let kperiodHardcode = Ethers.BigNumber.fromUnsafe("5184000") // ~60 days
+let kmultiplierHardcode = Ethers.BigNumber.fromUnsafe("2000000000000000000")
 let equilibriumOffsetHardcode = zeroBN
-let balanceIncentiveExponentHardcode = twoBN
+let balanceIncentiveExponentHardcode = fiveBN
 let yieldGradientHardcode = tenToThe18
 let floatCapitalPercentE18HardCode = tenToThe18->Ethers.BigNumber.div(fiveBN)
 

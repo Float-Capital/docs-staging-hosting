@@ -53,9 +53,11 @@ var PriceGraphLabels = {
   year: "1Y"
 };
 
-var kperiodHardcode = Ethers$1.BigNumber.from("1664000");
+var unstakeFeeHardCode = Ethers$1.BigNumber.from("5000000000000000");
 
-var kmultiplierHardcode = Ethers$1.BigNumber.from("5000000000000000000");
+var kperiodHardcode = Ethers$1.BigNumber.from("5184000");
+
+var kmultiplierHardcode = Ethers$1.BigNumber.from("2000000000000000000");
 
 var floatCapitalPercentE18HardCode = tenToThe18.div(fiveBN);
 
@@ -87,7 +89,7 @@ var multiplierHotAPYThreshold = 1.0;
 
 var equilibriumOffsetHardcode = zeroBN;
 
-var balanceIncentiveExponentHardcode = twoBN;
+var balanceIncentiveExponentHardcode = fiveBN;
 
 var yieldGradientHardcode = tenToThe18;
 
@@ -144,6 +146,7 @@ exports.threeMonthsInSeconds = threeMonthsInSeconds;
 exports.oneYearInSeconds = oneYearInSeconds;
 exports.hotAPYThreshold = hotAPYThreshold;
 exports.multiplierHotAPYThreshold = multiplierHotAPYThreshold;
+exports.unstakeFeeHardCode = unstakeFeeHardCode;
 exports.kperiodHardcode = kperiodHardcode;
 exports.kmultiplierHardcode = kmultiplierHardcode;
 exports.equilibriumOffsetHardcode = equilibriumOffsetHardcode;

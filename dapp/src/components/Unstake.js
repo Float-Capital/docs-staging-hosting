@@ -2,6 +2,7 @@
 'use strict';
 
 var Form = require("./Form.js");
+var Misc = require("../libraries/Misc.js");
 var Curry = require("rescript/lib/js/curry.js");
 var Login = require("../pages/Login.js");
 var React = require("react");
@@ -9,7 +10,9 @@ var Button = require("./UI/Base/Button.js");
 var Config = require("../config/Config.js");
 var Ethers = require("../ethereum/Ethers.js");
 var Loader = require("./UI/Base/Loader.js");
+var Ethers$1 = require("ethers");
 var Queries = require("../data/Queries.js");
+var CONSTANTS = require("../CONSTANTS.js");
 var Contracts = require("../ethereum/Contracts.js");
 var DataHooks = require("../data/DataHooks.js");
 var Formality = require("re-formality/src/Formality.js");
@@ -26,6 +29,28 @@ var ViewProfileButton = require("./UI/ViewProfileButton.js");
 var MessageUsOnDiscord = require("./Ethereum/MessageUsOnDiscord.js");
 var ViewOnBlockExplorer = require("./Ethereum/ViewOnBlockExplorer.js");
 var Formality__ReactUpdate = require("re-formality/src/Formality__ReactUpdate.js");
+
+function Unstake$ApproxDollarFeeUnstake(Props) {
+  var tokenPrice = Props.tokenPrice;
+  var value = Props.value;
+  var numberStrRegex = /^[+]?\d+(\.\d+)?$/;
+  var tokenPriceBN = numberStrRegex.test(tokenPrice) ? Ethers$1.BigNumber.from(tokenPrice) : CONSTANTS.zeroBN;
+  var valueBN = numberStrRegex.test(value) ? Ethers.Utils.parseEtherUnsafe(value) : CONSTANTS.zeroBN;
+  var dollarValue = valueBN.mul(tokenPriceBN).div(CONSTANTS.tenToThe18);
+  return React.createElement(React.Fragment, undefined, numberStrRegex.test(value) ? React.createElement("div", {
+                    className: "flex flex-row items-center justify-end mb-2 w-full text-right"
+                  }, React.createElement("span", {
+                        className: "text-xxs text-gray-500 pr-2"
+                      }, "approx"), React.createElement("span", {
+                        className: "text-sm text-gray-500"
+                      }, "~$"), React.createElement("span", {
+                        className: "text-sm text-gray-800"
+                      }, Misc.NumberFormat.formatEther(undefined, dollarValue))) : null);
+}
+
+var ApproxDollarFeeUnstake = {
+  make: Unstake$ApproxDollarFeeUnstake
+};
 
 var validators = {
   amount: {
@@ -520,6 +545,9 @@ function Unstake$StakeFormInput(Props) {
                   onBlur: onBlur,
                   onChange: onChange,
                   onMaxClick: onMaxClick
+                }), React.createElement(Unstake$ApproxDollarFeeUnstake, {
+                  tokenPrice: CONSTANTS.tenToThe18.toString(),
+                  value: CONSTANTS.tenToThe18.toString()
                 }), tmp);
 }
 
@@ -746,6 +774,7 @@ function Unstake(Props) {
 
 var make = Unstake;
 
+exports.ApproxDollarFeeUnstake = ApproxDollarFeeUnstake;
 exports.StakeForm = StakeForm;
 exports.toNumber = toNumber;
 exports.useUnstakeModal = useUnstakeModal;
