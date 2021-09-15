@@ -19,7 +19,8 @@ let uiContracts = [
   "Staker",
   "TokenFactory",
   "Treasury_v0",
-  "Dai"
+  "Dai",
+  "GEMS"
 ]
 
 let renames = {
@@ -40,5 +41,7 @@ Object.keys(build.contracts).forEach((contractName) => {
 
 if (build.name == "mumbai") {
   output.uiContracts["Dai"] = "0x001B3B4d0F3714Ca98ba10F6042DaEbF0B1B7b6F";
+} else if (build.name == "polygon") {
+  output.uiContracts["Dai"] = "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063";
 }
 console.log(JSON.stringify(output, null, 2));

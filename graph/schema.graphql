@@ -248,6 +248,14 @@ type User @entity {
   settledNextPriceActions: [UserNextPriceAction!]!
   pendingNextPriceStakeActions: [UserNextPriceStakeAction!]!
   settledNextPriceStakeActions: [UserNextPriceStakeAction!]!
+  gems: Gems!
+}
+
+type Gems @entity {
+  id: ID! # user address
+  balance: BigInt!
+  streak: BigInt!
+  lastUpdated: BigInt!
 }
 
 type UserSyntheticTokenBalance @entity {

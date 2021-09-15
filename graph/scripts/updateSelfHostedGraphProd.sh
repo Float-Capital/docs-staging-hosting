@@ -18,6 +18,6 @@ docker image prune -f
 # Give it time start everything...
 sleep 60
 
-docker exec -ti graph-deployer-prod sh -c "yarn graph-command create float-capital/float-capital${GRAPH_POSTFIX} --node http://graph-node-prod:8020"
+docker exec -ti graph-deployer-prod sh -c "yarn graph-command create float-capital/float-capital-alpha${GRAPH_POSTFIX} --node http://graph-node-prod:8020"
 
-docker exec -ti graph-deployer-prod sh -c "yarn graph-command deploy float-capital/float-capital${GRAPH_POSTFIX} --ipfs http://ipfs-prod:5001 --node http://graph-node-prod:8020 ./subgraph.polygon.yaml"
+docker exec -ti graph-deployer-prod sh -c "yarn graph-command deploy float-capital/float-capital-alpha${GRAPH_POSTFIX} --ipfs http://ipfs-prod:5001 --node http://graph-node-prod:8020"

@@ -30,7 +30,7 @@ let testUnit =
           ~isShiftFromLong,
           ~amountSyntheticTokensToShiftBeforeValue,
           ~amountSyntheticTokensToShift,
-          ~userNextPrice_stakedSyntheticTokenShiftIndex,
+          ~userNextPrice_stakedActionIndex,
           ~latestRewardIndex,
           ~userAmountStaked,
         ) => {
@@ -43,7 +43,7 @@ let testUnit =
           ~isShiftFromLong,
           ~user,
           ~amountSyntheticTokensToShift=amountSyntheticTokensToShiftBeforeValue,
-          ~userNextPrice_stakedSyntheticTokenShiftIndex,
+          ~userNextPrice_stakedActionIndex,
           ~latestRewardIndex,
           ~userAmountStaked,
           ~syntheticToken=syntheticTokenSmocked.address,
@@ -76,18 +76,15 @@ let testUnit =
       "calls _mintAccumulatedFloatAndExecuteOutstandingShifts (via modifier) with the correct arguments if the user has a 'confirmed' shift that needs to be settled",
       () => {
         let user = accounts.contents->Array.getUnsafe(0).address;
-        let userNextPrice_stakedSyntheticTokenShiftIndex =
-          Helpers.randomInteger();
+        let userNextPrice_stakedActionIndex = Helpers.randomInteger();
         let latestRewardIndex =
-          userNextPrice_stakedSyntheticTokenShiftIndex->add(
-            Helpers.randomInteger(),
-          );
+          userNextPrice_stakedActionIndex->add(Helpers.randomInteger());
 
         let%Await _ =
           setup(
             ~isShiftFromLong,
             ~amountSyntheticTokensToShiftBeforeValue,
-            ~userNextPrice_stakedSyntheticTokenShiftIndex,
+            ~userNextPrice_stakedActionIndex,
             ~latestRewardIndex,
             ~amountSyntheticTokensToShift,
             ~userAmountStaked=
@@ -104,7 +101,7 @@ let testUnit =
     );
 
     it(
-      "doesn't call _mintAccumulatedFloatAndExecuteOutstandingShifts if userNextPrice_stakedSyntheticTokenShiftIndex == 0",
+      "doesn't call _mintAccumulatedFloatAndExecuteOutstandingShifts if userNextPrice_stakedActionIndex == 0",
       () => {
         let latestRewardIndex = Helpers.randomInteger();
 
@@ -112,7 +109,7 @@ let testUnit =
           setup(
             ~isShiftFromLong,
             ~amountSyntheticTokensToShiftBeforeValue,
-            ~userNextPrice_stakedSyntheticTokenShiftIndex=zeroBn,
+            ~userNextPrice_stakedActionIndex=zeroBn,
             ~latestRewardIndex,
             ~amountSyntheticTokensToShift,
             ~userAmountStaked=
@@ -128,17 +125,16 @@ let testUnit =
       },
     );
     it(
-      "doesn't call _mintAccumulatedFloatAndExecuteOutstandingShifts if userNextPrice_stakedSyntheticTokenShiftIndex == latestRewardIndex",
+      "doesn't call _mintAccumulatedFloatAndExecuteOutstandingShifts if userNextPrice_stakedActionIndex == latestRewardIndex",
       () => {
-        let userNextPrice_stakedSyntheticTokenShiftIndex =
-          Helpers.randomInteger();
-        let latestRewardIndex = userNextPrice_stakedSyntheticTokenShiftIndex;
+        let userNextPrice_stakedActionIndex = Helpers.randomInteger();
+        let latestRewardIndex = userNextPrice_stakedActionIndex;
 
         let%Await _ =
           setup(
             ~isShiftFromLong,
             ~amountSyntheticTokensToShiftBeforeValue,
-            ~userNextPrice_stakedSyntheticTokenShiftIndex,
+            ~userNextPrice_stakedActionIndex,
             ~latestRewardIndex,
             ~amountSyntheticTokensToShift,
             ~userAmountStaked=
@@ -156,17 +152,17 @@ let testUnit =
     );
 
     it(
-      "doesn't call _mintAccumulatedFloatAndExecuteOutstandingShifts if userNextPrice_stakedSyntheticTokenShiftIndex > latestRewardIndex",
+      "doesn't call _mintAccumulatedFloatAndExecuteOutstandingShifts if userNextPrice_stakedActionIndex > latestRewardIndex",
       () => {
         let latestRewardIndex = Helpers.randomInteger();
-        let userNextPrice_stakedSyntheticTokenShiftIndex =
+        let userNextPrice_stakedActionIndex =
           latestRewardIndex->add(Helpers.randomInteger());
 
         let%Await _ =
           setup(
             ~isShiftFromLong,
             ~amountSyntheticTokensToShiftBeforeValue,
-            ~userNextPrice_stakedSyntheticTokenShiftIndex,
+            ~userNextPrice_stakedActionIndex,
             ~latestRewardIndex,
             ~amountSyntheticTokensToShift,
             ~userAmountStaked=
@@ -183,37 +179,33 @@ let testUnit =
     );
 
     it(
-      "sets the userNextPrice_stakedSyntheticTokenShiftIndex for the user to latestRewardIndex + 1",
+      "sets the userNextPrice_stakedActionIndex for the user to latestRewardIndex + 1",
       () => {
-        let latestRewardIndex = Helpers.randomInteger();
-        let user = accounts.contents->Array.getUnsafe(0).address;
+      let latestRewardIndex = Helpers.randomInteger();
+      let user = accounts.contents->Array.getUnsafe(0).address;
 
-        let%Await _ =
-          setup(
-            ~isShiftFromLong,
-            ~amountSyntheticTokensToShiftBeforeValue,
-            ~userNextPrice_stakedSyntheticTokenShiftIndex=zeroBn,
-            ~latestRewardIndex,
-            ~amountSyntheticTokensToShift,
-            ~userAmountStaked=
-              amountSyntheticTokensToShift->add(
-                amountSyntheticTokensToShiftBeforeValue,
-              ),
-          );
-
-        let%Await userNextPrice_stakedSyntheticTokenShiftIndexAfter =
-          contracts.contents.staker
-          ->Staker.userNextPrice_stakedSyntheticTokenShiftIndex(
-              marketIndex,
-              user,
-            );
-
-        Chai.bnEqual(
-          userNextPrice_stakedSyntheticTokenShiftIndexAfter,
-          latestRewardIndex->add(oneBn),
+      let%Await _ =
+        setup(
+          ~isShiftFromLong,
+          ~amountSyntheticTokensToShiftBeforeValue,
+          ~userNextPrice_stakedActionIndex=zeroBn,
+          ~latestRewardIndex,
+          ~amountSyntheticTokensToShift,
+          ~userAmountStaked=
+            amountSyntheticTokensToShift->add(
+              amountSyntheticTokensToShiftBeforeValue,
+            ),
         );
-      },
-    );
+
+      let%Await userNextPrice_stakedActionIndexAfter =
+        contracts.contents.staker
+        ->Staker.userNextPrice_stakedActionIndex(marketIndex, user);
+
+      Chai.bnEqual(
+        userNextPrice_stakedActionIndexAfter,
+        latestRewardIndex->add(oneBn),
+      );
+    });
 
     let sideSpecificTests = (~isShiftFromLong) => {
       it(
@@ -228,7 +220,7 @@ let testUnit =
             setup(
               ~isShiftFromLong,
               ~amountSyntheticTokensToShiftBeforeValue,
-              ~userNextPrice_stakedSyntheticTokenShiftIndex=zeroBn,
+              ~userNextPrice_stakedActionIndex=zeroBn,
               ~latestRewardIndex,
               ~amountSyntheticTokensToShift,
               ~userAmountStaked=
@@ -256,7 +248,7 @@ let testUnit =
             setup(
               ~isShiftFromLong,
               ~amountSyntheticTokensToShiftBeforeValue,
-              ~userNextPrice_stakedSyntheticTokenShiftIndex=zeroBn,
+              ~userNextPrice_stakedActionIndex=zeroBn,
               ~latestRewardIndex,
               ~amountSyntheticTokensToShift,
               ~userAmountStaked=

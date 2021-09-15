@@ -39,8 +39,10 @@ function getRescriptType(typeString) {
     return "bool";
   } else if (typeString === "bytes" || typeString === "bytes32") {
     return "bytes32";
-  } else if (typeString === "uint16" || typeString === "uint32") {
+  } else if (typeString === "uint8" || typeString === "uint32" || typeString === "uint16") {
     return "int";
+  } else if (typeString === "uint256" || typeString === "uint128" || typeString === "int256" || typeString === "uint80") {
+    return "Ethers.BigNumber.t";
   } else if (typeString === "address[]") {
     return "array<Ethers.ethAddress>";
   } else if (typeString === "string") {
@@ -49,10 +51,6 @@ function getRescriptType(typeString) {
     return "array<int>";
   } else if (typeString === "address") {
     return "Ethers.ethAddress";
-  } else if (typeString === "int256" || typeString === "uint256") {
-    return "Ethers.BigNumber.t";
-  } else if (typeString === "uint8") {
-    return "int";
   } else if (typeString === "bytes4") {
     return "bytes4";
   } else if (typeString.startsWith("tuple")) {
@@ -68,30 +66,30 @@ function typeInputs(inputs, paramLayout) {
     contents: ""
   };
   Belt_Array.mapWithIndex(inputs, (function (index, input) {
-    var paramType = input.type;
-    var parameterIsNamed = input.name !== "";
-    var paramName = input.name === "" ? "param" + String(index) : formatKeywords(input.name);
-    var rescriptType = getRescriptType(paramType);
-    var tmp;
-    switch (paramLayout) {
-      case /* NamedTyped */0:
-        tmp = (
-          parameterIsNamed ? "~" + paramName + ":" : ""
-        ) + " " + rescriptType + ",";
-        break;
-      case /* NamedUntyped */1:
-        tmp = (
-          parameterIsNamed ? "~" : ""
-        ) + paramName + ",";
-        break;
-      case /* UnnamedUntyped */2:
-        tmp = paramName + ",";
-        break;
-
-    }
-    paramsString.contents = paramsString.contents + tmp;
-
-  }));
+          var paramType = input.type;
+          var parameterIsNamed = input.name !== "";
+          var paramName = input.name === "" ? "param" + String(index) : formatKeywords(input.name);
+          var rescriptType = getRescriptType(paramType);
+          var tmp;
+          switch (paramLayout) {
+            case /* NamedTyped */0 :
+                tmp = (
+                  parameterIsNamed ? "~" + paramName + ":" : ""
+                ) + " " + rescriptType + ",";
+                break;
+            case /* NamedUntyped */1 :
+                tmp = (
+                  parameterIsNamed ? "~" : ""
+                ) + paramName + ",";
+                break;
+            case /* UnnamedUntyped */2 :
+                tmp = paramName + ",";
+                break;
+            
+          }
+          paramsString.contents = paramsString.contents + tmp;
+          
+        }));
   return paramsString.contents;
 }
 
@@ -101,12 +99,12 @@ function typeOutputs(outputs, functionName) {
   };
   if (outputs.length > 1) {
     Belt_Array.mapWithIndex(outputs, (function (index, output) {
-      var paramType = output.type;
-      var paramName = output.name === "" ? "param" + String(index) : formatKeywords(output.name);
-      var rescriptType = getRescriptType(paramType);
-      paramsString.contents = paramsString.contents + ("\n" + paramName + ": " + rescriptType + ",");
-
-    }));
+            var paramType = output.type;
+            var paramName = output.name === "" ? "param" + String(index) : formatKeywords(output.name);
+            var rescriptType = getRescriptType(paramType);
+            paramsString.contents = paramsString.contents + ("\n" + paramName + ": " + rescriptType + ",");
+            
+          }));
     return "type " + functionName + "Return = {" + paramsString.contents + "\n    }";
   }
   if (outputs.length !== 1) {
@@ -126,61 +124,61 @@ function generateConstructor(constructorParams, moduleName) {
 var moduleDictionary = {};
 
 Belt_Array.map(files, (function (abiFileName) {
-  var abiFileContents = Fs.readFileSync("../contracts/abis/" + abiFileName, "utf8");
-  var abiFileObject = JSON.parse(abiFileContents);
-  var moduleName = getMmoduleName(abiFileName);
-  var moduleContents = {};
-  var moduleConstructor = {
-    contents: "let make: unit => JsPromise.t<t> = () => deployContract0(contractName)->Obj.magic\n    let makeSmock: unit => JsPromise.t<t> = () => deployMockContract0(contractName)->Obj.magic\n\n    let setVariable: (t, ~name: string, ~value: 'a) => JsPromise.t<unit> = setVariableRaw\n    "
-  };
-  Belt_Array.map(abiFileObject, (function (abiItem) {
-    var name = abiItem.name;
-    var itemType = abiItem.type;
-    var inputs = abiItem.inputs;
-    if (itemType === "event") {
-      console.log("we have an event - " + name);
-      return;
-    }
-    if (itemType !== "function") {
-      if (itemType === "constructor") {
-        moduleConstructor.contents = generateConstructor(inputs, moduleName);
-      } else {
-        console.log("We have an unhandled type - " + name + " " + itemType, abiItem);
-      }
-      return;
-    }
-    var outputs = abiItem.outputs;
-    var hasReturnValues = outputs.length !== 0;
-    var stateMutability = abiItem.stateMutability;
-    var typeNames = typeInputs(inputs, /* NamedTyped */0);
-    var returnType = lowerCaseFirstLetter(name + "Return");
-    var returnTypeDefinition = typeOutputs(outputs, name);
-    if (stateMutability === "view" || stateMutability === "pure") {
-      moduleContents[name] = "\n  " + returnTypeDefinition + "\n  @send\n  external " + lowerCaseFirstLetter(name) + ": (\n    t," + typeNames + "\n  ) => JsPromise.t<" + returnType + "> = \"" + name + "\"\n";
-      return;
-    }
-    var callVersion = hasReturnValues ? "\n    " + returnTypeDefinition + "\n    @send @scope(\"callStatic\")\n    external " + name + "Call: (\n      t," + typeNames + "\n    ) => JsPromise.t<" + returnType + "> = \"" + name + "\"\n" : "";
-    moduleContents[name] = "\n  @send\n  external " + name + ": (\n    t," + typeNames + "\n  ) => JsPromise.t<transaction> = \"" + name + "\"\n" + callVersion;
-
-  }));
-  moduleDictionary[moduleName] = [
-    moduleContents,
-    moduleConstructor.contents
-  ];
-
-}));
+        var abiFileContents = Fs.readFileSync("../contracts/abis/" + abiFileName, "utf8");
+        var abiFileObject = JSON.parse(abiFileContents);
+        var moduleName = getMmoduleName(abiFileName);
+        var moduleContents = {};
+        var moduleConstructor = {
+          contents: "let make: unit => JsPromise.t<t> = () => deployContract0(contractName)->Obj.magic\n    let makeSmock: unit => JsPromise.t<t> = () => deployMockContract0(contractName)->Obj.magic\n\n    let setVariable: (t, ~name: string, ~value: 'a) => JsPromise.t<unit> = setVariableRaw\n    "
+        };
+        Belt_Array.map(abiFileObject, (function (abiItem) {
+                var name = abiItem.name;
+                var itemType = abiItem.type;
+                var inputs = abiItem.inputs;
+                if (itemType === "event") {
+                  console.log("we have an event - " + name);
+                  return ;
+                }
+                if (itemType !== "function") {
+                  if (itemType === "constructor") {
+                    moduleConstructor.contents = generateConstructor(inputs, moduleName);
+                  } else {
+                    console.log("We have an unhandled type - " + name + " " + itemType, abiItem);
+                  }
+                  return ;
+                }
+                var outputs = abiItem.outputs;
+                var hasReturnValues = outputs.length !== 0;
+                var stateMutability = abiItem.stateMutability;
+                var typeNames = typeInputs(inputs, /* NamedTyped */0);
+                var returnType = lowerCaseFirstLetter(name + "Return");
+                var returnTypeDefinition = typeOutputs(outputs, name);
+                if (stateMutability === "view" || stateMutability === "pure") {
+                  moduleContents[name] = "\n  " + returnTypeDefinition + "\n  @send\n  external " + lowerCaseFirstLetter(name) + ": (\n    t," + typeNames + "\n  ) => JsPromise.t<" + returnType + "> = \"" + name + "\"\n";
+                  return ;
+                }
+                var callVersion = hasReturnValues ? "\n    " + returnTypeDefinition + "\n    @send @scope(\"callStatic\")\n    external " + name + "Call: (\n      t," + typeNames + "\n    ) => JsPromise.t<" + returnType + "> = \"" + name + "\"\n" : "";
+                moduleContents[name] = "\n  @send\n  external " + name + ": (\n    t," + typeNames + "\n  ) => JsPromise.t<transaction> = \"" + name + "\"\n" + callVersion;
+                
+              }));
+        moduleDictionary[moduleName] = [
+          moduleContents,
+          moduleConstructor.contents
+        ];
+        
+      }));
 
 var _writeFiles = Belt_Array.map(Js_dict.entries(moduleDictionary), (function (param) {
-  var moduleName = param[0];
-  if (moduleName.endsWith("Mockable")) {
-    return;
-  }
-  var match = param[1];
-  var optExposedFunctions = Js_dict.get(moduleDictionary, moduleName + "Mockable");
-  var exposedFunctionBinding = optExposedFunctions !== undefined ? "module Exposed = {\n          let contractName = \"" + moduleName + "Mockable\"\n\n          " + optExposedFunctions[1] + "\n          " + Caml_splice_call.spliceObjApply("", "concat", [Js_dict.values(optExposedFunctions[0])]) + "\n        }" : "";
-  Fs.writeFileSync("../contracts/test/library/contracts/" + moduleName + ".res", "\n@@ocaml.warning(\"-32\")\nopen SmockGeneral\nopen ContractHelpers\ntype t = {address: Ethers.ethAddress}\nlet contractName = \"" + moduleName + "\"\n\nlet at: Ethers.ethAddress => JsPromise.t<t> = contractAddress =>\n  attachToContract(contractName, ~contractAddress)->Obj.magic\n\n" + match[1] + "\n\n" + Caml_splice_call.spliceObjApply("", "concat", [Js_dict.values(match[0])]) + "\n\n" + exposedFunctionBinding + "\n", "utf8");
-
-}));
+        var moduleName = param[0];
+        if (moduleName.endsWith("Mockable")) {
+          return ;
+        }
+        var match = param[1];
+        var optExposedFunctions = Js_dict.get(moduleDictionary, moduleName + "Mockable");
+        var exposedFunctionBinding = optExposedFunctions !== undefined ? "module Exposed = {\n          let contractName = \"" + moduleName + "Mockable\"\n\n          " + optExposedFunctions[1] + "\n          " + Caml_splice_call.spliceObjApply("", "concat", [Js_dict.values(optExposedFunctions[0])]) + "\n        }" : "";
+        Fs.writeFileSync("../contracts/test/library/contracts/" + moduleName + ".res", "\n@@ocaml.warning(\"-32\")\nopen SmockGeneral\nopen ContractHelpers\ntype t = {address: Ethers.ethAddress}\nlet contractName = \"" + moduleName + "\"\n\nlet at: Ethers.ethAddress => JsPromise.t<t> = contractAddress =>\n  attachToContract(contractName, ~contractAddress)->Obj.magic\n\n" + match[1] + "\n\n" + Caml_splice_call.spliceObjApply("", "concat", [Js_dict.values(match[0])]) + "\n\n" + exposedFunctionBinding + "\n", "utf8");
+        
+      }));
 
 exports.files = files;
 exports.startsWith = startsWith;

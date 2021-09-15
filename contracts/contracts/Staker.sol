@@ -10,6 +10,7 @@ import "./interfaces/IFloatToken.sol";
 import "./interfaces/ILongShort.sol";
 import "./interfaces/IStaker.sol";
 import "./interfaces/ISyntheticToken.sol";
+import "./GEMS.sol";
 import "hardhat/console.sol";
 
 contract Staker is IStaker, AccessControlledAndUpgradeable {
@@ -30,6 +31,9 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
   address public longShort;
   address public floatToken;
 
+  address public gems;
+  uint256[45] private __globalStateGap;
+
   /* ══════ Market specific ══════ */
   mapping(uint32 => uint256) public marketLaunchIncentive_period; // seconds
   mapping(uint32 => uint256) public marketLaunchIncentive_multipliers; // e18 scale
@@ -39,9 +43,11 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
   mapping(uint32 => uint256) public safeExponentBitShifting;
 
   mapping(uint32 => mapping(bool => address)) public syntheticTokens;
+  uint256[45] private __marketStateGap;
 
   mapping(address => uint32) public marketIndexOfToken;
   mapping(address => uint32) public userNonce;
+  uint256[45] private __synthStateGap;
 
   /* ══════ Reward specific ══════ */
   mapping(uint32 => uint256) public latestRewardIndex; // This is synced to be the same as LongShort
@@ -53,17 +59,23 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
     uint256 accumulativeFloatPerSyntheticToken_short;
   }
 
+  uint256[45] private __rewardStateGap;
   /* ══════ User specific ══════ */
   mapping(uint32 => mapping(address => uint256)) public userIndexOfLastClaimedReward;
   mapping(address => mapping(address => uint256)) public override userAmountStaked;
+  uint256[45] private __userStateGap;
 
-  /* ══════ Token shift management specific ══════ */
-  /// @dev marketIndex => usersAddress => stakerTokenShiftIndex
-  mapping(uint32 => mapping(address => uint256))
-    public userNextPrice_stakedSyntheticTokenShiftIndex;
+  /* ══════ Next price action management specific ══════ */
+  /// @dev marketIndex => usersAddress => stakedActionIndex
+  mapping(uint32 => mapping(address => uint256)) public userNextPrice_stakedActionIndex;
+
   /// @dev marketIndex => usersAddress => amountUserRequestedToShiftAwayFromLongOnNextUpdate
   mapping(uint32 => mapping(bool => mapping(address => uint256)))
     public userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom;
+
+  /// @dev marketIndex => usersAddress => stakedActionIndex
+  mapping(uint32 => mapping(bool => mapping(address => uint256)))
+    public userNextPrice_paymentToken_depositAmount;
 
   /*╔═════════════════════════════╗
     ║          MODIFIERS          ║
@@ -101,9 +113,8 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
     address user
   ) internal virtual {
     if (
-      userNextPrice_stakedSyntheticTokenShiftIndex[marketIndex][msg.sender] != 0 &&
-      userNextPrice_stakedSyntheticTokenShiftIndex[marketIndex][msg.sender] <=
-      latestRewardIndex[marketIndex]
+      userNextPrice_stakedActionIndex[marketIndex][msg.sender] != 0 &&
+      userNextPrice_stakedActionIndex[marketIndex][msg.sender] <= latestRewardIndex[marketIndex]
     ) {
       _mintAccumulatedFloatAndExecuteOutstandingShifts(marketIndex, msg.sender);
     }
@@ -114,6 +125,11 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
     address user
   ) {
     _updateUsersStakedPosition_mintAccumulatedFloatAndExecuteOutstandingShifts(marketIndex, user);
+    _;
+  }
+
+  modifier gemCollecting(address user) {
+    GEMS(gems).gm(user);
     _;
   }
 
@@ -138,7 +154,8 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
     address _floatTreasury,
     address _floatCapital,
     address _discountSigner,
-    uint256 _floatPercentage
+    uint256 _floatPercentage,
+    address _gems
   ) external virtual initializer {
     require(
       _admin != address(0) &&
@@ -146,6 +163,7 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
         _floatToken != address(0) &&
         _floatTreasury != address(0) &&
         _floatCapital != address(0) &&
+        _gems != address(0) &&
         _floatPercentage != 0
     );
 
@@ -153,6 +171,7 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
     floatTreasury = _floatTreasury;
     longShort = _longShort;
     floatToken = _floatToken;
+    gems = _gems;
 
     _AccessControlledAndUpgradeable_init(_admin);
     _setupRole(DISCOUNT_ROLE, _discountSigner);
@@ -631,7 +650,7 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
       return 0;
     }
 
-    uint256 usersShiftIndex = userNextPrice_stakedSyntheticTokenShiftIndex[marketIndex][user];
+    uint256 usersShiftIndex = userNextPrice_stakedActionIndex[marketIndex][user];
     // if there is a change in the users tokens held due to a token shift (or possibly another action in the future)
     if (usersShiftIndex > 0 && usersShiftIndex <= currentRewardIndex) {
       floatReward = _calculateAccumulatedFloatInRange(
@@ -690,7 +709,7 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
         currentRewardIndex
       );
 
-      userNextPrice_stakedSyntheticTokenShiftIndex[marketIndex][user] = 0;
+      userNextPrice_stakedActionIndex[marketIndex][user] = 0;
     } else {
       floatReward = _calculateAccumulatedFloatInRange(
         marketIndex,
@@ -801,6 +820,7 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
     virtual
     override
     onlyValidSynthetic(msg.sender)
+    gemCollecting(from)
   {
     uint32 marketIndex = marketIndexOfToken[msg.sender];
     ILongShort(longShort).updateSystemState(marketIndex);
@@ -842,6 +862,7 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
       marketIndex,
       msg.sender
     )
+    gemCollecting(msg.sender)
   {
     require(amountSyntheticTokensToShift > 0, "No zero shifts.");
     address token = syntheticTokens[marketIndex][isShiftFromLong];
@@ -866,7 +887,7 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
     ] = totalAmountForNextShift;
 
     uint256 userRewardIndex = latestRewardIndex[marketIndex] + 1;
-    userNextPrice_stakedSyntheticTokenShiftIndex[marketIndex][msg.sender] = userRewardIndex;
+    userNextPrice_stakedActionIndex[marketIndex][msg.sender] = userRewardIndex;
 
     emit NextPriceStakeShift(
       msg.sender,
@@ -892,7 +913,7 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
     uint32 marketIndex,
     address token,
     uint256 amount
-  ) internal virtual {
+  ) internal virtual gemCollecting(msg.sender) {
     uint256 amountFees = (amount * marketUnstakeFee_e18[marketIndex]) / 1e18;
 
     ISyntheticToken(token).transfer(floatTreasury, amountFees);
@@ -997,7 +1018,7 @@ contract Staker is IStaker, AccessControlledAndUpgradeable {
     uint8 v,
     bytes32 r,
     bytes32 s
-  ) external {
+  ) external gemCollecting(msg.sender) {
     address discountSigner = ecrecover(
       _hasher(
         marketIndex,

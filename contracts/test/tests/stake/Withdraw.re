@@ -161,7 +161,7 @@ let testUnit =
               ~user=adminWallet.address,
               ~amountStaked=bnFromInt(0),
               ~token,
-              ~userNextPrice_stakedSyntheticTokenShiftIndex=bnFromInt(777),
+              ~userNextPrice_stakedActionIndex=bnFromInt(777),
               ~syntheticTokens=token,
               ~userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_long=
                 Helpers.randomTokenAmount(),
@@ -196,7 +196,7 @@ let testUnit =
               ~token,
               ~user=userWallet.contents.address,
               ~amountStaked,
-              ~userNextPrice_stakedSyntheticTokenShiftIndex=bnFromInt(1),
+              ~userNextPrice_stakedActionIndex=bnFromInt(1),
               ~syntheticTokens=Helpers.randomAddress(),
               ~userNextPrice_amountStakedSyntheticToken_toShiftAwayFrom_long=
                 bnFromInt(0),

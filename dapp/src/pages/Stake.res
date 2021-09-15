@@ -62,7 +62,7 @@ let make = () => {
                     <Button
                       onClick={_ =>
                         router->Next.Router.pushShallow(
-                          `/app/mint/markets?marketIndex=${marketIndex}&actionOption=${actionOption}`,
+                          `/app/markets?marketIndex=${marketIndex}&actionOption=${actionOption}`,
                         )}>
                       "Mint"
                     </Button>

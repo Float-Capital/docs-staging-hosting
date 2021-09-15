@@ -332,44 +332,19 @@ module UserTokenBox = {
 }
 module UserPendingBox = {
   @react.component
-  let make = (
-    ~name,
-    ~isLong,
-    ~daiSpend,
-    ~txConfirmedTimestamp,
-    ~marketIndex,
-    ~setTimerFinished,
-  ) => {
-    let lastOracleTimestamp = DataHooks.useOracleLastUpdate(
-      ~marketIndex=marketIndex->Ethers.BigNumber.toString,
-    )
-
-    let oracleHeartbeatForMarket = Backend.getMarketInfoUnsafe(
-      marketIndex->Ethers.BigNumber.toNumber,
-    ).oracleHeartbeat
-
-    switch lastOracleTimestamp {
-    | Response(lastOracleUpdateTimestamp) =>
-      <div
-        className=`flex flex-col justify-between w-11/12 mx-auto p-2 mb-2 border-2 border-primary rounded-lg shadow relative`>
-        <div className="flex flex-row justify-between">
-          <div className=` text-sm self-center`> {name->React.string} </div>
-          <div className=` text-sm self-center`> {(isLong ? "Long" : "Short")->React.string} </div>
-          <div className=`flex  text-sm self-center`>
-            <img src={CONSTANTS.daiDisplayToken.iconUrl} className="h-5 pr-1" />
-            {daiSpend->Ethers.Utils.formatEther->React.string}
-          </div>
+  let make = (~name, ~isLong, ~daiSpend, ~marketIndex, ~refetchCallback) => {
+    <div
+      className=`flex flex-col justify-between w-11/12 mx-auto p-2 mb-2 border-2 border-primary rounded-lg shadow relative`>
+      <div className="flex flex-row justify-between">
+        <div className=` text-sm self-center`> {name->React.string} </div>
+        <div className=` text-sm self-center`> {(isLong ? "Long" : "Short")->React.string} </div>
+        <div className=`flex  text-sm self-center`>
+          <img src={CONSTANTS.daiDisplayToken.iconUrl} className="h-5 pr-1" />
+          {daiSpend->Ethers.Utils.formatEther->React.string}
         </div>
-        <ProgressBar
-          txConfirmedTimestamp
-          nextPriceUpdateTimestamp={lastOracleUpdateTimestamp->Ethers.BigNumber.toNumber +
-            oracleHeartbeatForMarket}
-          setTimerFinished
-        />
       </div>
-    | GraphError(error) => <p> {error->React.string} </p>
-    | Loading => <Loader.Tiny />
-    }
+      <PendingBar marketIndex refetchCallback />
+    </div>
   }
 }
 

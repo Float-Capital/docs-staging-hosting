@@ -97,9 +97,9 @@ let make = () => {
         </a>
       </Link>
       <div className="hidden md:flex w-2/3 text-base items-center justify-end">
-        <span onClick={_ => clickedTradingDispatch(StartTrading.ClickedTradingProvider.Clicked)}>
+        <span className={`hover:bg-white`} onClick={_ => clickedTradingDispatch(StartTrading.ClickedTradingProvider.Clicked)}>
           <Link href="/app/markets">
-            <a className={`px-3 hover:bg-white ${"/app/markets"->activeHighlight}`}>
+            <a className={`px-3 ${"/app/markets"->activeHighlight}`}>
               {React.string("MARKETS")}
             </a>
           </Link>

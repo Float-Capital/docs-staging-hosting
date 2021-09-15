@@ -15,44 +15,10 @@ let getUsersTotalTokenBalance = (balancesResponse: array<Queries.UserTokenBalanc
 module UserPendingMintItem = {
   @react.component
   let make = (~userId, ~pendingMint) => {
-    let (timerFinished, setTimerFinished) = React.useState(_ => false)
+    let (refetchAttempt, setRefetchAttempt) = React.useState(_ => 0.)
 
-    let client = Client.useApolloClient()
-    let reqVariables = {
-      Queries.UsersConfirmedMints.userId: userId,
-    }
-
-    React.useEffect1(() => {
-      let timeForGraphToUpdate = 1000 // Give the graph a chance to capture the data before making the request
-      let timeout = Js.Global.setTimeout(() => {
-        let _ = client.query(
-          ~query=module(Queries.UsersConfirmedMints),
-          ~fetchPolicy=NetworkOnly,
-          reqVariables,
-        )->JsPromise.map(queryResult => {
-          switch queryResult {
-          | Ok({data: {user}}) =>
-            switch user {
-            | Some(usr) => {
-                let _ = client.writeQuery(
-                  ~query=module(Queries.UsersConfirmedMints),
-                  ~data={
-                    user: Some({
-                      __typename: usr.__typename,
-                      confirmedNextPriceActions: usr.confirmedNextPriceActions,
-                    }),
-                  },
-                )
-              }
-            | None => ()
-            }
-
-          | _ => ()
-          }
-        })
-      }, timeForGraphToUpdate)
-      Some(() => Js.Global.clearTimeout(timeout))
-    }, [timerFinished])
+    let _ = Refetchers.useRefetchConfirmedSynths(~userId, ~stateForRefetchExecution=refetchAttempt)
+    let _ = Refetchers.useRefetchPendingSynths(~userId, ~stateForRefetchExecution=refetchAttempt)
 
     <>
       {pendingMint->Array.length > 0
@@ -61,14 +27,13 @@ module UserPendingMintItem = {
           </UserColumnTextCenter>
         : React.null}
       {pendingMint
-      ->Array.map(({marketIndex, isLong, amount, confirmedTimestamp}) =>
+      ->Array.map(({marketIndex, isLong, amount, confirmedTimestamp: _}) =>
         <UserPendingBox
           name={(marketIndex->toNumber->Backend.getMarketInfoUnsafe).name}
           isLong
           daiSpend=amount
           marketIndex
-          txConfirmedTimestamp={confirmedTimestamp->toNumber}
-          setTimerFinished
+          refetchCallback=setRefetchAttempt
         />
       )
       ->React.array}
@@ -167,69 +132,13 @@ module UserTotalStakedCard = {
 
 module PendingRedeemItem = {
   @react.component
-  let make = (~pendingRedeem, ~userId) => {
-    let {marketIndex, confirmedTimestamp} = pendingRedeem
+  let make = (~marketIndex, ~userId) => {
+    let (refetchAttempt, setRefetchAttempt) = React.useState(_ => 0.)
 
-    let (timerFinished, setTimerFinished) = React.useState(_ => false)
+    let _ = Refetchers.useRefetchPendingRedeems(~userId, ~stateForRefetchExecution=refetchAttempt)
+    let _ = Refetchers.useRefetchConfirmedRedeems(~userId, ~stateForRefetchExecution=refetchAttempt)
 
-    let client = Client.useApolloClient()
-    let reqVariables = {
-      Queries.UsersConfirmedRedeems.userId: userId,
-    }
-
-    React.useEffect1(() => {
-      let timeForGraphToUpdate = 1000 // Give the graph a chance to capture the data before making the request
-      let timeout = Js.Global.setTimeout(() => {
-        let _ = client.query(
-          ~query=module(Queries.UsersConfirmedRedeems),
-          ~fetchPolicy=NetworkOnly,
-          reqVariables,
-        )->JsPromise.map(queryResult => {
-          switch queryResult {
-          | Ok({data: {user}}) =>
-            switch user {
-            | Some(usr) => {
-                let _ = client.writeQuery(
-                  ~query=module(Queries.UsersConfirmedRedeems),
-                  ~data={
-                    user: Some({
-                      __typename: usr.__typename,
-                      confirmedNextPriceActions: usr.confirmedNextPriceActions,
-                    }),
-                  },
-                )
-              }
-            | None => ()
-            }
-
-          | _ => ()
-          }
-        })
-      }, timeForGraphToUpdate)
-      Some(() => Js.Global.clearTimeout(timeout))
-    }, [timerFinished])
-
-    let lastOracleTimestamp = DataHooks.useOracleLastUpdate(
-      ~marketIndex=marketIndex->Ethers.BigNumber.toString,
-    )
-
-    let oracleHeartbeatForMarket = Backend.getMarketInfoUnsafe(
-      marketIndex->Ethers.BigNumber.toNumber,
-    ).oracleHeartbeat
-
-    switch lastOracleTimestamp {
-    | Loading => <Loader.Tiny />
-    | GraphError(error) => <p> {error->React.string} </p>
-    | Response(lastOracleUpdateTimestamp) => {
-        let nextPriceUpdate =
-          lastOracleUpdateTimestamp->Ethers.BigNumber.toNumber + oracleHeartbeatForMarket
-        <ProgressBar
-          txConfirmedTimestamp={confirmedTimestamp->Ethers.BigNumber.toNumber}
-          nextPriceUpdateTimestamp={nextPriceUpdate}
-          setTimerFinished
-        />
-      }
-    }
+    <PendingBar marketIndex refetchCallback=setRefetchAttempt />
   }
 }
 
@@ -287,6 +196,11 @@ module IncompleteWithdrawalsCard = {
       },
     )
 
+    let (refetchAttempt, setRefetchAttempt) = React.useState(_ => 0.)
+
+    let _ = Refetchers.useRefetchPendingRedeems(~userId, ~stateForRefetchExecution=refetchAttempt)
+    let _ = Refetchers.useRefetchConfirmedRedeems(~userId, ~stateForRefetchExecution=refetchAttempt)
+
     let _ = WithdrawTxStatusModal.useWithdrawTxModal(~txState)
 
     <>
@@ -302,7 +216,9 @@ module IncompleteWithdrawalsCard = {
               <div className=`flex flex-col`>
                 {pendingRedeems
                 ->Array.map(pendingRedeem => {
-                  <PendingRedeemItem pendingRedeem userId />
+                  <PendingBar
+                    marketIndex=pendingRedeem.marketIndex refetchCallback=setRefetchAttempt
+                  />
                 })
                 ->React.array}
               </div>
@@ -336,7 +252,7 @@ module IncompleteWithdrawalsCard = {
 
 module UserProfileCard = {
   @react.component
-  let make = (~userInfo) => {
+  let make = (~userInfo: DataHooks.basicUserInfo) => {
     let addressStr = DisplayAddress.ellipsifyMiddle(
       ~inputString=userInfo.id,
       ~maxLength=8,
@@ -347,6 +263,8 @@ module UserProfileCard = {
     let {Swr.data: optDaiBalance} = ContractHooks.useErc20BalanceRefresh(
       ~erc20Address=Config.config.contracts.dai,
     )
+
+    let usersGems = DataHooks.useUserGems(~userId=userInfo.id)
 
     <UserColumnCard>
       <UserProfileHeader address={addressStr} />
@@ -361,6 +279,23 @@ module UserProfileCard = {
               body={`$${daiBalance->Misc.NumberFormat.formatEther(~digits=2)}`}
             />
           | None => React.null
+          }}
+          {switch usersGems {
+          | Loading => <div className="m-auto"> <Loader.Tiny /> </div>
+          | GraphError(string) => {
+              Js.log(string)
+              <> </>
+            }
+          | Response({balance, streak}) => <>
+              <UserColumnText
+                icon="/img/gem.gif"
+                head=`Gems collected`
+                body={balance->Misc.NumberFormat.formatEther(~digits=2)}
+              />
+              <UserColumnText
+                head=`⚡ Gem streak` body={`${streak->Ethers.BigNumber.toString} days`}
+              />
+            </>
           }}
           <UserColumnText head=`🎉 Joined` body={joinedStr} />
           <UserColumnText head=`🏃 No. txs` body={txStr} />

@@ -14,6 +14,7 @@ type coreContracts = {
   floatToken: FloatToken.t,
   staker: Staker.t,
   longShort: LongShort.t,
+  gems: GEMS.t,
   markets: array<markets>,
 }
 
@@ -166,7 +167,7 @@ let getAllMarkets = longShort => {
 }
 
 let initialize = (~admin: Ethers.Wallet.t, ~exposeInternals: bool) => {
-  JsPromise.all6((
+  JsPromise.all7((
     FloatCapital_v0.make(),
     Treasury_v0.make(),
     FloatToken.make(),
@@ -176,6 +177,7 @@ let initialize = (~admin: Ethers.Wallet.t, ~exposeInternals: bool) => {
       ERC20Mock.make(~name="Pay Token 1", ~symbol="PT1"),
       ERC20Mock.make(~name="Pay Token 2", ~symbol="PT2"),
     )),
+    GEMS.make(),
   ))->JsPromise.then(((
     floatCapital,
     treasury,
@@ -183,9 +185,10 @@ let initialize = (~admin: Ethers.Wallet.t, ~exposeInternals: bool) => {
     staker,
     longShort,
     (payToken1, payToken2),
+    gems,
   )) => {
     TokenFactory.make(~longShort=longShort.address)->JsPromise.then(tokenFactory => {
-      JsPromise.all4((
+      JsPromise.all5((
         floatToken->FloatToken.initialize(
           ~name="Float token",
           ~symbol="FLOAT TOKEN",
@@ -197,10 +200,16 @@ let initialize = (~admin: Ethers.Wallet.t, ~exposeInternals: bool) => {
           ~floatToken=floatToken.address,
           ~longShort=longShort.address,
         ),
+        gems->GEMS.initialize(
+          ~admin=admin.address,
+          ~longShort=longShort.address,
+          ~staker=staker.address,
+        ),
         longShort->LongShort.initialize(
           ~admin=admin.address,
           ~tokenFactory=tokenFactory.address,
           ~staker=staker.address,
+          ~gems=gems.address,
         ),
         staker->Staker.initialize(
           ~admin=admin.address,
@@ -212,6 +221,7 @@ let initialize = (~admin: Ethers.Wallet.t, ~exposeInternals: bool) => {
           // NOTE: for now using the admin address as the discount signer
           ~discountSigner=admin.address,
           ~floatPercentage=bnFromString("250000000000000000"),
+          ~gems=gems.address,
         ),
       ))
       ->JsPromise.then(_ => {
@@ -239,6 +249,7 @@ let initialize = (~admin: Ethers.Wallet.t, ~exposeInternals: bool) => {
         treasury: treasury,
         markets: markets,
         floatCapital_v0: floatCapital,
+        gems: gems,
       })
     })
   })
@@ -250,10 +261,11 @@ type stakerUnitTestContracts = {
   floatTokenSmocked: FloatTokenSmocked.t,
   syntheticTokenSmocked: SyntheticTokenSmocked.t,
   floatCapitalSmocked: FloatCapital_v0.t,
+  gems: GEMS.t,
 }
 
 let initializeStakerUnit = () => {
-  JsPromise.all5((
+  JsPromise.all6((
     Staker.Exposed.makeSmock()->JsPromise.then(staker => {
       staker->StakerSmocked.InternalMock.setup->JsPromise.map(_ => staker)
     }),
@@ -261,21 +273,25 @@ let initializeStakerUnit = () => {
     FloatTokenSmocked.make(),
     SyntheticTokenSmocked.make(),
     FloatCapital_v0.make(),
+    GEMS.make(),
   ))->JsPromise.then(((
     staker,
     longShortSmocked,
     floatTokenSmocked,
     syntheticTokenSmocked,
     floatCapitalSmocked,
+    gems,
   )) =>
     staker
     ->Staker.setVariable(~name="longShort", ~value=longShortSmocked.address)
+    ->JsPromise.map(_ => staker->Staker.setVariable(~name="gems", ~value=gems.address))
     ->JsPromise.map(_ => {
       staker: staker,
       longShortSmocked: longShortSmocked,
       floatTokenSmocked: floatTokenSmocked,
       syntheticTokenSmocked: syntheticTokenSmocked,
       floatCapitalSmocked: floatCapitalSmocked,
+      gems: gems,
     })
   )
 }
@@ -311,7 +327,7 @@ let deployAYieldManager = (~longShort: Ethers.ethAddress, ~lendingPoolAddressesP
 }
 
 let initializeLongShortUnit = () => {
-  JsPromise.all8((
+  JsPromise.all9((
     LongShort.Exposed.makeSmock()->JsPromise.then(staker => {
       staker->LongShortSmocked.InternalMock.setup->JsPromise.map(_ => staker)
     }),
@@ -322,6 +338,7 @@ let initializeLongShortUnit = () => {
     TokenFactorySmocked.make(),
     YieldManagerAaveSmocked.make(),
     OracleManagerMockSmocked.make(),
+    GEMS.make(),
   ))->JsPromise.map(((
     longShort,
     stakerSmocked,
@@ -331,6 +348,7 @@ let initializeLongShortUnit = () => {
     tokenFactorySmocked,
     yieldManagerSmocked,
     oracleManagerSmocked,
+    _gems,
   )) => {
     {
       longShort: longShort,

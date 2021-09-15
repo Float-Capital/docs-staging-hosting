@@ -4,6 +4,7 @@
   "aaveGraphEndpoint": "https://api.thegraph.com/subgraphs/name/aave/aave-v2-polygon-mumbai",
   "networkId": 1337,
   "networkName": "localhost",
+  "torusName": "",
   "networkCurrencyName": "Test ETH",
   "networkCurrencySymbol": "ETH",
   "rpcEndopint": "http://localhost:8545",

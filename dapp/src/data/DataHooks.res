@@ -90,7 +90,7 @@ let useTotalClaimableFloatForUser = (~userId, ~synthTokens) => {
             Response((totalClaimable, totalPredicted))
           } else {
             let amount = stake.currentStake.amount
-            let timestamp = stake.lastMintState.timestamp
+            let timestamp = stake.syntheticMarket.latestAccumulativeFloatIssuanceSnapshot.timestamp
             let isLong = stake.syntheticToken.id == stake.lastMintState.longToken.id
             let lastAccumulativeFloatPerToken = isLong
               ? stake.lastMintState.accumulativeFloatPerTokenLong
@@ -460,6 +460,34 @@ let useBasicUserInfo = (~userId) => {
       }),
     )
   | {data: Some({user: None})} => Response(NewUser)
+  | {error: Some({message})} => GraphError(message)
+  | _ => Loading
+  }
+}
+
+type userGems = {
+  id: string,
+  balance: Ethers.BigNumber.t,
+  streak: Ethers.BigNumber.t,
+  streakActive: bool,
+}
+@ocaml.doc(`Returns basic user info for the given user.`)
+let useUserGems = (~userId) => {
+  let userQuery = Queries.UsersGems.use({
+    userId: userId,
+  })
+
+  switch userQuery {
+  | {data: Some({user: Some({gems: {id, balance, streak, lastUpdated}})})} =>
+    let streakActive = lastUpdated->Ethers.BigNumber.toNumberFloat >= Js.Date.now()
+    Response({
+      id: id,
+      balance: balance,
+      streak: streak,
+      streakActive: streakActive,
+    })
+  | {data: Some({user: None})} =>
+    Response({id: "", balance: CONSTANTS.zeroBN, streak: CONSTANTS.zeroBN, streakActive: false})
   | {error: Some({message})} => GraphError(message)
   | _ => Loading
   }

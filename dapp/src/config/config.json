@@ -1,9 +1,10 @@
 {
-  "graphEndpoint": "https://api.thegraph.com/subgraphs/name/float-capital/testnet",
-  "priceHistoryGraphEndpoint": "https://api.thegraph.com/subgraphs/name/float-capital/testnet-price-history",
+  "graphEndpoint": "https://test.graph.float.capital/subgraphs/name/float-capital/float-capital2",
+  "priceHistoryGraphEndpoint": "https://api.thegraph.com/subgraphs/name/float-capital/testnet-price-history-dev",
   "aaveGraphEndpoint": "https://api.thegraph.com/subgraphs/name/aave/aave-v2-matic",
   "networkId": 80001,
   "networkName": "mumbai testnet",
+  "torusName": "mumbai",
   "networkCurrencyName": "Test MATIC",
   "networkCurrencySymbol": "MATIC",
   "rpcEndopint": "https://rpc-endpoints.superfluid.dev/mumbai",
@@ -15,12 +16,13 @@
   "web3PollingInterval": 8000,
   "apolloConnectToDevTools": false,
   "contracts": {
-    "FloatToken": "0x4E83BDCF0029ff5F5FaE89943BDE9eF4f384DE66",
-    "FloatCapital_v0": "0xC005B2c59aaf08F44073cEA693AE932B7D441C57",
-    "LongShort": "0x037c66973F5a77dA28b6014e3B67E004724bbAf0",
-    "Staker": "0x0a4A94Bf20DB76dEb345375a670C9bF1337903fc",
-    "TokenFactory": "0x00d607f3E2FaAC41053a141D292533035CD4C025",
-    "Treasury_v0": "0x515F0dd05D3Ead8d74E4A5aD3EAbb939b8388a13",
+    "FloatToken": "0x2827c87a2FC35b0D20E414DF5358B95264aC726E",
+    "FloatCapital_v0": "0x6975225FA43820f71725807644b9836EDc7192B6",
+    "GEMS": "0xD28789C4563d70B42226C2AFcc13bF3386a449A2",
+    "LongShort": "0x51565F132c5B25BC9EA6e4D112ab6A680d553d2A",
+    "Staker": "0xe058C1679D34fd291B06124F16AF70e88dFB8422",
+    "TokenFactory": "0x1347C5c4A5c582FB3EFC7D82aF3C451167739e22",
+    "Treasury_v0": "0x733FC3a395a35904045Ab6a3678601512c244003",
     "Dai": "0x001B3B4d0F3714Ca98ba10F6042DaEbF0B1B7b6F"
   }
 }

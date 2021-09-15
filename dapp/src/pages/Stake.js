@@ -97,7 +97,7 @@ function Stake(Props) {
                             className: "max-w-xs mx-auto"
                           }, React.createElement(Button.make, {
                                 onClick: (function (param) {
-                                    return Next.Router.pushShallow(router, "/app/mint/markets?marketIndex=" + marketIndex + "&actionOption=" + actionOption);
+                                    return Next.Router.pushShallow(router, "/app/markets?marketIndex=" + marketIndex + "&actionOption=" + actionOption);
                                   }),
                                 children: "Mint"
                               }))) : React.createElement(StakeForm.make, {

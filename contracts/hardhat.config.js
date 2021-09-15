@@ -35,6 +35,7 @@ const {
   etherscanApiKey,
   polygonscanApiKey,
   mumbaiProviderUrl,
+  polygonProviderUrl,
 } = config;
 
 let runCoverage =
@@ -87,17 +88,27 @@ module.exports = {
       // this line ensure the use of the corresponding accounts
       forking: process.env.HARDHAT_FORK
         ? {
-            url: mumbaiProviderUrl || "https://rpc-mumbai.maticvigil.com/v1",
-          }
+          url: process.env.HARDHAT_FORK == "polygon" ? polygonProviderUrl : mumbaiProviderUrl || "https://rpc-mumbai.maticvigil.com/v1",
+        }
         : undefined,
       accounts: process.env.HARDHAT_FORK
         ? {
-            mnemonic,
-          }
+          mnemonic,
+        }
         : undefined,
     },
     ganache: {
       url: "http://localhost:8545",
+    },
+    polygon: {
+      chainId: 137,
+      // "https://matic-mainnet-full-rpc.bwarelabs.com/",
+      // "https://rpc-mainnet.matic.network",
+      // "https://matic-mainnet.chainstacklabs.com",
+      url: polygonProviderUrl || "https://matic-mainnet-full-rpc.bwarelabs.com/",
+      accounts: { mnemonic },
+      gasPrice: 10000000000,
+      gas: 10000000,
     },
     mumbai: {
       chainId: 80001,
@@ -151,12 +162,14 @@ module.exports = {
       ":TreasuryAlpha$",
       ":OracleManager$",
       ":OracleManagerChainlink$",
+      ":OracleManagerFlipp3ning$",
       ":OracleManagerChainlinkTestnet$",
       ":OracleManagerMock$",
       ":LendingPoolAaveMock$",
       ":LendingPoolAddressesProviderMock$",
       ":AaveIncentivesControllerMock$",
       "Mockable$",
+      ":GEMS$",
     ],
     spacing: 2,
   },

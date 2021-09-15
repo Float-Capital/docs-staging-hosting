@@ -2,6 +2,9 @@ const { runTestTransactions } = require("../deployTests/RunTestTransactions");
 const {
   runMumbaiTransactions,
 } = require("../deployTests/RunMumbaiTransactions");
+const {
+  launchPolygonMarkets,
+} = require("../deployTests/PolygonTransactions");
 const { ethers } = require("hardhat");
 
 const {
@@ -15,6 +18,7 @@ const {
   isAlphaLaunch,
   FLOAT_TOKEN_ALPHA,
   TREASURY_ALPHA,
+  GEMS,
 } = require("../helper-hardhat-config");
 
 let networkToUse = network.name;
@@ -33,7 +37,9 @@ module.exports = async (hardhatDeployArguments) => {
   ////////////////////////
   console.log("1");
   let paymentTokenAddress;
-  if (networkToUse == "mumbai") {
+  if (networkToUse == "polygon") {
+    paymentTokenAddress = "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063";
+  } else if (networkToUse == "mumbai") {
     paymentTokenAddress = "0x001B3B4d0F3714Ca98ba10F6042DaEbF0B1B7b6F";
   } else if (networkToUse == "hardhat" || networkToUse == "ganache") {
     paymentTokenAddress = (await deployments.get(COLLATERAL_TOKEN)).address;
@@ -43,7 +49,9 @@ module.exports = async (hardhatDeployArguments) => {
     paymentTokenAddress
   );
 
-  console.log("2");
+  const Gems = await deployments.get(GEMS);
+  const gems = await ethers.getContractAt(GEMS, Gems.address);
+
   const LongShort = await deployments.get(LONGSHORT);
   const longShort = await ethers.getContractAt(LONGSHORT, LongShort.address);
 
@@ -77,7 +85,12 @@ module.exports = async (hardhatDeployArguments) => {
   ///////////////////////////
   //Initialize the contracts/
   ///////////////////////////
-  await longShort.initialize(admin, tokenFactory.address, staker.address);
+  await longShort.initialize(
+    admin,
+    tokenFactory.address,
+    staker.address,
+    gems.address
+  );
   if (isAlphaLaunch) {
     await floatToken.initialize(
       "Alpha Float",
@@ -95,10 +108,24 @@ module.exports = async (hardhatDeployArguments) => {
     treasury.address,
     floatCapital.address,
     discountSigner,
-    "100000000000000" // mint an additional 0.01% for the treasury - just for testing purposes
+    "333333333333333333", // 25% for flt (33.333/133.333 ~= 0.25)
+    gems.address
   );
 
-  if (networkToUse == "mumbai") {
+  await gems.initialize(admin, longShort.address, staker.address);
+
+  if (networkToUse == "polygon") {
+    console.log("polygon test transactions");
+    await launchPolygonMarkets(
+      {
+        staker,
+        longShort: longShort.connect(admin),
+        paymentToken,
+        treasury,
+      },
+      hardhatDeployArguments
+    );
+  } else if (networkToUse == "mumbai") {
     console.log("mumbai test transactions");
     await runMumbaiTransactions(
       {

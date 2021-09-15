@@ -218,7 +218,7 @@ function useTotalClaimableFloatForUser(userId, synthTokens) {
                           };
                   }
                   var amount = stake.currentStake.amount;
-                  var timestamp = stake.lastMintState.timestamp;
+                  var timestamp = stake.syntheticMarket.latestAccumulativeFloatIssuanceSnapshot.timestamp;
                   var isLong = stake.syntheticToken.id === stake.lastMintState.longToken.id;
                   var lastAccumulativeFloatPerToken = isLong ? stake.lastMintState.accumulativeFloatPerTokenLong : stake.lastMintState.accumulativeFloatPerTokenShort;
                   var accumulativeFloatPerToken = isLong ? stake.syntheticMarket.latestAccumulativeFloatIssuanceSnapshot.accumulativeFloatPerTokenLong : stake.syntheticMarket.latestAccumulativeFloatIssuanceSnapshot.accumulativeFloatPerTokenShort;
@@ -773,6 +773,65 @@ function useBasicUserInfo(userId) {
   }
 }
 
+function useUserGems(userId) {
+  var userQuery = Curry.app(Queries.UsersGems.use, [
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        {
+          userId: userId
+        }
+      ]);
+  var match = userQuery.data;
+  if (match !== undefined) {
+    var match$1 = match.user;
+    if (match$1 === undefined) {
+      return {
+              TAG: 1,
+              _0: {
+                id: "",
+                balance: CONSTANTS.zeroBN,
+                streak: CONSTANTS.zeroBN,
+                streakActive: false
+              },
+              [Symbol.for("name")]: "Response"
+            };
+    }
+    var match$2 = match$1.gems;
+    var streakActive = match$2.lastUpdated.toNumber() >= Date.now();
+    return {
+            TAG: 1,
+            _0: {
+              id: match$2.id,
+              balance: match$2.balance,
+              streak: match$2.streak,
+              streakActive: streakActive
+            },
+            [Symbol.for("name")]: "Response"
+          };
+  }
+  var match$3 = userQuery.error;
+  if (match$3 !== undefined) {
+    return {
+            TAG: 0,
+            _0: match$3.message,
+            [Symbol.for("name")]: "GraphError"
+          };
+  } else {
+    return /* Loading */0;
+  }
+}
+
 function useSyntheticTokenBalance(user, tokenAddress) {
   var syntheticBalanceQuery = Curry.app(Queries.UsersBalance.use, [
         undefined,
@@ -1177,6 +1236,7 @@ exports.useBatchedSynthPrices = useBatchedSynthPrices;
 exports.useUsersConfirmedRedeems = useUsersConfirmedRedeems;
 exports.useFloatBalancesForUser = useFloatBalancesForUser;
 exports.useBasicUserInfo = useBasicUserInfo;
+exports.useUserGems = useUserGems;
 exports.useSyntheticTokenBalance = useSyntheticTokenBalance;
 exports.useSyntheticTokenBalanceOrZero = useSyntheticTokenBalanceOrZero;
 exports.useTokenPriceAtTime = useTokenPriceAtTime;
