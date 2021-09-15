@@ -4,9 +4,10 @@ let mapVal = apy =>
   `${(apy *. 100.)->Js.Float.toFixedWithPrecision(~digits=2)}%${apy->isHotAPY ? `🔥` : ""}`
 
 @react.component
-let make = (~marketName, ~isLong, ~rewards, ~stakeYield) =>
+let make = (~marketName, ~isLong, ~rewards, ~stakeYield, ~akey) =>
   <Next.Link href="/app/stake-markets">
     <div
+      key=akey
       className="my-2 flex w-full mx-auto border-2 border-light-purple rounded-lg z-10 shadow cursor-pointer">
       <div className="my-2 ml-5 text-sm">
         {marketName->React.string}

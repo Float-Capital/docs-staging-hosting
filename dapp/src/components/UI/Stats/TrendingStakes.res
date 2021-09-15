@@ -19,14 +19,13 @@ let make = (~global) => {
             ~bnApy,
           )
           trendingStakes
-          ->Array.map(({marketName, isLong, apy, floatApy, stakeApy}) =>
+          ->Array.map(({marketName, isLong, apy: _, floatApy, stakeApy}) =>
             <StatsStakeCard
               marketName={marketName}
               isLong={isLong}
-              yield={apy}
               rewards={floatApy}
               stakeYield={stakeApy}
-              key={marketName ++ (isLong ? "-long" : "-short")}
+              akey={marketName ++ (isLong ? "-long" : "-short")}
             />
           )
           ->React.array

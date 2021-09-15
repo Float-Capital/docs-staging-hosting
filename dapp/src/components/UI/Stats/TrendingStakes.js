@@ -50,10 +50,9 @@ function TrendingStakes(Props) {
                   return React.createElement(StatsStakeCard.make, {
                               marketName: marketName,
                               isLong: isLong,
-                              yield: param.apy,
                               rewards: param.floatApy,
                               stakeYield: param.stakeApy,
-                              key: marketName + (
+                              akey: marketName + (
                                 isLong ? "-long" : "-short"
                               )
                             });
