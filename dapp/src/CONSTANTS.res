@@ -62,6 +62,8 @@ let floatCapitalPercentE18HardCode = tenToThe18->Ethers.BigNumber.div(fiveBN)
 let oneYearInSecondsMulTenToThe18 =
   oneYearInSeconds->Ethers.BigNumber.fromInt->Ethers.BigNumber.mul(tenToThe18)
 
+let tenToThe36 = tenToThe18->Ethers.BigNumber.mul(tenToThe18)
+
 /* Currencies */
 type displayToken = {name: string, iconUrl: string}
 

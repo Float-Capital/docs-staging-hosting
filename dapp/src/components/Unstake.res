@@ -1,29 +1,24 @@
 module ApproxDollarFeeUnstake = {
+  open Ethers.BigNumber
+
   @react.component
   let make = (~tokenPrice, ~value) => {
-    let numberStrRegex = %re(`/^[+]?\d+(\.\d+)?$/`)
-    let tokenPriceBN =
-      numberStrRegex->Js.Re.test_(tokenPrice)
-        ? tokenPrice->Ethers.BigNumber.fromUnsafe
-        : CONSTANTS.zeroBN
-    let valueBN =
-      numberStrRegex->Js.Re.test_(value)
-        ? Ethers.Utils.parseEtherUnsafe(~amount=value)
-        : CONSTANTS.zeroBN
-    let dollarValue =
-      valueBN->Ethers.BigNumber.mul(tokenPriceBN)->Ethers.BigNumber.div(CONSTANTS.tenToThe18)
+    switch (tokenPrice, value) {
+    | (Some(tokenPrice), Some(value)) => {
+        let dollarValue =
+          tokenPrice->mul(value)->mul(CONSTANTS.unstakeFeeHardCode)->div(CONSTANTS.tenToThe36)
 
-    <>
-      {numberStrRegex->Js.Re.test_(value)
-        ? <div className="flex flex-row items-center justify-end mb-2 w-full text-right">
-            <span className="text-xxs text-gray-500 pr-2"> {`approx`->React.string} </span>
-            <span className="text-sm text-gray-500"> {`~$`->React.string} </span>
-            <span className="text-sm text-gray-800">
-              {dollarValue->Misc.NumberFormat.formatEther->React.string}
-            </span>
-          </div>
-        : React.null}
-    </>
+        <div className="flex flex-row items-center justify-end mb-2 w-full text-right">
+          <span className="text-xxs text-gray-500 pr-2"> {`unstake fee`->React.string} </span>
+          <span className="text-xxs text-gray-500 pr-2"> {`approx`->React.string} </span>
+          <span className="text-sm text-gray-500"> {`~$`->React.string} </span>
+          <span className="text-sm text-gray-800">
+            {dollarValue->Misc.NumberFormat.formatEther->React.string}
+          </span>
+        </div>
+      }
+    | _ => React.null
+    }
   }
 }
 
@@ -99,14 +94,13 @@ module StakeFormInput = {
     ~resetButton=_ => React.null,
     ~buttonDisabled=false,
     ~buttonText,
+    ~tokens=None,
+    ~tokenPrice=None,
     ~txState=ContractActions.UnInitialised,
   ) => {
     <Form className="" onSubmit>
       <AmountInput value optBalance={optBalance} disabled onBlur onChange onMaxClick />
-      <ApproxDollarFeeUnstake
-        tokenPrice={CONSTANTS.tenToThe18->Ethers.BigNumber.toString}
-        value={CONSTANTS.tenToThe18->Ethers.BigNumber.toString}
-      />
+      <ApproxDollarFeeUnstake tokenPrice={tokenPrice} value={tokens} />
       {switch txState {
       | ContractActions.UnInitialised
       | ContractActions.Created
@@ -125,6 +119,7 @@ module ConnectedStakeForm = {
       id: tokenId,
       syntheticMarket: {marketIndex, name: syntheticMarketName},
       tokenType,
+      latestPrice: {price: {price}},
     }: Queries.SyntheticTokenInfo.t,
     ~contractExecutionHandler,
     ~txState: ContractActions.transactionState,
@@ -225,12 +220,19 @@ module ConnectedStakeForm = {
       }
     }
 
+    let formAmount = switch form.amountResult {
+    | Some(Ok(amount)) => Some(amount)
+    | _ => None
+    }
+
     <StakeFormInput
       onSubmit=form.submit
       value={form.input.amount}
       optBalance={optTokenBalance}
       disabled=form.submitting
       onBlur={_ => form.blurAmount()}
+      tokens={formAmount}
+      tokenPrice={Some(price)}
       onChange={event => form.updateAmount((_, amount) => {
           amount: amount,
         }, (event->ReactEvent.Form.target)["value"])}

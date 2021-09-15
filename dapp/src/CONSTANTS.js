@@ -63,6 +63,8 @@ var floatCapitalPercentE18HardCode = tenToThe18.div(fiveBN);
 
 var oneYearInSecondsMulTenToThe18 = Ethers$1.BigNumber.from(31536000).mul(tenToThe18);
 
+var tenToThe36 = tenToThe18.mul(tenToThe18);
+
 var fiveMinutesInSeconds = 300;
 
 var oneHourInSeconds = 3600;
@@ -154,6 +156,7 @@ exports.balanceIncentiveExponentHardcode = balanceIncentiveExponentHardcode;
 exports.yieldGradientHardcode = yieldGradientHardcode;
 exports.floatCapitalPercentE18HardCode = floatCapitalPercentE18HardCode;
 exports.oneYearInSecondsMulTenToThe18 = oneYearInSecondsMulTenToThe18;
+exports.tenToThe36 = tenToThe36;
 exports.daiDisplayToken = daiDisplayToken;
 exports.polygonDisplayToken = polygonDisplayToken;
 exports.mumbai = mumbai;
