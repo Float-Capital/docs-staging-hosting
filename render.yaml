@@ -10,6 +10,10 @@ services:
         sync: false # placeholder for a value to be added in the dashboard
       - key: MNEMONIC
         sync: false # placeholder for a value to be added in the dashboard
+      - key: SCOUT_KEY
+        sync: false # placeholder for a value to be added in the dashboard
+      - key: SCOUT_MONITOR
+        value: true
 
   - name: alpha-system-update-bot
     type: pserv
@@ -22,3 +26,7 @@ services:
         sync: false # placeholder for a value to be added in the dashboard
       - key: MNEMONIC
         sync: false # placeholder for a value to be added in the dashboard
+      - key: SCOUT_KEY
+        sync: false # placeholder for a value to be added in the dashboard
+      - key: SCOUT_MONITOR
+        value: true
