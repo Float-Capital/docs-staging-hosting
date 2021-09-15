@@ -25,7 +25,7 @@ function useStartTradingStorage(param) {
           var optNumberOfVisits = localStorage$1.getItem(key);
           var numberOfVisits = optNumberOfVisits !== null ? Belt_Option.getWithDefault(Belt_Int.fromString(optNumberOfVisits), 0) + 1 | 0 : 0;
           Curry._1(setHasVisitedEnoughTimes, (function (param) {
-                  return numberOfVisits >= 6;
+                  return numberOfVisits >= 1;
                 }));
           localStorage$1.setItem(key, String(numberOfVisits));
           var key$1 = "isActiveSession";

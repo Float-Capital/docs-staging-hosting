@@ -3,9 +3,16 @@
 
 var React = require("react");
 var Loader = require("../UI/Base/Loader.js");
-var Masonry = require("../UI/Masonry.js");
 var Tooltip = require("../UI/Base/Tooltip.js");
 var CONSTANTS = require("../../CONSTANTS.js");
+
+function ifElement(condition, element) {
+  if (condition) {
+    return element;
+  } else {
+    return null;
+  }
+}
 
 function MarketStakeCardSide(Props) {
   var orderPostion = Props.orderPostion;
@@ -50,13 +57,16 @@ function MarketStakeCardSide(Props) {
       var stakeApy$1 = stakeApy._0;
       var apyGreaterThanZero = apyVal >= 0.01;
       var stakeApyGreaterThanZero = stakeApy$1 >= 0.01;
-      tmp = React.createElement(React.Fragment, undefined, Masonry.ifElement(apyGreaterThanZero, apyComponent("SYNTH", apyVal, null)), Masonry.ifElement(stakeApyGreaterThanZero && apyGreaterThanZero, React.createElement("span", {
-                    className: "mx-1"
-                  }, "+")), Masonry.ifElement(stakeApyGreaterThanZero, apyComponent("STAKE", stakeApy$1, React.createElement("span", {
-                        className: "ml-1"
-                      }, React.createElement(Tooltip.make, {
-                            tip: "Expected yield from FLT token buybacks"
-                          })))));
+      var element = apyComponent("SYNTH", apyVal, null);
+      var element$1 = React.createElement("span", {
+            className: "mx-1"
+          }, "+");
+      var element$2 = apyComponent("STAKE", stakeApy$1, React.createElement("span", {
+                className: "ml-1"
+              }, React.createElement(Tooltip.make, {
+                    tip: "Expected yield from FLT token buybacks"
+                  })));
+      tmp = React.createElement(React.Fragment, undefined, apyGreaterThanZero ? element : null, stakeApyGreaterThanZero && apyGreaterThanZero ? element$1 : null, stakeApyGreaterThanZero ? element$2 : null);
     }
   }
   if (exit === 1) {
@@ -88,8 +98,6 @@ function MarketStakeCardSide(Props) {
                       className: "text-lg tracking-widest font-alphbeta"
                     }, beta + "%")));
 }
-
-var ifElement = Masonry.ifElement;
 
 var make = MarketStakeCardSide;
 

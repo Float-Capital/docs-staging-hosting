@@ -27,6 +27,10 @@ let config: configShape = %raw(`require('config_file')`)
 
 // NOTE: no validation happens on the config. IT IS NOT TYPE SAFE.
 
+let isPolygon = config.networkId == CONSTANTS.polygon.chainId
+
+let floatTokenName = isPolygon ? "alphaFloat" : "Float"
+
 let {
   graphEndpoint,
   priceHistoryGraphEndpoint,

@@ -2,6 +2,7 @@
 'use strict';
 
 var React = require("react");
+var Config = require("../../../config/Config.js");
 var CONSTANTS = require("../../../CONSTANTS.js");
 var Link = require("next/link").default;
 
@@ -20,10 +21,12 @@ function StatsStakeCard(Props) {
   var isLong = Props.isLong;
   var rewards = Props.rewards;
   var stakeYield = Props.stakeYield;
+  var akey = Props.akey;
   return React.createElement(Link, {
               href: "/app/stake-markets",
               children: React.createElement("div", {
-                    className: "mb-5 flex w-11/12 mx-auto border-2 border-light-purple rounded-lg z-10 shadow cursor-pointer"
+                    key: akey,
+                    className: "my-2 flex w-full mx-auto border-2 border-light-purple rounded-lg z-10 shadow cursor-pointer"
                   }, React.createElement("div", {
                         className: "my-2 ml-5 text-sm"
                       }, marketName, React.createElement("br", {
@@ -31,8 +34,8 @@ function StatsStakeCard(Props) {
                           }), isLong ? "Long↗️" : "Short↘️"), React.createElement("div", {
                         className: "flex-1 my-2 text-sm flex flex-col items-center"
                       }, React.createElement("div", undefined, React.createElement("div", undefined, React.createElement("span", {
-                                    className: "text-xs font-bold mr-2"
-                                  }, "Float rewards:"), mapVal(rewards)), React.createElement("div", {
+                                    className: "text-xxs font-bold mr-2"
+                                  }, Config.floatTokenName + " rewards:"), mapVal(rewards)), React.createElement("div", {
                                 className: "mt-2"
                               }, React.createElement("span", {
                                     className: "text-xs font-bold mr-2"

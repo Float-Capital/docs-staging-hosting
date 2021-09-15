@@ -3,11 +3,10 @@ module PriceCard = {
 
   module Card = {
     @react.component
-    let make = (~selected=false, ~children=React.null) =>
+    let make = (~selected=false, ~children=React.null) => {
       <div
-        className={`${selected
-            ? "shadow-inner-card"
-            : "shadow-outer-card opacity-60 transform hover:scale-102"}
+        className={`        
+        ${selected ? "shadow-inner-card" : "shadow-outer-card opacity-60 transform hover:scale-102"}
     my-2
     md:my-3
     h-md
@@ -20,6 +19,20 @@ module PriceCard = {
     relative
     rounded-lg`}>
         {children}
+      </div>
+    }
+  }
+
+  module ComingSoon = {
+    @react.component
+    let make = (~releaseDate=Int.fromFloat(Js.Date.now() /. 1000.)) =>
+      <div
+        className={`shadow-inner-card px-8 py-2 opacity-60 my-2 md:my-3 h-md md:w-price-width md:mr-4 md:h-price-height bg-white flex md:flex-col relative rounded-lg items-center justify-center`}>
+        <p className="text-xs text-gray"> {"New market"->React.string} </p>
+        <p className="text-xs text-gray"> {"coming soon"->React.string} </p>
+        <div className="text-xxxs text-center text-gray-600">
+          <CountDown endDateTimestamp=releaseDate displayUnits=true />
+        </div>
       </div>
   }
 
@@ -96,7 +109,7 @@ module PriceCard = {
           />
           {market.name->React.string}
         </div>
-        <div className="mr-3">
+        <div className="mr-3 flex flex-row items-center">
           {switch state {
           | Response({latestPrice}) => `\$${latestPrice}`->React.string
           | _ => React.null
@@ -107,7 +120,10 @@ module PriceCard = {
         {switch state {
         | Response({data}) => <LoadedGraph data />
         | Loading => <Loader.Ellipses />
-        | GraphError(e) => e->React.string
+        | GraphError(e) => {
+          Js.log(e) 
+        <p className="text-xxs text-gray-500">{`unable to fetch price data`->React.string}</p>
+        }
         }}
       </div>
     </Card>
@@ -203,31 +219,39 @@ let make = () => {
       } else {
         let selected = selectedInt >= 0 && selectedInt < markets->Array.length ? selectedInt : 0
         <div className="w-9/10 md:w-auto flex flex-col">
-          {if markets->Array.length > 1 {
-            <div
-              className="pb-6 flex md:order-1 order-2 flex-col md:flex-row w-full md:w-auto justify-center">
-              {markets
-              ->Array.mapWithIndex((index, market) =>
-                <PriceCard
-                  selected={selected == index}
-                  market
-                  onClick={_ => {
-                    if selected !== index {
-                      router.query->Js.Dict.set("selected", index->Int.toString)
-                      router.query->Js.Dict.set("actionOption", "short")
-                      router->Next.Router.pushObjShallow({
-                        pathname: router.pathname,
-                        query: router.query,
-                      })
-                    }
-                  }}
-                />
-              )
-              ->React.array}
-            </div>
-          } else {
-            React.null
-          }}
+          <div
+            className="pb-6 flex md:order-1 order-2 flex-col md:flex-row w-full md:w-auto justify-center">
+            {markets
+            ->Array.mapWithIndex((index, market) =>
+              <PriceCard
+                selected={selected == index}
+                market
+                onClick={_ => {
+                  if selected !== index {
+                    router.query->Js.Dict.set("selected", index->Int.toString)
+                    router.query->Js.Dict.set("actionOption", "short")
+                    router->Next.Router.pushObjShallow({
+                      pathname: router.pathname,
+                      query: router.query,
+                    })
+                  }
+                }}
+              />
+            )
+            ->React.array}
+            {if markets->Array.length < 3 {
+              <>
+                <PriceCard.ComingSoon releaseDate=1633053600 />
+                {if markets->Array.length < 2 {
+                  <PriceCard.ComingSoon releaseDate=1634263200 />
+                } else {
+                  React.null
+                }}
+              </>
+            } else {
+              React.null
+            }}
+          </div>
           <Mint market={markets->Array.getUnsafe(selected)} key={selectedStr} />
         </div>
       }

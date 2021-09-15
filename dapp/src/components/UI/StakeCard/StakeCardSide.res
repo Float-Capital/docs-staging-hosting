@@ -1,6 +1,11 @@
 open APYProvider
 
-let {ifElement} = module(Masonry)
+let ifElement = (condition, element) =>
+  if condition {
+    element
+  } else {
+    React.null
+  }
 
 let isHotAPY = apy => apy > CONSTANTS.hotAPYThreshold
 

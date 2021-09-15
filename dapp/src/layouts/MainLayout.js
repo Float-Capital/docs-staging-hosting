@@ -3,8 +3,8 @@
 
 var Lost = require("../components/UI/Lost.js");
 var React = require("react");
+var Banner = require("../components/Banner.js");
 var Config = require("../config/Config.js");
-var ComingSoon = require("../components/ComingSoon.js");
 var Navigation = require("./Navigation.js");
 var RootProvider = require("../libraries/RootProvider.js");
 var BridgeToPolygon = require("../components/UI/BridgeToPolygon.js");
@@ -18,7 +18,7 @@ function MainLayout(Props) {
                   className: "w-full text-gray-900 font-base"
                 }, React.createElement("div", {
                       className: "flex flex-col h-screen"
-                    }, React.createElement(ComingSoon.make, {}), React.createElement(Navigation.make, {}), React.createElement("div", {
+                    }, React.createElement(Banner.make, {}), React.createElement(Navigation.make, {}), React.createElement("div", {
                           className: "m-auto w-full pt-20 overflow-y-scroll"
                         }, chainId !== undefined && chainId !== Config.networkId ? React.createElement(React.Fragment, undefined, React.createElement("h2", undefined, "You are currently connected to the wrong network."), React.createElement("h4", {
                                     className: "text-lg"
