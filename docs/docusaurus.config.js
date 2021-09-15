@@ -39,7 +39,7 @@ module.exports = {
         //   label: "Docs",
         //   position: "left",
         // },
-        // { to: "blog", label: "Blog", position: "left" },
+        { to: "blog", label: "Blog", position: "left" },
         {
           href: "https://github.com/float-capital",
           label: "GitHub",
@@ -83,10 +83,10 @@ module.exports = {
             //   label: "Home",
             //   to: "https://float.capital",
             // },
-            // {
-            //   label: "Blog",
-            //   to: "blog",
-            // },
+            {
+              label: "Blog",
+              to: "blog",
+            },
             {
               label: "GitHub",
               href: "https://github.com/float-capital",
@@ -109,10 +109,10 @@ module.exports = {
           // Please change this to your repo.
           editUrl: "https://github.com/",
         },
-        // blog: {
-        //   showReadingTime: true,
-        //   editUrl: "https://github.com/",
-        // },
+        blog: {
+          showReadingTime: true,
+          // editUrl: "https://github.com/",
+        },
         theme: {
           customCss: require.resolve("./src/css/custom.css"),
         },
