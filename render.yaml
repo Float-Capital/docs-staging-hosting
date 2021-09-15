@@ -3,8 +3,8 @@ services:
     name: mumbai-system-update-bot
     env: node
     repo: https://github.com/Float-Capital/monorepo/
-    buildCommand: yarn
-    startCommand: yarn start
+    buildCommand: cd system-update-bot && yarn
+    startCommand: cd system-update-bot && yarn start
     envVars:
       - key: PROVIDER_URL
         sync: false # placeholder for a value to be added in the dashboard
