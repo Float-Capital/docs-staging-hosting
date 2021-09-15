@@ -208,11 +208,18 @@ function Markets$PriceCard(Props) {
   var tmp;
   tmp = typeof state === "number" || state.TAG === /* GraphError */0 ? null : "$" + state._0.latestPrice;
   var tmp$1;
-  tmp$1 = typeof state === "number" ? React.createElement(Loader.Ellipses.make, {}) : (
-      state.TAG === /* GraphError */0 ? state._0 : React.createElement(Markets$PriceCard$LoadedGraph, {
-              data: state._0.data
-            })
-    );
+  if (typeof state === "number") {
+    tmp$1 = React.createElement(Loader.Ellipses.make, {});
+  } else if (state.TAG === /* GraphError */0) {
+    console.log(state._0);
+    tmp$1 = React.createElement("p", {
+          className: "text-xxs text-gray-500"
+        }, "unable to fetch price data");
+  } else {
+    tmp$1 = React.createElement(Markets$PriceCard$LoadedGraph, {
+          data: state._0.data
+        });
+  }
   return React.createElement(Markets$PriceCard$Card, {
               selected: selected,
               children: null

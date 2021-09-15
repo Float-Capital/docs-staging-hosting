@@ -120,7 +120,10 @@ module PriceCard = {
         {switch state {
         | Response({data}) => <LoadedGraph data />
         | Loading => <Loader.Ellipses />
-        | GraphError(e) => e->React.string
+        | GraphError(e) => {
+          Js.log(e) 
+        <p className="text-xxs text-gray-500">{`unable to fetch price data`->React.string}</p>
+        }
         }}
       </div>
     </Card>
