@@ -2,7 +2,6 @@ services:
   - type: pserv
     name: mumbai-system-update-bot
     env: node
-    repo: https://github.com/Float-Capital/monorepo/
     buildCommand: cd system-update-bot && yarn
     startCommand: cd system-update-bot && yarn start
     envVars:
