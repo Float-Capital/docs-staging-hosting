@@ -3,7 +3,7 @@ services:
     name: mumbai-system-update-bot
     env: node
     buildCommand: cd system-update-bot && yarn
-    startCommand: cd system-update-bot && yarn start
+    startCommand: cd system-update-bot && yarn start-testnet
     envVars:
       - key: PROVIDER_URL
         sync: false # placeholder for a value to be added in the dashboard
