@@ -8,14 +8,18 @@ module ApproxDollarFeeUnstake = {
         let dollarValue =
           tokenPrice->mul(value)->mul(CONSTANTS.unstakeFeeHardCode)->div(CONSTANTS.tenToThe36)
 
-        <div className="flex flex-row items-center justify-end mb-2 w-full text-right">
-          <span className="text-xxs text-gray-500 pr-2"> {`unstake fee`->React.string} </span>
-          <span className="text-xxs text-gray-500 pr-2"> {`approx`->React.string} </span>
-          <span className="text-sm text-gray-500"> {`~$`->React.string} </span>
-          <span className="text-sm text-gray-800">
-            {dollarValue->Misc.NumberFormat.formatEther->React.string}
-          </span>
-        </div>
+        let dollarValueStr = dollarValue->Misc.NumberFormat.formatEther
+
+        if dollarValueStr != "0.00" {
+          <div className="flex flex-row items-center justify-end mb-2 w-full text-right">
+            <span className="text-xxs text-gray-500 pr-2"> {`unstake fee`->React.string} </span>
+            <span className="text-xxs text-gray-500 pr-2"> {`approx`->React.string} </span>
+            <span className="text-sm text-gray-500"> {`~$`->React.string} </span>
+            <span className="text-sm text-gray-800"> {dollarValueStr->React.string} </span>
+          </div>
+        } else {
+          React.null
+        }
       }
     | _ => React.null
     }
@@ -108,6 +112,14 @@ module StakeFormInput = {
         <Button onClick={_ => onSubmit()} disabled={buttonDisabled}> {buttonText} </Button>
       | _ => resetButton()
       }}
+      {value == ""
+        ? React.null
+        : <p
+            className="text-xxs text-yellow-600 text-center mt-3 flex justify-center items-center w-full">
+            <span> {`⚡ We charge a small unstake fee on your tokens`->React.string} </span>
+            <span className="text-black mx-1 "> <Tooltip tip={"50 basis points"} /> </span> // TODO: Not hardcode
+            <span> {`⚡`->React.string} </span>
+          </p>}
     </Form>
   }
 }

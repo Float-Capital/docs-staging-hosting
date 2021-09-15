@@ -11,6 +11,7 @@ var Config = require("../config/Config.js");
 var Ethers = require("../ethereum/Ethers.js");
 var Loader = require("./UI/Base/Loader.js");
 var Queries = require("../data/Queries.js");
+var Tooltip = require("./UI/Base/Tooltip.js");
 var CONSTANTS = require("../CONSTANTS.js");
 var Contracts = require("../ethereum/Contracts.js");
 var DataHooks = require("../data/DataHooks.js");
@@ -39,17 +40,22 @@ function Unstake$ApproxDollarFeeUnstake(Props) {
     return null;
   }
   var dollarValue = Caml_option.valFromOption(tokenPrice).mul(Caml_option.valFromOption(value)).mul(CONSTANTS.unstakeFeeHardCode).div(CONSTANTS.tenToThe36);
-  return React.createElement("div", {
-              className: "flex flex-row items-center justify-end mb-2 w-full text-right"
-            }, React.createElement("span", {
-                  className: "text-xxs text-gray-500 pr-2"
-                }, "unstake fee"), React.createElement("span", {
-                  className: "text-xxs text-gray-500 pr-2"
-                }, "approx"), React.createElement("span", {
-                  className: "text-sm text-gray-500"
-                }, "~$"), React.createElement("span", {
-                  className: "text-sm text-gray-800"
-                }, Misc.NumberFormat.formatEther(undefined, dollarValue)));
+  var dollarValueStr = Misc.NumberFormat.formatEther(undefined, dollarValue);
+  if (dollarValueStr !== "0.00") {
+    return React.createElement("div", {
+                className: "flex flex-row items-center justify-end mb-2 w-full text-right"
+              }, React.createElement("span", {
+                    className: "text-xxs text-gray-500 pr-2"
+                  }, "unstake fee"), React.createElement("span", {
+                    className: "text-xxs text-gray-500 pr-2"
+                  }, "approx"), React.createElement("span", {
+                    className: "text-sm text-gray-500"
+                  }, "~$"), React.createElement("span", {
+                    className: "text-sm text-gray-800"
+                  }, dollarValueStr));
+  } else {
+    return null;
+  }
 }
 
 var ApproxDollarFeeUnstake = {
@@ -556,7 +562,13 @@ function Unstake$StakeFormInput(Props) {
                 }), React.createElement(Unstake$ApproxDollarFeeUnstake, {
                   tokenPrice: tokenPrice,
                   value: tokens
-                }), tmp);
+                }), tmp, value === "" ? null : React.createElement("p", {
+                    className: "text-xxs text-yellow-600 text-center mt-3 flex justify-center items-center w-full"
+                  }, React.createElement("span", undefined, "⚡ We charge a small unstake fee on your tokens"), React.createElement("span", {
+                        className: "text-black mx-1 "
+                      }, React.createElement(Tooltip.make, {
+                            tip: "50 basis points"
+                          })), React.createElement("span", undefined, "⚡")));
 }
 
 var StakeFormInput = {
