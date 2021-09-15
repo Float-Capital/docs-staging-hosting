@@ -3,7 +3,7 @@ let make = (~totalFloatMinted) =>
   <div className={"bg-white w-full bg-opacity-75 rounded-lg shadow-lg mb-2 md:mb-5 p-6"}>
     <div className="flex flex-row items-center justify-center">
       <h1 className="font-bold text-center text-lg font-alphbeta">
-        {`alphaFloat Token`->React.string}
+        {`${Config.floatTokenName} Token`->React.string}
       </h1>
       <img src="/icons/alpha-float-token.svg" className="ml-2 h-4" />
     </div>
@@ -25,10 +25,13 @@ let make = (~totalFloatMinted) =>
       //     <span className="text-md" />
       //   </li>
     </ul>
+    {Config.isPolygon ? 
     <a href="https://docs.float.capital/docs/alpha">
       <p className="text-center text-xxs text-gray mx-8">
         {`The alphaFloat token is the temporary non-transferable Float token for the alpha release. You can read more on the alpha release `->React.string}
         <span className="underline"> {"here."->React.string} </span>
       </p>
     </a>
+    : React.null
+    }
   </div>

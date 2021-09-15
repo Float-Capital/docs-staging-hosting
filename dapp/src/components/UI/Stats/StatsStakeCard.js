@@ -2,6 +2,7 @@
 'use strict';
 
 var React = require("react");
+var Config = require("../../../config/Config.js");
 var CONSTANTS = require("../../../CONSTANTS.js");
 var Link = require("next/link").default;
 
@@ -34,7 +35,7 @@ function StatsStakeCard(Props) {
                         className: "flex-1 my-2 text-sm flex flex-col items-center"
                       }, React.createElement("div", undefined, React.createElement("div", undefined, React.createElement("span", {
                                     className: "text-xxs font-bold mr-2"
-                                  }, "alphaFloat rewards:"), mapVal(rewards)), React.createElement("div", {
+                                  }, Config.floatTokenName + " rewards:"), mapVal(rewards)), React.createElement("div", {
                                 className: "mt-2"
                               }, React.createElement("span", {
                                     className: "text-xs font-bold mr-2"

@@ -485,7 +485,7 @@ function UserUI$UserFloatEarnedFromStake(Props) {
               className: "text-xs flex flex-col items-center justify-center"
             }, React.createElement("div", {
                   className: "text-gray-500"
-                }, "alphaFloat Accruing"), "~" + Misc.NumberFormat.formatEther(5, match[0].add(match[1])));
+                }, Config.floatTokenName + " Accruing"), "~" + Misc.NumberFormat.formatEther(5, match[0].add(match[1])));
 }
 
 var UserFloatEarnedFromStake = {
@@ -669,17 +669,17 @@ function UserUI$UserFloatCard(Props) {
             }, React.createElement("div", {
                   className: "flex"
                 }, React.createElement(UserUI$UserColumnText, {
-                      head: "alphaFloat accruing",
+                      head: Config.floatTokenName + " accruing",
                       body: floatAccrued
                     }), React.createElement("span", {
                       className: "ml-1"
                     }, React.createElement(Tooltip.make, {
                           tip: "This is an estimate at the current time, the amount issued may differ due to changes in market liquidity and asset prices."
                         }))), React.createElement(UserUI$UserColumnText, {
-                  head: "alphaFloat balance",
+                  head: Config.floatTokenName + " balance",
                   body: floatBalance
                 }), React.createElement(UserUI$UserColumnText, {
-                  head: "alphaFloat minted",
+                  head: Config.floatTokenName + " minted",
                   body: floatMinted
                 })), isCurrentUser ? React.createElement("div", {
                 className: "flex justify-around flex-row my-1"
@@ -692,7 +692,7 @@ function UserUI$UserFloatCard(Props) {
             }, React.createElement(UserUI$UserColumnHeader, {
                   children: React.createElement("div", {
                         className: "flex flex-row items-center justify-center"
-                      }, React.createElement("h3", undefined, "alphaFloat rewards"), React.createElement("img", {
+                      }, React.createElement("h3", undefined, Config.floatTokenName + " rewards"), React.createElement("img", {
                             className: "ml-2 h-5",
                             src: "/icons/alpha-float-token.svg"
                           }))

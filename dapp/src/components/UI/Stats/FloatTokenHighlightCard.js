@@ -3,6 +3,7 @@
 
 var Misc = require("../../../libraries/Misc.js");
 var React = require("react");
+var Config = require("../../../config/Config.js");
 
 function FloatTokenHighlightCard(Props) {
   var totalFloatMinted = Props.totalFloatMinted;
@@ -12,7 +13,7 @@ function FloatTokenHighlightCard(Props) {
                   className: "flex flex-row items-center justify-center"
                 }, React.createElement("h1", {
                       className: "font-bold text-center text-lg font-alphbeta"
-                    }, "alphaFloat Token"), React.createElement("img", {
+                    }, Config.floatTokenName + " Token"), React.createElement("img", {
                       className: "ml-2 h-4",
                       src: "/icons/alpha-float-token.svg"
                     })), React.createElement("ul", {
@@ -21,13 +22,13 @@ function FloatTokenHighlightCard(Props) {
                           className: "text-sm mr-2"
                         }, "🗳 alphaFloat supply:"), React.createElement("span", {
                           className: "text-md"
-                        }, Misc.NumberFormat.formatEther(undefined, totalFloatMinted)))), React.createElement("a", {
-                  href: "https://docs.float.capital/docs/alpha"
-                }, React.createElement("p", {
-                      className: "text-center text-xxs text-gray mx-8"
-                    }, "The alphaFloat token is the temporary non-transferable Float token for the alpha release. You can read more on the alpha release ", React.createElement("span", {
-                          className: "underline"
-                        }, "here."))));
+                        }, Misc.NumberFormat.formatEther(undefined, totalFloatMinted)))), Config.isPolygon ? React.createElement("a", {
+                    href: "https://docs.float.capital/docs/alpha"
+                  }, React.createElement("p", {
+                        className: "text-center text-xxs text-gray mx-8"
+                      }, "The alphaFloat token is the temporary non-transferable Float token for the alpha release. You can read more on the alpha release ", React.createElement("span", {
+                            className: "underline"
+                          }, "here."))) : null);
 }
 
 var make = FloatTokenHighlightCard;

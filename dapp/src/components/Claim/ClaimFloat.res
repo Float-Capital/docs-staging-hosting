@@ -43,5 +43,5 @@ let make = (~marketIndexes) => {
       ~contractFunction=Contracts.Staker.claimFloatCustom(~marketIndexes),
     )
 
-  <Button.Tiny onClick={_ => claimFloatCall()}> "Claim alphaFloat" </Button.Tiny>
+  <Button.Tiny onClick={_ => claimFloatCall()}> `Claim ${Config.floatTokenName}` </Button.Tiny>
 }

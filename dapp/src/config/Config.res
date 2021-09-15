@@ -29,6 +29,8 @@ let config: configShape = %raw(`require('config_file')`)
 
 let isPolygon = config.networkId == CONSTANTS.polygon.chainId
 
+let floatTokenName = isPolygon ? "alphaFloat" : "Float"
+
 let {
   graphEndpoint,
   priceHistoryGraphEndpoint,

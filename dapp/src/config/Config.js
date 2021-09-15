@@ -7,6 +7,8 @@ var config = (require('config_file'));
 
 var isPolygon = config.networkId === CONSTANTS.polygon.chainId;
 
+var floatTokenName = isPolygon ? "alphaFloat" : "Float";
+
 var match = config.contracts;
 
 var graphEndpoint = config.graphEndpoint;
@@ -51,6 +53,7 @@ var floatToken = match.FloatToken;
 
 exports.config = config;
 exports.isPolygon = isPolygon;
+exports.floatTokenName = floatTokenName;
 exports.graphEndpoint = graphEndpoint;
 exports.priceHistoryGraphEndpoint = priceHistoryGraphEndpoint;
 exports.aaveGraphEndpoint = aaveGraphEndpoint;
