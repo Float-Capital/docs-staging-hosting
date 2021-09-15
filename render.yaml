@@ -11,7 +11,7 @@ services:
       - key: MNEMONIC
         sync: false # placeholder for a value to be added in the dashboard
 
-  - name: alhpa-system-update-bot
+  - name: alpha-system-update-bot
     type: pserv
     env: node
     region: frankfurt
