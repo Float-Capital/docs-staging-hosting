@@ -56,8 +56,6 @@ The alpha protocol only charges a fee for unstaking positions within the dApp, b
 
 This discount for Kong holders is part of a longer partnership, bridging the gap between synthetic assets and NFT communities.
 
-Keep an eye out for future
-
 ## More than an alpha :fast_forward:
 
 Not all alphas are made the same. In many cases when a team refers to an alpha, they mean an MVP, or an untested release. The Float alpha is production ready.
