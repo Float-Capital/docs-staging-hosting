@@ -1,4 +1,3 @@
-var secretsManager = require("../secretsManager.js");
 var ethers = require("ethers");
 
 const longShortContractAddress = "0x51565F132c5B25BC9EA6e4D112ab6A680d553d2A";
@@ -12,8 +11,17 @@ let provider;
 
 let wallet;
 
-const providerUrl = process.env.PROVIDER_URL || secretsManager.providerUrl;
-const mnemonic = process.env.MNEMONIC || secretsManager.mnemonic;
+let providerUrl = process.env.PROVIDER_URL;
+let mnemonic = process.env.MNEMONIC;
+try {
+  const config = require("./secretsManager.js");
+  providerUrl = config.providerUrl;
+  mnemonic = config.mnemonic;
+} catch (e) {
+  console.warn(
+    "Using the `PROVIDER_URL` and `MNEMONIC` environment variables"
+  );
+}
 
 const setup = async () => {
   provider = await new ethers.providers.JsonRpcProvider(
