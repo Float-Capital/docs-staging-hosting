@@ -1,0 +1,1 @@
+(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[535],{6353:function(e){"use strict";e.exports=JSON.parse('{"title":"Recent posts","items":[{"title":"Introducing Float Capital: The Future of On-Chain Assets Powered by Chainlink","permalink":"/blog/future-onchain-assets"}]}')}}]);
