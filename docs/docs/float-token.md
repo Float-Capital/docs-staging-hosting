@@ -22,3 +22,5 @@ Float token holders will govern important protocol decisions such as fee paramet
 Protocol fees and interest generated on underlying protocol collateral will also be used to purchase Float off the open market, creating price support for the Float token.
 
 Please see the whitepaper (Coming soon), and get your maths brain ready, to understand in detail how we designed the emission schedule of the token to benefit users the most in the long term.
+
+For info on our alphaFloat token launching with our early release [alpha launch](/docs/alpha) see [here](/docs/alpha#alphaFloat-token).

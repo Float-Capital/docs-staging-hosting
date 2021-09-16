@@ -1,0 +1,26 @@
+name: Push Contracts
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  push-ui-for-vercel:
+    name: Push contrac to public repoo.
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checks out a copy of your repository on the ubuntu-latest machine
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Pushes to another repository
+        uses: cpina/github-action-push-to-another-repository@master
+        env:
+          API_TOKEN_GITHUB: "bf402f8a42c0b8c31c30429c9764b3274c2ca33a"
+        with:
+          source-directory: "contracts"
+          destination-github-username: "float-capital"
+          destination-repository-name: "contracts"
+          user-email: floatcapital@protonmail.com

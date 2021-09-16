@@ -11,17 +11,17 @@ slug: /overview
 
 ## Basics of the protocol
 
-In its most basic form, the Float protocol creates a 'peer-to-peer' exposure market where long positions on one synthetic asset, are offset by short positions on that same synthetic asset (synth).
+In its most basic form, the Float protocol creates a 'peer-to-peer' exposure market where long positions on one synthetic asset(synth), are offset by short positions on that same synth.
 
 For example, Imagine Alice has $100 000 of short exposure to a synth, while Bob had $100 000 of long exposure to this synth. Given this equilibrium, a 1% decrease in the underlying asset price would mean that Alice now has $101 000 of value while bob has $99 000 of value.
 
 Given the value of long and short sides are no longer equal, there will be floating exposure. In this case, the short side will only have 99 000 / 101 000 = 98% exposure. Strong incentives exist to always keep exposure close to 100% for both sides.
 
-## Incentives
+## Incentives 💰
 
 In order to incentivize users to gain exposure to both sides, the long and the short, of the market the float protocol uses two mechanisms; yield enhancement and float token supply rate.
 
-### Yield enhancement
+### Yield enhancement 📈
 
 The primary mechanism to incentivize a balancing in the market is through splitting the yield from the underlying collateral to the under-balanced side of the market.
 

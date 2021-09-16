@@ -73,13 +73,13 @@ NOTE: these testnet addresses are frequently changing during development 👷‍
     "OracleManager": "0x5E14F89E1420F9C52cC22AB5bF207E2354C527B3"
     "LongToken": "0x99f06f3E871E18F35b9a504F672bDa47D0380E23",
     "ShortToken": "0xf7Bfa8bD974011657E87ab453FF978156482C783",
-    "YieldManagerETH": "0xD5627DEe8700213aE9F074bE68b5Ac61AE41c5B0",
+    "YieldManagerETH": "0xD5627DEe8700213aE9F074bE68b5Ac61AE41c5B0"
   },
   "matic": {
     "OracleManager": "0xcED789d13CECD8a8318F8135c4D74728a8eaF8aF"
     "LongToken": "0x3329c91bD5118F83F5794ffa2c55b1d88eC49aC5",
     "ShortToken": "0xcDa695e6c6257d8984D6D9864278A96d81Fdf082",
-    "YieldManagerMATIC": "0x1c2760728CfF0ceaF41ED5A37d441AB90DcA2Cc1",
+    "YieldManagerMATIC": "0x1c2760728CfF0ceaF41ED5A37d441AB90DcA2Cc1"
   }
 ]
 ```
