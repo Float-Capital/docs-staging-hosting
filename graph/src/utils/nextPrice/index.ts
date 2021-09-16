@@ -364,7 +364,7 @@ export function createOrUpdateUserNextPriceAction(
         amount
       );
     } else {
-      userNextPriceAction.amountSynthTokenForWithdrawalLong = userNextPriceAction.amountSynthTokenForWithdrawalLong.plus(
+      userNextPriceAction.amountSynthTokenForWithdrawalShort = userNextPriceAction.amountSynthTokenForWithdrawalShort.plus(
         amount
       );
     }
