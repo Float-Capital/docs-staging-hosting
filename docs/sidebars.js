@@ -8,6 +8,7 @@ module.exports = {
       "float-token",
       "governance",
       "addresses",
+      "gems",
     ],
     "User Guide": ["mint", "redeem", "stake", "gas-costs", "testnet"],
     Developer: ["smart-contracts", "api"],

@@ -41,7 +41,29 @@ PM2 Long = "0xDc24f4BD4F9dAC21aBd2e497479D18a87009Fad4",
 PM2 Short = "0x75e8EEFfCe2A345aa419bE87C0bA20f8Bc2A72cD",
 ``` -->
 
+## Alpha Launch on Polygon
+
+See details on our alpha launch[here](/docs/alpha).
+
+Alpha contracts:
+
+```javascript
+Contracts {
+"AlphaFloatToken": "0x01309A1Ec476871760D9Ea454628500BCcc1E011",
+"FloatCapital_v0": "0xEe0c19f26b3B3A4fb82f466a6023DcD979c27a2F",
+"GEMS": "0x756218A9476bF7C75a887d9c7aB916DE15AB5Ddf",
+"LongShort": "0x168a5d1217AEcd258b03018d5bF1A1677A07b733",
+"Staker": "0xe7C89eb987c415B4233789E5ceC0eE7407d2C47F",
+"TokenFactory": "0x809C2619a27c58334CAac07470899e4dd0574AEC",
+"Treasury_v0": "0xeb1bB399997463d8Fd0cb85C89Da0fc958006441",
+"Dai": "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063"
+}
+```
+
 ## Polygon
 
-Our Polygon mainnet launch is pending further testing.
-Join our [discord](https://discord.gg/qesr2KZAhn) for the latest updates!
+Join our [discord](https://discord.gg/qesr2KZAhn) for the latest updates on our main launch on the Polygon network!
+
+```
+
+```
