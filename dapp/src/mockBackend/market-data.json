@@ -2,7 +2,7 @@
     {    
         "name": "The Flipp3ning",
         "description": "The flipp3ning represents a 3x leveraged market between the ethereum and bitcoin marketcap. Enter a long position to gain exposure to ethereum increasing in value in relation to bitcoin or a short position to gain exposure to bitcoin increasing in value in relation to ethereum",
-        "oracleHeartbeat": 300,
+        "oracleHeartbeat": 310,
         "icon": "/icons/tokens/flippening.svg",
         "oracleDecimals": 18
     },

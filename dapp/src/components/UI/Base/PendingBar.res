@@ -31,7 +31,7 @@ module PendingBarInner = {
     ~refetchCallback,
   ) => {
     React.useEffect1(() => {
-      let earlyEdgeCaseTimeOffset = 20
+      let earlyEdgeCaseTimeOffset = 30
       if (
         lastOracleUpdateTimestamp->Ethers.BigNumber.toNumber +
         oracleHeartbeat -

@@ -77,7 +77,7 @@ function PendingBar$PendingBarInner(Props) {
   var updateSystemStateCall = Props.updateSystemStateCall;
   var refetchCallback = Props.refetchCallback;
   React.useEffect((function () {
-          if (((lastOracleUpdateTimestamp.toNumber() + oracleHeartbeat | 0) - 20 | 0) > (now | 0)) {
+          if (((lastOracleUpdateTimestamp.toNumber() + oracleHeartbeat | 0) - 30 | 0) > (now | 0)) {
             Curry._1(refetchCallback, (function (param) {
                     return now;
                   }));
