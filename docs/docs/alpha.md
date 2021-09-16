@@ -26,17 +26,17 @@ For the alpha launch, the alphaFloat token will be used, and will be convertible
 
 ## Minting a position on the Polygon network :heavy_dollar_sign:
 
-DAI is the stable coin required to mint a position. Polygon has provided a [faucet](https://matic.supply/) to receive a small amount of Matic token required for making transactions on the Polygon network.
+DAI is the stable coin required to mint a position. Polygon has provided a free [faucet](https://matic.supply/) to receive a small amount of Matic token required for making transactions on the Polygon network.
 
 ### Polygon Bridge :bridge_at_night:
 
-The alpha Float protocol will provide users with a direct link to bring their cross-chain assets to the Polygon chain via the Polygon Bridge. Users can then convert their DAI from other chains to the Polygon network to use on the alpha Float protocol.
+The alpha Float protocol will provide users with a direct link to bring their cross-chain assets to the Polygon chain via the Polygon Bridge. Users can then bridge their DAI from other chains to the Polygon network to use on the alpha Float protocol.
 
 ## Alpha Float markets :fire:
 
-The alpha Float protocol will launch with support for an initial market of the Flipp3ning, a 3x leveraged version of the Flippening, which is based on the market cap of Ethereum vs. the market cap of Bitcoin.
+The alpha Float protocol will launch with an initial market of the Flipp3ning, a 3x leveraged version of the Flippening, which is based on the market cap of Ethereum vs. the market cap of Bitcoin.
 
-Additional markets will be added throughout the Alpha in a two week cadence. Users can make suggestions for each new market on the [Float.capital discord](https://discord.gg/yyrHVeDd) .
+Additional markets will be added throughout the Alpha in a two week cadence. Users can make suggestions for each new market on the Float Capital [discord](https://discord.gg/yyrHVeDd) .
 
 ## Beat the market :trophy:
 
@@ -62,4 +62,4 @@ Not all alphas are made the same. In many cases when a team refers to an alpha, 
 
 By launching as an alpha the aim is to field test the protocol before making any of its mechanisms immutable. This will help guarantee that the protocol has maximum utility for users.
 
-The alpha protocol has already passed a range of smart contract audits, including by community driven audit platform, [Code 423n4](https://code423n4.com/), and users will be able to inject capital and stake positions with complete confidence in the safety of their assets.
+The alpha protocol has already passed a range of smart contract audits, including by community driven audit platform, [Code 423n4](https://code423n4.com/), and users will be able to inject capital and stake positions with confidence in the safety of their assets.
