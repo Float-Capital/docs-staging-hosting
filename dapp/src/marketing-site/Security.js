@@ -46,7 +46,7 @@ function Security(Props) {
                               className: "mx-4  order-1 md:order-3  bg-white bg-opacity-70 md:p-4 p-1 rounded  w-46 "
                             }, React.createElement("a", {
                                   className: "custom-cursor",
-                                  href: "https://docs.float.capital/docs/security",
+                                  href: "https://github.com/code-423n4/2021-08-floatcapital/pull/20",
                                   rel: "noopener noreferrer",
                                   target: "_blank"
                                 }, React.createElement("img", {
@@ -56,7 +56,7 @@ function Security(Props) {
                                       className: "text-center font-bold mx-auto hover:underline"
                                     }, "Audit"), React.createElement("p", {
                                       className: "text-center mx-auto text-xs text-gray-500"
-                                    }, "coming soon")))))), React.createElement(Footer.make, {}));
+                                    }, "full results coming soon")))))), React.createElement(Footer.make, {}));
 }
 
 var make = Security;
