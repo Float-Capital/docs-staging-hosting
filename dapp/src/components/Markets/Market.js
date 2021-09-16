@@ -28,7 +28,7 @@ function Market(Props) {
                               marketName: marketData.name,
                               oracleAddress: marketData.oracleAddress,
                               timestampCreated: marketData.timestampCreated,
-                              oracleDecimals: Backend.getMarketInfoUnsafe(marketData.marketIndex.toNumber() - 1 | 0).oracleDecimals
+                              oracleDecimals: Backend.getMarketInfoUnsafe(marketData.marketIndex.toNumber()).oracleDecimals
                             }))), React.createElement(MarketInfoCard.make, {
                       marketIndex: marketData.marketIndex.toNumber()
                     }), React.createElement("div", {

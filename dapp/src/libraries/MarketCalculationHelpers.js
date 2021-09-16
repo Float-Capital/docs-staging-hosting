@@ -14,13 +14,13 @@ function calculateBeta(totalValueLocked, totalLockedLong, totalLockedShort, isLo
   if (totalValueLocked.eq(CONSTANTS.zeroBN) || totalLockedLong.eq(CONSTANTS.zeroBN) || totalLockedShort.eq(CONSTANTS.zeroBN)) {
     return "0";
   } else if (totalLockedLong.eq(totalLockedShort)) {
-    return "100";
+    return "300";
   } else if (isLong && totalLockedShort.lt(totalLockedLong)) {
-    return Globals.percentStr(totalLockedShort, totalLockedLong);
+    return Globals.percentStr(totalLockedShort.mul(Ethers$1.BigNumber.from("3")), totalLockedLong);
   } else if (!isLong && totalLockedLong.lt(totalLockedShort)) {
-    return Globals.percentStr(totalLockedLong, totalLockedShort);
+    return Globals.percentStr(totalLockedLong.mul(Ethers$1.BigNumber.from("3")), totalLockedShort);
   } else {
-    return "100";
+    return "300";
   }
 }
 

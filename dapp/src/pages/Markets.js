@@ -158,7 +158,7 @@ function Markets$PriceCard(Props) {
         }
       ]);
   var marketIndex = market.marketIndex.toNumber();
-  var assetDecimals = Backend.getMarketInfoUnsafe(marketIndex - 1 | 0).oracleDecimals;
+  var assetDecimals = Backend.getMarketInfoUnsafe(marketIndex).oracleDecimals;
   var match = priceHistory.data;
   var state;
   var exit = 0;
@@ -206,7 +206,7 @@ function Markets$PriceCard(Props) {
         });
   }
   var tmp;
-  tmp = typeof state === "number" || state.TAG === /* GraphError */0 ? null : "$" + state._0.latestPrice;
+  tmp = typeof state === "number" || state.TAG === /* GraphError */0 ? null : state._0.latestPrice + "%";
   var tmp$1;
   if (typeof state === "number") {
     tmp$1 = React.createElement(Loader.Ellipses.make, {});

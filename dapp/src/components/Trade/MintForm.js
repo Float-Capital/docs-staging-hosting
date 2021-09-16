@@ -3,6 +3,7 @@
 
 var Form = require("../Form.js");
 var Next = require("../../bindings/Next.js");
+var Ramp = require("../../libraries/Ramp.js");
 var Tick = require("../UI/Base/Tick.js");
 var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
@@ -713,13 +714,15 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
         exit = 2;
     }
   }
-  if (exit === 2) {
-    if (typeof txStateMint === "number") {
-      txStateMint === /* UnInitialised */0;
-    } else if (txStateMint.TAG !== /* SignedAndSubmitted */0) {
-      return Curry._1(resetFormButton, undefined);
+  if (exit === 2 && typeof txStateMint !== "number") {
+    switch (txStateMint.TAG | 0) {
+      case /* Declined */1 :
+      case /* Complete */2 :
+      case /* Failed */3 :
+          return Curry._1(resetFormButton, undefined);
+      default:
+        
     }
-    
   }
   return React.createElement(Button.make, {
               onClick: (function (param) {
@@ -769,6 +772,7 @@ function MintForm$MintFormInput(Props) {
           children: "Login & Mint"
         });
   var router = Router.useRouter();
+  var onramp = Ramp.useRamp(undefined);
   var formInput = React.createElement(React.Fragment, undefined, React.createElement(LongOrShortSelect.make, {
             isLong: isLong,
             selectPosition: Curry.__1(onChangeSide),
@@ -792,7 +796,7 @@ function MintForm$MintFormInput(Props) {
                   children: null
                 }, React.createElement("div", {
                       className: "relative"
-                    }, formInput), submitButton), Config.networkId === 80001 && router.pathname !== "/" ? React.createElement("p", {
+                    }, formInput), submitButton), Config.networkId === CONSTANTS.mumbai.chainId && router.pathname !== "/" ? React.createElement("p", {
                     className: "cursor-pointer text-xxs py-2",
                     onClick: (function (param) {
                         router.push("/app/faucet");
@@ -800,7 +804,23 @@ function MintForm$MintFormInput(Props) {
                       })
                   }, "Visit our ", React.createElement("a", {
                         className: "hover:bg-white underline"
-                      }, "faucet"), " if you need more aave test DAI.") : null);
+                      }, "faucet"), " if you need more aave test DAI.") : (
+                Config.networkId === CONSTANTS.polygon.chainId && router.pathname !== "/" ? React.createElement("div", {
+                        className: "inline-block px-2"
+                      }, React.createElement("div", {
+                            className: "flex flex-row justify-start items-center py-2 custom-cursor hover:bg-white",
+                            onClick: (function (param) {
+                                return Curry._1(onramp.show, undefined);
+                              })
+                          }, React.createElement("p", {
+                                className: "  text-xxs mr-1"
+                              }, "Buy "), React.createElement("p", {
+                                className: " text-xxs  underline "
+                              }, "DAI"), React.createElement("img", {
+                                className: "ml-1 h-3",
+                                src: CONSTANTS.daiDisplayToken.iconUrl
+                              }))) : null
+              ));
 }
 
 var MintFormInput = {

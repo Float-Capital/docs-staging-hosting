@@ -19,10 +19,10 @@ function Security(Props) {
                         }), React.createElement("div", {
                           className: "grid grid-cols-1 md:grid-cols-3 gap-10 items-center justify-center my-4"
                         }, React.createElement("div", {
-                              className: "mx-4 order-3 md:order-1 bg-white bg-opacity-70 md:p-4 p-1 rounded w-46"
+                              className: "mx-4 h-full order-3 md:order-1 bg-white bg-opacity-70 md:p-4 p-1 rounded w-46"
                             }, React.createElement("a", {
                                   className: "custom-cursor",
-                                  href: "https://docs.float.capital/docs/security",
+                                  href: "/contract-coverage/index.html",
                                   rel: "noopener noreferrer",
                                   target: "_blank"
                                 }, React.createElement("img", {
@@ -30,13 +30,11 @@ function Security(Props) {
                                       src: "/icons/coverage.svg"
                                     }), React.createElement("p", {
                                       className: "text-center font-bold mx-auto hover:underline"
-                                    }, "Contract coverage"), React.createElement("p", {
-                                      className: "text-center mx-auto text-xs text-gray-500"
-                                    }, "coming soon"))), React.createElement("div", {
-                              className: "mx-4 order-2  bg-white bg-opacity-70 md:p-4 p-1 rounded  w-46"
+                                    }, "Contract coverage"))), React.createElement("div", {
+                              className: "mx-4 h-full order-2  bg-white bg-opacity-70 md:p-4 p-1 rounded  w-46"
                             }, React.createElement("a", {
                                   className: "custom-cursor",
-                                  href: "https://docs.float.capital/docs/security",
+                                  href: "https://github.com/Float-Capital/contracts/tree/v0-alpha-launch",
                                   rel: "noopener noreferrer",
                                   target: "_blank"
                                 }, React.createElement("img", {
@@ -44,13 +42,11 @@ function Security(Props) {
                                       src: "/icons/github-color.svg"
                                     }), React.createElement("p", {
                                       className: "text-center font-bold mx-auto hover:underline"
-                                    }, "Github code"), React.createElement("p", {
-                                      className: "text-center mx-auto text-xs text-gray-500"
-                                    }, "coming soon"))), React.createElement("div", {
+                                    }, "Github code"))), React.createElement("div", {
                               className: "mx-4  order-1 md:order-3  bg-white bg-opacity-70 md:p-4 p-1 rounded  w-46 "
                             }, React.createElement("a", {
                                   className: "custom-cursor",
-                                  href: "https://docs.float.capital/docs/security",
+                                  href: "https://github.com/code-423n4/2021-08-floatcapital/pull/20",
                                   rel: "noopener noreferrer",
                                   target: "_blank"
                                 }, React.createElement("img", {
@@ -60,7 +56,7 @@ function Security(Props) {
                                       className: "text-center font-bold mx-auto hover:underline"
                                     }, "Audit"), React.createElement("p", {
                                       className: "text-center mx-auto text-xs text-gray-500"
-                                    }, "coming soon")))))), React.createElement(Footer.make, {}));
+                                    }, "full results coming soon")))))), React.createElement(Footer.make, {}));
 }
 
 var make = Security;

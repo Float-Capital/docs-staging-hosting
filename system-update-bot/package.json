@@ -6,6 +6,7 @@
   "license": "MIT",
   "dependencies": {
     "bs-fetch": "^0.6.2",
+    "@scout_apm/scout-apm": "^0.2.2",
     "ethers": "^5.3.1",
     "express": "^4.17.1",
     "isomorphic-fetch": "^3.0.0",
@@ -16,7 +17,7 @@
   "scripts": {
     "dev": "nodemon src/index.js",
     "dev-price-update": "nodemon src/res/Index.bs.js",
-    "start": "node src/res/Index.bs.js",
+    "start": "node src/index-alpha.js",
     "start-testnet": "node src/index.js",
     "res:build": "rescript",
     "res:start": "rescript build -w",

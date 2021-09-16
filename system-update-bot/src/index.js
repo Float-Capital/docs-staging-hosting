@@ -1,4 +1,5 @@
 var ethers = require("ethers");
+const scout = require("@scout_apm/scout-apm");
 
 const longShortContractAddress = "0x51565F132c5B25BC9EA6e4D112ab6A680d553d2A";
 const longShortAbi = [

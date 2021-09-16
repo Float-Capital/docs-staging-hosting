@@ -1,0 +1,644 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for contracts/SyntheticTokenUpgradeable.sol</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../index.html">all files</a> / <a href="index.html">contracts/</a> SyntheticTokenUpgradeable.sol
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>0/29</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>0/6</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>0/10</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>0/29</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line low'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// SPDX-License-Identifier: BUSL-1.1
+&nbsp;
+pragma solidity 0.8.3;
+&nbsp;
+import "./interfaces/IStaker.sol";
+import "./interfaces/ILongShort.sol";
+import "./interfaces/ISyntheticToken.sol";
+&nbsp;
+import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20BurnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/draft-ERC20PermitUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+&nbsp;
+/**
+@title SyntheticTokenUpgradeable
+@notice An ERC20 token that tracks or inversely tracks the price of an
+        underlying asset with floating exposure.
+@dev Logic for price tracking contained in LongShort.sol. 
+     The contract inherits from ERC20PresetMinterPauser.sol
+*/
+contract SyntheticTokenUpgradeable is
+  ISyntheticToken,
+  Initializable,
+  ERC20Upgradeable,
+  ERC20BurnableUpgradeable,
+  AccessControlUpgradeable,
+  ERC20PermitUpgradeable,
+  UUPSUpgradeable
+{
+  bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
+  bytes32 public constant UPGRADER_ROLE = keccak256("UPGRADER_ROLE");
+&nbsp;
+  /// @notice Address of the LongShort contract, a deployed LongShort.sol
+  address public longShort;
+  /// @notice Address of the Staker contract, a deployed Staker.sol
+  address public staker;
+  /// @notice Identifies which market in longShort the token is for.
+  uint32 public marketIndex;
+  /// @notice Whether the token is a long token or short token for its market.
+  bool public isLong;
+&nbsp;
+  /// @notice Creates an instance of the contract.
+  /// @dev Should only be called by TokenFactory.sol for our system.
+  /// @param name The name of the token.
+  /// @param symbol The symbol for the token.
+  /// @param _longShort Address of the core LongShort contract.
+  /// @param _staker Address of the staker contract.
+  /// @param _marketIndex Which market the token is for.
+  /// @param _isLong Whether the token is long or short for its market.
+<span class="fstat-no" title="function not covered" >  function initialize(</span>
+    string memory name,
+    string memory symbol,
+    address _longShort,
+    address _staker,
+    uint32 _marketIndex,
+    bool _isLong
+  ) external initializer {
+<span class="cstat-no" title="statement not covered" >    __ERC20_init(name, symbol)</span>;
+<span class="cstat-no" title="statement not covered" >    __ERC20Burnable_init()</span>;
+<span class="cstat-no" title="statement not covered" >    __AccessControl_init()</span>;
+<span class="cstat-no" title="statement not covered" >    __ERC20Permit_init(name)</span>;
+<span class="cstat-no" title="statement not covered" >    __UUPSUpgradeable_init()</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    renounceRole(DEFAULT_ADMIN_ROLE, msg.sender)</span>;
+<span class="cstat-no" title="statement not covered" >    renounceRole(MINTER_ROLE, msg.sender)</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    _setupRole(DEFAULT_ADMIN_ROLE, _longShort)</span>;
+<span class="cstat-no" title="statement not covered" >    _setupRole(MINTER_ROLE, _longShort)</span>;
+<span class="cstat-no" title="statement not covered" >    _setupRole(UPGRADER_ROLE, msg.sender)</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    longShort = _longShort</span>;
+<span class="cstat-no" title="statement not covered" >    staker = _staker</span>;
+<span class="cstat-no" title="statement not covered" >    marketIndex = _marketIndex</span>;
+<span class="cstat-no" title="statement not covered" >    isLong = _isLong</span>;
+  }
+&nbsp;
+  /// @notice Authorizes an upgrade to a new address.
+  /// @dev Can only be called by the current admin.
+<span class="fstat-no" title="function not covered" >  function _authorizeUpgrade(address newImplementation) internal override onlyRole(UPGRADER_ROLE) {}</span>
+&nbsp;
+  // TODO - look at some way of not duplicating implementation logic between this and SyntheticToken.sol
+&nbsp;
+  /// @notice Allows users to stake their synthetic tokens to earn Float.
+  /// @dev Core staking logic contained in Staker.sol
+  /// @param amount Amount to stake in wei.
+<span class="fstat-no" title="function not covered" >  function stake(uint256 amount) external override {</span>
+    // NOTE: this is safe, this function will throw "ERC20: transfer
+    //       amount exceeds balance" if amount exceeds users balance.
+<span class="cstat-no" title="statement not covered" >    super._transfer(msg.sender, address(staker), amount)</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    IStaker(staker).stakeFromUser(msg.sender, amount)</span>;
+  }
+&nbsp;
+  /*╔══════════════════════════════════════════════════════╗
+    ║    FUNCTIONS INHERITED BY ERC20PresetMinterPauser    ║
+    ╚══════════════════════════════════════════════════════╝*/
+&nbsp;
+<span class="fstat-no" title="function not covered" >  function totalSupply()</span>
+    public
+    view
+    virtual
+    override(ERC20Upgradeable, ISyntheticToken)
+    returns (uint256)
+  {
+<span class="cstat-no" title="statement not covered" >    return ERC20Upgradeable.totalSupply();</span>
+  }
+&nbsp;
+  /** 
+  @notice Mints a number of synthetic tokens for an address.
+  @dev Can only be called by addresses with a minter role. 
+        This should correspond to the Long Short contract.
+  @param to The address for which to mint the tokens for.
+  @param amount Amount of synthetic tokens to mint in wei.
+  */
+<span class="fstat-no" title="function not covered" >  function mint(address to, uint256 amount) external override onlyRole(MINTER_ROLE) {</span>
+<span class="cstat-no" title="statement not covered" >    _mint(to, amount)</span>;
+  }
+&nbsp;
+  /// @notice Burns or destroys a number of held synthetic tokens for an address.
+  /// @dev Modified to only allow Long Short to burn tokens on redeem.
+  /// @param amount The amount of tokens to burn in wei.
+<span class="fstat-no" title="function not covered" >  function burn(uint256 amount) public override(ERC20BurnableUpgradeable, ISyntheticToken) {</span>
+<span class="cstat-no" title="statement not covered" >    require(msg.sender == longShort, "Only LongShort contract")</span>;
+<span class="cstat-no" title="statement not covered" >    super._burn(_msgSender(), amount)</span>;
+  }
+&nbsp;
+  /** 
+  @notice Overrides the default ERC20 transferFrom.
+  @dev To allow users to avoid approving LongShort when redeeming tokens,
+       longShort has a virtual infinite allowance.
+  @param sender User for which to transfer tokens.
+  @param recipient Recipient of the transferred tokens.
+  @param amount Amount of tokens to transfer in wei.
+  */
+<span class="fstat-no" title="function not covered" >  function transferFrom(</span>
+    address sender,
+    address recipient,
+    uint256 amount
+  ) public override(ERC20Upgradeable, ISyntheticToken) returns (bool) {
+<span class="cstat-no" title="statement not covered" >    if (recipient == longShort &amp;&amp; msg.sender == longShort) {</span>
+      // If it to longShort and msg.sender is longShort don't perform additional transfer checks.
+<span class="cstat-no" title="statement not covered" >      ERC20Upgradeable._transfer(sender, recipient, amount)</span>;
+<span class="cstat-no" title="statement not covered" >      return true;</span>
+    } else {
+<span class="cstat-no" title="statement not covered" >      return ERC20Upgradeable.transferFrom(sender, recipient, amount);</span>
+    }
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  function transfer(address recipient, uint256 amount)</span>
+    public
+    virtual
+    override(ERC20Upgradeable, ISyntheticToken)
+    returns (bool)
+  {
+<span class="cstat-no" title="statement not covered" >    return ERC20Upgradeable.transfer(recipient, amount);</span>
+  }
+&nbsp;
+  /** 
+  @notice Overrides the OpenZeppelin _beforeTokenTransfer hook
+  @dev Ensures that this contract's accounting reflects all the senders's outstanding
+       tokens from next price actions before any token transfer occurs.
+       Removal of pausing functionality of ERC20PresetMinterPausable is intentional.
+  @param sender User for which tokens are to be transferred for.
+  */
+<span class="fstat-no" title="function not covered" >  function _beforeTokenTransfer(</span>
+    address sender,
+    address to,
+    uint256 amount
+  ) internal override {
+<span class="cstat-no" title="statement not covered" >    if (sender != longShort) {</span>
+<span class="cstat-no" title="statement not covered" >      ILongShort(longShort).executeOutstandingNextPriceSettlementsUser(sender, marketIndex)</span>;
+    }
+<span class="cstat-no" title="statement not covered" >    super._beforeTokenTransfer(sender, to, amount)</span>;
+  }
+&nbsp;
+  /** 
+  @notice Gets the synthetic token balance of the user in wei.
+  @dev To automatically account for next price actions which have been confirmed but not settled,
+        includes any outstanding tokens owed by longShort.
+  @param account The address for which to get the balance of.
+  */
+<span class="fstat-no" title="function not covered" >  function balanceOf(address account) public view virtual override returns (uint256) {</span>
+<span class="cstat-no" title="statement not covered" >    return</span>
+      ERC20Upgradeable.balanceOf(account) +
+      ILongShort(longShort).getUsersConfirmedButNotSettledSynthBalance(
+        account,
+        marketIndex,
+        isLong
+      );
+  }
+}
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Thu Sep 16 2021 09:25:05 GMT+0200 (South Africa Standard Time)
+</div>
+</div>
+<script src="../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../sorter.js"></script>
+</body>
+</html>

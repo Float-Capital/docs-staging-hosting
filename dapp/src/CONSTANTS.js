@@ -53,13 +53,17 @@ var PriceGraphLabels = {
   year: "1Y"
 };
 
-var kperiodHardcode = Ethers$1.BigNumber.from("1664000");
+var unstakeFeeHardCode = Ethers$1.BigNumber.from("5000000000000000");
 
-var kmultiplierHardcode = Ethers$1.BigNumber.from("5000000000000000000");
+var kperiodHardcode = Ethers$1.BigNumber.from("5184000");
+
+var kmultiplierHardcode = Ethers$1.BigNumber.from("2000000000000000000");
 
 var floatCapitalPercentE18HardCode = tenToThe18.div(fiveBN);
 
 var oneYearInSecondsMulTenToThe18 = Ethers$1.BigNumber.from(31536000).mul(tenToThe18);
+
+var tenToThe36 = tenToThe18.mul(tenToThe18);
 
 var fiveMinutesInSeconds = 300;
 
@@ -87,7 +91,7 @@ var multiplierHotAPYThreshold = 1.0;
 
 var equilibriumOffsetHardcode = zeroBN;
 
-var balanceIncentiveExponentHardcode = twoBN;
+var balanceIncentiveExponentHardcode = fiveBN;
 
 var yieldGradientHardcode = tenToThe18;
 
@@ -144,6 +148,7 @@ exports.threeMonthsInSeconds = threeMonthsInSeconds;
 exports.oneYearInSeconds = oneYearInSeconds;
 exports.hotAPYThreshold = hotAPYThreshold;
 exports.multiplierHotAPYThreshold = multiplierHotAPYThreshold;
+exports.unstakeFeeHardCode = unstakeFeeHardCode;
 exports.kperiodHardcode = kperiodHardcode;
 exports.kmultiplierHardcode = kmultiplierHardcode;
 exports.equilibriumOffsetHardcode = equilibriumOffsetHardcode;
@@ -151,6 +156,7 @@ exports.balanceIncentiveExponentHardcode = balanceIncentiveExponentHardcode;
 exports.yieldGradientHardcode = yieldGradientHardcode;
 exports.floatCapitalPercentE18HardCode = floatCapitalPercentE18HardCode;
 exports.oneYearInSecondsMulTenToThe18 = oneYearInSecondsMulTenToThe18;
+exports.tenToThe36 = tenToThe36;
 exports.daiDisplayToken = daiDisplayToken;
 exports.polygonDisplayToken = polygonDisplayToken;
 exports.mumbai = mumbai;

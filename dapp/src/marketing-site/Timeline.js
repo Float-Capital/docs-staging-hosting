@@ -137,8 +137,10 @@ function Timeline(Props) {
                     className: "font-semibold text-lg mb-1"
                   }, timeLineContent.title), React.createElement("ul", {
                     className: "text-sm"
-                  }, Belt_Array.map(timeLineContent.milestones, (function (milestone) {
-                          return React.createElement("li", undefined, React.createElement("span", {
+                  }, Belt_Array.mapWithIndex(timeLineContent.milestones, (function (index, milestone) {
+                          return React.createElement("li", {
+                                      key: String(index)
+                                    }, React.createElement("span", {
                                           className: "font-vt323 font-bold mr-2"
                                         }, milestone.isBeginning ? ">" : "\xa0"), milestone.lineContent);
                         }))));

@@ -2,6 +2,7 @@
 'use strict';
 
 var Form = require("./Form.js");
+var Misc = require("../libraries/Misc.js");
 var Curry = require("rescript/lib/js/curry.js");
 var Login = require("../pages/Login.js");
 var React = require("react");
@@ -10,6 +11,8 @@ var Config = require("../config/Config.js");
 var Ethers = require("../ethereum/Ethers.js");
 var Loader = require("./UI/Base/Loader.js");
 var Queries = require("../data/Queries.js");
+var Tooltip = require("./UI/Base/Tooltip.js");
+var CONSTANTS = require("../CONSTANTS.js");
 var Contracts = require("../ethereum/Contracts.js");
 var DataHooks = require("../data/DataHooks.js");
 var Formality = require("re-formality/src/Formality.js");
@@ -26,6 +29,38 @@ var ViewProfileButton = require("./UI/ViewProfileButton.js");
 var MessageUsOnDiscord = require("./Ethereum/MessageUsOnDiscord.js");
 var ViewOnBlockExplorer = require("./Ethereum/ViewOnBlockExplorer.js");
 var Formality__ReactUpdate = require("re-formality/src/Formality__ReactUpdate.js");
+
+function Unstake$ApproxDollarFeeUnstake(Props) {
+  var tokenPrice = Props.tokenPrice;
+  var value = Props.value;
+  if (tokenPrice === undefined) {
+    return null;
+  }
+  if (value === undefined) {
+    return null;
+  }
+  var dollarValue = Caml_option.valFromOption(tokenPrice).mul(Caml_option.valFromOption(value)).mul(CONSTANTS.unstakeFeeHardCode).div(CONSTANTS.tenToThe36);
+  var dollarValueStr = Misc.NumberFormat.formatEther(undefined, dollarValue);
+  if (dollarValueStr !== "0.00") {
+    return React.createElement("div", {
+                className: "flex flex-row items-center justify-end mb-2 w-full text-right"
+              }, React.createElement("span", {
+                    className: "text-xxs text-gray-500 pr-2"
+                  }, "unstake fee"), React.createElement("span", {
+                    className: "text-xxs text-gray-500 pr-2"
+                  }, "approx"), React.createElement("span", {
+                    className: "text-sm text-gray-500"
+                  }, "~$"), React.createElement("span", {
+                    className: "text-sm text-gray-800"
+                  }, dollarValueStr));
+  } else {
+    return null;
+  }
+}
+
+var ApproxDollarFeeUnstake = {
+  make: Unstake$ApproxDollarFeeUnstake
+};
 
 var validators = {
   amount: {
@@ -472,6 +507,8 @@ function Unstake$StakeFormInput(Props) {
   var resetButtonOpt = Props.resetButton;
   var buttonDisabledOpt = Props.buttonDisabled;
   var buttonText = Props.buttonText;
+  var tokensOpt = Props.tokens;
+  var tokenPriceOpt = Props.tokenPrice;
   var txStateOpt = Props.txState;
   var onSubmit = onSubmitOpt !== undefined ? onSubmitOpt : (function (param) {
         
@@ -492,6 +529,8 @@ function Unstake$StakeFormInput(Props) {
         return null;
       });
   var buttonDisabled = buttonDisabledOpt !== undefined ? buttonDisabledOpt : false;
+  var tokens = tokensOpt !== undefined ? Caml_option.valFromOption(tokensOpt) : undefined;
+  var tokenPrice = tokenPriceOpt !== undefined ? Caml_option.valFromOption(tokenPriceOpt) : undefined;
   var txState = txStateOpt !== undefined ? txStateOpt : /* UnInitialised */0;
   var tmp;
   var exit = 0;
@@ -520,7 +559,16 @@ function Unstake$StakeFormInput(Props) {
                   onBlur: onBlur,
                   onChange: onChange,
                   onMaxClick: onMaxClick
-                }), tmp);
+                }), React.createElement(Unstake$ApproxDollarFeeUnstake, {
+                  tokenPrice: tokenPrice,
+                  value: tokens
+                }), tmp, value === "" ? null : React.createElement("p", {
+                    className: "text-xxs text-yellow-600 text-center mt-3 flex justify-center items-center w-full"
+                  }, React.createElement("span", undefined, "⚡ We charge a small unstake fee on your tokens"), React.createElement("span", {
+                        className: "text-black mx-1 "
+                      }, React.createElement(Tooltip.make, {
+                            tip: "5 basis points"
+                          })), React.createElement("span", undefined, "⚡")));
 }
 
 var StakeFormInput = {
@@ -644,6 +692,8 @@ function Unstake$ConnectedStakeForm(Props) {
       true
     ];
   }
+  var match$3 = form.amountResult;
+  var formAmount$1 = match$3 !== undefined && match$3.TAG === /* Ok */0 ? Caml_option.some(match$3._0) : undefined;
   return React.createElement(Unstake$StakeFormInput, {
               onSubmit: form.submit,
               value: form.input.amount,
@@ -669,6 +719,8 @@ function Unstake$ConnectedStakeForm(Props) {
               resetButton: resetFormButton,
               buttonDisabled: match$2[2],
               buttonText: match$2[1],
+              tokens: formAmount$1,
+              tokenPrice: Caml_option.some(param.latestPrice.price.price),
               txState: txState
             });
 }
@@ -746,6 +798,7 @@ function Unstake(Props) {
 
 var make = Unstake;
 
+exports.ApproxDollarFeeUnstake = ApproxDollarFeeUnstake;
 exports.StakeForm = StakeForm;
 exports.toNumber = toNumber;
 exports.useUnstakeModal = useUnstakeModal;

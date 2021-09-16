@@ -12,10 +12,7 @@ module SystemUpdateTxState = {
       | Failed(_) =>
         <p className="text-xxxxs text-right text-red-500 "> {`Update tx failed`->React.string} </p>
       | _ =>
-        <div>
-          <p className="text-xxxxs text-right text-yellow-500 ">
-            {`⚠️ Keeper down ⚠️`->React.string}
-          </p>
+        <div>          
           <Button.Tiny onClick={_ => updateSystemStateCall()}> {"Update Price"} </Button.Tiny>
         </div>
       }}
@@ -34,7 +31,7 @@ module PendingBarInner = {
     ~refetchCallback,
   ) => {
     React.useEffect1(() => {
-      let earlyEdgeCaseTimeOffset = 20
+      let earlyEdgeCaseTimeOffset = 30
       if (
         lastOracleUpdateTimestamp->Ethers.BigNumber.toNumber +
         oracleHeartbeat -
@@ -88,7 +85,7 @@ module PendingBarInner = {
 
 module PendingBarWrapper = {
   @react.component
-  let make = (~marketIndex, ~signer, ~refetchCallback) => {
+  let make = (~marketIndex, ~signer, ~refetchCallback, ~showBlurb) => {
     let lastOracleTimestamp = DataHooks.useOracleLastUpdate(
       ~marketIndex=marketIndex->Ethers.BigNumber.toString,
     )
@@ -117,13 +114,16 @@ module PendingBarWrapper = {
     let _ = Misc.Time.useInterval(_ => setNow(_ => Js.Date.now() /. 1000.), ~delay=1000)
 
     {
-      <div className="relative pt-1">
+      <div className="relative pt-1">{
+showBlurb ?
         <div className="text-xxs text-center mx-4 text-gray-600">
           {`Your transaction will be processed with the next price update `->React.string}
           <Tooltip
             tip="To ensure fairness and security your position will be opened on the next oracle price update"
           />
         </div>
+        : React.null
+      }
         {switch lastOracleTimestamp {
         | Response(lastOracleUpdateTimestamp) =>
           <PendingBarInner
@@ -147,9 +147,9 @@ module PendingBarWrapper = {
 }
 
 @react.component
-let make = (~marketIndex, ~refetchCallback) => {
+let make = (~marketIndex, ~refetchCallback, ~showBlurb=true) => {
   // TODO pass market index (es)
   let signer = ContractActions.useSignerExn()
 
-  <PendingBarWrapper signer marketIndex refetchCallback />
+  <PendingBarWrapper signer marketIndex refetchCallback showBlurb />
 }

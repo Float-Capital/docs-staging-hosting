@@ -70,7 +70,7 @@ module PriceCard = {
 
     let marketIndex = market.marketIndex->Ethers.BigNumber.toNumber
 
-    let assetDecimals = ((marketIndex - 1)->Backend.getMarketInfoUnsafe).oracleDecimals
+    let assetDecimals = (marketIndex->Backend.getMarketInfoUnsafe).oracleDecimals
 
     let state: possibleState = switch priceHistory {
     | {data: Some({priceIntervalManager: Some({prices, latestPriceInterval: {endPrice}})})} => {
@@ -111,7 +111,7 @@ module PriceCard = {
         </div>
         <div className="mr-3 flex flex-row items-center">
           {switch state {
-          | Response({latestPrice}) => `\$${latestPrice}`->React.string
+          | Response({latestPrice}) => `${latestPrice}%`->React.string // TODO: NOT HARDCODE AS %
           | _ => React.null
           }}
         </div>
@@ -121,9 +121,9 @@ module PriceCard = {
         | Response({data}) => <LoadedGraph data />
         | Loading => <Loader.Ellipses />
         | GraphError(e) => {
-          Js.log(e) 
-        <p className="text-xxs text-gray-500">{`unable to fetch price data`->React.string}</p>
-        }
+            Js.log(e)
+            <p className="text-xxs text-gray-500"> {`unable to fetch price data`->React.string} </p>
+          }
         }}
       </div>
     </Card>

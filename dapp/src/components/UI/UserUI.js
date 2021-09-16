@@ -52,6 +52,20 @@ function toString(prim) {
   return prim.toString();
 }
 
+function getUsersTotalStakeValue(stakes) {
+  var totalStakedValue = {
+    contents: CONSTANTS.zeroBN
+  };
+  Belt_Array.forEach(stakes, (function (stake) {
+          var syntheticToken = stake.currentStake.syntheticToken;
+          var price = syntheticToken.latestPrice.price.price;
+          var value = stake.currentStake.amount.mul(price).div(CONSTANTS.tenToThe18);
+          totalStakedValue.contents = totalStakedValue.contents.add(value);
+          
+        }));
+  return totalStakedValue;
+}
+
 function UserUI$UserContainer(Props) {
   var children = Props.children;
   return React.createElement("div", {
@@ -68,11 +82,13 @@ function UserUI$UserTotalValue(Props) {
   var totalValueNameSub = Props.totalValueNameSub;
   var totalValue = Props.totalValue;
   var tokenIconUrlOpt = Props.tokenIconUrl;
+  var childrenOpt = Props.children;
   var tokenIconUrl = tokenIconUrlOpt !== undefined ? Caml_option.valFromOption(tokenIconUrlOpt) : undefined;
+  var children = childrenOpt !== undefined ? Caml_option.valFromOption(childrenOpt) : null;
   var isABaller = totalValue.gte(CONSTANTS.oneHundredThousandInWei);
   var isAWhale = totalValue.gte(CONSTANTS.oneMillionInWei);
   return React.createElement("div", {
-              className: "p-5 mb-5 flex items-center justify-between bg-white bg-opacity-75 rounded-lg shadow-lg"
+              className: "relative p-5 mb-5 flex items-center justify-between bg-white bg-opacity-75 rounded-lg shadow-lg"
             }, React.createElement("div", {
                   className: "flex flex-col"
                 }, React.createElement("span", {
@@ -84,9 +100,9 @@ function UserUI$UserTotalValue(Props) {
                         isABaller ? "text-xl" : "text-2xl"
                       ) + " text-primary"
                     }, "$" + Misc.NumberFormat.formatEther(isAWhale ? 1 : 2, totalValue), tokenIconUrl !== undefined ? React.createElement("img", {
-                            className: "h-6 pr-1",
+                            className: "h-6 pl-1",
                             src: tokenIconUrl
-                          }) : null)));
+                          }) : null)), children);
 }
 
 var UserTotalValue = {
@@ -460,7 +476,7 @@ function UserUI$UserPendingBox(Props) {
                     }, React.createElement("img", {
                           className: "h-5 pr-1",
                           src: CONSTANTS.daiDisplayToken.iconUrl
-                        }), Ethers.Utils.formatEther(daiSpend))), React.createElement(PendingBar.make, {
+                        }), Ethers.Utils.formatEtherToPrecision(daiSpend, 2))), React.createElement(PendingBar.make, {
                   marketIndex: marketIndex,
                   refetchCallback: refetchCallback
                 }));
@@ -619,10 +635,16 @@ function UserUI$UserStakesCard(Props) {
                         isLong: isLong
                       }));
       });
+  var totalStakedValue = getUsersTotalStakeValue(stakes);
   return React.createElement(UserUI$UserColumnCard, {
               children: null
             }, React.createElement(UserUI$UserColumnHeader, {
-                  children: "Staked assets 🔐"
+                  children: "Staked assets"
+                }), React.createElement(UserUI$UserColumnTextCenter, {
+                  children: React.createElement(UserUI$UserColumnText, {
+                        head: "🔐 Staked value",
+                        body: "$" + Misc.NumberFormat.formatEther(undefined, totalStakedValue.contents)
+                      })
                 }), stakeBoxes);
 }
 
@@ -709,6 +731,7 @@ exports.div = div;
 exports.toNumber = toNumber;
 exports.eq = eq;
 exports.toString = toString;
+exports.getUsersTotalStakeValue = getUsersTotalStakeValue;
 exports.UserContainer = UserContainer;
 exports.UserTotalValue = UserTotalValue;
 exports.UserColumnContainer = UserColumnContainer;

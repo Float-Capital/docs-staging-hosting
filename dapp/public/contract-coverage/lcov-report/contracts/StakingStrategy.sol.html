@@ -1,0 +1,845 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for contracts/StakingStrategy.sol</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../index.html">all files</a> / <a href="index.html">contracts/</a> StakingStrategy.sol
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>0/56</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>0/12</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>0/9</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>0/55</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line low'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// SPDX-License-Identifier: BUSL-1.1
+&nbsp;
+pragma solidity 0.8.3;
+&nbsp;
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
+&nbsp;
+import "./interfaces/ILongShort.sol";
+import "./interfaces/ISyntheticToken.sol";
+import "./interfaces/IStaker.sol";
+import "./StrategyToken.sol";
+&nbsp;
+/** @title ILO Contract */
+contract StakingStrategy is Initializable, UUPSUpgradeable, AccessControlUpgradeable {
+  bytes32 public constant UPGRADER_ROLE = keccak256("UPGRADER_ROLE");
+&nbsp;
+  address public longShort;
+  address public staker;
+  StrategyToken public strategyToken;
+&nbsp;
+  /*╔═════════════════════════════╗
+    ║       CONTRACT SETUP        ║
+    ╚═════════════════════════════╝*/
+&nbsp;
+<span class="fstat-no" title="function not covered" >  function initialize(</span>
+    string calldata name,
+    string calldata symbol,
+    address _longShort,
+    address _staker
+  ) external initializer {
+<span class="cstat-no" title="statement not covered" >    __AccessControl_init()</span>;
+<span class="cstat-no" title="statement not covered" >    __UUPSUpgradeable_init()</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    longShort = _longShort</span>;
+<span class="cstat-no" title="statement not covered" >    strategyToken = new StrategyToken(name, symbol)</span>;
+<span class="cstat-no" title="statement not covered" >    staker = _staker</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    _setupRole(UPGRADER_ROLE, msg.sender)</span>;
+<span class="cstat-no" title="statement not covered" >    grantRole(DEFAULT_ADMIN_ROLE, msg.sender)</span>;
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  function _authorizeUpgrade(address newImplementation) internal override onlyRole(UPGRADER_ROLE) {}</span>
+&nbsp;
+  /*╔═════════════════════════════╗
+    ║           DEPOSIT           ║
+    ╚═════════════════════════════╝*/
+<span class="fstat-no" title="function not covered" >  function depositLongAndShortTokens(</span>
+    uint32 marketIndex,
+    uint256 amountToken,
+    bool isLong
+  ) public {
+<span class="cstat-no" title="statement not covered" >    ILongShort _longShort = ILongShort(longShort);</span>
+<span class="cstat-no" title="statement not covered" >    address longTokenAddress = _longShort.syntheticTokens(marketIndex, true);</span>
+<span class="cstat-no" title="statement not covered" >    address shortTokenAddress = _longShort.syntheticTokens(marketIndex, false);</span>
+&nbsp;
+    //TODO
+    //can maybe add this method to longShort contract?
+<span class="cstat-no" title="statement not covered" >    (uint256 longTokenPrice, uint256 shortTokenPrice) = _getLongAndShortTokenPrice(marketIndex);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    (uint256 longShortRatio, uint256 beforeBalanceOfContract) = _getContractStakedBalanceAndRatio(</span>
+      marketIndex,
+      longTokenAddress,
+      shortTokenAddress,
+      longTokenPrice,
+      shortTokenPrice
+    );
+<span class="cstat-no" title="statement not covered" >    (uint256 _amountStakedLong, uint256 _amountStakedShort) = _getTotalLongAndShortTokensStaked(</span>
+      marketIndex,
+      longTokenAddress,
+      shortTokenAddress
+    );
+<span class="cstat-no" title="statement not covered" >    uint256 amountOfTokensToMatchRatio;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    if (isLong) {</span>
+<span class="cstat-no" title="statement not covered" >      amountOfTokensToMatchRatio = amountToken / (longShortRatio)</span>;
+    } else {
+<span class="cstat-no" title="statement not covered" >      amountOfTokensToMatchRatio = amountToken * longShortRatio</span>;
+    }
+&nbsp;
+    //TODO
+    //two transfers - can optimise
+<span class="cstat-no" title="statement not covered" >    ISyntheticToken(_longShort.syntheticTokens(marketIndex, isLong)).transferFrom(</span>
+      msg.sender,
+      address(this),
+      amountToken
+    );
+<span class="cstat-no" title="statement not covered" >    ISyntheticToken(_longShort.syntheticTokens(marketIndex, !isLong)).transferFrom(</span>
+      msg.sender,
+      address(this),
+      amountOfTokensToMatchRatio
+    );
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    ISyntheticToken(_longShort.syntheticTokens(marketIndex, isLong)).stake(amountToken)</span>;
+<span class="cstat-no" title="statement not covered" >    ISyntheticToken(_longShort.syntheticTokens(marketIndex, !isLong)).stake(</span>
+      amountOfTokensToMatchRatio
+    );
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    (uint256 finalLongShortRatio, uint256 totalValueStaked) = _getContractStakedBalanceAndRatio(</span>
+      marketIndex,
+      longTokenAddress,
+      shortTokenAddress,
+      longTokenPrice,
+      shortTokenPrice
+    );
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    if (finalLongShortRatio != 1) {</span>
+<span class="cstat-no" title="statement not covered" >      _performShiftingStrategy(</span>
+        marketIndex,
+        totalValueStaked,
+        longTokenAddress,
+        shortTokenAddress,
+        longTokenPrice,
+        shortTokenPrice
+      );
+    }
+&nbsp;
+    //TODO can seperate this into it's own method?
+<span class="cstat-no" title="statement not covered" >    uint256 shares;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    if (strategyToken.totalSupply() == 0) {</span>
+<span class="cstat-no" title="statement not covered" >      shares = totalValueStaked</span>;
+    } else {
+      // Users deposited amount * cost per share
+      //cost per share =
+<span class="cstat-no" title="statement not covered" >      shares =</span>
+        (((totalValueStaked - beforeBalanceOfContract)) * beforeBalanceOfContract) /
+        strategyToken.totalSupply();
+    }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    strategyToken.mint(msg.sender, shares)</span>;
+  }
+&nbsp;
+  /*╔═════════════════════════════╗
+    ║       HELPER FUNCTIONS      ║
+    ╚═════════════════════════════╝*/
+&nbsp;
+  //Retrieves the number of long and short tokens staked by this contract
+<span class="fstat-no" title="function not covered" >  function _getTotalLongAndShortTokensStaked(</span>
+    uint32 marketIndex,
+    address longTokenAddress,
+    address shortTokenAddress
+  ) internal view returns (uint256, uint256) {
+<span class="cstat-no" title="statement not covered" >    IStaker _staker = IStaker(staker);</span>
+<span class="cstat-no" title="statement not covered" >    uint256 amountStakedLong = _staker.userAmountStaked(longTokenAddress, address(this));</span>
+<span class="cstat-no" title="statement not covered" >    uint256 amountStakedShort = _staker.userAmountStaked(shortTokenAddress, address(this));</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    return (amountStakedLong, amountStakedShort);</span>
+  }
+&nbsp;
+  //TODO calculate the shares for the user
+<span class="fstat-no" title="function not covered" >  function _calculateUserShares() internal returns (uint256) {</span>
+    // add the logic for share distribution here
+  }
+&nbsp;
+  //Gets the $ balance of the staked tokens
+<span class="fstat-no" title="function not covered" >  function _getContractStakedBalanceAndRatio(</span>
+    uint32 marketIndex,
+    address longTokenAddress,
+    address shortTokenAddress,
+    uint256 longTokenPrice,
+    uint256 shortTokenPrice
+  ) internal view returns (uint256, uint256) {
+<span class="cstat-no" title="statement not covered" >    uint256 marketUpdateIndex = ILongShort(longShort).marketUpdateIndex(marketIndex);</span>
+<span class="cstat-no" title="statement not covered" >    (uint256 _amountStakedLong, uint256 _amountStakedShort) = _getTotalLongAndShortTokensStaked(</span>
+      marketIndex,
+      longTokenAddress,
+      shortTokenAddress
+    );
+<span class="cstat-no" title="statement not covered" >    uint256 longSideValue = (_amountStakedLong * longTokenPrice) / 1e18;</span>
+<span class="cstat-no" title="statement not covered" >    uint256 shortSideValue = (_amountStakedShort * shortTokenPrice) / 1e18;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    uint256 longShortRatio = longSideValue / shortSideValue;</span>
+<span class="cstat-no" title="statement not covered" >    uint256 contractBalance = (longSideValue + shortSideValue);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    return (longShortRatio, contractBalance);</span>
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  function _getLongAndShortTokenPrice(uint32 marketIndex)</span>
+    internal
+    view
+    returns (uint256 longTokenPrice, uint256 shortTokenPrice)
+  {
+<span class="cstat-no" title="statement not covered" >    uint256 marketUpdateIndex = ILongShort(longShort).marketUpdateIndex(marketIndex);</span>
+<span class="cstat-no" title="statement not covered" >    uint256 longTokenPrice = ILongShort(longShort).syntheticToken_priceSnapshot(</span>
+      marketIndex,
+      true,
+      marketUpdateIndex
+    );
+<span class="cstat-no" title="statement not covered" >    uint256 shortTokenPrice = ILongShort(longShort).syntheticToken_priceSnapshot(</span>
+      marketIndex,
+      false,
+      marketUpdateIndex
+    );
+  }
+&nbsp;
+  /*╔═════════════════════════════╗
+    ║           STRATEGY          ║
+    ╚═════════════════════════════╝*/
+&nbsp;
+  //Perform the shifting strategy of this contract to ensure 50/50 balance of long short token values
+<span class="fstat-no" title="function not covered" >  function _performShiftingStrategy(</span>
+    uint32 marketIndex,
+    uint256 totalValueStaked,
+    address longTokenAddress,
+    address shortTokenAddress,
+    uint256 longTokenPrice,
+    uint256 shortTokenPrice
+  ) internal {
+<span class="cstat-no" title="statement not covered" >    (uint256 _amountStakedLong, uint256 _amountStakedShort) = _getTotalLongAndShortTokensStaked(</span>
+      marketIndex,
+      longTokenAddress,
+      shortTokenAddress
+    );
+&nbsp;
+    //50 - 50 split, can aim to make this resuable
+<span class="cstat-no" title="statement not covered" >    uint256 desiredAmountOfLongTokens = ((totalValueStaked / 2) * 1e18) / longTokenPrice;</span>
+<span class="cstat-no" title="statement not covered" >    uint256 desiredAmountOfShortTokens = ((totalValueStaked / 2) * 1e18) / shortTokenPrice;</span>
+&nbsp;
+    //check that no shifting occurs if the distribution of long and short tokens are already correct
+<span class="cstat-no" title="statement not covered" >    if (_amountStakedLong &gt; desiredAmountOfLongTokens) {</span>
+      //Shift to short side
+<span class="cstat-no" title="statement not covered" >      IStaker(staker).shiftTokens(_amountStakedLong - desiredAmountOfLongTokens, marketIndex, true)</span>;
+    } else <span class="cstat-no" title="statement not covered" >if (_amountStakedShort &gt; desiredAmountOfShortTokens) {</span>
+      //shift to long side
+<span class="cstat-no" title="statement not covered" >      IStaker(staker).shiftTokens(</span>
+        _amountStakedShort - desiredAmountOfShortTokens,
+        marketIndex,
+        false
+      );
+    }
+  }
+&nbsp;
+  /// @notice Shifts tokens to either the long or the short position for the market to maintain 50/50 split in $ value
+  /// @param marketIndex An uint32 which uniquely identifies a market.
+<span class="fstat-no" title="function not covered" >  function performShiftingStrategy(uint32 marketIndex) external {</span>
+<span class="cstat-no" title="statement not covered" >    address longTokenAddress = ILongShort(longShort).syntheticTokens(marketIndex, true);</span>
+<span class="cstat-no" title="statement not covered" >    address shortTokenAddress = ILongShort(longShort).syntheticTokens(marketIndex, false);</span>
+<span class="cstat-no" title="statement not covered" >    (uint256 longTokenPrice, uint256 shortTokenPrice) = _getLongAndShortTokenPrice(marketIndex);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    (uint256 longShortRatio, uint256 totalValueStaked) = _getContractStakedBalanceAndRatio(</span>
+      marketIndex,
+      longTokenAddress,
+      shortTokenAddress,
+      longTokenPrice,
+      shortTokenPrice
+    );
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    if (longShortRatio != 1) {</span>
+<span class="cstat-no" title="statement not covered" >      _performShiftingStrategy(</span>
+        marketIndex,
+        totalValueStaked,
+        longTokenAddress,
+        shortTokenAddress,
+        longTokenPrice,
+        shortTokenPrice
+      );
+    }
+  }
+}
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Thu Sep 16 2021 09:25:05 GMT+0200 (South Africa Standard Time)
+</div>
+</div>
+<script src="../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../sorter.js"></script>
+</body>
+</html>
