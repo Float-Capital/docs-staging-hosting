@@ -17,7 +17,9 @@ let make = (~marketName, ~isLong, ~rewards, ~stakeYield, ~akey) =>
       <div className="flex-1 my-2 text-sm flex flex-col items-center">
         <div>
           <div>
-            <span className="text-xxs font-bold mr-2"> {`${Config.floatTokenName} rewards:`->React.string} </span>
+            <span className="text-xxs font-bold mr-2">
+              {`${Config.floatTokenName} rewards:`->React.string}
+            </span>
             {mapVal(rewards)->React.string}
           </div>
           <div className="mt-2">

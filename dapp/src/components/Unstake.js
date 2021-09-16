@@ -601,7 +601,9 @@ function Unstake$ConnectedStakeForm(Props) {
           return Curry._2(contractExecutionHandler, (function (param) {
                         return Contracts.Staker.make(Config.staker, param);
                       }), (function (param) {
-                        return param.withdraw(arg, arg$1, amount);
+                        return function (param$1) {
+                          return param.withdraw(arg, arg$1, amount, param$1);
+                        };
                       }));
         }));
   var toastDispatch = React.useContext(ToastProvider.DispatchToastContext.context);

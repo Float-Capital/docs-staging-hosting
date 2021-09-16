@@ -545,13 +545,23 @@ function RedeemForm$ConnectedRedeemForm(Props) {
         amount: ""
       }, (function (param, _form) {
           var amount = param.amount;
+          var tmp;
+          if (isActuallyLong) {
+            tmp = (function (param) {
+                return function (param$1) {
+                  return param.redeemLongNextPrice(marketIndex, amount, param$1);
+                };
+              });
+          } else {
+            tmp = (function (param) {
+                return function (param$1) {
+                  return param.redeemShortNextPrice(marketIndex, amount, param$1);
+                };
+              });
+          }
           return Curry._2(contractExecutionHandler, (function (param) {
                         return Contracts.LongShort.make(Config.longShort, param);
-                      }), isActuallyLong ? (function (param) {
-                          return param.redeemLongNextPrice(marketIndex, amount);
-                        }) : (function (param) {
-                          return param.redeemShortNextPrice(marketIndex, amount);
-                        }));
+                      }), tmp);
         }));
   var toastDispatch = React.useContext(ToastProvider.DispatchToastContext.context);
   var resetFormButton = function (param) {

@@ -25,13 +25,12 @@ let make = (~totalFloatMinted) =>
       //     <span className="text-md" />
       //   </li>
     </ul>
-    {Config.isPolygon ? 
-    <a href="https://docs.float.capital/docs/alpha">
-      <p className="text-center text-xxs text-gray mx-8">
-        {`The alphaFloat token is the temporary non-transferable Float token for the alpha release. You can read more on the alpha release `->React.string}
-        <span className="underline"> {"here."->React.string} </span>
-      </p>
-    </a>
-    : React.null
-    }
+    {Config.isPolygon
+      ? <a href="https://docs.float.capital/docs/alpha">
+          <p className="text-center text-xxs text-gray mx-8">
+            {`The alphaFloat token is the temporary non-transferable Float token for the alpha release. You can read more on the alpha release `->React.string}
+            <span className="underline"> {"here."->React.string} </span>
+          </p>
+        </a>
+      : React.null}
   </div>

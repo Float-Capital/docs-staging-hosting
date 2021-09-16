@@ -141,7 +141,9 @@ function PendingBar$PendingBarWrapper(Props) {
     };
     var arg = [marketIndex];
     return Curry._2(contractExecutionHandler, longShortContract, (function (param) {
-                  return param.updateSystemStateMulti(arg);
+                  return function (param$1) {
+                    return param.updateSystemStateMulti(arg, param$1);
+                  };
                 }));
   };
   var match$1 = React.useState(function () {

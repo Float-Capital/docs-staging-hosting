@@ -567,15 +567,15 @@ module UserFloatCard = {
             className=`w-11/12 px-2 mx-auto mb-2 border-2 border-light-purple rounded-lg z-10 shadow`>
             <UserColumnTextList>
               <div className="flex">
-                <UserColumnText head=`${Config.floatTokenName} accruing` body={floatAccrued} />
+                <UserColumnText head={`${Config.floatTokenName} accruing`} body={floatAccrued} />
                 <span className="ml-1">
                   <Tooltip
                     tip="This is an estimate at the current time, the amount issued may differ due to changes in market liquidity and asset prices."
                   />
                 </span>
               </div>
-              <UserColumnText head=`${Config.floatTokenName} balance` body={floatBalance} />
-              <UserColumnText head=`${Config.floatTokenName} minted` body={floatMinted} />
+              <UserColumnText head={`${Config.floatTokenName} balance`} body={floatBalance} />
+              <UserColumnText head={`${Config.floatTokenName} minted`} body={floatMinted} />
             </UserColumnTextList>
             {isCurrentUser
               ? <div className=`flex justify-around flex-row my-1`>

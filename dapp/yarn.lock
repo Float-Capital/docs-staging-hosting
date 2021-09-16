@@ -2558,6 +2558,11 @@ bs-css@14.0.1:
   resolved "https://registry.yarnpkg.com/bs-css/-/bs-css-14.0.1.tgz#983394472d825c590a8f91230bfcb082e9474670"
   integrity sha512-gNaKpU7sQKjyVCTgNa+ReHt0yAx19HcOYbGU4Sg7Jlv04NXK3FCvqffF60xb+x+jMMquOTLIj4VyQPiPSZ82Nw==
 
+bs-fetch@^0.6.2:
+  version "0.6.2"
+  resolved "https://registry.yarnpkg.com/bs-fetch/-/bs-fetch-0.6.2.tgz#37d982e9f79b9bc44c23e87ae78ccbee1f869adf"
+  integrity sha512-VXEjp8kY3vHPckaoy3d96Bx0KYjJAPLNISBwfpwMN26K6DtuZYwI2HKhx7zeHBajz1bRArfx7O8OOLcdtujMvg==
+
 bs-mocha@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/bs-mocha/-/bs-mocha-1.0.0.tgz#10d94294018c3e4bc98e6ca2589ce00e33fa9b9c"

@@ -3,8 +3,12 @@
 
 var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
+var Ethers = require("ethers");
 var Globals = require("../../libraries/Globals.js");
 var Queries = require("../../data/Queries.js");
+var JsPromise = require("../../libraries/Js.Promise/JsPromise.js");
+var Belt_Option = require("rescript/lib/js/belt_Option.js");
+var Caml_option = require("rescript/lib/js/caml_option.js");
 var StateChangeMonitor = require("../../libraries/StateChangeMonitor.js");
 
 function useUsersStakes(address) {
@@ -50,5 +54,55 @@ function useUsersStakes(address) {
             ]);
 }
 
+var oneGweiInWei = Ethers.BigNumber.from(1000000000);
+
+var defaultGasPriceInGwei = oneGweiInWei.mul(Ethers.BigNumber.from(95));
+
+function getGasPrice(param) {
+  return JsPromise.$$catch(fetch("https://gasstation-mainnet.matic.network").then(function (prim) {
+                    return prim.json();
+                  }).then(function (response) {
+                  return Belt_Option.map(response.fast, (function (param) {
+                                return oneGweiInWei.mul(param);
+                              }));
+                }), (function (err) {
+                console.log("Error fetching gas price:", err);
+                return Promise.resolve(Caml_option.some(defaultGasPriceInGwei));
+              }));
+}
+
+function useRecommendedGasPrice(param) {
+  var match = React.useState(function () {
+        return defaultGasPriceInGwei;
+      });
+  var setGasPrice = match[1];
+  var getAndSetGasPrice = function (param) {
+    getGasPrice(undefined).then(function (optGasPrice) {
+          if (optGasPrice === undefined) {
+            return ;
+          }
+          var gasPrice = Caml_option.valFromOption(optGasPrice);
+          Curry._1(setGasPrice, (function (param) {
+                  return gasPrice;
+                }));
+          
+        });
+    
+  };
+  React.useEffect((function () {
+          getAndSetGasPrice(undefined);
+          var interval = setInterval(getAndSetGasPrice, 3000);
+          return (function (param) {
+                    clearInterval(interval);
+                    
+                  });
+        }), []);
+  return match[0];
+}
+
 exports.useUsersStakes = useUsersStakes;
-/* react Not a pure module */
+exports.oneGweiInWei = oneGweiInWei;
+exports.defaultGasPriceInGwei = defaultGasPriceInGwei;
+exports.getGasPrice = getGasPrice;
+exports.useRecommendedGasPrice = useRecommendedGasPrice;
+/* oneGweiInWei Not a pure module */

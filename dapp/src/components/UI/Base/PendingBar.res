@@ -12,7 +12,7 @@ module SystemUpdateTxState = {
       | Failed(_) =>
         <p className="text-xxxxs text-right text-red-500 "> {`Update tx failed`->React.string} </p>
       | _ =>
-        <div>          
+        <div>
           <Button.Tiny onClick={_ => updateSystemStateCall()}> {"Update Price"} </Button.Tiny>
         </div>
       }}
@@ -114,16 +114,15 @@ module PendingBarWrapper = {
     let _ = Misc.Time.useInterval(_ => setNow(_ => Js.Date.now() /. 1000.), ~delay=1000)
 
     {
-      <div className="relative pt-1">{
-showBlurb ?
-        <div className="text-xxs text-center mx-4 text-gray-600">
-          {`Your transaction will be processed with the next price update `->React.string}
-          <Tooltip
-            tip="To ensure fairness and security your position will be opened on the next oracle price update"
-          />
-        </div>
-        : React.null
-      }
+      <div className="relative pt-1">
+        {showBlurb
+          ? <div className="text-xxs text-center mx-4 text-gray-600">
+              {`Your transaction will be processed with the next price update `->React.string}
+              <Tooltip
+                tip="To ensure fairness and security your position will be opened on the next oracle price update"
+              />
+            </div>
+          : React.null}
         {switch lastOracleTimestamp {
         | Response(lastOracleUpdateTimestamp) =>
           <PendingBarInner
