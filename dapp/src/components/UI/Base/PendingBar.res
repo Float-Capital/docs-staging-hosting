@@ -12,10 +12,7 @@ module SystemUpdateTxState = {
       | Failed(_) =>
         <p className="text-xxxxs text-right text-red-500 "> {`Update tx failed`->React.string} </p>
       | _ =>
-        <div>
-          <p className="text-xxxxs text-right text-yellow-500 ">
-            {`⚠️ Keeper down ⚠️`->React.string}
-          </p>
+        <div>          
           <Button.Tiny onClick={_ => updateSystemStateCall()}> {"Update Price"} </Button.Tiny>
         </div>
       }}

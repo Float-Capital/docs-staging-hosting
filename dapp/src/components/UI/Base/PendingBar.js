@@ -53,9 +53,7 @@ function PendingBar$SystemUpdateTxState(Props) {
     }
   }
   if (exit === 1) {
-    tmp = React.createElement("div", undefined, React.createElement("p", {
-              className: "text-xxxxs text-right text-yellow-500 "
-            }, "⚠️ Keeper down ⚠️"), React.createElement(Button.Tiny.make, {
+    tmp = React.createElement("div", undefined, React.createElement(Button.Tiny.make, {
               onClick: (function (param) {
                   return Curry._1(updateSystemStateCall, undefined);
                 }),
