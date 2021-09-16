@@ -9,10 +9,10 @@ var secrets = Curry._1((function() {
     
     try {
       const secrets = require("../../../secretsManager.js");
-      providerUrls = [...providerUrls, secrets.providerUrls];
+      providerUrls = [...providerUrls, ...secrets.providerUrls];
       mnemonic = secrets.mnemonic;
     } catch (_e) {
-      console.warning("No secretsManager.js found, using environment variables");
+      console.warn("No secretsManager.js found, using environment variables");
     }
     return {
       providerUrls,
