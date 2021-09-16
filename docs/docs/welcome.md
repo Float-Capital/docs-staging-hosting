@@ -11,7 +11,7 @@ slug: /
 
 Welcome to Float Capital! 👋
 
-This is the official documentation for Float Capital, a novel protocol allowing users to easily and safely gain exposure to [synthetic assets](/docs/faqs#what-is-a-synthetic-asset) without [over-collateralization](https://www.investopedia.com/terms/o/overcollateralization.asp). 💡
+This is the official documentation for Float Capital, a novel protocol allowing users to easily and safely gain exposure to [synthetic assets](/docs/faqs#what-is-a-synthetic-asset) without [over-collateralization](/docs/terminology#over-collateralization). 💡
 
 Check out our [alpha launch](/docs/alpha) for info on our early release!
 
@@ -35,7 +35,7 @@ The vision of Float is to provide decentralize and trustless exposure to various
 
 Smart contracts allow for trustworthy and efficient coordination of a financial system where the user’s exposure to various assets can be built in a peer-to-peer marketplace.
 
-**Float is a financial paradigm where code is law.**
+**Float is a financial paradigm where code is law.**📖
 
 Float allows our global investor base to easily gain synthetic asset exposure, **without over-collateralization, leverage**, or any other financial mechanism designed to make you fail. Instead, Float uses a novel protocol (yes, it's not simply a fork of some existing protocol), allowing users to gain floating exposure to a synthetic asset, where economic mechanisms exist, incentivising exposure to the synthetic asset to remain within a certain band.
 
@@ -48,6 +48,7 @@ Float allows our global investor base to easily gain synthetic asset exposure, *
 - [How to mint a synthetic asset position?](/docs/mint)
 - [What is the Float token?](/docs/float-token)
 - [How to stake and earn Float?](/docs/stake)
+- [Smart Contract walkthroughs on Youtube](https://www.youtube.com/watch?v=Hm4rZfB8Chk&list=PL7RT-0ybd7joiqKeGklvFxcc8dNWpPBCk)
 
 ---
 

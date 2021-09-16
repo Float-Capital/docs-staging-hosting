@@ -17,16 +17,14 @@ Although the code has been audited, usage of the alpha protocol is recommended f
 
 More on the security steps taken to ensure user safety on the Float protocol can be read [here](/docs/security).
 
-<!-- Thoughts: Redeemable / Convertable -->
-
 ## alphaFloat token :chart:
 
-The alpha release will be launched with the alphaFloat token. The Float Governance token (FLT) will be launched during the main release of the Float Capital protocol.
-For the alpha launch, the alphaFloat token will be used, and will be convertible for value accrued to the system.
+The alpha release will be launched with the alphaFloat(alphaFLT) token. The Float Governance token (FLT) will be launched during the main release of the Float Capital protocol.
+For the alpha launch, the alphaFloat token will be used and will be non-transferable, however, it will be convertible for value accrued to the system.
 
 ## Minting a position on the Polygon network :heavy_dollar_sign:
 
-DAI is the stable coin required to mint a position. Polygon has provided a free [faucet](https://matic.supply/) to receive a small amount of Matic token required for making transactions on the Polygon network.
+DAI is the stable coin required to [mint](/docs/mint) a position. Polygon has provided a free [faucet](https://matic.supply/) to receive a small amount of Matic token required for making transactions on the Polygon network.
 
 ### Polygon Bridge :bridge_at_night:
 
@@ -55,6 +53,12 @@ The alpha Float protocol will go live with 0% fees for holders of Rumble Kongs N
 The alpha protocol only charges a fee for unstaking positions within the dApp, but for users with Rumble Kongs held in the wallet linked to the protocol, this fee will be waived.
 
 This discount for Kong holders is part of a longer partnership, bridging the gap between synthetic assets and NFT communities.
+
+## Did somebody say Gems? 💠
+
+Users of the alpha Float protocol can collect Gems when interacting with the protocol. Read more on Gems [here](/docs/gems).
+
+Keep your daily streak going and see how many gems you can collect!
 
 ## More than an alpha :fast_forward:
 

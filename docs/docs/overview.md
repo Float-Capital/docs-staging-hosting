@@ -17,11 +17,11 @@ For example, Imagine Alice has $100 000 of short exposure to a synth, while Bob 
 
 Given the value of long and short sides are no longer equal, there will be floating exposure. In this case, the short side will only have 99 000 / 101 000 = 98% exposure. Strong incentives exist to always keep exposure close to 100% for both sides.
 
-## Incentives
+## Incentives 💰
 
 In order to incentivize users to gain exposure to both sides, the long and the short, of the market the float protocol uses two mechanisms; yield enhancement and float token supply rate.
 
-### Yield enhancement
+### Yield enhancement 📈
 
 The primary mechanism to incentivize a balancing in the market is through splitting the yield from the underlying collateral to the under-balanced side of the market.
 

@@ -23,9 +23,13 @@ As an example, normally to get exposure to an asset, say Gold, you would need to
 
 ### What synthetic assets does Float Capital currently support?
 
-Our testnet deployment currently supports 3 synthetic assets. This may change for Polygon launch.
+Checkout our [alpha launch markets](/docs/alpha#alpha-float-markets) for details on supported synthetic assets in our early release. The alpha Float protocol will launch with an initial synthetic asset tracking the Flipp3ning, a 3x leveraged version of the Flippening, which is based on the market cap of Ethereum vs. the market cap of Bitcoin.
 
-One of our synthetic asset is an 'index' known as the ethereum killers (ETHKillers). This Market is an average of the prices of the tokens of the three protocols seen as alternatives to ethereum, namely TRON, XRP and EOS. The EthKillers market allows users to gain long or short exposure to an equally weighted basket containing TRON, XRP and EOS.
+### Testnet synthetic assets
+
+Our testnet deployment currently supports 3 synthetic assets.
+
+One of our test synthetic asset is an 'index' known as the ethereum killers (ETHKillers). This Market is an average of the prices of the tokens of the three protocols seen as alternatives to ethereum, namely TRON, XRP and EOS. The EthKillers market allows users to gain long or short exposure to an equally weighted basket containing TRON, XRP and EOS.
 
 Another synthetic market we have on the testnet is an asset tracking bitcoin vs ethereum dominance.
 
@@ -35,7 +39,7 @@ Join our [Discord](https://discord.gg/qesr2KZAhn) and give us your suggestions o
 
 ### What are 'long' and 'short' tokens?
 
-For every synthetic market we offer (eg. ETHKillers), users can create long or short tokens for this market.
+For every synthetic market we offer (eg. The Flipp3ning), users can create long or short tokens for this market.
 
 Holding long tokens allows you to benefit from the price appreciation 📈 of the underlying market. Holding short tokens allows you to benefit from the price depreciation 📉 of the underlying market.
 
@@ -65,7 +69,7 @@ The basis of Float Capital is creating a 'peer-to-peer' exposure market where lo
 
 ### Are there any trading fees?
 
-Float Capital currently doesn't take any trading fees from traders. All fees levied are accrued either to Float token holders or to users already providing liquidity in that synthetic market. Fees are generally only levied when _bad liquidity_ is entering the protocol or _good liquidity_ is leaving the protocol.
+Float Capital currently doesn't take any trading fees from traders. All fees levied are accrued either to Float token holders or to users already providing liquidity in that synthetic market. Fees are generally only levied when users [unstake](/docs/stake) their position.
 
 ### What are the benefits of adding good liquidity?
 
@@ -94,7 +98,7 @@ A synthetic asset simulates the performance of an underlying asset but with some
 
 ---
 
-## Terminology
+## Terminology 📗
 
 ### What is an oracle?
 
@@ -106,7 +110,7 @@ A governance token can be thought of a bit like equity in a company. Governance 
 
 ---
 
-## Other things you may want to know
+## Other things you may want to know 🤔
 
 ### What Blockchain are you on?
 
