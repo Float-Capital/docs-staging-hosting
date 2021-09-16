@@ -288,6 +288,7 @@ module MintFormInput = {
     ~submitButton=<Button> "Login & Mint" </Button>,
   ) => {
     let router = Next.Router.useRouter()
+    let onramp: Ramp.rampInstantSDK = Ramp.useRamp()
 
     let formInput =
       <>
@@ -311,7 +312,7 @@ module MintFormInput = {
       <Form className="h-full" onSubmit>
         <div className="relative"> {formInput} </div> {submitButton}
       </Form>
-      {if Config.networkId == 80001 && router.pathname != "/" {
+      {if Config.networkId == CONSTANTS.mumbai.chainId && router.pathname != "/" {
         <p
           onClick={_ => {
             router->Next.Router.push(`/app/faucet`)
@@ -321,6 +322,16 @@ module MintFormInput = {
           <a className="hover:bg-white underline"> {"faucet"->React.string} </a>
           {" if you need more aave test DAI."->React.string}
         </p>
+      } else if Config.networkId == CONSTANTS.polygon.chainId && router.pathname != "/" {
+        <div className="inline-block px-2">
+          <div
+            className="flex flex-row justify-start items-center py-2 custom-cursor hover:bg-white"
+            onClick={_ => onramp.show()}>
+            <p className="  text-xxs mr-1"> {`Buy `->React.string} </p>
+            <p className=" text-xxs  underline "> {"DAI"->React.string} </p>
+            <img src=CONSTANTS.daiDisplayToken.iconUrl className="ml-1 h-3" />
+          </div>
+        </div>
       } else {
         React.null
       }}

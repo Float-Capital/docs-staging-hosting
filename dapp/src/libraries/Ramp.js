@@ -20,19 +20,19 @@ function useRamp(param) {
       });
   var setOnramp = match[1];
   var userAddress = RootProvider.useCurrentUser(undefined);
-  React.useEffect(function () {
-        Misc.onlyExecuteClientSide(function (param) {
-              return Curry._1(setOnramp, (function (param) {
-                            return new RampInstantSdk.RampInstantSDK({
-                                        hostAppName: "Float Capital",
-                                        hostLogoUrl: "https://float.capital/img/float-capital-logo-sq.svg",
-                                        swapAsset: "MATIC_DAI",
-                                        userAddress: userAddress !== undefined ? Ethers.Utils.ethAdrToStr(Caml_option.valFromOption(userAddress)) : ""
-                                      });
-                          }));
-            });
-        
-      });
+  React.useEffect((function () {
+          Misc.onlyExecuteClientSide(function (param) {
+                return Curry._1(setOnramp, (function (param) {
+                              return new RampInstantSdk.RampInstantSDK({
+                                          hostAppName: "Float Capital",
+                                          hostLogoUrl: "https://float.capital/img/float-capital-logo-sq.svg",
+                                          swapAsset: "MATIC_DAI",
+                                          userAddress: userAddress !== undefined ? Ethers.Utils.ethAdrToStr(Caml_option.valFromOption(userAddress)) : ""
+                                        });
+                            }));
+              });
+          
+        }), []);
   return match[0];
 }
 
