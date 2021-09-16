@@ -476,7 +476,7 @@ function UserUI$UserPendingBox(Props) {
                     }, React.createElement("img", {
                           className: "h-5 pr-1",
                           src: CONSTANTS.daiDisplayToken.iconUrl
-                        }), Ethers.Utils.formatEther(daiSpend))), React.createElement(PendingBar.make, {
+                        }), Ethers.Utils.formatEtherToPrecision(daiSpend, 2))), React.createElement(PendingBar.make, {
                   marketIndex: marketIndex,
                   refetchCallback: refetchCallback
                 }));

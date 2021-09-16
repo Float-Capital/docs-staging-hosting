@@ -53,9 +53,7 @@ function PendingBar$SystemUpdateTxState(Props) {
     }
   }
   if (exit === 1) {
-    tmp = React.createElement("div", undefined, React.createElement("p", {
-              className: "text-xxxxs text-right text-yellow-500 "
-            }, "⚠️ Keeper down ⚠️"), React.createElement(Button.Tiny.make, {
+    tmp = React.createElement("div", undefined, React.createElement(Button.Tiny.make, {
               onClick: (function (param) {
                   return Curry._1(updateSystemStateCall, undefined);
                 }),
@@ -79,7 +77,7 @@ function PendingBar$PendingBarInner(Props) {
   var updateSystemStateCall = Props.updateSystemStateCall;
   var refetchCallback = Props.refetchCallback;
   React.useEffect((function () {
-          if (((lastOracleUpdateTimestamp.toNumber() + oracleHeartbeat | 0) - 20 | 0) > (now | 0)) {
+          if (((lastOracleUpdateTimestamp.toNumber() + oracleHeartbeat | 0) - 30 | 0) > (now | 0)) {
             Curry._1(refetchCallback, (function (param) {
                     return now;
                   }));
@@ -132,6 +130,7 @@ function PendingBar$PendingBarWrapper(Props) {
   var marketIndex = Props.marketIndex;
   var signer = Props.signer;
   var refetchCallback = Props.refetchCallback;
+  var showBlurb = Props.showBlurb;
   var lastOracleTimestamp = DataHooks.useOracleLastUpdate(marketIndex.toString());
   var oracleHeartbeat = Backend.getMarketInfoUnsafe(marketIndex.toNumber()).oracleHeartbeat;
   var match = ContractActions.useContractFunction(signer);
@@ -171,11 +170,11 @@ function PendingBar$PendingBarWrapper(Props) {
     );
   return React.createElement("div", {
               className: "relative pt-1"
-            }, React.createElement("div", {
-                  className: "text-xxs text-center mx-4 text-gray-600"
-                }, "Your transaction will be processed with the next price update ", React.createElement(Tooltip.make, {
-                      tip: "To ensure fairness and security your position will be opened on the next oracle price update"
-                    })), tmp, React.createElement("div", {
+            }, showBlurb ? React.createElement("div", {
+                    className: "text-xxs text-center mx-4 text-gray-600"
+                  }, "Your transaction will be processed with the next price update ", React.createElement(Tooltip.make, {
+                        tip: "To ensure fairness and security your position will be opened on the next oracle price update"
+                      })) : null, tmp, React.createElement("div", {
                   className: "w-full mx-auto my-1"
                 }, React.createElement("div", {
                       className: "pending-bar-container"
@@ -191,11 +190,14 @@ var PendingBarWrapper = {
 function PendingBar(Props) {
   var marketIndex = Props.marketIndex;
   var refetchCallback = Props.refetchCallback;
+  var showBlurbOpt = Props.showBlurb;
+  var showBlurb = showBlurbOpt !== undefined ? showBlurbOpt : true;
   var signer = ContractActions.useSignerExn(undefined);
   return React.createElement(PendingBar$PendingBarWrapper, {
               marketIndex: marketIndex,
               signer: signer,
-              refetchCallback: refetchCallback
+              refetchCallback: refetchCallback,
+              showBlurb: showBlurb
             });
 }
 
