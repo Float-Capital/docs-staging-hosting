@@ -1,7 +1,9 @@
-name: Deploy UI
+name: Push Contracts
 
 on:
   push:
+    branches:
+      - master
 
 jobs:
   push-ui-for-vercel:
