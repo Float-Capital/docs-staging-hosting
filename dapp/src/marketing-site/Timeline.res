@@ -68,8 +68,8 @@ let make = () => {
       <h3 className="font-semibold text-lg mb-1"> {timeLineContent.title->React.string} </h3>
       <ul className="text-sm">
         {timeLineContent.milestones
-        ->Array.map(milestone =>
-          <li>
+        ->Array.mapWithIndex((index, milestone) =>
+          <li key={index->Int.toString}>
             <span className="font-vt323 font-bold mr-2">
               {(milestone.isBeginning ? ">" : `\xa0`)->React.string}
             </span>
