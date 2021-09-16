@@ -16,7 +16,9 @@ let make = (~marketData: Queries.SyntheticMarketInfo.t) => {
             timestampCreated={marketData.timestampCreated}
             marketName={marketData.name}
             oracleAddress={marketData.oracleAddress}
-            oracleDecimals={((marketData.marketIndex->Ethers.BigNumber.toNumber - 1)->Backend.getMarketInfoUnsafe).oracleDecimals}
+            oracleDecimals={(
+              marketData.marketIndex->Ethers.BigNumber.toNumber->Backend.getMarketInfoUnsafe
+            ).oracleDecimals}
           />
         </div>
       </div>
