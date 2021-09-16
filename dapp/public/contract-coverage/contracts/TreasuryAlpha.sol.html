@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for contracts/TreasuryAlpha.sol</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../index.html">all files</a> / <a href="index.html">contracts/</a> TreasuryAlpha.sol
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>0/20</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>0/4</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>0/11</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>0/22</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line low'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// SPDX-License-Identifier: BUSL-1.1
+&nbsp;
+pragma solidity 0.8.3;
+&nbsp;
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+&nbsp;
+import "./abstract/AccessControlledAndUpgradeable.sol";
+import "./interfaces/IFloatToken.sol";
+import "./interfaces/ILongShort.sol";
+&nbsp;
+import "@openzeppelin/contracts/utils/math/Math.sol";
+&nbsp;
+/** This contract implementation is purely for the alpha, allowing the burning of FLT tokens
+  for a proportional share of the value held in the treasury. In contrast, the beta launch will be
+  rely on a more robust governance mechanism to vote on the buying and buring of FLT tokens using
+  treasury funds.*/
+&nbsp;
+/** @title Treasury Contract */
+contract TreasuryAlpha is AccessControlledAndUpgradeable {
+  //Using Open Zeppelin safe transfer library for token transfers
+  using SafeERC20 for IERC20;
+&nbsp;
+  address public paymentToken;
+  address public floatToken;
+  address public longShort;
+  // An aproximation of what the FLT price should be according to the yield at the time.
+  uint256 public basePrice;
+  bool public redemptionsActivated;
+&nbsp;
+  event BasePriceUpdated(uint256 newBasePrice);
+&nbsp;
+<span class="fstat-no" title="function not covered" >  function initialize(</span>
+    address _admin,
+    address _paymentToken,
+    address _floatToken,
+    address _longShort
+  ) external initializer {
+<span class="cstat-no" title="statement not covered" >    _AccessControlledAndUpgradeable_init(_admin)</span>;
+<span class="cstat-no" title="statement not covered" >    paymentToken = _paymentToken</span>;
+<span class="cstat-no" title="statement not covered" >    floatToken = _floatToken</span>;
+<span class="cstat-no" title="statement not covered" >    longShort = _longShort</span>;
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  function onlyAdminModifierLogic() internal virtual {</span>
+<span class="cstat-no" title="statement not covered" >    _checkRole(ADMIN_ROLE, msg.sender)</span>;
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  modifier onlyAdmin() {</span>
+<span class="cstat-no" title="statement not covered" >    onlyAdminModifierLogic()</span>;
+    _;
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  modifier redemptionsActive() {</span>
+<span class="cstat-no" title="statement not covered" >    require(redemptionsActivated, "redemptions haven't been activated")</span>;
+    _;
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  function _getValueLockedInTreasury() internal view returns (uint256) {</span>
+<span class="cstat-no" title="statement not covered" >    return IERC20(paymentToken).balanceOf(address(this));</span>
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  function _getFloatTokenSupply() internal view returns (uint256) {</span>
+<span class="cstat-no" title="statement not covered" >    return IFloatToken(floatToken).totalSupply();</span>
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  function updateBasePrice(uint256 newBasePrice) public onlyAdmin {</span>
+    // What should the minimum for this value be? 0.2 DAI per token seems reasonable if we are targetting 0.5 DAI as the normal price (and say Aave yield is poor or similar)
+<span class="cstat-no" title="statement not covered" >    require(newBasePrice &gt; 2e17, "base price too low")</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    basePrice = newBasePrice</span>;
+<span class="cstat-no" title="statement not covered" >    emit BasePriceUpdated(newBasePrice);</span>
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  function activateRedemptions() public onlyAdmin {</span>
+<span class="cstat-no" title="statement not covered" >    redemptionsActivated = true</span>;
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  function burnFloatForShareOfTreasury(uint256 amountOfFloatToBurn) external redemptionsActive {</span>
+<span class="cstat-no" title="statement not covered" >    uint256 priceAccordingToTreasuryAndSupply = (_getValueLockedInTreasury() * 1e18) /</span>
+      _getFloatTokenSupply();
+    // In normal operation the `priceAccordingToTreasuryAndSupply` value will be an over-estimation favouring people who withdraw early. Thus typically the 'basePrice' will be a bit lower to prevent this in typical cases.
+    // We take the min of these two values so it is impossible for us to run with the money.
+<span class="cstat-no" title="statement not covered" >    uint256 priceToUse = Math.min(priceAccordingToTreasuryAndSupply, basePrice);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    uint256 amountToRecieve = (priceToUse * amountOfFloatToBurn) / 1e18;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    IFloatToken(floatToken).burnFrom(msg.sender, amountOfFloatToBurn)</span>; // Can modify the core FLT token if wanted to remove the need for this step. // Currently requires user to approve treasury contract.
+<span class="cstat-no" title="statement not covered" >    IERC20(paymentToken).safeTransfer(msg.sender, amountToRecieve)</span>;
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  function convertSynthsToPaymentTokenNextPriceLong(uint32 marketIndex, uint256 tokens_redeem)</span>
+    external
+  {
+<span class="cstat-no" title="statement not covered" >    ILongShort(longShort).redeemLongNextPrice(marketIndex, tokens_redeem)</span>;
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  function convertSynthsToPaymentTokenNextPriceShort(uint32 marketIndex, uint256 tokens_redeem)</span>
+    external
+  {
+<span class="cstat-no" title="statement not covered" >    ILongShort(longShort).redeemShortNextPrice(marketIndex, tokens_redeem)</span>;
+  }
+}
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Thu Sep 16 2021 09:25:05 GMT+0200 (South Africa Standard Time)
+</div>
+</div>
+<script src="../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../sorter.js"></script>
+</body>
+</html>

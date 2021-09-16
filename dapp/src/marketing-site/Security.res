@@ -6,19 +6,17 @@ let make = () => {
       <div className="max-w-5xl flex flex-col justify-evenly items-center mx-auto">
         <Heading title="Security" suffixEmoji=`🔐` />
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 items-center justify-center my-4">
-          <div className="mx-4 order-3 md:order-1 bg-white bg-opacity-70 md:p-4 p-1 rounded w-46">
+          <div
+            className="mx-4 h-full order-3 md:order-1 bg-white bg-opacity-70 md:p-4 p-1 rounded w-46">
             <a
               className="custom-cursor"
               target="_blank"
-              href="https://docs.float.capital/docs/security"
+              href="/contract-coverage/index.html"
               rel="noopener noreferrer">
               //TODO
               <img src="/icons/coverage.svg" className="h-16 md:h-32 mx-auto  hover:opacity-80" />
               <p className="text-center font-bold mx-auto hover:underline">
                 {"Contract coverage"->React.string}
-              </p>
-              <p className="text-center mx-auto text-xs text-gray-500">
-                {"coming soon"->React.string}
               </p>
             </a>
           </div>

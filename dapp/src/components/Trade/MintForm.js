@@ -714,13 +714,15 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
         exit = 2;
     }
   }
-  if (exit === 2) {
-    if (typeof txStateMint === "number") {
-      txStateMint === /* UnInitialised */0;
-    } else if (txStateMint.TAG !== /* SignedAndSubmitted */0) {
-      return Curry._1(resetFormButton, undefined);
+  if (exit === 2 && typeof txStateMint !== "number") {
+    switch (txStateMint.TAG | 0) {
+      case /* Declined */1 :
+      case /* Complete */2 :
+      case /* Failed */3 :
+          return Curry._1(resetFormButton, undefined);
+      default:
+        
     }
-    
   }
   return React.createElement(Button.make, {
               onClick: (function (param) {

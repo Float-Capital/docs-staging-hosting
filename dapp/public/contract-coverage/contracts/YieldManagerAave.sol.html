@@ -1,0 +1,887 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for contracts/YieldManagerAave.sol</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../index.html">all files</a> / <a href="index.html">contracts/</a> YieldManagerAave.sol
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">38.78% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>19/49</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">21.43% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>3/14</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">40% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>4/10</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">40% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>20/50</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line low'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// SPDX-License-Identifier: BUSL-1.1
+&nbsp;
+pragma solidity 0.8.3;
+&nbsp;
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+&nbsp;
+import "hardhat/console.sol";
+&nbsp;
+import "./interfaces/IYieldManager.sol";
+import "./interfaces/aave/ILendingPool.sol";
+import "./interfaces/aave/ILendingPoolAddressesProvider.sol";
+import "./interfaces/aave/IAaveIncentivesController.sol";
+import "./abstract/AccessControlledAndUpgradeable.sol";
+&nbsp;
+/** @title YieldManagerAave
+  @notice contract is used to manage the yield generated by the underlying tokens.
+  YieldManagerAave is an implementation of a yield manager that earns APY from the Aave protocol.
+  Each fund's payment token (such as DAI) has a corresponding aToken (such as aDAI) that
+  continuously accrues interest based on a lend/borrow liquidity ratio.
+  @dev https://docs.aave.com/portal/
+  */
+contract YieldManagerAave is IYieldManager, AccessControlledAndUpgradeable {
+  /*╔═════════════════════════════╗
+    ║          VARIABLES          ║
+    ╚═════════════════════════════╝*/
+&nbsp;
+  /// @notice address of longShort contract
+  address public longShort;
+  /// @notice address of treasury contract - this is the address that can claim aave incentives rewards
+  address public treasury;
+&nbsp;
+  /// @notice boolean to prevent markets using an already initialized market
+  bool public isInitialized;
+&nbsp;
+  /// @notice The payment token the yield manager supports
+  /// @dev DAI token
+  IERC20 public paymentToken;
+  /// @notice The token representing the interest accruing payment token position from Aave
+  /// @dev ADAI token
+  IERC20Upgradeable public aToken;
+  /// @notice The specific Aave lending pool address provider contract
+  ILendingPoolAddressesProvider public lendingPoolAddressesProvider;
+  /// @notice The specific Aave incentives controller contract
+  IAaveIncentivesController public aaveIncentivesController;
+&nbsp;
+  /// @dev An aave specific referralCode that has been a depricated feature. This will be set to 0 for "no referral" at deployment
+  uint16 referralCode;
+&nbsp;
+  /// @notice distributed yield not yet transferred to the treasury
+  uint256 public override totalReservedForTreasury;
+&nbsp;
+  /// @dev This value will likely remain zero forever. It exists to handle the rare edge case that Aave doesn't have enough liquidity for a withdrawal.
+  ///      In this case this variable would keep track of that so that the withdrawal can happen after the fact when liquidity becomes available.
+  uint256 public amountReservedInCaseOfInsufficientAaveLiquidity;
+&nbsp;
+  /*╔═════════════════════════════╗
+    ║          MODIFIERS          ║
+    ╚═════════════════════════════╝*/
+&nbsp;
+  /// @dev only allow longShort contract to execute modified functions
+  modifier longShortOnly() {
+    <span class="missing-if-branch" title="else path not taken" >E</span>require(msg.sender == longShort, "Not longShort");
+    _;
+  }
+&nbsp;
+  /*╔═════════════════════════════╗
+    ║       CONTRACT SET-UP       ║
+    ╚═════════════════════════════╝*/
+&nbsp;
+  /**
+    @notice Constructor for initializing the aave yield manager with a given payment token and corresponding Aave contracts
+    @param _longShort address of the longShort contract
+    @param _treasury address of the treasury contract
+    @param _paymentToken address of the payment token
+    @param _aToken address of the interest accruing token linked to the payment token
+    @param _lendingPoolAddressesProvider address of the aave lending pool address provider contract
+    @param _aaveReferralCode unique code for aave referrals
+    @param _admin admin for the contract
+    @dev referral code will be set to 0, depricated Aave feature
+  */
+  function initialize(
+    address _longShort,
+    address _treasury,
+    address _paymentToken,
+    address _aToken,
+    address _lendingPoolAddressesProvider,
+    address _aaveIncentivesController,
+    uint16 _aaveReferralCode,
+    address _admin
+  ) external initializer {
+    <span class="missing-if-branch" title="else path not taken" >E</span>require(
+      _longShort != address(0) &amp;&amp;
+        _treasury != address(0) &amp;&amp;
+        _paymentToken != address(0) &amp;&amp;
+        _aToken != address(0) &amp;&amp;
+        _lendingPoolAddressesProvider != address(0) &amp;&amp;
+        _aaveIncentivesController != address(0) &amp;&amp;
+        _admin != address(0)
+    );
+&nbsp;
+    longShort = _longShort;
+    treasury = _treasury;
+&nbsp;
+    _AccessControlledAndUpgradeable_init(_admin);
+&nbsp;
+    referralCode = _aaveReferralCode;
+&nbsp;
+    paymentToken = IERC20(_paymentToken);
+    aToken = IERC20Upgradeable(_aToken);
+    lendingPoolAddressesProvider = ILendingPoolAddressesProvider(_lendingPoolAddressesProvider);
+    aaveIncentivesController = IAaveIncentivesController(_aaveIncentivesController);
+&nbsp;
+    // Approve tokens for aave lending pool maximally.
+    IERC20(_paymentToken).approve(
+      ILendingPoolAddressesProvider(_lendingPoolAddressesProvider).getLendingPool(),
+      type(uint256).max
+    );
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  function updateLatestLendingPoolAddress() external {</span>
+<span class="cstat-no" title="statement not covered" >    IERC20(paymentToken).approve(lendingPoolAddressesProvider.getLendingPool(), type(uint256).max)</span>;
+  }
+&nbsp;
+  /*╔════════════════════════╗
+    ║     IMPLEMENTATION     ║
+    ╚════════════════════════╝*/
+&nbsp;
+  /**
+   @notice Allows the LongShort contract to deposit tokens into the aave pool
+   @param amount Amount of payment token to deposit
+  */
+<span class="fstat-no" title="function not covered" >  function depositPaymentToken(uint256 amount) external override longShortOnly {</span>
+    // If amountReservedInCaseOfInsufficientAaveLiquidity isn't zero, then efficiently net the difference between the amount
+    //    It basically always be zero besides extreme and unlikely situations with aave.
+<span class="cstat-no" title="statement not covered" >    if (amountReservedInCaseOfInsufficientAaveLiquidity != 0) {</span>
+<span class="cstat-no" title="statement not covered" >      if (amountReservedInCaseOfInsufficientAaveLiquidity &gt;= amount) {</span>
+<span class="cstat-no" title="statement not covered" >        amountReservedInCaseOfInsufficientAaveLiquidity -= amount</span>;
+        // Return early, nothing to deposit into the lending pool
+<span class="cstat-no" title="statement not covered" >        return;</span>
+      } else {
+<span class="cstat-no" title="statement not covered" >        amount -= amountReservedInCaseOfInsufficientAaveLiquidity</span>;
+<span class="cstat-no" title="statement not covered" >        amountReservedInCaseOfInsufficientAaveLiquidity = 0</span>;
+      }
+    }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    ILendingPool(lendingPoolAddressesProvider.getLendingPool()).deposit(</span>
+      address(paymentToken),
+      amount,
+      address(this),
+      referralCode
+    );
+  }
+&nbsp;
+  /// @notice Allows the LongShort pay out a user from tokens already withdrawn from Aave
+  /// @param user User to recieve the payout
+  /// @param amount Amount of payment token to pay to user
+<span class="fstat-no" title="function not covered" >  function transferPaymentTokensToUser(address user, uint256 amount)</span>
+    external
+    override
+    longShortOnly
+  {
+<span class="cstat-no" title="statement not covered" >    try paymentToken.transfer(user, amount) returns (bool transferSuccess) {</span>
+<span class="cstat-no" title="statement not covered" >      if (transferSuccess) {</span>
+        // If the transfer is successful return early, otherwise try pay the user out with the amountReservedInCaseOfInsufficientAaveLiquidity
+<span class="cstat-no" title="statement not covered" >        return;</span>
+      }
+    } catch {}
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    amountReservedInCaseOfInsufficientAaveLiquidity -= amount</span>;
+&nbsp;
+    // If this reverts (ie aave unable to make payout), then the whole transaction will revert. User will have to wait until sufficient liquidity available.
+<span class="cstat-no" title="statement not covered" >    ILendingPool(lendingPoolAddressesProvider.getLendingPool()).withdraw(</span>
+      address(paymentToken),
+      amount,
+      user
+    );
+  }
+&nbsp;
+  /// @notice Allows the LongShort contract to redeem aTokens for the payment token
+  /// @param amount Amount of payment token to withdraw
+  /// @dev This will update the amountReservedInCaseOfInsufficientAaveLiquidity if not enough liquidity is avaiable on aave.
+  ///      This means that our system can continue to operate even if there is insufficient liquidity in Aave for any reason.
+<span class="fstat-no" title="function not covered" >  function removePaymentTokenFromMarket(uint256 amount) external override longShortOnly {</span>
+<span class="cstat-no" title="statement not covered" >    try</span>
+      ILendingPool(lendingPoolAddressesProvider.getLendingPool()).withdraw(
+        address(paymentToken),
+        amount,
+        address(this)
+      )
+    {} catch {
+      // In theory we should only catch `VL_CURRENT_AVAILABLE_LIQUIDITY_NOT_ENOUGH` errors.
+      // Safe to revert on all errors, if aave completely blocks withdrawals the amountReservedInCaseOfInsufficientAaveLiquidity can grow until it is fixed without problems.
+<span class="cstat-no" title="statement not covered" >      amountReservedInCaseOfInsufficientAaveLiquidity += amount</span>;
+    }
+  }
+&nbsp;
+  /**
+    @notice Allows for withdrawal of aave rewards to the treasury contract
+    @dev This is specifically implemented to allow withdrawal of aave reward wMatic tokens accrued
+  */
+  function claimAaveRewardsToTreasury() external {
+    IAaveIncentivesController _aaveIncentivesController = IAaveIncentivesController(
+      aaveIncentivesController
+    );
+    uint256 amount = _aaveIncentivesController.getUserUnclaimedRewards(address(this));
+&nbsp;
+    address[] memory aTokenAddresses = new address[](1);
+    aTokenAddresses[0] = address(aToken);
+&nbsp;
+    _aaveIncentivesController.claimRewards(aTokenAddresses, amount, treasury);
+&nbsp;
+    emit ClaimAaveRewardTokenToTreasury(amount);
+  }
+&nbsp;
+  /**
+    @notice Calculates and updates the yield allocation to the treasury and the market
+    @dev treasuryPercent = 1 - marketPercent
+    @param totalValueRealizedForMarket total value of long and short side of the market
+    @param treasuryYieldPercent_e18 Percentage of yield in base 1e18 that is allocated to the treasury
+    @return The market allocation of the yield
+  */
+<span class="fstat-no" title="function not covered" >  function distributeYieldForTreasuryAndReturnMarketAllocation(</span>
+    uint256 totalValueRealizedForMarket,
+    uint256 treasuryYieldPercent_e18
+  ) external override longShortOnly returns (uint256) {
+<span class="cstat-no" title="statement not covered" >    uint256 totalHeld = aToken.balanceOf(address(this));</span>
+<span class="cstat-no" title="statement not covered" >    uint256 _totalReservedForTreasury = totalReservedForTreasury;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    uint256 totalRealized = totalValueRealizedForMarket +</span>
+      _totalReservedForTreasury +
+      amountReservedInCaseOfInsufficientAaveLiquidity;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    if (totalRealized == totalHeld) {</span>
+<span class="cstat-no" title="statement not covered" >      return 0;</span>
+    }
+&nbsp;
+    // will revert in case totalRealized &gt; totalHeld which should never occur since yield is always possitive with aave.
+<span class="cstat-no" title="statement not covered" >    uint256 unrealizedYield = totalHeld - totalRealized;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    uint256 amountForTreasury = (unrealizedYield * treasuryYieldPercent_e18) / 1e18;</span>
+<span class="cstat-no" title="statement not covered" >    uint256 amountForMarketIncentives = unrealizedYield - amountForTreasury;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    totalReservedForTreasury = _totalReservedForTreasury + amountForTreasury</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    emit YieldDistributed(unrealizedYield, treasuryYieldPercent_e18);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    return amountForMarketIncentives;</span>
+  }
+&nbsp;
+  /// @notice Withdraw treasury allocated accrued yield from the lending pool to the treasury contract
+<span class="fstat-no" title="function not covered" >  function withdrawTreasuryFunds() external override {</span>
+<span class="cstat-no" title="statement not covered" >    uint256 amountToWithdrawForTreasury = totalReservedForTreasury;</span>
+<span class="cstat-no" title="statement not covered" >    totalReservedForTreasury = 0</span>;
+&nbsp;
+    // Redeem aToken for payment tokens.
+<span class="cstat-no" title="statement not covered" >    ILendingPool(lendingPoolAddressesProvider.getLendingPool()).withdraw(</span>
+      address(paymentToken),
+      amountToWithdrawForTreasury,
+      treasury
+    );
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    emit WithdrawTreasuryFunds();</span>
+  }
+&nbsp;
+  /// @notice Initializes a specific yield manager to a given market
+  function initializeForMarket() external override longShortOnly {
+    <span class="missing-if-branch" title="else path not taken" >E</span>require(!isInitialized, "Yield Manager is already in use");
+    isInitialized = true;
+  }
+}
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Thu Sep 16 2021 09:25:05 GMT+0200 (South Africa Standard Time)
+</div>
+</div>
+<script src="../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../sorter.js"></script>
+</body>
+</html>
