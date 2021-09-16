@@ -52,9 +52,6 @@ let make = () => {
               <p className="text-center font-bold mx-auto hover:underline">
                 {"Audit"->React.string}
               </p>
-              <p className="text-center mx-auto text-xs text-gray-500">
-                {"coming soon"->React.string}
-              </p>
             </a>
           </div>
         </div>
