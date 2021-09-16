@@ -11,7 +11,7 @@ slug: /
 
 Welcome to Float Capital! 👋
 
-This is the official documentation for Float Capital, a novel protocol allowing users to easily and safely gain exposure to [synthetic assets](/docs/faqs#what-is-a-synthetic-asset) without [over-collateralization](https://www.investopedia.com/terms/o/overcollateralization.asp). 💡<!-- TODO  add link to over-collateralization definition-->
+This is the official documentation for Float Capital, a novel protocol allowing users to easily and safely gain exposure to [synthetic assets](/docs/faqs#what-is-a-synthetic-asset) without [over-collateralization](https://www.investopedia.com/terms/o/overcollateralization.asp). 💡
 
 Check out our [alpha launch](/docs/alpha) for info on our early release!
 
