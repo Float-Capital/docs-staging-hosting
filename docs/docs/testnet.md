@@ -18,4 +18,4 @@ To get Mumbai Matic token and Mumbai DAI you can visit the following faucets;
 - [Matic](https://faucet.matic.network/)
 - [DAI](https://float.capital/app/faucet)
 
-Please note that the protocol is still under active development and some features might not function as expected.
+Please note that the protocol is still under active development and some features might not function as expected. See our [alpha](/docs/alpha) for info on our early release on the Polygon network.
