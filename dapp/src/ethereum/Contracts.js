@@ -23,9 +23,9 @@ var LongShort = {
 };
 
 var abi$1 = Ethers.makeAbi([
-      "function stake(address tokenAddress, uint256 amount)",
-      "function withdraw(uint32, bool, uint256 amount) @300000",
-      "function claimFloatCustom(uint32[] calldata marketIndexes) @2000000"
+      "function stake(address tokenAddress, uint256 amount) @6000000",
+      "function withdraw(uint32, bool, uint256 amount) @6000000",
+      "function claimFloatCustom(uint32[] calldata marketIndexes) @6000000"
     ]);
 
 function make$1(address, providerOrSigner) {
@@ -57,7 +57,7 @@ var abi$3 = Ethers.makeAbi([
       "function approve(address spender, uint256 amount) @52000",
       "function balanceOf(address owner) public view returns (uint256 balance)",
       "function allowance(address owner, address spender) public view returns (uint256 remaining)",
-      "function stake(uint256 amount) external"
+      "function stake(uint256 amount) external @500000"
     ]);
 
 function make$3(address, providerOrSigner) {
