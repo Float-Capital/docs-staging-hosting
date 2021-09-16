@@ -52,7 +52,7 @@ This helps ensure that the peg of the on-chain assets matches the asset it repre
 
 “Integrating the industry-standard Chainlink Price Feeds into the Float Capital protocol has provided us easy access to the high-quality financial market data required to mint on-chain assets in a hyper-reliable and secure manner,” stated Jon Jon Clark, Co-Founder of Float Capital. “We look forward to expanding our Chainlink integration to include additional secure oracle services, helping grow and bring advanced utility to our products.”
 
-<img src="/blog-assets/model-diagram.png" alt="float-chainlink-diagram" width="100%"/>
+<img src="/blog-assets/model-diagram.jpg" alt="float-chainlink-diagram" width="100%"/>
 
 ## About Chainlink
 
