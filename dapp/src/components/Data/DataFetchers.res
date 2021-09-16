@@ -1,4 +1,5 @@
 open Globals
+let {mul, fromInt, toString} = module(Ethers.BigNumber)
 
 let useUsersStakes = (~address) => {
   let userId = address->ethAdrToStr->Js.String.toLowerCase
@@ -12,14 +13,16 @@ let useUsersStakes = (~address) => {
   Queries.UsersStakes.use({userId: userId})
 }
 
-let oneGweiInWei = Ethers.BigNumber.fromInt(1000000000)
-let defaultGasPriceInGwei = oneGweiInWei->Ethers.BigNumber.mul(Ethers.BigNumber.fromInt(95)) // 95 gwei should be fast enough in most cases
+let oneGweiInWei = fromInt(1000000000)
+let defaultGasPriceInGwei = oneGweiInWei->mul(fromInt(95)) // 95 gwei should be fast enough in most cases
 
 let getGasPrice = () => {
   Fetch.fetch("https://gasstation-mainnet.matic.network")
   ->JsPromise.then(Fetch.Response.json)
   ->JsPromise.map(response =>
-    Obj.magic(response)["fast"]->Option.map(Ethers.BigNumber.mul(oneGweiInWei))
+    Obj.magic(response)["fast"]->Option.map(gasInGWeiAsFloat =>
+      gasInGWeiAsFloat->Js.Math.ceil_int->fromInt->mul(oneGweiInWei)
+    )
   )
   ->JsPromise.catch(err => {
     Js.log2("Error fetching gas price:", err)
@@ -27,6 +30,7 @@ let getGasPrice = () => {
   })
 }
 
+// TODO: put this code into the global context rather, on pages that have multiple transactions (eg pages with a payment token approval) the gas prices are fetched twice as often as they need to be
 let useRecommendedGasPrice = () => {
   let (gasPrice, setGasPrice) = React.useState(() => defaultGasPriceInGwei)
 
