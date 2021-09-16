@@ -19,4 +19,4 @@ Simply follow instructions in the staking page to stake.
 
 ## Withdrawing your staked Float synthetic tokens
 
-Staked tokens can simply be unstaked at any point by the user for a nominal fee.
+Staked tokens can simply be unstaked at any point by the user for a nominal fee of 50 basis points.

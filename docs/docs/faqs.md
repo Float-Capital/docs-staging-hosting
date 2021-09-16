@@ -69,7 +69,7 @@ The basis of Float Capital is creating a 'peer-to-peer' exposure market where lo
 
 ### Are there any trading fees?
 
-Float Capital currently doesn't take any trading fees from traders. All fees levied are accrued either to Float token holders or to users already providing liquidity in that synthetic market. Fees are generally only levied when users [unstake](/docs/stake) their position.
+Float Capital currently doesn't take any trading fees from traders. All fees levied are accrued either to Float token holders or to users already providing liquidity in that synthetic market. Fees only levied when users [unstake](/docs/stake) their position at a fee of 50 basis points.
 
 ### What are the benefits of adding good liquidity?
 

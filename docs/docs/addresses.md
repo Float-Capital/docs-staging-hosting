@@ -43,7 +43,7 @@ PM2 Short = "0x75e8EEFfCe2A345aa419bE87C0bA20f8Bc2A72cD",
 
 ## Alpha Launch on Polygon
 
-See details on our alpha launch[here]](/docs/alpha).
+See details on our alpha launch[here](/docs/alpha).
 
 Alpha contracts:
 

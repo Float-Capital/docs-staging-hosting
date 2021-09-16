@@ -20,7 +20,7 @@ More on the security steps taken to ensure user safety on the Float protocol can
 ## alphaFloat token :chart:
 
 The alpha release will be launched with the alphaFloat(alphaFLT) token. The Float Governance token (FLT) will be launched during the main release of the Float Capital protocol.
-For the alpha launch, the alphaFloat token will be used and will be non-transferable, however, it will be convertible for value accrued to the system.
+For the alpha launch, the alphaFloat token will be non-transferable, however, it will be convertible for value accrued to the system.
 
 ## Minting a position on the Polygon network :heavy_dollar_sign:
 
@@ -58,7 +58,14 @@ This discount for Kong holders is part of a longer partnership, bridging the gap
 
 Users of the alpha Float protocol can collect Gems when interacting with the protocol. Read more on Gems [here](/docs/gems).
 
-Keep your daily streak going and see how many gems you can collect!
+To collect Gems users must do one of the following actions every 24 hours:
+
+- mint a long or short position on a market
+- redeem long or short synthetic tokens
+- stake synthetic tokens
+- unstake synthetic tokens
+
+Keep your daily streak :fire: going and see how many gems you can collect by interacting with the protocol every 24 hours!💠
 
 ## More than an alpha :fast_forward:
 
