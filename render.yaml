@@ -1,6 +1,6 @@
 services:
   - name: mumbai-system-update-bot
-    type: pserv
+    type: worker
     env: node
     region: frankfurt
     buildCommand: cd system-update-bot && yarn
@@ -16,7 +16,7 @@ services:
         value: true
 
   - name: alpha-system-update-bot
-    type: pserv
+    type: worker
     env: node
     region: frankfurt
     buildCommand: cd system-update-bot && yarn && yarn res:build
