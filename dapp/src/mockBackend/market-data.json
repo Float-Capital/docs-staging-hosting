@@ -1,23 +1,23 @@
 [
     {    
-        "name": "Eth Market",
-        "description": "Ether (ETH) is the main token of the Ethereum blockchain and acts as the primary 'fuel' that powers all activity on it. Ether is used to perform actions on the network, such as sending transactions and interacting with dapps.",
+        "name": "The Flipp3ning",
+        "description": "The flipp3ning represents a 3x leveraged market between the ethereum and bitcoin marketcap. Enter a long position to gain exposure to ethereum increasing in value in relation to bitcoin or a short position to gain exposure to bitcoin increasing in value in relation to ethereum",
+        "oracleHeartbeat": 300,
+        "icon": "/icons/tokens/flippening.svg",
+        "oracleDecimals": 18
+    },
+    {    
+        "name": "",
+        "description": "" ,
         "oracleHeartbeat": 70,
-        "icon": "/icons/tokens/eth.svg",
+        "icon": "/icons/tokens/placeholder.svg",
         "oracleDecimals": 8
     },
     {    
-        "name": "Matic Market",
-        "description": "Matic is the native token of the polygon network. A proof of stake EVM compatable blockchain. Polygon transaction fees are payed in Matic token." ,
+        "name": "",
+        "description": "" ,
         "oracleHeartbeat": 70,
-        "icon": "/icons/tokens/matic.svg",
-        "oracleDecimals": 8
-    },
-    {    
-        "name": "Bitcoin Market",
-        "description": "Bitcoin is the first decentralized digital cryptocurrency launched in 2009 by an anonymous developer under the pseudonym 'Satoshi Nakamoto'. Bitcoin is used as a trasnfer of value and a store of wealth.",
-        "oracleHeartbeat": 70,
-        "icon": "/icons/tokens/btc.svg",
+        "icon": "/icons/tokens/placeholder.svg",
         "oracleDecimals": 8
     }
 ]

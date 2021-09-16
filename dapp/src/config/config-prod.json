@@ -1,0 +1,26 @@
+{
+  "graphEndpoint": "https://polygon.graph.float.capital/subgraphs/name/float-capital/float-capital",
+  "priceHistoryGraphEndpoint": "",
+  "aaveGraphEndpoint": "https://api.thegraph.com/subgraphs/name/aave/aave-v2-polygon",
+  "networkId": 137,
+  "networkName": "Polygon",
+  "networkCurrencyName": "MATIC",
+  "networkCurrencySymbol": "MATIC",
+  "rpcEndopint": "https://polygon-rpc.com/",
+  "paymentTokenName": "DAI",
+  "blockExplorer": "https://polygonscan.com/",
+  "blockExplorerName": "polygonscan",
+  "discordInviteLink": "https://discord.gg/dqDwgrVYcU",
+  "polygonBridgeLink": "https://wallet.matic.network/bridge/",
+  "web3PollingInterval": 5000,
+  "apolloConnectToDevTools": false,
+  "contracts": {
+    "FloatToken": "",
+    "FloatCapital_v0": "",
+    "LongShort": "",
+    "Staker": "",
+    "TokenFactory": "",
+    "Treasury_v0": "",
+    "Dai": ""
+  }
+}

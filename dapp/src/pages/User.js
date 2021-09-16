@@ -12,7 +12,6 @@ var Loader = require("../components/UI/Base/Loader.js");
 var UserUI = require("../components/UI/UserUI.js");
 var Backend = require("../mockBackend/Backend.js");
 var Js_dict = require("rescript/lib/js/js_dict.js");
-var Masonry = require("../components/UI/Masonry.js");
 var Withdraw = require("../components/Withdraw/Withdraw.js");
 var CONSTANTS = require("../CONSTANTS.js");
 var DataHooks = require("../data/DataHooks.js");
@@ -410,10 +409,10 @@ function onQueryError(msg) {
 
 function onQuerySuccess(data) {
   return React.createElement(UserUI.UserContainer.make, {
-              children: React.createElement(Masonry.Container.make, {
-                    children: null
-                  }, React.createElement(Masonry.Divider.make, {
-                        children: null
+              children: React.createElement("div", {
+                    className: "w-full flex flex-col md:flex-row justify-between"
+                  }, React.createElement("div", {
+                        className: "w-full md:w-1/3 px-3 md:px-0 m-0 md:m-4"
                       }, React.createElement(User$UserProfileCard, {
                             userInfo: data.userInfo
                           }), React.createElement(User$IncompleteWithdrawalsCard, {
@@ -421,15 +420,15 @@ function onQuerySuccess(data) {
                           }), React.createElement(UserUI.UserFloatCard.make, {
                             userId: data.user,
                             stakes: data.stakes
-                          })), React.createElement(Masonry.Divider.make, {
-                        children: null
+                          })), React.createElement("div", {
+                        className: "w-full md:w-1/3 px-3 md:px-0 m-0 md:m-4"
                       }, React.createElement(User$UserTotalInvestedCard, {
                             stakes: data.stakes,
                             userId: data.user
                           }), React.createElement(User$UserBalancesCard, {
                             userId: data.user
-                          })), React.createElement(Masonry.Divider.make, {
-                        children: null
+                          })), React.createElement("div", {
+                        className: "w-full md:w-1/3 px-3 md:px-0 m-0 md:m-4"
                       }, React.createElement(User$UserTotalDaiCard, {}), React.createElement(UserUI.UserStakesCard.make, {
                             stakes: data.stakes,
                             userId: data.user

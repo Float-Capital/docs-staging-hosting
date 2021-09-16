@@ -40,6 +40,87 @@ let isGreaterThanBalance = (~amount, ~balance) => {
   amount->Ethers.BigNumber.gt(balance)
 }
 
+let useIsAccreditedStorage = () => {
+  open Dom.Storage2
+  let key = "isAccredited"
+  let (isAccredited, setIsAccredited) = React.useState(_ =>
+    localStorage->getItem(key)->Option.getWithDefault("") == "true"
+  )
+
+  let setAsAccredited = () => {
+    setIsAccredited(_ => true)
+    localStorage->setItem(key, "true")
+  }
+
+  (isAccredited, setAsAccredited)
+}
+
+module AccreditedModal = {
+  @react.component
+  let make = (~contractFunction) => {
+    let _ = contractFunction
+    let (isWizard, setIsWizard) = React.useState(_ => false)
+    let (isntUs, setIsntUs) = React.useState(_ => false)
+
+    <div className="text-sm w-full flex flex-col space-y-3 mb-4">
+      <label
+        className="inline-flex items-center space-x-3 cursor-pointer"
+        onClick={e => {
+          ReactEvent.Mouse.preventDefault(e)
+          setIsWizard(a => !a)
+        }}>
+        <input
+          className="form-tick cursor-pointer appearance-none h-6 min-w-6 w-6 border border-gray-300 rounded-md checked:bg-primary-light checked:border-transparent focus:outline-none"
+          type_="checkbox"
+          key={isWizard ? "1" : "0"}
+          value={isWizard ? "1" : "0"}
+          checked={isWizard}
+        />
+        <span>
+          <span className="mr-1"> {`I am a DeFi Wizard`->React.string} </span>
+          <span className="text-lg mr-1"> {`🧙`->React.string} </span>
+          <Tooltip
+            tip="I am a professional investor and I am familiar with decentralized finance."
+          />
+        </span>
+      </label>
+      <label
+        className="inline-flex items-center space-x-3 cursor-pointer"
+        onClick={e => {
+          ReactEvent.Mouse.preventDefault(e)
+          setIsntUs(isntUs => !isntUs)
+        }}>
+        <input
+          className="form-tick cursor-pointer appearance-none h-6 w-6 min-w-6 border border-gray-300 rounded-md checked:bg-primary-light checked:border-transparent focus:outline-none"
+          type_="checkbox"
+          value={isntUs ? "1" : "0"}
+          key={isntUs ? "1" : "0"}
+          checked={isntUs}
+        />
+        <span> {"I confirm that I am not a resident or citizen of the US"->React.string} </span>
+      </label>
+      <div className="w-full flex justify-center h-12">
+        <button
+          className={`
+            w-44 h-12 text-sm my-2 shadow-md rounded-lg border-2 focus:outline-none border-gray-200 hover:bg-gray-200
+            flex justify-center items-center mx-auto
+            ${!isWizard || !isntUs
+              ? "bg-gray-300 hover:bg-gray-300 shadow-none border-none cursor-auto"
+              : ""}
+            `}
+          onClick={isWizard && isntUs
+            ? e => {
+                ReactEvent.Mouse.preventDefault(e)
+                contractFunction()
+              }
+            : _ => ()}>
+          <span className="mx-2"> {"Confirmed"->React.string} </span>
+        </button>
+      </div>
+    </div>
+  }
+}
+
 module SubmitButtonAndTxTracker = {
   @react.component
   let make = (
@@ -51,6 +132,8 @@ module SubmitButtonAndTxTracker = {
     ~tokenToMint,
     ~buttonText,
     ~buttonDisabled,
+    ~needsToBeAccredited,
+    ~contractFunction,
   ) => {
     let randomMintTweetMessage = (isLong, marketName) => {
       let position = isLong ? "long" : "short"
@@ -66,9 +149,10 @@ module SubmitButtonAndTxTracker = {
 
     let {showModal, hideModal} = ModalProvider.useModalDisplay()
 
-    React.useEffect2(_ => {
-      switch (txStateApprove, txStateMint) {
-      | (ContractActions.Created, _) =>
+    React.useEffect3(_ => {
+      switch (needsToBeAccredited, txStateApprove, txStateMint) {
+      | (true, _, _) => showModal(<AccreditedModal contractFunction />)
+      | (_, ContractActions.Created, _) =>
         showModal(
           <div className="text-center mx-3 my-6">
             <Loader.Ellipses />
@@ -76,7 +160,7 @@ module SubmitButtonAndTxTracker = {
           </div>,
         )
 
-      | (ContractActions.SignedAndSubmitted(txHash), _) =>
+      | (_, ContractActions.SignedAndSubmitted(txHash), _) =>
         showModal(
           <div className="text-center m-3">
             <div className="m-2"> <Loader.Mini /> </div>
@@ -84,15 +168,15 @@ module SubmitButtonAndTxTracker = {
             <ViewOnBlockExplorer txHash />
           </div>,
         )
-      | (ContractActions.Complete({transactionHash: _}), ContractActions.Created)
-      | (ContractActions.Complete({transactionHash: _}), ContractActions.UnInitialised) =>
+      | (_, ContractActions.Complete({transactionHash: _}), ContractActions.Created)
+      | (_, ContractActions.Complete({transactionHash: _}), ContractActions.UnInitialised) =>
         showModal(
           <div className="text-center mx-3 my-6">
             <Loader.Ellipses />
             <p> {`Confirm transaction to mint ${tokenToMint}`->React.string} </p>
           </div>,
         )
-      | (ContractActions.Failed(txHash), _) =>
+      | (_, ContractActions.Failed(txHash), _) =>
         showModal(
           <div className="text-center m-3">
             <p> {`The transaction failed.`->React.string} </p>
@@ -100,14 +184,18 @@ module SubmitButtonAndTxTracker = {
             <MessageUsOnDiscord />
           </div>,
         )
-      | (_, ContractActions.Created) =>
+      | (_, _, ContractActions.Created) =>
         showModal(
           <div className="text-center m-3">
             <Loader.Ellipses />
             <h1> {`Confirm the transaction to mint ${tokenToMint}`->React.string} </h1>
           </div>,
         )
-      | (ContractActions.Complete({transactionHash}), ContractActions.SignedAndSubmitted(txHash)) =>
+      | (
+          _,
+          ContractActions.Complete({transactionHash}),
+          ContractActions.SignedAndSubmitted(txHash),
+        ) =>
         showModal(
           <div className="text-center m-3">
             <p> {`Approval confirmed 🎉`->React.string} </p>
@@ -117,7 +205,7 @@ module SubmitButtonAndTxTracker = {
             </h1>
           </div>,
         )
-      | (_, ContractActions.SignedAndSubmitted(txHash)) =>
+      | (_, _, ContractActions.SignedAndSubmitted(txHash)) =>
         showModal(
           <div className="text-center m-3">
             <div className="m-2"> <Loader.Mini /> </div>
@@ -125,11 +213,23 @@ module SubmitButtonAndTxTracker = {
             <ViewOnBlockExplorer txHash />
           </div>,
         )
-      | (_, ContractActions.Complete({transactionHash: _})) =>
+      | (_, _, ContractActions.Complete({transactionHash: _})) =>
         showModal(
           <div className="text-center m-3">
             <Tick />
             <p> {`Transaction complete 🎉`->React.string} </p>
+            <div className="w-full flex justify-center">
+              <p className="w-48 text-xs text-center mb-2">
+                <span className="text-green-600 ">
+                  {`It may take a few minutes for the tokens to show in your wallet`->React.string}
+                </span>
+                <span className="ml-1">
+                  <Tooltip
+                    tip="To ensure fairness and security your position will be opened on the next oracle price update"
+                  />
+                </span>
+              </p>
+            </div>
             <TweetButton message={randomMintTweetMessage(isLong, marketName)} />
             <Metamask.AddTokenButton
               token={Config.config.contracts.floatToken}
@@ -138,14 +238,14 @@ module SubmitButtonAndTxTracker = {
             <ViewProfileButton />
           </div>,
         )
-      | (_, ContractActions.Declined(_message)) =>
+      | (_, _, ContractActions.Declined(_message)) =>
         showModal(
           <div className="text-center m-3">
             <p> {`The transaction was rejected by your wallet`->React.string} </p>
             <MessageUsOnDiscord />
           </div>,
         )
-      | (_, ContractActions.Failed(txHash)) =>
+      | (_, _, ContractActions.Failed(txHash)) =>
         showModal(
           <div className="text-center m-3">
             <h1> {`The transaction failed.`->React.string} </h1>
@@ -153,17 +253,19 @@ module SubmitButtonAndTxTracker = {
             <MessageUsOnDiscord />
           </div>,
         )
+
       | _ => hideModal()
       }
       None
-    }, (txStateMint, txStateApprove))
+    }, (needsToBeAccredited, txStateMint, txStateApprove))
 
-    switch (txStateApprove, txStateMint) {
-    | (ContractActions.Declined(_), _)
-    | (ContractActions.Failed(_), _)
-    | (_, ContractActions.Complete({transactionHash: _}))
-    | (_, ContractActions.Declined(_))
-    | (_, ContractActions.Failed(_)) =>
+    switch (needsToBeAccredited, txStateApprove, txStateMint) {
+    | (true, _, _)
+    | (_, ContractActions.Declined(_), _)
+    | (_, ContractActions.Failed(_), _)
+    | (_, _, ContractActions.Complete({transactionHash: _}))
+    | (_, _, ContractActions.Declined(_))
+    | (_, _, ContractActions.Failed(_)) =>
       resetFormButton()
     | _ => <Button disabled=buttonDisabled onClick={_ => ()}> {buttonText} </Button>
     }
@@ -253,39 +355,56 @@ module MintFormSignedIn = {
       setContractActionToCallAfterApproval,
     ) = React.useState(((), ()) => ())
 
+    let (isAccredited, setAsAccredited) = useIsAccreditedStorage()
+    let (wantsToBeAccredited, setsWantToBeAccredited) = React.useState(_ => false)
+
     let (optDaiBalance, optDaiAmountApproved) = useBalanceAndApproved(
       ~erc20Address=Config.dai,
       ~spender=Config.longShort,
     )
 
-    let form = MintForm.useForm(~initialInput, ~onSubmit=({amount}, _form) => {
-      let approveFunction = () =>
-        contractExecutionHandlerApprove(
-          ~makeContractInstance=Contracts.Erc20.make(~address=Config.dai),
-          ~contractFunction=Contracts.Erc20.approve(
-            ~amount=amount->Globals.amountForApproval,
-            ~spender=Config.longShort,
+    let makeContractFunction = amount => {
+      () => {
+        if !isAccredited {
+          setAsAccredited()
+        }
+
+        let approveFunction = () =>
+          contractExecutionHandlerApprove(
+            ~makeContractInstance=Contracts.Erc20.make(~address=Config.dai),
+            ~contractFunction=Contracts.Erc20.approve(
+              ~amount=amount->Globals.amountForApproval,
+              ~spender=Config.longShort,
+            ),
+          )
+        let mintFunction = () =>
+          contractExecutionHandler(
+            ~makeContractInstance=Contracts.LongShort.make(~address=Config.longShort),
+            ~contractFunction=isLong
+              ? Contracts.LongShort.mintLongNextPrice(~marketIndex=market.marketIndex, ~amount)
+              : Contracts.LongShort.mintShortNextPrice(~marketIndex=market.marketIndex, ~amount),
+          )
+        let needsToApprove = isGreaterThanApproval(
+          ~amount,
+          ~amountApproved=optDaiAmountApproved->Option.getWithDefault(
+            Ethers.BigNumber.fromUnsafe("0"),
           ),
         )
-      let mintFunction = () =>
-        contractExecutionHandler(
-          ~makeContractInstance=Contracts.LongShort.make(~address=Config.longShort),
-          ~contractFunction=isLong
-            ? Contracts.LongShort.mintLongNextPrice(~marketIndex=market.marketIndex, ~amount)
-            : Contracts.LongShort.mintShortNextPrice(~marketIndex=market.marketIndex, ~amount),
-        )
-      let needsToApprove = isGreaterThanApproval(
-        ~amount,
-        ~amountApproved=optDaiAmountApproved->Option.getWithDefault(
-          Ethers.BigNumber.fromUnsafe("0"),
-        ),
-      )
 
-      switch needsToApprove {
-      | true =>
-        setContractActionToCallAfterApproval(_ => mintFunction)
-        approveFunction()
-      | false => mintFunction()
+        switch needsToApprove {
+        | true =>
+          setContractActionToCallAfterApproval(_ => mintFunction)
+          approveFunction()
+        | false => mintFunction()
+        }
+      }
+    }
+
+    let form = MintForm.useForm(~initialInput, ~onSubmit=({amount}, _form) => {
+      if isAccredited {
+        makeContractFunction(amount)()
+      } else {
+        setsWantToBeAccredited(_ => true)
       }
     })
 
@@ -298,6 +417,7 @@ module MintFormSignedIn = {
       <Button
         onClick={_ => {
           form.reset()
+          setsWantToBeAccredited(_ => false)
           setTxStateApprove(_ => ContractActions.UnInitialised)
           setTxState(_ => ContractActions.UnInitialised)
         }}>
@@ -428,6 +548,8 @@ module MintFormSignedIn = {
         buttonDisabled
         isLong
         marketName={market.name}
+        needsToBeAccredited={!isAccredited && wantsToBeAccredited}
+        contractFunction={makeContractFunction(formAmount->Option.getWithDefault(CONSTANTS.zeroBN))}
       />}
     />
   }

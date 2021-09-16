@@ -8,13 +8,14 @@ type marketInfo = {
 
 let marketsInfoData: array<marketInfo> = %raw(`require('./market-data.json')`)
 
-let getMarketInfoUnsafe = index =>
+let getMarketInfoUnsafe = index => {
   marketsInfoData[index - 1]->Option.getWithDefault({
     name: "",
     description: "",
     oracleHeartbeat: 300,
-    icon: "/",
+    icon: "/icons/tokens/placeholder.svg",
     oracleDecimals: 8,
   })
+}
 
 // NOTE: no validation happens on the marketsInfoData. IT IS NOT TYPE SAFE.

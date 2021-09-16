@@ -4,6 +4,7 @@ let calculateBeta = (
   ~totalLockedShort,
   ~isLong,
 ) => {
+  // TODO: NOT HARDCODE THE BETA AS WITH A LEVERAGE OF 3
   if (
     totalValueLocked->Ethers.BigNumber.eq(CONSTANTS.zeroBN) ||
     totalLockedLong->Ethers.BigNumber.eq(CONSTANTS.zeroBN) ||
@@ -11,13 +12,19 @@ let calculateBeta = (
   ) {
     "0"
   } else if totalLockedLong->Ethers.BigNumber.eq(totalLockedShort) {
-    "100"
+    "300"
   } else if isLong && totalLockedShort->Ethers.BigNumber.lt(totalLockedLong) {
-    Globals.percentStr(~n=totalLockedShort, ~outOf=totalLockedLong)
+    Globals.percentStr(
+      ~n=totalLockedShort->Ethers.BigNumber.mul(Ethers.BigNumber.fromUnsafe("3")),
+      ~outOf=totalLockedLong,
+    )
   } else if !isLong && totalLockedLong->Ethers.BigNumber.lt(totalLockedShort) {
-    Globals.percentStr(~n=totalLockedLong, ~outOf=totalLockedShort)
+    Globals.percentStr(
+      ~n=totalLockedLong->Ethers.BigNumber.mul(Ethers.BigNumber.fromUnsafe("3")),
+      ~outOf=totalLockedShort,
+    )
   } else {
-    "100"
+    "300"
   }
 }
 

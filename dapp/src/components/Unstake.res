@@ -1,3 +1,31 @@
+module ApproxDollarFeeUnstake = {
+  open Ethers.BigNumber
+
+  @react.component
+  let make = (~tokenPrice, ~value) => {
+    switch (tokenPrice, value) {
+    | (Some(tokenPrice), Some(value)) => {
+        let dollarValue =
+          tokenPrice->mul(value)->mul(CONSTANTS.unstakeFeeHardCode)->div(CONSTANTS.tenToThe36)
+
+        let dollarValueStr = dollarValue->Misc.NumberFormat.formatEther
+
+        if dollarValueStr != "0.00" {
+          <div className="flex flex-row items-center justify-end mb-2 w-full text-right">
+            <span className="text-xxs text-gray-500 pr-2"> {`unstake fee`->React.string} </span>
+            <span className="text-xxs text-gray-500 pr-2"> {`approx`->React.string} </span>
+            <span className="text-sm text-gray-500"> {`~$`->React.string} </span>
+            <span className="text-sm text-gray-800"> {dollarValueStr->React.string} </span>
+          </div>
+        } else {
+          React.null
+        }
+      }
+    | _ => React.null
+    }
+  }
+}
+
 module StakeForm = %form(
   type input = {amount: string}
   type output = {amount: Ethers.BigNumber.t}
@@ -70,10 +98,13 @@ module StakeFormInput = {
     ~resetButton=_ => React.null,
     ~buttonDisabled=false,
     ~buttonText,
+    ~tokens=None,
+    ~tokenPrice=None,
     ~txState=ContractActions.UnInitialised,
   ) => {
     <Form className="" onSubmit>
       <AmountInput value optBalance={optBalance} disabled onBlur onChange onMaxClick />
+      <ApproxDollarFeeUnstake tokenPrice={tokenPrice} value={tokens} />
       {switch txState {
       | ContractActions.UnInitialised
       | ContractActions.Created
@@ -81,6 +112,14 @@ module StakeFormInput = {
         <Button onClick={_ => onSubmit()} disabled={buttonDisabled}> {buttonText} </Button>
       | _ => resetButton()
       }}
+      {value == ""
+        ? React.null
+        : <p
+            className="text-xxs text-yellow-600 text-center mt-3 flex justify-center items-center w-full">
+            <span> {`⚡ We charge a small unstake fee on your tokens`->React.string} </span>
+            <span className="text-black mx-1 "> <Tooltip tip={"5 basis points"} /> </span> // TODO: Not hardcode
+            <span> {`⚡`->React.string} </span>
+          </p>}
     </Form>
   }
 }
@@ -92,6 +131,7 @@ module ConnectedStakeForm = {
       id: tokenId,
       syntheticMarket: {marketIndex, name: syntheticMarketName},
       tokenType,
+      latestPrice: {price: {price}},
     }: Queries.SyntheticTokenInfo.t,
     ~contractExecutionHandler,
     ~txState: ContractActions.transactionState,
@@ -192,12 +232,19 @@ module ConnectedStakeForm = {
       }
     }
 
+    let formAmount = switch form.amountResult {
+    | Some(Ok(amount)) => Some(amount)
+    | _ => None
+    }
+
     <StakeFormInput
       onSubmit=form.submit
       value={form.input.amount}
       optBalance={optTokenBalance}
       disabled=form.submitting
       onBlur={_ => form.blurAmount()}
+      tokens={formAmount}
+      tokenPrice={Some(price)}
       onChange={event => form.updateAmount((_, amount) => {
           amount: amount,
         }, (event->ReactEvent.Form.target)["value"])}

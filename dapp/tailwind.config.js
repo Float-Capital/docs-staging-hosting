@@ -87,6 +87,7 @@ module.exports = {
       400: "400px",
       500: "500px",
       56: "56px",
+      6: "1.5rem",
     },
     minHeight: {
       "1/2": "50%",
@@ -177,10 +178,11 @@ module.exports = {
   variants: {
     width: ["responsive"],
     extend: {
-      backgroundColor: ["active"],
+      backgroundColor: ["active", "checked"],
       translate: ["active"],
       textColor: ["active"],
       outline: ["active"],
+      borderColor: ["checked"],
     },
   },
   plugins: [],

@@ -18,6 +18,7 @@ var Belt_Int = require("rescript/lib/js/belt_Int.js");
 var MintForm = require("../components/Trade/MintForm.js");
 var Recharts = require("recharts");
 var CONSTANTS = require("../CONSTANTS.js");
+var CountDown = require("../components/UI/Base/CountDown.js");
 var DataHooks = require("../data/DataHooks.js");
 var Link = require("next/link").default;
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
@@ -34,7 +35,7 @@ function Markets$PriceCard$Card(Props) {
   var selected = selectedOpt !== undefined ? selectedOpt : false;
   var children = childrenOpt !== undefined ? Caml_option.valFromOption(childrenOpt) : null;
   return React.createElement("div", {
-              className: (
+              className: "        \n        " + (
                 selected ? "shadow-inner-card" : "shadow-outer-card opacity-60 transform hover:scale-102"
               ) + "\n    my-2\n    md:my-3\n    h-md\n    md:w-price-width\n    md:mr-4\n    md:h-price-height\n    custom-cursor\n    bg-white\n    flex md:flex-col\n    relative\n    rounded-lg"
             }, children);
@@ -42,6 +43,27 @@ function Markets$PriceCard$Card(Props) {
 
 var Card = {
   make: Markets$PriceCard$Card
+};
+
+function Markets$PriceCard$ComingSoon(Props) {
+  var releaseDateOpt = Props.releaseDate;
+  var releaseDate = releaseDateOpt !== undefined ? releaseDateOpt : Date.now() / 1000 | 0;
+  return React.createElement("div", {
+              className: "shadow-inner-card px-8 py-2 opacity-60 my-2 md:my-3 h-md md:w-price-width md:mr-4 md:h-price-height bg-white flex md:flex-col relative rounded-lg items-center justify-center"
+            }, React.createElement("p", {
+                  className: "text-xs text-gray"
+                }, "New market"), React.createElement("p", {
+                  className: "text-xs text-gray"
+                }, "coming soon"), React.createElement("div", {
+                  className: "text-xxxs text-center text-gray-600"
+                }, React.createElement(CountDown.make, {
+                      endDateTimestamp: releaseDate,
+                      displayUnits: true
+                    })));
+}
+
+var ComingSoon = {
+  make: Markets$PriceCard$ComingSoon
 };
 
 function Markets$PriceCard$LoadedGraph(Props) {
@@ -136,7 +158,7 @@ function Markets$PriceCard(Props) {
         }
       ]);
   var marketIndex = market.marketIndex.toNumber();
-  var assetDecimals = Backend.getMarketInfoUnsafe(marketIndex - 1 | 0).oracleDecimals;
+  var assetDecimals = Backend.getMarketInfoUnsafe(marketIndex).oracleDecimals;
   var match = priceHistory.data;
   var state;
   var exit = 0;
@@ -184,13 +206,20 @@ function Markets$PriceCard(Props) {
         });
   }
   var tmp;
-  tmp = typeof state === "number" || state.TAG === /* GraphError */0 ? null : "$" + state._0.latestPrice;
+  tmp = typeof state === "number" || state.TAG === /* GraphError */0 ? null : state._0.latestPrice + "%";
   var tmp$1;
-  tmp$1 = typeof state === "number" ? React.createElement(Loader.Ellipses.make, {}) : (
-      state.TAG === /* GraphError */0 ? state._0 : React.createElement(Markets$PriceCard$LoadedGraph, {
-              data: state._0.data
-            })
-    );
+  if (typeof state === "number") {
+    tmp$1 = React.createElement(Loader.Ellipses.make, {});
+  } else if (state.TAG === /* GraphError */0) {
+    console.log(state._0);
+    tmp$1 = React.createElement("p", {
+          className: "text-xxs text-gray-500"
+        }, "unable to fetch price data");
+  } else {
+    tmp$1 = React.createElement(Markets$PriceCard$LoadedGraph, {
+          data: state._0.data
+        });
+  }
   return React.createElement(Markets$PriceCard$Card, {
               selected: selected,
               children: null
@@ -205,7 +234,7 @@ function Markets$PriceCard(Props) {
                           className: "h-3 mr-1",
                           src: Backend.getMarketInfoUnsafe(market.marketIndex.toNumber()).icon
                         }), market.name), React.createElement("div", {
-                      className: "mr-3"
+                      className: "mr-3 flex flex-row items-center"
                     }, tmp)), React.createElement("div", {
                   className: "flex items-center justify-center px-4 py-2 md:px-4 md:py-4 flex-1"
                 }, tmp$1));
@@ -213,6 +242,7 @@ function Markets$PriceCard(Props) {
 
 var PriceCard = {
   Card: Card,
+  ComingSoon: ComingSoon,
   LoadedGraph: LoadedGraph,
   make: Markets$PriceCard
 };
@@ -321,25 +351,29 @@ function Markets(Props) {
         var selected = selectedInt >= 0 && selectedInt < markets.length ? selectedInt : 0;
         tmp = React.createElement("div", {
               className: "w-9/10 md:w-auto flex flex-col"
-            }, markets.length > 1 ? React.createElement("div", {
-                    className: "pb-6 flex md:order-1 order-2 flex-col md:flex-row w-full md:w-auto justify-center"
-                  }, Belt_Array.mapWithIndex(markets, (function (index, market) {
-                          return React.createElement(Markets$PriceCard, {
-                                      selected: selected === index,
-                                      market: market,
-                                      onClick: (function (param) {
-                                          if (selected !== index) {
-                                            router.query["selected"] = String(index);
-                                            router.query["actionOption"] = "short";
-                                            return Next.Router.pushObjShallow(router, {
-                                                        pathname: router.pathname,
-                                                        query: router.query
-                                                      });
-                                          }
-                                          
-                                        })
-                                    });
-                        }))) : null, React.createElement(Markets$Mint, {
+            }, React.createElement("div", {
+                  className: "pb-6 flex md:order-1 order-2 flex-col md:flex-row w-full md:w-auto justify-center"
+                }, Belt_Array.mapWithIndex(markets, (function (index, market) {
+                        return React.createElement(Markets$PriceCard, {
+                                    selected: selected === index,
+                                    market: market,
+                                    onClick: (function (param) {
+                                        if (selected !== index) {
+                                          router.query["selected"] = String(index);
+                                          router.query["actionOption"] = "short";
+                                          return Next.Router.pushObjShallow(router, {
+                                                      pathname: router.pathname,
+                                                      query: router.query
+                                                    });
+                                        }
+                                        
+                                      })
+                                  });
+                      })), markets.length < 3 ? React.createElement(React.Fragment, undefined, React.createElement(Markets$PriceCard$ComingSoon, {
+                            releaseDate: 1633053600
+                          }), markets.length < 2 ? React.createElement(Markets$PriceCard$ComingSoon, {
+                              releaseDate: 1634263200
+                            }) : null) : null), React.createElement(Markets$Mint, {
                   market: markets[selected],
                   key: selectedStr
                 }));
