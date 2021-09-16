@@ -174,9 +174,11 @@ let useMarketInfo = () => {
 
 let header = (~marketInfo: DataHooks.graphResponse<marketInfo>) => {
   switch marketInfo {
-  | Response({marketName, marketSymbol}) =>
+  | Response({marketIndex, marketSymbol}) =>
     <div className="flex justify-between mb-2 pt-6 pl-6">
-      {`${marketName} (${marketSymbol})`->React.string}
+      {`${(
+          marketIndex->Ethers.BigNumber.toNumber->Backend.getMarketInfoUnsafe
+        ).name} (${marketSymbol})`->React.string}
     </div>
   | _ => React.null
   }

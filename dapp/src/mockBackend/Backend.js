@@ -12,7 +12,8 @@ function getMarketInfoUnsafe(index) {
               description: "",
               oracleHeartbeat: 300,
               icon: "/icons/tokens/placeholder.svg",
-              oracleDecimals: 8
+              oracleDecimals: 8,
+              leverage: 1.0
             });
 }
 

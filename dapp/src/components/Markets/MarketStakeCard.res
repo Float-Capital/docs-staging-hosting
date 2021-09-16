@@ -3,6 +3,7 @@ let {mapStakeApy} = module(MarketCalculationHelpers)
 @react.component
 let make = (
   ~syntheticMarket as {
+    marketIndex,
     name: marketName,
     timestampCreated,
     latestSystemState: {
@@ -70,6 +71,8 @@ let make = (
     "short",
   )
 
+  let marketInfo = marketIndex->Ethers.BigNumber.toNumber->Backend.getMarketInfoUnsafe
+
   <div
     className="p-4 rounded-lg flex flex-col justify-center bg-white bg-opacity-75 shadow-lg h-full">
     <div className="flex flex-wrap justify-center w-full">
@@ -85,7 +88,7 @@ let make = (
       />
       <div className="w-full md:w-1/2 flex items-center justify-center flex-col order-1 md:order-2">
         <div className="flex justify-center w-full mb-2">
-          <h1 className="font-bold text-xl font-alphbeta"> {marketName->React.string} </h1>
+          <h1 className="font-bold text-xl font-alphbeta"> {marketInfo.name->React.string} </h1>
         </div>
         <div className="flex flex-row items-center justify-center w-full mb-4">
           <div>

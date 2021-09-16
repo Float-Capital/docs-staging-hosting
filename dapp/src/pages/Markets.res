@@ -134,14 +134,24 @@ module Mint = {
   module Header = {
     module TypedCharacters = {
       @react.component
-      let make = (~str) => {
+      let make = (~str, ~leverageStr) => {
         let (count, setCount) = React.useState(_ => 1)
         Misc.Time.useIntervalFixed(
           _ => setCount(c => c + 1),
-          ~numIterations=str->String.length - 1,
+          ~numIterations=str->String.length + leverageStr->String.length - 1,
           ~delay=25,
         )
-        str->String.sub(0, count)->React.string
+
+        <span className="flex items-center">
+          {str->String.sub(0, count->Js.Math.min_int(str->String.length))->React.string}
+          {leverageStr != ""
+            ? <span className="ml-2 text-sm">
+                {leverageStr
+                ->String.sub(0, (count - str->String.length)->Js.Math.max_int(0))
+                ->React.string}
+              </span>
+            : React.null}
+        </span>
       }
     }
 
@@ -153,7 +163,18 @@ module Mint = {
             src={Backend.getMarketInfoUnsafe(market.marketIndex->Ethers.BigNumber.toNumber).icon}
             className="h-6 mr-2"
           />
-          <TypedCharacters str={market.name} />
+          {
+            let marketInfo = marketIndex->Backend.getMarketInfoUnsafe
+
+            <TypedCharacters
+              str={marketInfo.name}
+              leverageStr={if marketInfo.leverage != 1.0 {
+                `(${marketInfo.leverage->Float.toString}x leverage)`
+              } else {
+                ""
+              }}
+            />
+          }
         </div>
         <Next.Link
           href={`/app/markets?marketIndex=${marketIndex->Int.toString}&actionOption=${actionOption}`}>

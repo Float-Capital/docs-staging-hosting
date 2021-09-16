@@ -249,16 +249,22 @@ var PriceCard = {
 
 function Markets$Mint$Header$TypedCharacters(Props) {
   var str = Props.str;
+  var leverageStr = Props.leverageStr;
   var match = React.useState(function () {
         return 1;
       });
   var setCount = match[1];
+  var count = match[0];
   Misc.Time.useIntervalFixed((function (param) {
           return Curry._1(setCount, (function (c) {
                         return c + 1 | 0;
                       }));
-        }), 25, str.length - 1 | 0);
-  return $$String.sub(str, 0, match[0]);
+        }), 25, (str.length + leverageStr.length | 0) - 1 | 0);
+  return React.createElement("span", {
+              className: "flex items-center"
+            }, $$String.sub(str, 0, Math.min(count, str.length)), leverageStr !== "" ? React.createElement("span", {
+                    className: "ml-2 text-sm"
+                  }, $$String.sub(leverageStr, 0, Math.max(count - str.length | 0, 0))) : null);
 }
 
 var TypedCharacters = {
@@ -269,6 +275,7 @@ function Markets$Mint$Header(Props) {
   var market = Props.market;
   var actionOption = Props.actionOption;
   var marketIndex = Props.marketIndex;
+  var marketInfo = Backend.getMarketInfoUnsafe(marketIndex);
   return React.createElement("div", {
               className: "flex justify-between items-center mb-2"
             }, React.createElement("div", {
@@ -277,7 +284,8 @@ function Markets$Mint$Header(Props) {
                       className: "h-6 mr-2",
                       src: Backend.getMarketInfoUnsafe(market.marketIndex.toNumber()).icon
                     }), React.createElement(Markets$Mint$Header$TypedCharacters, {
-                      str: market.name
+                      str: marketInfo.name,
+                      leverageStr: marketInfo.leverage !== 1.0 ? "(" + String(marketInfo.leverage) + "x leverage)" : ""
                     })), React.createElement(Link, {
                   href: "/app/markets?marketIndex=" + String(marketIndex) + "&actionOption=" + actionOption,
                   children: React.createElement("div", {

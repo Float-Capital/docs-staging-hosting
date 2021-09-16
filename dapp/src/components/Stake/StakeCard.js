@@ -74,6 +74,7 @@ function StakeCard(Props) {
                       totalValueLocked: totalValueLocked
                     }));
   };
+  var marketInfo = Backend.getMarketInfoUnsafe(marketIndex.toNumber());
   return React.createElement(Link, {
               href: "/app/markets?marketIndex=" + marketIndex.toString() + "&tab=stake",
               children: React.createElement("div", {
@@ -82,10 +83,10 @@ function StakeCard(Props) {
                         className: "flex justify-center items-center w-full my-1"
                       }, React.createElement("img", {
                             className: "h-6 mr-2",
-                            src: Backend.getMarketInfoUnsafe(marketIndex.toNumber()).icon
+                            src: marketInfo.icon
                           }), React.createElement("h1", {
                             className: "font-bold text-xl font-alphbeta"
-                          }, param.name)), React.createElement("div", {
+                          }, marketInfo.name)), React.createElement("div", {
                         className: "flex flex-wrap justify-center w-full"
                       }, React.createElement(StakeCardSide.make, {
                             orderPostion: 1,

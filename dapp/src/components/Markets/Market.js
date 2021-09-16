@@ -25,7 +25,7 @@ function Market(Props) {
                     }, React.createElement(MarketInteractionCard.make, {}), React.createElement("div", {
                           className: "flex-1 w-full min-h-10 p-1 mx:0 mt-4 md:mt-0 md:ml-4 rounded-lg flex flex-col bg-white bg-opacity-70 shadow-lg"
                         }, React.createElement(PriceGraph.make, {
-                              marketName: marketData.name,
+                              marketName: Backend.getMarketInfoUnsafe(marketData.marketIndex.toNumber()).name,
                               oracleAddress: marketData.oracleAddress,
                               timestampCreated: marketData.timestampCreated,
                               oracleDecimals: Backend.getMarketInfoUnsafe(marketData.marketIndex.toNumber()).oracleDecimals
