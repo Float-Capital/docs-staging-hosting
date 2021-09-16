@@ -6,8 +6,30 @@ var Config = require("./library/Config.bs.js");
 var Ethers = require("./library/Ethers.bs.js");
 var Ethers$1 = require("ethers");
 var Contracts = require("./library/Contracts.bs.js");
+var JsPromise = require("./library/Js.Promise/JsPromise.bs.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var Belt_Option = require("rescript/lib/js/belt_Option.js");
+
+((require('isomorphic-fetch')));
+
+var oneGweiInWei = Ethers$1.BigNumber.from(1000000000);
+
+function getGasPrice(param) {
+  return JsPromise.$$catch(fetch("https://gasstation-mainnet.matic.network").then(function (prim) {
+                          return prim.json();
+                        }).then(function (response) {
+                        return response.fast;
+                      }), (function (err) {
+                      console.log("Error fetching gas price:", err);
+                      return Promise.resolve(85);
+                    })).then(function (result) {
+                  return Belt_Option.getWithDefault(result, 85);
+                }).then(function (prim) {
+                return Ethers$1.BigNumber.from(prim);
+              }).then(function (param) {
+              return oneGweiInWei.mul(param);
+            });
+}
 
 function getAggregatorAddresses(chainlinkOracleAddresses, wallet) {
   var signer = Ethers.getSigner(wallet);
@@ -36,10 +58,6 @@ function getProvider(urls) {
             });
 }
 
-var defaultOptions = {
-  gasPrice: Ethers$1.BigNumber.from("85000000000")
-};
-
 var wallet = {
   contents: undefined
 };
@@ -64,20 +82,25 @@ function runUpdateSystemStateMulti(marketsToUpdate) {
                     
                   })).then(function (param) {
                 var contract = Contracts.LongShort.make(Config.config.longShortContractAddress, Ethers.getSigner(wallet.contents));
-                console.log(marketsToUpdate, defaultOptions);
-                return contract.functions.updateSystemStateMulti(marketsToUpdate, defaultOptions).then(function (update) {
-                                console.log("submitted transaction", update.hash);
-                                return update.wait();
-                              }).then(function (param) {
-                              return function (param) {
-                                console.log("Transaction processes", param);
-                                
-                              };
-                            }).catch(function (e) {
-                            console.log("ERROR");
-                            console.log("-------------------");
-                            console.log(e);
-                            
+                return getGasPrice(undefined).then(function (gasPrice) {
+                            var transactionOptions = {
+                              gasPrice: gasPrice
+                            };
+                            console.log(marketsToUpdate, transactionOptions);
+                            return contract.functions.updateSystemStateMulti(marketsToUpdate, transactionOptions).then(function (update) {
+                                            console.log("submitted transaction", update.hash);
+                                            return update.wait();
+                                          }).then(function (param) {
+                                          return function (param) {
+                                            console.log("Transaction processes", param);
+                                            
+                                          };
+                                        }).catch(function (e) {
+                                        console.log("ERROR");
+                                        console.log("-------------------");
+                                        console.log(e);
+                                        
+                                      });
                           });
               }).then(function (param) {
               return mapWalletBalance(wallet.contents, (function (balance) {
@@ -129,16 +152,20 @@ var config = Config.config;
 
 var secrets = Config.secrets;
 
+var defaultGasPriceInGwei = 85;
+
 exports.config = config;
 exports.secrets = secrets;
+exports.oneGweiInWei = oneGweiInWei;
+exports.defaultGasPriceInGwei = defaultGasPriceInGwei;
+exports.getGasPrice = getGasPrice;
 exports.getAggregatorAddresses = getAggregatorAddresses;
 exports.mapWalletBalance = mapWalletBalance;
 exports.getJsonProviders = getJsonProviders;
 exports.getProvider = getProvider;
-exports.defaultOptions = defaultOptions;
 exports.wallet = wallet;
 exports.provider = provider;
 exports.updateCounter = updateCounter;
 exports.runUpdateSystemStateMulti = runUpdateSystemStateMulti;
 exports.setup = setup;
-/* defaultOptions Not a pure module */
+/*  Not a pure module */

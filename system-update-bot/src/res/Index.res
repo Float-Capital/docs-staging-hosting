@@ -1,7 +1,25 @@
 open Contracts
 open Ethers
 
+%raw("require('isomorphic-fetch')")
+
 let {config, secrets} = module(Config)
+
+let oneGweiInWei = Ethers.BigNumber.fromInt(1000000000)
+let defaultGasPriceInGwei: int = 85 // 85 gwei should be fast enough in most cases
+
+let getGasPrice = () => {
+  Fetch.fetch("https://gasstation-mainnet.matic.network")
+    ->JsPromise.then(Fetch.Response.json)
+    ->JsPromise.map(response => Obj.magic(response)["fast"])
+    ->JsPromise.catch(err => {
+      Js.log2("Error fetching gas price:", err)
+      Some(defaultGasPriceInGwei)->JsPromise.resolve
+    })
+    ->JsPromise.map(result => result->Option.getWithDefault(defaultGasPriceInGwei))
+    ->JsPromise.map(Ethers.BigNumber.fromInt)
+    ->JsPromise.map(Ethers.BigNumber.mul(oneGweiInWei))
+}
 
 let getAggregatorAddresses = (chainlinkOracleAddresses, wallet: Wallet.t) => {
   let signer = wallet->getSigner
@@ -35,8 +53,6 @@ let getProvider = urls =>
     providers->Providers.FallbackProvider.make(~quorum=1)
   })
 
-let defaultOptions: Contracts.txOptions = {gasPrice: Ethers.BigNumber.fromUnsafe("85000000000")} // 85 gwei should be fast enough in most cases
-
 let wallet: ref<Ethers.Wallet.t> = ref(None->Obj.magic)
 let provider: ref<Ethers.Providers.t> = ref(None->Obj.magic)
 let updateCounter: ref<int> = ref(0)
@@ -57,20 +73,27 @@ let runUpdateSystemStateMulti = (~marketsToUpdate) => {
       ~providerOrSigner=wallet.contents->getSigner,
     )
 
-    Js.log2(marketsToUpdate, defaultOptions)
-    contract
-    ->LongShort.updateSystemStateMulti(~marketIndexes=marketsToUpdate, ~gasOptions=defaultOptions)
-    ->JsPromise.then(update => {
-      Js.log2("submitted transaction", update.hash)
-      update.wait(.)
-    })
-    ->JsPromise.map(_ => {
-      Js.log2("Transaction processes")
-    })
-    ->JsPromise.mapCatch(e => {
-      Js.log("ERROR")
-      Js.log("-------------------")
-      Js.log(e)
+
+    getGasPrice()
+    ->JsPromise.map(gasPrice => {
+      let transactionOptions = {gasPrice: gasPrice}
+
+      Js.log2(marketsToUpdate, transactionOptions)
+
+      contract
+        ->LongShort.updateSystemStateMulti(~marketIndexes=marketsToUpdate, ~gasOptions=transactionOptions)
+        ->JsPromise.then(update => {
+          Js.log2("submitted transaction", update.hash)
+          update.wait(.)
+        })
+        ->JsPromise.map(_ => {
+          Js.log2("Transaction processes")
+        })
+        ->JsPromise.mapCatch(e => {
+          Js.log("ERROR")
+          Js.log("-------------------")
+          Js.log(e)
+        })
     })
   })
   ->JsPromise.then(_ =>

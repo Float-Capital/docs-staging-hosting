@@ -15,7 +15,7 @@ let wallet;
 let providerUrl = process.env.PROVIDER_URL;
 let mnemonic = process.env.MNEMONIC;
 try {
-  const config = require("./secretsManager.js");
+  const config = require("../secretsManager.js");
   providerUrl = config.providerUrl;
   mnemonic = config.mnemonic;
 } catch (e) {
