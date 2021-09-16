@@ -20,21 +20,17 @@ let make = () => {
               </p>
             </a>
           </div>
-          <div className="mx-4 order-2  bg-white bg-opacity-70 md:p-4 p-1 rounded  w-46">
+          <div className="mx-4 h-full order-2  bg-white bg-opacity-70 md:p-4 p-1 rounded  w-46">
             <a
               className="custom-cursor"
               target="_blank"
-              href="https://docs.float.capital/docs/security"
+              href="https://github.com/Float-Capital/contracts/tree/v0-alpha-launch"
               rel="noopener noreferrer">
-              //TODO
               <img
                 src="/icons/github-color.svg" className="h-16 md:h-32 mx-auto  hover:opacity-80"
               />
               <p className="text-center font-bold mx-auto hover:underline">
                 {"Github code"->React.string}
-              </p>
-              <p className="text-center mx-auto text-xs text-gray-500">
-                {"coming soon"->React.string}
               </p>
             </a>
           </div>
