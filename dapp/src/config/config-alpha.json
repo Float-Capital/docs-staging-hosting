@@ -1,5 +1,5 @@
 {
-  "graphEndpoint": "https://graph.float.capital/subgraphs/name/float-capital/float-capital-alpha",
+  "graphEndpoint": "https://graph.float.capital/subgraphs/name/float-capital/float-capital-alpha2",
   "priceHistoryGraphEndpoint": "https://api.thegraph.com/subgraphs/name/float-capital/alpha-price-history",
   "aaveGraphEndpoint": "https://api.thegraph.com/subgraphs/name/aave/aave-v2-matic",
   "networkId": 137,
