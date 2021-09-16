@@ -41,7 +41,8 @@ function RedeemSubmitButtonAndTxStatusModal$ConfirmedTransactionModal(Props) {
                   contractExecutionHandler: contractExecutionHandlerWithdraw
                 }) : React.createElement(PendingBar.make, {
                   marketIndex: marketIndex,
-                  refetchCallback: match[1]
+                  refetchCallback: match[1],
+                  showBlurb: false
                 })
         )
     );

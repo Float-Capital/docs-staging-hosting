@@ -26,7 +26,7 @@ module ConfirmedTransactionModal = {
               txState=txStateWithdraw
               contractExecutionHandler=contractExecutionHandlerWithdraw
             />
-          : <PendingBar marketIndex refetchCallback=setRefetchAttempt />
+          : <PendingBar marketIndex refetchCallback=setRefetchAttempt showBlurb={false} />
       | GraphError(error) => <p> {error->React.string} </p>
       | Loading => <Loader.Tiny />
       }}

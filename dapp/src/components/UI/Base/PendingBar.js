@@ -130,6 +130,7 @@ function PendingBar$PendingBarWrapper(Props) {
   var marketIndex = Props.marketIndex;
   var signer = Props.signer;
   var refetchCallback = Props.refetchCallback;
+  var showBlurb = Props.showBlurb;
   var lastOracleTimestamp = DataHooks.useOracleLastUpdate(marketIndex.toString());
   var oracleHeartbeat = Backend.getMarketInfoUnsafe(marketIndex.toNumber()).oracleHeartbeat;
   var match = ContractActions.useContractFunction(signer);
@@ -169,11 +170,11 @@ function PendingBar$PendingBarWrapper(Props) {
     );
   return React.createElement("div", {
               className: "relative pt-1"
-            }, React.createElement("div", {
-                  className: "text-xxs text-center mx-4 text-gray-600"
-                }, "Your transaction will be processed with the next price update ", React.createElement(Tooltip.make, {
-                      tip: "To ensure fairness and security your position will be opened on the next oracle price update"
-                    })), tmp, React.createElement("div", {
+            }, showBlurb ? React.createElement("div", {
+                    className: "text-xxs text-center mx-4 text-gray-600"
+                  }, "Your transaction will be processed with the next price update ", React.createElement(Tooltip.make, {
+                        tip: "To ensure fairness and security your position will be opened on the next oracle price update"
+                      })) : null, tmp, React.createElement("div", {
                   className: "w-full mx-auto my-1"
                 }, React.createElement("div", {
                       className: "pending-bar-container"
@@ -189,11 +190,14 @@ var PendingBarWrapper = {
 function PendingBar(Props) {
   var marketIndex = Props.marketIndex;
   var refetchCallback = Props.refetchCallback;
+  var showBlurbOpt = Props.showBlurb;
+  var showBlurb = showBlurbOpt !== undefined ? showBlurbOpt : true;
   var signer = ContractActions.useSignerExn(undefined);
   return React.createElement(PendingBar$PendingBarWrapper, {
               marketIndex: marketIndex,
               signer: signer,
-              refetchCallback: refetchCallback
+              refetchCallback: refetchCallback,
+              showBlurb: showBlurb
             });
 }
 
