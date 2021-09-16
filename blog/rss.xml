@@ -4,14 +4,14 @@
         <title>Float Capital | Docs Blog</title>
         <link>https://stagingdocs.float.capital/blog</link>
         <description>Float Capital | Docs Blog</description>
-        <lastBuildDate>Thu, 16 Sep 2021 08:30:07 GMT</lastBuildDate>
+        <lastBuildDate>Thu, 16 Sep 2021 08:30:44 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <item>
             <title><![CDATA[Introducing Float Capital: The Future of On-Chain Assets Powered by Chainlink]]></title>
             <link>https://stagingdocs.float.capital/blog/future-onchain-assets</link>
             <guid>/future-onchain-assets</guid>
-            <pubDate>Thu, 16 Sep 2021 08:30:07 GMT</pubDate>
+            <pubDate>Thu, 16 Sep 2021 08:30:44 GMT</pubDate>
             <description><![CDATA[First up, some massive news. The Float Capital Alpha goes LIVE on Polygon, this Friday, September 17, 2021.]]></description>
         </item>
     </channel>
