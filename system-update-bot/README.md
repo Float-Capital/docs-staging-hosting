@@ -26,9 +26,17 @@ _The time waiting for next mint in market_ can be avoided by the bot calling the
 
 `docker rename <default-docker-container-name> system_update_bot`
 
-\*Don't forget to populate the secretsManager.js
+\*Don't forget to populate the secretsManager.js*
 
 ## Improvements
 
 - Convert to rescript
 - Only execute on market oracle price update
+
+## Additional Resources 
+
+### Tip for generating mnemonic:
+`yarn add global bip39`
+` node -e 'console.log(require("bip39").generateMnemonic())'`
+
+https://github.com/kyledewy/eth-keys <- ethersjs wrapper that can be used to convert mnemonic to pvt key & get public address of mnemonic
