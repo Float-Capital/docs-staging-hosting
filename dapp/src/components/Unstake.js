@@ -567,7 +567,7 @@ function Unstake$StakeFormInput(Props) {
                   }, React.createElement("span", undefined, "⚡ We charge a small unstake fee on your tokens"), React.createElement("span", {
                         className: "text-black mx-1 "
                       }, React.createElement(Tooltip.make, {
-                            tip: "50 basis points"
+                            tip: "5 basis points"
                           })), React.createElement("span", undefined, "⚡")));
 }
 

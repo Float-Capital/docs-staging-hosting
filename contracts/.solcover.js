@@ -26,6 +26,14 @@ module.exports = {
   skipFiles: [
     "FloatCapital_v0.sol",
     "Treasury_v0.sol",
+    "AlphaTestFLT.sol",
+    "StakingStrategy.sol",
+    "StrategyToken.sol",
+    "SyntheticTokenUpgradeable.sol",
+    "TreasuryAlpha.sol",
+    "YieldManagerAave.sol",
+
+    "deployment/UUPSProxy.sol",
 
     "interfaces/IFloatToken.sol",
     "interfaces/ILongShort.sol",
@@ -47,12 +55,15 @@ module.exports = {
     "mocks/ERC20Mock.sol",
     "mocks/LendingPoolAaveMock.sol",
     "mocks/LendingPoolAddressesProviderMock.sol",
+    "mocks/LendingPoolAddressesProvider.sol",
 
     "oracles/OracleManagerChainlink.sol",
     "oracles/OracleManagerEthKillerChainlink.sol",
     "oracles/OracleManagerEthKillerChainlinkTestnet.sol",
     "oracles/OracleManagerEthVsBtc.sol",
     "oracles/OracleManagerFlippening_V0.sol",
+    "oracles/OracleManagerChainlinkTestnet.sol",
+    "oracles/OracleManagerFlipp3ning.sol",
 
     "testing/StakerInternalStateSetters.sol",
     "testing/LongShortInternalStateSetters.sol",
@@ -60,7 +71,7 @@ module.exports = {
     "testing/generated/LongShortForInternalMocking.sol",
     "testing/generated/StakerForInternalMocking.sol",
     "testing/generated/LongShortMockable.sol",
-    "testing/generated/StakerMockable.sol"
+    "testing/generated/StakerMockable.sol",
   ].concat(extraFilesToIgnore),
   istanbulFolder: coverageReportOutputDirectory,
   configureYulOptimizer: true
