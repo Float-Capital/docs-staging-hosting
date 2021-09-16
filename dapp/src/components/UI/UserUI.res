@@ -360,7 +360,7 @@ module UserPendingBox = {
         <div className=` text-sm self-center`> {(isLong ? "Long" : "Short")->React.string} </div>
         <div className=`flex  text-sm self-center`>
           <img src={CONSTANTS.daiDisplayToken.iconUrl} className="h-5 pr-1" />
-          {daiSpend->Ethers.Utils.formatEther->React.string}
+          {daiSpend->Ethers.Utils.formatEtherToPrecision(2)->React.string}
         </div>
       </div>
       <PendingBar marketIndex refetchCallback />
