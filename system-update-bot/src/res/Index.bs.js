@@ -7,6 +7,7 @@ var Ethers = require("./library/Ethers.bs.js");
 var Ethers$1 = require("ethers");
 var Js_math = require("rescript/lib/js/js_math.js");
 var Contracts = require("./library/Contracts.bs.js");
+var JsPromise = require("./library/Js.Promise/JsPromise.bs.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var Belt_Option = require("rescript/lib/js/belt_Option.js");
 
@@ -27,14 +28,15 @@ function toString(prim) {
 var oneGweiInWei = Ethers$1.BigNumber.from(1000000000);
 
 function getGasPrice(param) {
-  return fetch("https://gasstation-mainnet.matic.network").then(function (prim) {
-                  return prim.json();
-                }).then(function (response) {
-                return Belt_Option.map(response.fast, (function (gasInGWeiAsFloat) {
-                              return Ethers$1.BigNumber.from(Js_math.ceil_int(gasInGWeiAsFloat)).mul(oneGweiInWei);
-                            }));
-              }).then(function (__x) {
-              return Belt_Option.getWithDefault(__x, Ethers$1.BigNumber.from(85).mul(oneGweiInWei));
+  return JsPromise.$$catch(fetch("https://gasstation-mainnet.matic.network").then(function (prim) {
+                      return prim.json();
+                    }).then(function (response) {
+                    return response.fast;
+                  }), (function (err) {
+                  console.log("Error fetching gas price, falling back to default gas price. Error:", err);
+                  return Promise.resolve(85.0);
+                })).then(function (optGasPriceInGwei) {
+              return Ethers$1.BigNumber.from(Math.min(Js_math.ceil_int(Belt_Option.getWithDefault(optGasPriceInGwei, 85.0)), 250)).mul(oneGweiInWei);
             });
 }
 
@@ -159,7 +161,9 @@ var config = Config.config;
 
 var secrets = Config.secrets;
 
-var defaultGasPriceInGwei = 85;
+var defaultGasPriceInGwei = 85.0;
+
+var maxGasPriceInGwei = 250;
 
 exports.mul = mul;
 exports.fromInt = fromInt;
@@ -168,6 +172,7 @@ exports.config = config;
 exports.secrets = secrets;
 exports.oneGweiInWei = oneGweiInWei;
 exports.defaultGasPriceInGwei = defaultGasPriceInGwei;
+exports.maxGasPriceInGwei = maxGasPriceInGwei;
 exports.getGasPrice = getGasPrice;
 exports.getAggregatorAddresses = getAggregatorAddresses;
 exports.mapWalletBalance = mapWalletBalance;
