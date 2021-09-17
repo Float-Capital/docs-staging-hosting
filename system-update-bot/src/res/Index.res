@@ -20,7 +20,7 @@ let getGasPrice = () => {
     })
     ->JsPromise.map(optGasPriceInGwei =>
                     optGasPriceInGwei
-                    ->Option.getWithDefault(_, defaultGasPriceInGwei)
+                    ->Option.getWithDefault(defaultGasPriceInGwei)
                     ->Js.Math.ceil_int
                     ->Js.Math.min_int(_, maxGasPriceInGwei)
                     ->fromInt
