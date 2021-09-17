@@ -21,6 +21,8 @@ let runTestTransactions =
   let user1 = loadedAccounts->Array.getUnsafe(2);
   let user2 = loadedAccounts->Array.getUnsafe(3);
   let user3 = loadedAccounts->Array.getUnsafe(4);
+  let user7 = loadedAccounts->Array.getUnsafe(8);
+  let user8 = loadedAccounts->Array.getUnsafe(9);
 
   let%AwaitThen _ = DeployHelpers.topupBalanceIfLow(~from=admin, ~to_=user1);
   let%AwaitThen _ = DeployHelpers.topupBalanceIfLow(~from=admin, ~to_=user2);
@@ -178,6 +180,61 @@ let runTestTransactions =
       ),
     );
 
+  let%AwaitThen _ = priceAndStateUpdate();
+  let%AwaitThen _ =
+    executeOnMarkets(
+      initialMarkets,
+      mintLongNextPriceWithSystemUpdate(
+        ~amount=bnFromInt(0),
+        ~marketIndex=_,
+        ~paymentToken,
+        ~longShort,
+        ~user=user1,
+        ~admin,
+      ),
+    );
+  let%AwaitThen _ =
+    executeOnMarkets(
+      initialMarkets,
+      mintShortNextPriceWithSystemUpdate(
+        ~amount=bnFromInt(0),
+        ~marketIndex=_,
+        ~paymentToken,
+        ~longShort,
+        ~user=user1,
+        ~admin,
+      ),
+    );
+  let%AwaitThen _ =
+    executeOnMarkets(
+      initialMarkets,
+      mintLongNextPriceWithSystemUpdate(
+        ~amount=bnFromInt(0),
+        ~marketIndex=_,
+        ~paymentToken,
+        ~longShort,
+        ~user=user2,
+        ~admin,
+      ),
+    );
+  let%AwaitThen _ =
+    executeOnMarkets(
+      initialMarkets,
+      mintLongNextPriceWithSystemUpdate(
+        ~amount=bnFromInt(0),
+        ~marketIndex=_,
+        ~paymentToken,
+        ~longShort,
+        ~user=user8,
+        ~admin,
+      ),
+    );
+  let%AwaitThen _ =
+    executeOnMarkets(initialMarkets, marketIndex => {
+      longShort
+      ->ContractHelpers.connect(~address=user7)
+      ->LongShort.mintLongNextPrice(~marketIndex, ~amount=bnFromInt(0))
+    });
   let%AwaitThen _ = priceAndStateUpdate();
 
   Js.log("Update treasury base price");
