@@ -22,7 +22,7 @@ let getGasPrice = () => {
                     optGasPriceInGwei
                     ->Option.getWithDefault(defaultGasPriceInGwei)
                     ->Js.Math.ceil_int
-                    ->Js.Math.min_int(_, maxGasPriceInGwei)
+                    ->Js.Math.min_int(maxGasPriceInGwei)
                     ->fromInt
                     ->mul(oneGweiInWei)
   )
