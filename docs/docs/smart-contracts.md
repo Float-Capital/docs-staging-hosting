@@ -29,6 +29,10 @@ contract Float is Legendary {
 
 View the currently deployed contracts on etherscan at the contract [addresses](/docs/addresses).
 
-Check out our video [walkthroughs](https://www.youtube.com/watch?v=Hm4rZfB8Chk&list=PL7RT-0ybd7joiqKeGklvFxcc8dNWpPBCk) which deep dives into our smart contracts that were prepared for our [Code 432n4 audit](/docs/security#code-432n4-Audit-✊)!
+Check out our video walkthroughs which deep dives into our smart contracts that were prepared for our [Code 432n4 audit](/docs/security#code-432n4-Audit-✊):
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/videoseries?list=PL7RT-0ybd7joiqKeGklvFxcc8dNWpPBCk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+---
 
 **Join our [discord](https://discord.gg/qesr2KZAhn) for more details of the current stage of development.**📈
