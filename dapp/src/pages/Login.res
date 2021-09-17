@@ -7,17 +7,17 @@ let connectors = [
     img: "/img/wallet-icons/metamask.svg",
     connectionPhrase: "Connect via MetaMask",
   },
-  {
-    name: "WalletConnect",
-    connector: WalletConnectConnector.make({
-      rpc: Js.Dict.fromArray([(Config.networkId->Int.toString, Config.rpcEndopint)]),
-      bridge: "https://bridge.walletconnect.org",
-      qrcode: true,
-      pollingInterval: Config.web3PollingInterval,
-    }),
-    connectionPhrase: "Connect via WalletConnect",
-    img: "/img/wallet-icons/walletConnect.svg",
-  },
+  // {
+  //   name: "WalletConnect",
+  //   connector: WalletConnectConnector.make({
+  //     rpc: Js.Dict.fromArray([(Config.networkId->Int.toString, Config.rpcEndopint)]),
+  //     bridge: "https://bridge.walletconnect.org",
+  //     qrcode: true,
+  //     pollingInterval: Config.web3PollingInterval,
+  //   }),
+  //   connectionPhrase: "Connect via WalletConnect",
+  //   img: "/img/wallet-icons/walletConnect.svg",
+  // },
   {
     name: "Torus",
     connector: TorusConnector.make({
@@ -118,7 +118,7 @@ let make = () => {
       } else {
         React.null
       }}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center my-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center my-5">
         {connectors
         ->Array.mapWithIndex((index, connector) =>
           <div

@@ -633,7 +633,7 @@ function useUsersConfirmedRedeems(userId) {
                 if (confirmedNextPriceAction.amountSynthTokenForWithdrawalLong.gt(CONSTANTS.zeroBN)) {
                   return true;
                 } else {
-                  return confirmedNextPriceAction.amountSynthTokenForWithdrawalLong.gt(CONSTANTS.zeroBN);
+                  return confirmedNextPriceAction.amountSynthTokenForWithdrawalShort.gt(CONSTANTS.zeroBN);
                 }
               })), (function (confirmedNextPriceAction) {
             var isLong = confirmedNextPriceAction.amountSynthTokenForWithdrawalLong.gt(CONSTANTS.zeroBN);
