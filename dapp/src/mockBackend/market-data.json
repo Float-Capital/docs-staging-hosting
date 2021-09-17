@@ -1,23 +1,23 @@
 [
-    {    
+    {
         "name": "The Flipp3ning",
         "description": "The Flipp3ning represents a 3x leveraged version of the Flippening, ratio of the ETH to BTC market cap. Enter a long position to gain exposure to ETH increasing in value in relation to BTC or a short position to gain exposure to BTC increasing in value in relation to ETH.",
-        "oracleHeartbeat": 310,
+        "oracleHeartbeat": 335,
         "icon": "/icons/tokens/flippening.svg",
         "oracleDecimals": 18,
         "leverage": 3.0
     },
-    {    
+    {
         "name": "",
-        "description": "" ,
+        "description": "",
         "oracleHeartbeat": 70,
         "icon": "/icons/tokens/placeholder.svg",
         "oracleDecimals": 8,
         "leverage": 1.0
     },
-    {    
+    {
         "name": "",
-        "description": "" ,
+        "description": "",
         "oracleHeartbeat": 70,
         "icon": "/icons/tokens/placeholder.svg",
         "oracleDecimals": 8,

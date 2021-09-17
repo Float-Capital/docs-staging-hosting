@@ -11,6 +11,10 @@ slug: /terminology
 
 ## Protocol
 
+### The Flipp3ning
+
+“The Flippening” tracks the possible future event where the Ethereum market cap overtakes the Bitcoin market capto become the most valuable cryptocurrency. The "Flipp3ning" is based on the Flippening, but with 3x leverage.
+
 ### EthKillers
 
 The EthKillers is the intended first synthetic market offered by Float Capital and tracks an equally weighted index comprised of [TRON](https://tron.network/), [XRP](https://ripple.com/xrp/), and [EOS](https://eos.io/) that were nicknamed EthKillers as they were said to be the _killers_ of Ethereum.
