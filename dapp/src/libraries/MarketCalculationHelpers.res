@@ -196,7 +196,7 @@ let calculateStakeAPYS = (
       ->Ethers.BigNumber.abs // compiler error if not fully qualified
       ->mul(CONSTANTS.yieldGradientHardcode)
       ->div(totalValueLocked)
-      ->min(CONSTANTS.tenToThe18)
+      ->(a => a->gt(CONSTANTS.tenToThe18) ? CONSTANTS.tenToThe18 : a)
 
     totalTreasuryYieldAfterYear :=
       totalTreasuryYieldAfterYear.contents->add(

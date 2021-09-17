@@ -4,7 +4,6 @@
 var Ethers = require("../ethereum/Ethers.js");
 var Ethers$1 = require("ethers");
 var Globals = require("./Globals.js");
-var Caml_obj = require("rescript/lib/js/caml_obj.js");
 var CONSTANTS = require("../CONSTANTS.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var Belt_Option = require("rescript/lib/js/belt_Option.js");
@@ -89,7 +88,8 @@ function calculateStakeAPYS(syntheticMarkets, $$global, apy) {
           var totalLockedLong = match.totalLockedLong;
           var match$1 = market.syntheticShort;
           var match$2 = market.syntheticLong;
-          var marketsShareOfYield = Caml_obj.caml_min(totalLockedLong.sub(totalLockedShort).abs().mul(CONSTANTS.yieldGradientHardcode).div(totalValueLocked), CONSTANTS.tenToThe18);
+          var a = totalLockedLong.sub(totalLockedShort).abs().mul(CONSTANTS.yieldGradientHardcode).div(totalValueLocked);
+          var marketsShareOfYield = a.gt(CONSTANTS.tenToThe18) ? CONSTANTS.tenToThe18 : a;
           totalTreasuryYieldAfterYear.contents = totalTreasuryYieldAfterYear.contents.add(CONSTANTS.tenToThe18.sub(marketsShareOfYield).mul(apy).mul(totalValueLocked).div(CONSTANTS.tenToThe18).div(CONSTANTS.tenToThe18));
           var match$3 = calcLongAndShortDollarFloatPerSecondUnscaled(totalLockedLong, totalLockedShort, CONSTANTS.equilibriumOffsetHardcode, market.timestampCreated, match.timestamp, CONSTANTS.kperiodHardcode, CONSTANTS.kmultiplierHardcode, CONSTANTS.balanceIncentiveExponentHardcode);
           var longFloatOverYear = calculateFloatMintedOverPeriod(match$3[0], match$2.totalStaked, Ethers$1.BigNumber.from(CONSTANTS.oneYearInSeconds), match$2.latestPrice.price.price);
