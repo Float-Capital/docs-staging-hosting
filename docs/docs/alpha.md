@@ -22,7 +22,7 @@ More on the security steps taken to ensure user safety on the Float protocol can
 The alpha release will be launched with the alphaFloat(alphaFLT) token. The Float Governance token (FLT) will be launched during the main release of the Float Capital protocol.
 For the alpha launch, the alphaFloat token will be non-transferable, however, it will be convertible for value accrued to the system.
 
-Users who stake early can earned increased alphaFloat tokens when the alpha launches. AlphaFloat Token issuance will launch with 2x multiplier on tokens earned which decreases linearly to 1 over 60 days! Stake early to maximize your alphaFloat earned!
+Users who stake early can earn increased alphaFloat tokens when the alpha launches. AlphaFloat Token issuance will launch with a 2x multiplier on tokens earned which decreases linearly to 1 over 60 days! Stake early to maximize your alphaFloat earned!
 
 ## Minting a position on the Polygon network :heavy_dollar_sign:
 
