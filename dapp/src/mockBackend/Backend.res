@@ -4,6 +4,7 @@ type marketInfo = {
   oracleHeartbeat: int,
   icon: string,
   oracleDecimals: int,
+  leverage: float,
 }
 
 let marketsInfoData: array<marketInfo> = %raw(`require('./market-data.json')`)
@@ -15,6 +16,7 @@ let getMarketInfoUnsafe = index => {
     oracleHeartbeat: 300,
     icon: "/icons/tokens/placeholder.svg",
     oracleDecimals: 8,
+    leverage: 1.0,
   })
 }
 

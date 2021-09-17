@@ -13,7 +13,6 @@ let {mapStakeApy} = module(MarketCalculationHelpers)
 @react.component
 let make = (
   ~syntheticMarket as {
-    name: marketName,
     timestampCreated,
     marketIndex,
     latestSystemState: {
@@ -114,15 +113,14 @@ let make = (
       }}
     </div>
 
+  let marketInfo = Backend.getMarketInfoUnsafe(marketIndex->Ethers.BigNumber.toNumber)
+
   <Next.Link href={`/app/markets?marketIndex=${marketIndex->Ethers.BigNumber.toString}&tab=stake`}>
     <div
       className="p-1 mb-8 rounded-lg flex flex-col bg-white bg-opacity-75 hover:bg-opacity-60 cursor-pointer my-5 shadow-lg">
       <div className="flex justify-center items-center w-full my-1">
-        <img
-          src={Backend.getMarketInfoUnsafe(marketIndex->Ethers.BigNumber.toNumber).icon}
-          className="h-6 mr-2"
-        />
-        <h1 className="font-bold text-xl font-alphbeta"> {marketName->React.string} </h1>
+        <img src={marketInfo.icon} className="h-6 mr-2" />
+        <h1 className="font-bold text-xl font-alphbeta"> {marketInfo.name->React.string} </h1>
       </div>
       <div className="flex flex-wrap justify-center w-full">
         <StakeCardSide

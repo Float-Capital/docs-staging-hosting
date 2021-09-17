@@ -16,8 +16,7 @@ let make = () => {
                   ? "md:transform md:-translate-y-14 md:-translate-x-10 "
                   : ""} ${index == 2 ? "md:transform  md:-translate-x-20" : ""}`}>
               <Mint.DetailsWrapper
-                market=marketData
-                marketIndex={index->Belt.Int.toString}
+                marketIndex={marketData.marketIndex->Ethers.BigNumber.toNumber->Belt.Int.toString}
                 actionOption={"long"}
                 view={Mint.LandingPage}>
                 <MintForm market={marketData} isLong={true} />

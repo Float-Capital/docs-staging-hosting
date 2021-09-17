@@ -2,13 +2,7 @@ type detailsWrapperView = LandingPage | MintView
 
 module DetailsWrapper = {
   @react.component
-  let make = (
-    ~market: Queries.SyntheticMarketInfo.t,
-    ~marketIndex,
-    ~actionOption,
-    ~children,
-    ~view: detailsWrapperView,
-  ) =>
+  let make = (~marketIndex, ~actionOption, ~children, ~view: detailsWrapperView) =>
     <div className="max-w-xl mx-auto">
       {view == LandingPage
         ? React.null
@@ -24,7 +18,21 @@ module DetailsWrapper = {
             ? "100 border"
             : "70"} shadow-lg`}>
         <div className="flex justify-between items-center mb-2">
-          <div className="text-xl"> {`${market.name} (${market.symbol})`->React.string} </div>
+          <div className="text-xl">
+            {
+              let marketInfo =
+                marketIndex->Int.fromString->Option.getWithDefault(0)->Backend.getMarketInfoUnsafe
+
+              <span className="flex items-center">
+                {marketInfo.name->React.string}
+                {marketInfo.leverage != 1.0
+                  ? <span className="text-sm ml-2">
+                      {`(${marketInfo.leverage->Float.toString}x leverage)`->React.string}
+                    </span>
+                  : React.null}
+              </span>
+            }
+          </div>
           <Next.Link href={`/app/markets?marketIndex=${marketIndex}&actionOption=${actionOption}`}>
             <div className="text-xxs hover:underline cursor-pointer">
               {`view details`->React.string}
@@ -53,7 +61,7 @@ let make = (~withHeader=true) => {
       switch optFirstMarket {
       | Some(firstMarket) =>
         withHeader
-          ? <DetailsWrapper market=firstMarket marketIndex actionOption view={MintView}>
+          ? <DetailsWrapper marketIndex actionOption view={MintView}>
               <MintForm market={firstMarket} isLong={actionOption == "short" ? false : true} />
             </DetailsWrapper>
           : <MintForm market={firstMarket} isLong={actionOption == "short" ? false : true} />

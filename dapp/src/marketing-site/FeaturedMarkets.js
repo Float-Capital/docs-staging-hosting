@@ -45,8 +45,7 @@ function FeaturedMarkets(Props) {
                                                     index === 2 ? "md:transform  md:-translate-x-20" : ""
                                                   )
                                                 }, React.createElement(Mint.DetailsWrapper.make, {
-                                                      market: marketData,
-                                                      marketIndex: String(index),
+                                                      marketIndex: String(marketData.marketIndex.toNumber()),
                                                       actionOption: "long",
                                                       children: React.createElement(MintForm.make, {
                                                             market: marketData,
