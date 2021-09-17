@@ -7,16 +7,6 @@ slug: /new-era-synthetic-assets
 
 # Float Capital Presents: A New Era of Synthetic Assets
 
-[![Float Capital](https://miro.medium.com/fit/c/56/56/1*3APLsfqpYIn95nllBmGjvA.png)](https://medium.com/@Float.Capital?source=post_page-----9e19712f8499--------------------------------)[
-
-Float Capital
-
-](https://medium.com/@Float.Capital?source=post_page-----9e19712f8499--------------------------------)[
-
-Just now·7 min read
-
-](https://medium.com/@Float.Capital/float-capital-presents-a-new-era-of-synthetic-assets-9e19712f8499?source=post_page-----9e19712f8499--------------------------------)
-
 ![](https://miro.medium.com/max/1024/0*Up_qik2aHogRW8Ve)
 
 **The Float Capital Alpha is going LIVE on the Polygon network!**
