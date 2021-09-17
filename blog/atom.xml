@@ -2,18 +2,11 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://stagingdocs.float.capital/blog</id>
     <title>Float Capital | Docs Blog</title>
-    <updated>2021-09-17T00:00:00.000Z</updated>
+    <updated>2021-09-16T00:00:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://stagingdocs.float.capital/blog"/>
     <subtitle>Float Capital | Docs Blog</subtitle>
     <icon>https://stagingdocs.float.capital/favicons/favicon.ico</icon>
-    <entry>
-        <title type="html"><![CDATA[Float Capital Presents: A New Era of Synthetic Assets]]></title>
-        <id>/new-era-synthetic-assets</id>
-        <link href="https://stagingdocs.float.capital/blog/new-era-synthetic-assets"/>
-        <updated>2021-09-17T00:00:00.000Z</updated>
-        <summary type="html"><![CDATA[Float Capital[]]></summary>
-    </entry>
     <entry>
         <title type="html"><![CDATA[Apeing in Responsibly: Managing risk in the Float Alpha]]></title>
         <id>/apeing-in-responsibly</id>
