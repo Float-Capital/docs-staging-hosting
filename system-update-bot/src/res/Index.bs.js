@@ -5,29 +5,36 @@ var Curry = require("rescript/lib/js/curry.js");
 var Config = require("./library/Config.bs.js");
 var Ethers = require("./library/Ethers.bs.js");
 var Ethers$1 = require("ethers");
+var Js_math = require("rescript/lib/js/js_math.js");
 var Contracts = require("./library/Contracts.bs.js");
-var JsPromise = require("./library/Js.Promise/JsPromise.bs.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var Belt_Option = require("rescript/lib/js/belt_Option.js");
+
+function mul(prim0, prim1) {
+  return prim0.mul(prim1);
+}
+
+function fromInt(prim) {
+  return Ethers$1.BigNumber.from(prim);
+}
+
+function toString(prim) {
+  return prim.toString();
+}
 
 ((require('isomorphic-fetch')));
 
 var oneGweiInWei = Ethers$1.BigNumber.from(1000000000);
 
 function getGasPrice(param) {
-  return JsPromise.$$catch(fetch("https://gasstation-mainnet.matic.network").then(function (prim) {
-                          return prim.json();
-                        }).then(function (response) {
-                        return response.fast;
-                      }), (function (err) {
-                      console.log("Error fetching gas price:", err);
-                      return Promise.resolve(85);
-                    })).then(function (result) {
-                  return Belt_Option.getWithDefault(result, 85);
-                }).then(function (prim) {
-                return Ethers$1.BigNumber.from(prim);
-              }).then(function (param) {
-              return oneGweiInWei.mul(param);
+  return fetch("https://gasstation-mainnet.matic.network").then(function (prim) {
+                  return prim.json();
+                }).then(function (response) {
+                return Belt_Option.map(response.fast, (function (gasInGWeiAsFloat) {
+                              return Ethers$1.BigNumber.from(Js_math.ceil_int(gasInGWeiAsFloat)).mul(oneGweiInWei);
+                            }));
+              }).then(function (__x) {
+              return Belt_Option.getWithDefault(__x, Ethers$1.BigNumber.from(85).mul(oneGweiInWei));
             });
 }
 
@@ -154,6 +161,9 @@ var secrets = Config.secrets;
 
 var defaultGasPriceInGwei = 85;
 
+exports.mul = mul;
+exports.fromInt = fromInt;
+exports.toString = toString;
 exports.config = config;
 exports.secrets = secrets;
 exports.oneGweiInWei = oneGweiInWei;
