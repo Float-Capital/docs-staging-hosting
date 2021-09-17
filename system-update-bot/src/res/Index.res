@@ -7,17 +7,25 @@ let {mul, fromInt, toString} = module(Ethers.BigNumber)
 let {config, secrets} = module(Config)
 
 let oneGweiInWei = fromInt(1000000000)
-let defaultGasPriceInGwei: int = 85 // 85 gwei should be fast enough in most cases
+let defaultGasPriceInGwei: float = 85.0 // 85 gwei should be fast enough in most cases
+let maxGasPriceInGwei: int = 250
 
 let getGasPrice = () => {
   Fetch.fetch("https://gasstation-mainnet.matic.network")
   ->JsPromise.then(Fetch.Response.json)
-  ->JsPromise.map(response =>
-    Obj.magic(response)["fast"]->Option.map(gasInGWeiAsFloat =>
-      gasInGWeiAsFloat->Js.Math.ceil_int->fromInt->mul(oneGweiInWei)
-    )
+    ->JsPromise.map(response => Obj.magic(response)["fast"])
+    ->JsPromise.catch(err => {
+      Js.log2("Error fetching gas price, falling back to default gas price. Error:", err)
+      Some(defaultGasPriceInGwei)->JsPromise.resolve
+    })
+    ->JsPromise.map(optGasPriceInGwei =>
+                    optGasPriceInGwei
+                    ->Option.getWithDefault(defaultGasPriceInGwei)
+                    ->Js.Math.ceil_int
+                    ->Js.Math.min_int(maxGasPriceInGwei)
+                    ->fromInt
+                    ->mul(oneGweiInWei)
   )
-  ->JsPromise.map(Option.getWithDefault(_, defaultGasPriceInGwei->fromInt->mul(oneGweiInWei)))
 }
 
 let getAggregatorAddresses = (chainlinkOracleAddresses, wallet: Wallet.t) => {
