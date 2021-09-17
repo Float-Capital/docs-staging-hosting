@@ -89,7 +89,7 @@ function start {
 
     echo "####### DEPLOYING CONTRACTS #######"
     rm -rf contracts/deployments/ganache
-    cd ../contracts && yarn clean && yarn deploy --network ganache
+    cd ../contracts; rm -rf deployments/ganache; yarn deploy --network ganache || true
     if [ "$?" -ne 0 ];
     then
         echo "ERROR: Could not deploy contracts successfully"

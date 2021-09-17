@@ -10,13 +10,20 @@ describe("All Tests", ({beforeAll, testAsync}) => {
     let allStateChangesRaw = Queries.getAllStateChanges()
 
     allStateChanges :=
-      allStateChangesRaw->StateChange.getAllStateChangeEvents->StateChange.splitIntoEventGroups
+      allStateChangesRaw
+      ->StateChange.getAllStateChangeEvents
+      ->StateChange.splitIntoEventGroups
+      ->JsPromise.catch(error => {
+        Js.log({"critical error fetching events": error})
+        ()->Obj.magic
+      })
+    Js.log2("Saving the promise", allStateChanges.contents)
   })
 
   describe("V1 event", ({testAsync}) => {
     testAsync("should occur exactly ONCE", ({expectEqual, callback}) => {
-      let _ = allStateChanges.contents->JsPromise.map(({allV1Events}) => {
-        expectEqual(allV1Events->Belt.Array.length, 1)
+      let _ = allStateChanges.contents->JsPromise.map(({allLongShortV1Events}) => {
+        expectEqual(allLongShortV1Events->Belt.Array.length, 1)
         callback()
       })
     })
@@ -27,9 +34,9 @@ describe("All Tests", ({beforeAll, testAsync}) => {
       expectTrue,
       callback,
     }) => {
-      let _ = allStateChanges.contents->JsPromise.map(({allV1Events}) => {
+      let _ = allStateChanges.contents->JsPromise.map(({allLongShortV1Events}) => {
         let {blockNumber, timestamp, data: {admin, staker, tokenFactory}} =
-          allV1Events->Array.getExn(0)
+          allLongShortV1Events->Array.getExn(0)
 
         let _ = Queries.getGlobalStateAtBlock(~blockNumber)->JsPromise.map((
           result: option<Queries.GetGlobalState.t_globalState>,
@@ -115,9 +122,10 @@ describe("All Tests", ({beforeAll, testAsync}) => {
               name,
               symbol,
               oracleAddress,
-              collateralAddress,
+              paymentAddress,
             },
           }) => {
+            Js.log({"market index": marketIndex->BN.toString, "txHash": txHash})
             Queries.getSyntheticMarketAtBlock(
               ~blockNumber,
               ~marketId=marketIndex->BN.toString,
@@ -128,7 +136,7 @@ describe("All Tests", ({beforeAll, testAsync}) => {
                   timestampCreated,
                   txHash: resultTxHash,
                   blockNumberCreated,
-                  collateralToken: {id: collateralTokenId},
+                  paymentToken: {id: paymentTokenId},
                   name: resultName,
                   symbol: resultSymbol,
                   marketIndex,
@@ -137,7 +145,6 @@ describe("All Tests", ({beforeAll, testAsync}) => {
                   syntheticLong: {id: longId},
                   syntheticShort: {id: shortId},
                   latestSystemState: {id: systemStateId},
-                  feeStructure: {id: feeStructureId},
                   kPeriod,
                   kMultiplier,
                 }) => {
@@ -154,13 +161,14 @@ describe("All Tests", ({beforeAll, testAsync}) => {
                   expectEqual(longId, longTokenAddress)
                   expectEqual(shortId, shortTokenAddress)
                   expectEqual(systemStateId, marketIndex->BN.toString ++ "-0")
-                  expectEqual(feeStructureId, marketIndex->BN.toString ++ "-fees")
-                  expectEqual(collateralTokenId, collateralAddress)
+                  Js.log({"paymentTokenId": paymentTokenId, "paymentAddress": paymentAddress})
+                  expectEqual(paymentTokenId, paymentAddress)
                 }
 
               | None => expectTrue(false)
               }
             })
+            // ->JsPromise.catch(error => Js.log({"Error": error})->Obj.magic)
           })
           ->JsPromise.all
         })
@@ -182,7 +190,6 @@ describe("All Tests", ({beforeAll, testAsync}) => {
         tokenType,
         tokenSupply,
         floatMintedFromSpecificToken,
-        latestStakerState: {id: stakerStateId},
         latestPrice: {id: latestPriceId, price: {id: priceId}},
         priceHistory,
       } = syntheticTokenQuery
@@ -194,7 +201,6 @@ describe("All Tests", ({beforeAll, testAsync}) => {
       expectEqual(marketId, marketIndex->BN.toString)
       expectEqual(tokenType->Obj.magic, tokenStrTypeUpper)
       expectEqual(floatMintedFromSpecificToken->BN.toString, "0")
-      expectEqual(stakerStateId, tokenAddress ++ "-0")
       expectEqual(
         latestPriceId,
         "latestPrice-" ++ marketIndex->BN.toString ++ "-" ++ tokenStrTypeLower,
