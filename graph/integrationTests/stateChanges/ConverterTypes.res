@@ -17,6 +17,15 @@ let bnDeccoCodex = (
     ),
 )
 
+let boolStringDeccoCodex = (
+  boolValue => boolValue ? "true" : "false",
+  boolString =>
+    boolString
+    ->Js.Json.decodeString
+    ->Option.map(decodedString => (decodedString->Js.String2.toLowerCase == "true")->Ok)
+    ->Option.getWithDefault(Decco.error("unable to decode boolean string", boolString)),
+)
+
 @decco
 type bn = @decco.codec(bnDeccoCodex) BN.t
 

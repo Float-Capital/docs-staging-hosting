@@ -36,6 +36,28 @@ var bnDeccoCodex = [
   bnDeccoCodex_1
 ];
 
+function boolStringDeccoCodex_0(boolValue) {
+  if (boolValue) {
+    return "true";
+  } else {
+    return "false";
+  }
+}
+
+function boolStringDeccoCodex_1(boolString) {
+  return Belt_Option.getWithDefault(Belt_Option.map(Js_json.decodeString(boolString), (function (decodedString) {
+                    return {
+                            TAG: /* Ok */0,
+                            _0: decodedString.toLowerCase() === "true"
+                          };
+                  })), Decco.error(undefined, "unable to decode boolean string", boolString));
+}
+
+var boolStringDeccoCodex = [
+  boolStringDeccoCodex_0,
+  boolStringDeccoCodex_1
+];
+
 var bn_encode = Curry.__1(bnDeccoCodex_0);
 
 var bn_decode = Curry.__1(bnDeccoCodex_1);
@@ -43,6 +65,7 @@ var bn_decode = Curry.__1(bnDeccoCodex_1);
 exports.address_encode = address_encode;
 exports.address_decode = address_decode;
 exports.bnDeccoCodex = bnDeccoCodex;
+exports.boolStringDeccoCodex = boolStringDeccoCodex;
 exports.bn_encode = bn_encode;
 exports.bn_decode = bn_decode;
 /* bn.js Not a pure module */

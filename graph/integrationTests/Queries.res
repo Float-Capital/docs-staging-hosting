@@ -2,17 +2,22 @@ open GqlConverters
 module ApolloQueryResult = ApolloClient.Types.ApolloQueryResult
 
 %graphql(`
- fragment StakerStateInfo on StakeState{
+ fragment StakerStateInfo on AccumulativeFloatIssuanceSnapshot{
   id
   blockNumber
   creationTxHash
-  stateIndex
-  syntheticToken{
+  index
+  longToken{
+    id
+  }
+  shortToken{
     id
   }
   timestamp
-  accumulativeFloatPerToken
-  floatRatePerTokenOverInterval
+  accumulativeFloatPerTokenLong
+  accumulativeFloatPerTokenShort
+  floatRatePerTokenOverIntervalLong
+  floatRatePerTokenOverIntervalShort
   timeSinceLastUpdate
  }
 
@@ -34,9 +39,6 @@ module ApolloQueryResult = ApolloClient.Types.ApolloQueryResult
   tokenType
   tokenSupply
   floatMintedFromSpecificToken
-  latestStakerState{
-    id
-  }
   latestPrice{
     id
     price{
@@ -54,33 +56,26 @@ module ApolloQueryResult = ApolloClient.Types.ApolloQueryResult
    txHash,
    blockNumber,
    marketIndex,
-   syntheticPrice,
-   longTokenPrice{
+   underlyingPrice {
+     id
+   },
+   longTokenPrice {
      id
    }
-   shortTokenPrice{
+   shortTokenPrice {
      id
    }
-   longToken{
+   longToken {
      id
    }
-   shortToken{
+   shortToken {
      id
    }
    totalLockedLong,
    totalLockedShort,
    totalValueLocked,
  }
-
- fragment FeeStructureInfo on FeeStructure{
-   id
-   baseEntryFee
-   badLiquidityEntryFee
-   baseExitFee
-   badLiquidityExitFee
- }
-
-  fragment CollateralTokenInfo on CollateralToken{
+  fragment PaymentTokenInfo on PaymentToken {
   id
   linkedMarkets{
     id
@@ -92,7 +87,7 @@ module ApolloQueryResult = ApolloClient.Types.ApolloQueryResult
   timestampCreated
   txHash
   blockNumberCreated
-  collateralToken {
+  paymentToken {
     id
   }
   name
@@ -107,9 +102,6 @@ module ApolloQueryResult = ApolloClient.Types.ApolloQueryResult
     id
   }
   latestSystemState {
-    id
-  }
-  feeStructure {
     id
   }
   kPeriod
