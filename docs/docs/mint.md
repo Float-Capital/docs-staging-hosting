@@ -17,6 +17,8 @@ For example, if you would like $1 000 long exposure to a certain synthetic asset
 
 Our synthetic markets currently accept DAI, allowing you to mint your synthetic position.
 
+<iframe width="560" height="315" src="https://www.youtube.com/embed/ByVBCyQpVvM" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
 ## Buying Float synthetic tokens on a DEX
 
 You can also simply buy synthetic Float tokens off a decentralized exchange such as [quickswap](https://quickswap.exchange/) (liquidity pool coming soon) instead of minting exposure directly from the smart contracts.

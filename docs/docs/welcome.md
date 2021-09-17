@@ -48,7 +48,9 @@ Float allows our global investor base to easily gain synthetic asset exposure, *
 - [How to mint a synthetic asset position?](/docs/mint)
 - [What is the Float token?](/docs/float-token)
 - [How to stake and earn Float?](/docs/stake)
-- [Smart Contract walkthroughs on Youtube](https://www.youtube.com/watch?v=Hm4rZfB8Chk&list=PL7RT-0ybd7joiqKeGklvFxcc8dNWpPBCk)
+- Getting started with Float Capital:
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/videoseries?list=PL7RT-0ybd7jqbTHvG0O4rQfeR3yruypCf" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 ---
 
