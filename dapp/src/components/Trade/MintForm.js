@@ -865,12 +865,16 @@ function MintForm$MintFormSignedIn(Props) {
       if (isLong) {
         var arg = market.marketIndex;
         tmp = (function (param) {
-            return param.mintLongNextPrice(arg, amount);
+            return function (param$1) {
+              return param.mintLongNextPrice(arg, amount, param$1);
+            };
           });
       } else {
         var arg$1 = market.marketIndex;
         tmp = (function (param) {
-            return param.mintShortNextPrice(arg$1, amount);
+            return function (param$1) {
+              return param.mintShortNextPrice(arg$1, amount, param$1);
+            };
           });
       }
       return Curry._2(contractExecutionHandler, (function (param) {
@@ -886,7 +890,10 @@ function MintForm$MintFormSignedIn(Props) {
       return Curry._2(contractExecutionHandlerApprove, (function (param) {
                     return Contracts.Erc20.make(Config.dai, param);
                   }), (function (param) {
-                    return param.approve(Config.longShort, arg);
+                    return function (param$1) {
+                      var prim1 = Config.longShort;
+                      return param.approve(prim1, arg, param$1);
+                    };
                   }));
     } else {
       return mintFunction(undefined);

@@ -26,7 +26,7 @@
     "update-test-schema": "get-graphql-schema http://127.0.0.1:8000/subgraphs/name/float-capital/float-capital -j > graphql_schema.json",
     "res:start": "rescript build -w",
     "res:clean": "rescript clean",
-    "test-codegen": "node ./test/util/Codegen.bs.js > ./test/stateChanges/Converters.res",
+    "test-codegen": "node ./integrationTests/util/Codegen.bs.js",
     "unit-test-codegen": "node ./testCodegenLib/EventGen.bs.js",
     "entity-helpers-codegen": "node ./testCodegenLib/GraphEntityGen.bs.js",
     "generate-all": "yarn entity-helpers-codegen && yarn unit-test-codegen",
@@ -41,7 +41,8 @@
   },
   "devDependencies": {
     "@apollo/client": "^3.3.16",
-    "@reasonml-community/graphql-ppx": "^1.2.0",
+    "@reasonml-community/graphql-ppx": "^1.2.2",
+    "@rescript/react": "^0.10.3",
     "decco": "^1.4.0",
     "dotenv": "^8.2.0",
     "get-graphql-schema": "^2.1.2",
@@ -49,9 +50,8 @@
     "jest": "^26.6.3",
     "js-yaml": "^4.1.0",
     "react": "^17.0.2",
-    "reason-react": "^0.9.1",
     "reason-test-framework": "^0.3.2",
-    "rescript": "^9.1.2",
-    "rescript-apollo-client": "^1.1.2"
+    "rescript": "^9.1.4",
+    "rescript-apollo-client": "^2.1.3"
   }
 }

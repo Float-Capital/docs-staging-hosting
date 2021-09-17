@@ -24,6 +24,7 @@
     "@reasonml-community/graphql-ppx",
     "bs-css",
     "bs-css-emotion",
+    "bs-fetch",
     "@rescript/react",
     "rescript-apollo-client",
     "rescript-future",

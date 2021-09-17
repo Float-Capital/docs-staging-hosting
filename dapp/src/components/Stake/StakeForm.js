@@ -527,7 +527,9 @@ function StakeForm$ConnectedStakeForm(Props) {
           return Curry._2(contractExecutionHandler, (function (param) {
                         return Contracts.Synth.make(partial_arg, param);
                       }), (function (param) {
-                        return param.stake(amount);
+                        return function (param$1) {
+                          return param.stake(amount, param$1);
+                        };
                       }));
         }));
   var match = form.amountResult;

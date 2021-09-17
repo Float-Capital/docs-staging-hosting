@@ -3,6 +3,7 @@
 
 var Curry = require("rescript/lib/js/curry.js");
 var Queries = require("../Queries.bs.js");
+var JsPromise = require("../libraries/Js.Promise/JsPromise.bs.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var Converters = require("../stateChanges/Converters.bs.js");
 var StateChange = require("../stateChanges/StateChange.bs.js");
@@ -23,7 +24,13 @@ var allStateChanges = {
 Curry._2(TestFramework.describe, "All Tests", (function (param) {
         Curry._1(param.beforeAll, (function (param) {
                 var allStateChangesRaw = Queries.getAllStateChanges(undefined);
-                allStateChanges.contents = StateChange.splitIntoEventGroups(StateChange.getAllStateChangeEvents(allStateChangesRaw));
+                allStateChanges.contents = JsPromise.$$catch(StateChange.splitIntoEventGroups(StateChange.getAllStateChangeEvents(allStateChangesRaw)), (function (error) {
+                        console.log({
+                              "critical error fetching events": error
+                            });
+                        
+                      }));
+                console.log("Saving the promise", allStateChanges.contents);
                 
               }));
         Curry._2(TestFramework.describe, "V1 event", (function (param) {
@@ -32,7 +39,7 @@ Curry._2(TestFramework.describe, "All Tests", (function (param) {
                         var expectEqual = param.expectEqual;
                         var callback = param.callback;
                         allStateChanges.contents.then(function (param) {
-                              Curry._2(expectEqual, param.allV1Events.length, 1);
+                              Curry._2(expectEqual, param.allLongShortV1Events.length, 1);
                               return Curry._1(callback, undefined);
                             });
                         
@@ -43,7 +50,7 @@ Curry._2(TestFramework.describe, "All Tests", (function (param) {
                               var expectTrue = param.expectTrue;
                               var callback = param.callback;
                               allStateChanges.contents.then(function (param) {
-                                    var match = Belt_Array.getExn(param.allV1Events, 0);
+                                    var match = Belt_Array.getExn(param.allLongShortV1Events, 0);
                                     var match$1 = match.data;
                                     var staker = match$1.staker;
                                     var tokenFactory = match$1.tokenFactory;
@@ -54,7 +61,6 @@ Curry._2(TestFramework.describe, "All Tests", (function (param) {
                                             Curry._2(expectEqual, result.contractVersion.toString(), "1");
                                             Curry._2(expectEqual, result.latestMarketIndex.toString(), "0");
                                             Curry._2(expectEqual, result.totalFloatMinted.toString(), "0");
-                                            Curry._2(expectEqual, result.totalTxs.toString(), "1");
                                             Curry._2(expectEqual, result.totalUsers.toString(), "1");
                                             Curry._2(expectEqual, result.timestampLaunched.toString(), String(timestamp));
                                             Curry._2(expectEqual, result.staker.address, staker);
@@ -107,20 +113,26 @@ Curry._2(TestFramework.describe, "All Tests", (function (param) {
                         allStateChanges.contents.then(function (param) {
                                 return Promise.all(Belt_Array.map(param.allSyntheticMarketCreatedEvents, (function (param) {
                                                   var match = param.data;
-                                                  var collateralAddress = match.collateralAddress;
                                                   var oracleAddress = match.oracleAddress;
                                                   var symbol = match.symbol;
                                                   var name = match.name;
+                                                  var paymentAddress = match.paymentAddress;
                                                   var shortTokenAddress = match.shortTokenAddress;
                                                   var longTokenAddress = match.longTokenAddress;
+                                                  var marketIndex = match.marketIndex;
                                                   var txHash = param.txHash;
                                                   var timestamp = param.timestamp;
                                                   var blockNumber = param.blockNumber;
-                                                  return Queries.getSyntheticMarketAtBlock(match.marketIndex.toString(), blockNumber).then(function (result) {
+                                                  console.log({
+                                                        "market index": marketIndex.toString(),
+                                                        txHash: txHash
+                                                      });
+                                                  return Queries.getSyntheticMarketAtBlock(marketIndex.toString(), blockNumber).then(function (result) {
                                                               if (result === undefined) {
                                                                 return Curry._1(expectTrue, false);
                                                               }
                                                               var marketIndex = result.marketIndex;
+                                                              var paymentTokenId = result.paymentToken.id;
                                                               Curry._2(expectEqual, result.id, marketIndex.toString());
                                                               Curry._2(expectEqual, String(timestamp), result.timestampCreated.toString());
                                                               Curry._2(expectEqual, txHash, result.txHash);
@@ -134,8 +146,11 @@ Curry._2(TestFramework.describe, "All Tests", (function (param) {
                                                               Curry._2(expectEqual, result.syntheticLong.id, longTokenAddress);
                                                               Curry._2(expectEqual, result.syntheticShort.id, shortTokenAddress);
                                                               Curry._2(expectEqual, result.latestSystemState.id, marketIndex.toString() + "-0");
-                                                              Curry._2(expectEqual, result.feeStructure.id, marketIndex.toString() + "-fees");
-                                                              return Curry._2(expectEqual, result.collateralToken.id, collateralAddress);
+                                                              console.log({
+                                                                    paymentTokenId: paymentTokenId,
+                                                                    paymentAddress: paymentAddress
+                                                                  });
+                                                              return Curry._2(expectEqual, paymentTokenId, paymentAddress);
                                                             });
                                                 })));
                               }).then(function (param) {
@@ -152,7 +167,6 @@ Curry._2(TestFramework.describe, "All Tests", (function (param) {
                   Curry._2(expectEqual, syntheticTokenQuery.syntheticMarket.id, marketIndex.toString());
                   Curry._2(expectEqual, syntheticTokenQuery.tokenType, tokenStrTypeUpper);
                   Curry._2(expectEqual, syntheticTokenQuery.floatMintedFromSpecificToken.toString(), "0");
-                  Curry._2(expectEqual, syntheticTokenQuery.latestStakerState.id, tokenAddress + "-0");
                   Curry._2(expectEqual, match.id, "latestPrice-" + marketIndex.toString() + "-" + tokenStrTypeLower);
                   Curry._2(expectEqual, match.price.id, marketIndex.toString() + "-" + tokenStrTypeLower + "-" + String(timestamp));
                   var initialPriceId = priceHistory[0].id;

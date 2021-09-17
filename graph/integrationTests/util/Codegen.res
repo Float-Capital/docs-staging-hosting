@@ -21,10 +21,12 @@ let lowercaseFirstLetter = %raw(`(word) => word.charAt(0).toLowerCase() + word.s
 let paramTypeToRescriptType = paramType =>
   switch paramType {
   | "uint32"
+  | "int256"
   | "uint256" => "bn"
   | "string" => "string"
   | "address" => "address"
   | "address[]" => "array<Ethers.ethAddress>"
+  | "bool" => "@decco.codec(boolStringDeccoCodex) bool"
   | unknownType =>
     Js.log(`Please handle all types - ${unknownType} isn't handled by this script.`)
     "unknownType"
@@ -86,34 +88,34 @@ type ${eventDataTypeName} = {${recordFields}
     })
   )
 
-  Js.log(
+  Node.Fs.writeFileAsUtf8Sync(
+    "./integrationTests/stateChanges/Converters.res",
     `${filePreRamble}
-${typesString.contents}
+  ${typesString.contents}
 
-${variantTypeString.contents}
+  ${variantTypeString.contents}
 
-${converterString.contents}
-${converterStringTail}
+  ${converterString.contents}
+  ${converterStringTail}
 
-${eventGroupTypes.contents}
-  allUnclassifiedEvents: array<ConverterTypes.unclassifiedEvent>,
-}
-${emptyEventGroupVar.contents}
-  allUnclassifiedEvents: [],
-}
+  ${eventGroupTypes.contents}
+    allUnclassifiedEvents: array<ConverterTypes.unclassifiedEvent>,
+  }
+  ${emptyEventGroupVar.contents}
+    allUnclassifiedEvents: [],
+  }
 
-let addEventToCorrectGrouping = (
-  currentEventGroups,
-  {ConverterTypes.blockNumber: blockNumber, timestamp, txHash, data},
-) => {
-  switch data {${eventGroupSwitches.contents}
-  | Unclassified(event) => {
-      ...currentEventGroups,
-      allUnclassifiedEvents: currentEventGroups.allUnclassifiedEvents->Array.concat([event]),
+  let addEventToCorrectGrouping = (
+    currentEventGroups,
+    {ConverterTypes.blockNumber: blockNumber, timestamp, txHash, data},
+  ) => {
+    switch data {${eventGroupSwitches.contents}
+    | Unclassified(event) => {
+        ...currentEventGroups,
+        allUnclassifiedEvents: currentEventGroups.allUnclassifiedEvents->Array.concat([event]),
+      }
     }
   }
-}
-`,
+  `,
   )
-  ()
 })

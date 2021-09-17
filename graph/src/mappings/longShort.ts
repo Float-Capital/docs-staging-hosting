@@ -639,7 +639,7 @@ export function handleSyntheticMarketCreated(
       marketIndex.toString(),
       longTokenAddress.toHex(),
       shortTokenAddress.toHex(),
-      initialAssetPrice.toHex(),
+      paymentToken.toHex(),
       initialAssetPrice.toString(),
       syntheticName,
       syntheticSymbol,

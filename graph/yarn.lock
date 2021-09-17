@@ -554,10 +554,15 @@
   resolved "https://registry.yarnpkg.com/@protobufjs/utf8/-/utf8-1.1.0.tgz#a777360b5b39a1a2e5106f8e858f2fd2d060c570"
   integrity sha1-p3c2C1s5oaLlEG+OhY8v0tBgxXA=
 
-"@reasonml-community/graphql-ppx@^1.2.0":
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/@reasonml-community/graphql-ppx/-/graphql-ppx-1.2.0.tgz#5a51021dd43c3a090da34d2dfa22b2257fdb9049"
-  integrity sha512-CKTzl/DZNT0QgpKjpi0Fij2R4r9c/oT+M8mEWYnNidaLDcFX7ZfcvmJA4ZhPYXRD6AGUO3cS1zQOJZSuJHKogQ==
+"@reasonml-community/graphql-ppx@^1.2.2":
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/@reasonml-community/graphql-ppx/-/graphql-ppx-1.2.2.tgz#c8e07f8d826782219da1ddb7b2c01202bb343690"
+  integrity sha512-mgkETKdZ2QM1Xqlsg7nb30KaM7ojDpxy1rWdiZE5XLaA+oJgClMxA6ghF2b3TZL5f/XdQJ1rnd0p4LmXKnmpqQ==
+
+"@rescript/react@^0.10.3":
+  version "0.10.3"
+  resolved "https://registry.yarnpkg.com/@rescript/react/-/react-0.10.3.tgz#a2a8bed6b017940ec26c2154764b350f50348889"
+  integrity sha512-Lf9rzrR3bQPKJjOK3PBRa/B3xrJ7CqQ1HYr9VHPVxJidarIJJFZBhj0Dg1uZURX+Wg/xiP0PHFxXmdj2bK8Vxw==
 
 "@sinonjs/commons@^1.7.0":
   version "1.8.3"
@@ -5004,12 +5009,12 @@ require-main-filename@^2.0.0:
   resolved "https://registry.yarnpkg.com/require-main-filename/-/require-main-filename-2.0.0.tgz#d0b329ecc7cc0f61649f62215be69af54aa8989b"
   integrity sha512-NKN5kMDylKuldxYLSUfrbo5Tuzh4hd+2E8NPPX02mZtn1VuREQToYe/ZdlJy+J3uCpfaiGF05e7B8W0iXbQHmg==
 
-rescript-apollo-client@^1.1.2:
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/rescript-apollo-client/-/rescript-apollo-client-1.1.2.tgz#c0e687f6b2e5268e29e620a83be9d8e55dd0961a"
-  integrity sha512-ByXUPisNdTywzRsIBV1hQiPTE1LR9YVSOGwjklDxuM7xjleNA8UvRmtkes7d3qbqNxvW+PJs+9o5ByiGvlWgAg==
+rescript-apollo-client@^2.1.3:
+  version "2.1.3"
+  resolved "https://registry.yarnpkg.com/rescript-apollo-client/-/rescript-apollo-client-2.1.3.tgz#ff5bcb4b4aab6fb400255b50f9c856783dcd7309"
+  integrity sha512-HrrXvjZ49reYCa1ZKGuv3i4XXqrEBdYncSsNrSrqC3l4nh7cu+roEt4F4AiaZTES71LuAkF1hGfzE7qmjuXRJw==
 
-rescript@^9.1.2:
+rescript@^9.1.4:
   version "9.1.4"
   resolved "https://registry.yarnpkg.com/rescript/-/rescript-9.1.4.tgz#1eb126f98d6c16942c0bf0df67c050198e580515"
   integrity sha512-aXANK4IqecJzdnDpJUsU6pxMViCR5ogAxzuqS0mOr8TloMnzAjJFu63fjD6LCkWrKAhlMkFFzQvVQYaAaVkFXw==

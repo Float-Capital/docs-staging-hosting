@@ -282,6 +282,8 @@ let determineDisplay = (
   }
 }
 
+type txOptionGasPrice = {"gasPrice": Ethers.BigNumber.t}
+
 module UnstakeInteractionWrapper = {
   type formProps = {
     "tokenId": string,
@@ -289,7 +291,10 @@ module UnstakeInteractionWrapper = {
     "setTxState": (ContractActions.transactionState => ContractActions.transactionState) => unit,
     "contractExecutionHandler": (
       ~makeContractInstance: (~providerOrSigner: Ethers.providerOrSigner) => Contracts.Synth.t,
-      ~contractFunction: (~contract: Contracts.Synth.t) => JsPromise.t<Ethers.txSubmitted>,
+      ~contractFunction: (
+        ~contract: Contracts.Synth.t,
+        txOptionGasPrice,
+      ) => JsPromise.t<Ethers.txSubmitted>,
     ) => unit,
   }
   @react.component
@@ -342,7 +347,10 @@ module StakeInteractionWrapper = {
     "setTxState": (ContractActions.transactionState => ContractActions.transactionState) => unit,
     "contractExecutionHandler": (
       ~makeContractInstance: (~providerOrSigner: Ethers.providerOrSigner) => Contracts.Synth.t,
-      ~contractFunction: (~contract: Contracts.Synth.t) => JsPromise.t<Ethers.txSubmitted>,
+      ~contractFunction: (
+        ~contract: Contracts.Synth.t,
+        txOptionGasPrice,
+      ) => JsPromise.t<Ethers.txSubmitted>,
     ) => unit,
   }
   @react.component

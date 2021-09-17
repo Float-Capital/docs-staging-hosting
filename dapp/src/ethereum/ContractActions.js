@@ -7,6 +7,7 @@ var JsPromise = require("../libraries/Js.Promise/JsPromise.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
+var DataFetchers = require("../components/Data/DataFetchers.js");
 var Core = require("@web3-react/core");
 var Caml_js_exceptions = require("rescript/lib/js/caml_js_exceptions.js");
 
@@ -76,6 +77,7 @@ function useContractFunction(signer) {
         return /* UnInitialised */0;
       });
   var setTxState = match[1];
+  var gasPrice = DataFetchers.useRecommendedGasPrice(undefined);
   return [
           (function (makeContractInstance, contractFunction) {
               Curry._1(setTxState, (function (param) {
@@ -86,7 +88,9 @@ function useContractFunction(signer) {
                     _0: signer,
                     [Symbol.for("name")]: "Signer"
                   });
-              var mintPromise = Curry._1(contractFunction, contractInstance);
+              var mintPromise = Curry._2(contractFunction, contractInstance, {
+                    gasPrice: gasPrice
+                  });
               JsPromise.$$catch(mintPromise, (function (error) {
                       return Curry._1(setTxState, (function (param) {
                                     var msg = error.message;

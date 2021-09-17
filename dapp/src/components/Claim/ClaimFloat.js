@@ -73,7 +73,9 @@ function ClaimFloat(Props) {
                   return Curry._2(contractExecutionHandler, (function (param) {
                                 return Contracts.Staker.make(Config.staker, param);
                               }), (function (param) {
-                                return param.claimFloatCustom(marketIndexes);
+                                return function (param$1) {
+                                  return param.claimFloatCustom(marketIndexes, param$1);
+                                };
                               }));
                 }),
               children: "Claim " + Config.floatTokenName

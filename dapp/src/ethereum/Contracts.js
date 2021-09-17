@@ -4,11 +4,11 @@
 var Ethers = require("./Ethers.js");
 
 var abi = Ethers.makeAbi([
-      "function mintLongNextPrice(uint32 marketIndex,uint256 amount) @1970000",
-      "function mintShortNextPrice(uint32 marketIndex,uint256 amount) @1970000",
-      "function redeemLongNextPrice(uint32 marketIndex,uint256 tokensToRedeem) @1100000",
-      "function redeemShortNextPrice(uint32 marketIndex,uint256 tokensToRedeem) @1100000",
-      "function executeOutstandingNextPriceSettlementsUser(address user,uint32 marketIndex) @130000",
+      "function mintLongNextPrice(uint32 marketIndex,uint256 amount) @300000",
+      "function mintShortNextPrice(uint32 marketIndex,uint256 amount) @300000",
+      "function redeemLongNextPrice(uint32 marketIndex,uint256 tokensToRedeem) @300000",
+      "function redeemShortNextPrice(uint32 marketIndex,uint256 tokensToRedeem) @300000",
+      "function executeOutstandingNextPriceSettlementsUser(address user,uint32 marketIndex) @300000",
       "function updateSystemState()",
       "function updateSystemStateMulti(uint32[] marketIndexes)"
     ]);
@@ -23,10 +23,9 @@ var LongShort = {
 };
 
 var abi$1 = Ethers.makeAbi([
-      "function stake(address tokenAddress, uint256 amount)",
-      "function stakeAndEarnImmediately(address tokenAddress, uint256 amount)  @1200000",
-      "function withdraw(uint32, bool, uint256 amount) @5000000",
-      "function claimFloatCustom(uint32[] calldata marketIndexes) @2000000"
+      "function stake(address tokenAddress, uint256 amount) @6000000",
+      "function withdraw(uint32, bool, uint256 amount) @6000000",
+      "function claimFloatCustom(uint32[] calldata marketIndexes) @6000000"
     ]);
 
 function make$1(address, providerOrSigner) {
@@ -39,7 +38,7 @@ var Staker = {
 };
 
 var abi$2 = Ethers.makeAbi([
-      "function approve(address spender, uint256 amount) @100000",
+      "function approve(address spender, uint256 amount) @52000",
       "function balanceOf(address owner) public view returns (uint256 balance)",
       "function allowance(address owner, address spender) public view returns (uint256 remaining)",
       "function mint(uint256 value) public virtual returns (bool)"
@@ -55,10 +54,10 @@ var Erc20 = {
 };
 
 var abi$3 = Ethers.makeAbi([
-      "function approve(address spender, uint256 amount) @100000",
+      "function approve(address spender, uint256 amount) @52000",
       "function balanceOf(address owner) public view returns (uint256 balance)",
       "function allowance(address owner, address spender) public view returns (uint256 remaining)",
-      "function stake(uint256 amount) external"
+      "function stake(uint256 amount) external @500000"
     ]);
 
 function make$3(address, providerOrSigner) {
