@@ -11,7 +11,7 @@ let make = () => {
         <span className="text-xxs"> {"Error loading TVL"->React.string} </span>
       </div>
     | {data: Some({globalState: Some({totalValueLocked})})} =>
-      if totalValueLocked->Ethers.BigNumber.gte(CONSTANTS.fiveHundredThousandInWei) {
+      if totalValueLocked->Ethers.BigNumber.gte(CONSTANTS.fiftyThousandInWei) {
         <div
           className="fixed bottom-3 left-3 flex flex-col items-end invisible md:visible bg-white bg-opacity-75 rounded-lg shadow-lg px-2 py-1">
           <div className="text-sm flex flex-row items-center">
