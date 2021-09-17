@@ -4,6 +4,7 @@
 var Misc = require("../../libraries/Misc.js");
 var React = require("react");
 var Ethers = require("../../ethereum/Ethers.js");
+var Backend = require("../../mockBackend/Backend.js");
 var CONSTANTS = require("../../CONSTANTS.js");
 var DataHooks = require("../../data/DataHooks.js");
 var MarketBar = require("../UI/MarketCard/MarketBar.js");
@@ -28,6 +29,7 @@ function MarketStakeCard(Props) {
   var stakeApys = DataHooks.useStakingAPYs(undefined);
   var longFloatApy = MarketCalculationHelpers.calculateFloatAPY(totalLockedLong, totalLockedShort, CONSTANTS.kperiodHardcode, CONSTANTS.kmultiplierHardcode, timestampCreated, currentTimestamp, CONSTANTS.equilibriumOffsetHardcode, CONSTANTS.balanceIncentiveExponentHardcode, "long");
   var shortFloatApy = MarketCalculationHelpers.calculateFloatAPY(totalLockedLong, totalLockedShort, CONSTANTS.kperiodHardcode, CONSTANTS.kmultiplierHardcode, timestampCreated, currentTimestamp, CONSTANTS.equilibriumOffsetHardcode, CONSTANTS.balanceIncentiveExponentHardcode, "short");
+  var marketInfo = Backend.getMarketInfoUnsafe(param.marketIndex.toNumber());
   return React.createElement("div", {
               className: "p-4 rounded-lg flex flex-col justify-center bg-white bg-opacity-75 shadow-lg h-full"
             }, React.createElement("div", {
@@ -47,7 +49,7 @@ function MarketStakeCard(Props) {
                           className: "flex justify-center w-full mb-2"
                         }, React.createElement("h1", {
                               className: "font-bold text-xl font-alphbeta"
-                            }, marketName)), React.createElement("div", {
+                            }, marketInfo.name)), React.createElement("div", {
                           className: "flex flex-row items-center justify-center w-full mb-4"
                         }, React.createElement("div", undefined, React.createElement("div", undefined, React.createElement("h2", {
                                       className: "text-xs mt-1 text-center"

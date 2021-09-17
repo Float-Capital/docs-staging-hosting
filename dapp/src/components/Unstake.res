@@ -117,7 +117,7 @@ module StakeFormInput = {
         : <p
             className="text-xxs text-yellow-600 text-center mt-3 flex justify-center items-center w-full">
             <span> {`⚡ We charge a small unstake fee on your tokens`->React.string} </span>
-            <span className="text-black mx-1 "> <Tooltip tip={"5 basis points"} /> </span> // TODO: Not hardcode
+            <span className="text-black mx-1 "> <Tooltip tip={"50 basis points"} /> </span> // TODO: Not hardcode
             <span> {`⚡`->React.string} </span>
           </p>}
     </Form>

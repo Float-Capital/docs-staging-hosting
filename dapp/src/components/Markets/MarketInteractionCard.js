@@ -9,6 +9,7 @@ var Button = require("../UI/Base/Button.js");
 var Ethers = require("../../ethereum/Ethers.js");
 var Loader = require("../UI/Base/Loader.js");
 var Redeem = require("../Redeem/Redeem.js");
+var Backend = require("../../mockBackend/Backend.js");
 var Js_dict = require("rescript/lib/js/js_dict.js");
 var Queries = require("../../data/Queries.js");
 var Unstake = require("../Unstake.js");
@@ -240,7 +241,7 @@ function header(marketInfo) {
   var match = marketInfo._0;
   return React.createElement("div", {
               className: "flex justify-between mb-2 pt-6 pl-6"
-            }, match.marketName + " (" + match.marketSymbol + ")");
+            }, Backend.getMarketInfoUnsafe(match.marketIndex.toNumber()).name + " (" + match.marketSymbol + ")");
 }
 
 function MarketInteractionCard$SelectOptions(Props) {

@@ -4,6 +4,7 @@
 var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
 var Loader = require("../components/UI/Base/Loader.js");
+var Backend = require("../mockBackend/Backend.js");
 var Js_dict = require("rescript/lib/js/js_dict.js");
 var Queries = require("../data/Queries.js");
 var Belt_Int = require("rescript/lib/js/belt_Int.js");
@@ -14,11 +15,11 @@ var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var Router = require("next/router");
 
 function Mint$DetailsWrapper(Props) {
-  var market = Props.market;
   var marketIndex = Props.marketIndex;
   var actionOption = Props.actionOption;
   var children = Props.children;
   var view = Props.view;
+  var marketInfo = Backend.getMarketInfoUnsafe(Belt_Option.getWithDefault(Belt_Int.fromString(marketIndex), 0));
   return React.createElement("div", {
               className: "max-w-xl mx-auto"
             }, view === /* LandingPage */0 ? null : React.createElement(Link, {
@@ -36,7 +37,11 @@ function Mint$DetailsWrapper(Props) {
                       className: "flex justify-between items-center mb-2"
                     }, React.createElement("div", {
                           className: "text-xl"
-                        }, market.name + " (" + market.symbol + ")"), React.createElement(Link, {
+                        }, React.createElement("span", {
+                              className: "flex items-center"
+                            }, marketInfo.name, marketInfo.leverage !== 1.0 ? React.createElement("span", {
+                                    className: "text-sm ml-2"
+                                  }, "(" + String(marketInfo.leverage) + "x leverage)") : null)), React.createElement(Link, {
                           href: "/app/markets?marketIndex=" + marketIndex + "&actionOption=" + actionOption,
                           children: React.createElement("div", {
                                 className: "text-xxs hover:underline cursor-pointer"
@@ -80,7 +85,6 @@ function Mint(Props) {
     var optFirstMarket = Belt_Array.get(match.syntheticMarkets, Belt_Option.getWithDefault(Belt_Int.fromString(marketIndex), 1) - 1 | 0);
     tmp = optFirstMarket !== undefined ? (
         withHeader ? React.createElement(Mint$DetailsWrapper, {
-                market: optFirstMarket,
                 marketIndex: marketIndex,
                 actionOption: actionOption,
                 children: React.createElement(MintForm.make, {

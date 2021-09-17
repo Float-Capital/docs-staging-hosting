@@ -359,7 +359,7 @@ let useUsersConfirmedRedeems = (~userId) => {
         confirmedNextPriceAction.amountSynthTokenForWithdrawalLong->Ethers.BigNumber.gt(
           CONSTANTS.zeroBN,
         ) ||
-          confirmedNextPriceAction.amountSynthTokenForWithdrawalLong->Ethers.BigNumber.gt(
+          confirmedNextPriceAction.amountSynthTokenForWithdrawalShort->Ethers.BigNumber.gt(
             CONSTANTS.zeroBN,
           )
       )

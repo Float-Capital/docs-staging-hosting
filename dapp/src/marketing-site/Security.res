@@ -7,7 +7,7 @@ let make = () => {
         <Heading title="Security" suffixEmoji=`🔐` />
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 items-center justify-center my-4">
           <div
-            className="mx-4 h-full order-3 md:order-1 bg-white bg-opacity-70 md:p-4 p-1 rounded w-46">
+            className="mx-4 order-3 md:order-1 bg-white bg-opacity-70 md:p-4 p-1 rounded w-46">
             <a
               className="custom-cursor"
               target="_blank"
@@ -19,7 +19,7 @@ let make = () => {
               </p>
             </a>
           </div>
-          <div className="mx-4 h-full order-2  bg-white bg-opacity-70 md:p-4 p-1 rounded  w-46">
+          <div className="mx-4 order-2 bg-white bg-opacity-70 md:p-4 p-1 rounded w-46">
             <a
               className="custom-cursor"
               target="_blank"
@@ -34,11 +34,11 @@ let make = () => {
             </a>
           </div>
           <div
-            className="mx-4  order-1 md:order-3  bg-white bg-opacity-70 md:p-4 p-1 rounded  w-46 ">
+            className="mx-4 order-1 md:order-3 bg-white bg-opacity-70 md:p-4 p-1 rounded w-46 ">
             <a
               className="custom-cursor"
               target="_blank"
-              href="https://github.com/code-423n4/2021-08-floatcapital/pull/20"
+              href="https://code423n4.com/reports/2021-08-floatcapital/"
               rel="noopener noreferrer">
               <img
                 src="/icons/code-arena-sq-dark.png"
@@ -46,9 +46,6 @@ let make = () => {
               />
               <p className="text-center font-bold mx-auto hover:underline">
                 {"Audit"->React.string}
-              </p>
-              <p className="text-center mx-auto text-xs text-gray-500">
-                {"full results coming soon"->React.string}
               </p>
             </a>
           </div>

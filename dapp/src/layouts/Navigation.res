@@ -118,33 +118,30 @@ let make = () => {
         <a className="px-3 hover:bg-white" target="_blank" href="https://docs.float.capital">
           {React.string("DOCS")}
         </a>
-        {
-          // Will uncomment this in prod so will leave for now TODO
-          // <a
-          //   className="px-3 hover:opacity-60" target="_blank" href="https://github.com/Float-Capital">
-          //   <img src="/icons/github.svg" className="h-5" />
-          // </a>
-          switch optCurrentUser {
-          | Some(currentUser) =>
-            <Link href={`/app/user/${currentUser->ethAdrToStr}`}>
-              <p
-                className={`flex flex-row items-center px-3 bg-white hover:bg-black hover:text-white ml-1  text-base cursor-pointer ${"/app/user/[user]"->activeHighlight}`}>
-                {"PROFILE"->React.string}
-                <img
-                  className="inline h-4 rounded ml-2"
-                  src={Blockies.makeBlockie(currentUser->ethAdrToStr)}
-                />
-              </p>
-            </Link>
-          | None =>
-            <Button.Small
-              onClick={_ => {
-                router->Next.Router.push(`/app/login?nextPath=${router.asPath}`)
-              }}>
-              "LOGIN"
-            </Button.Small>
-          }
-        }
+        <a
+          className="px-3 hover:opacity-60" target="_blank" href="https://github.com/Float-Capital">
+          <img src="/icons/github.svg" className="h-5" />
+        </a>
+        {switch optCurrentUser {
+        | Some(currentUser) =>
+          <Link href={`/app/user/${currentUser->ethAdrToStr}`}>
+            <p
+              className={`flex flex-row items-center px-3 bg-white hover:bg-black hover:text-white ml-1  text-base cursor-pointer ${"/app/user/[user]"->activeHighlight}`}>
+              {"PROFILE"->React.string}
+              <img
+                className="inline h-4 rounded ml-2"
+                src={Blockies.makeBlockie(currentUser->ethAdrToStr)}
+              />
+            </p>
+          </Link>
+        | None =>
+          <Button.Small
+            onClick={_ => {
+              router->Next.Router.push(`/app/login?nextPath=${router.asPath}`)
+            }}>
+            "LOGIN"
+          </Button.Small>
+        }}
       </div>
       <div className="flex w-2/3 text-base items-center justify-end visible md:hidden">
         <div
@@ -155,7 +152,7 @@ let make = () => {
           <div className="zoom-in-effect flex flex-col text-3xl text-white">
             <div
               onClick={_ => {
-                router->Next.Router.push(`/`)
+                router->Next.Router.push(`/app/markets`)
                 setIsOpen(_ => false)
               }}
               className={`px-3 bg-black m-2 ${"/app/markets"->activeHighlight}`}>
@@ -190,47 +187,44 @@ let make = () => {
               href="https://docs.float.capital">
               {React.string("DOCS")}
             </a>
-            {
-              // TODO: Uncomment in prod
-              // <a
-              //   onClick={_ => {
-              //     setIsOpen(_ => false)
-              //   }}
-              //   className="px-3 hover:opacity-60 m-4"
-              //   target="_"
-              //   rel="noopener noreferrer"
-              //   href="https://github.com/float-capital/float-contracts">
-              //   <img src="/icons/github.svg" className="h-10" />
-              // </a>
-              switch optCurrentUser {
-              | Some(currentUser) =>
-                <p
-                  onClick={_ => {
-                    router->Next.Router.push(`/app/user/${currentUser->ethAdrToStr}`)
-                    setIsOpen(_ => false)
-                  }}
-                  className="flex flex-row items-center px-3 bg-white text-black hover:bg-black hover:text-gray-200 
+            <a
+              onClick={_ => {
+                setIsOpen(_ => false)
+              }}
+              className="px-3 hover:opacity-60 m-4"
+              target="_"
+              rel="noopener noreferrer"
+              href="https://github.com/float-capital/float-contracts">
+              <img src="/icons/github.svg" className="h-10" />
+            </a>
+            {switch optCurrentUser {
+            | Some(currentUser) =>
+              <p
+                onClick={_ => {
+                  router->Next.Router.push(`/app/user/${currentUser->ethAdrToStr}`)
+                  setIsOpen(_ => false)
+                }}
+                className="flex flex-row items-center px-3 bg-white text-black hover:bg-black hover:text-gray-200 
                    cursor-pointer text-3xl">
-                  <img
-                    className="inline h-6 rounded mr-2"
-                    src={Blockies.makeBlockie(currentUser->ethAdrToStr)}
-                  />
-                  <p
-                    className={`flex flex-row items-center px-3 hover:bg-white  cursor-pointer ${"/app/user/[user]"->activeHighlight}`}>
-                    {"PROFILE"->React.string}
-                  </p>
+                <img
+                  className="inline h-6 rounded mr-2"
+                  src={Blockies.makeBlockie(currentUser->ethAdrToStr)}
+                />
+                <p
+                  className={`flex flex-row items-center px-3 hover:bg-white  cursor-pointer ${"/app/user/[user]"->activeHighlight}`}>
+                  {"PROFILE"->React.string}
                 </p>
+              </p>
 
-              | None =>
-                <Button.Small
-                  onClick={_ => {
-                    router->Next.Router.push(`/app/login?nextPath=${router.asPath}`)
-                    setIsOpen(_ => false)
-                  }}>
-                  "LOGIN"
-                </Button.Small>
-              }
-            }
+            | None =>
+              <Button.Small
+                onClick={_ => {
+                  router->Next.Router.push(`/app/login?nextPath=${router.asPath}`)
+                  setIsOpen(_ => false)
+                }}>
+                "LOGIN"
+              </Button.Small>
+            }}
           </div>
         </div>
       </div>

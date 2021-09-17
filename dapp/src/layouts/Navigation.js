@@ -198,7 +198,14 @@ function Navigation(Props) {
                           className: "px-3 hover:bg-white",
                           href: "https://docs.float.capital",
                           target: "_blank"
-                        }, "DOCS"), tmp), React.createElement("div", {
+                        }, "DOCS"), React.createElement("a", {
+                          className: "px-3 hover:opacity-60",
+                          href: "https://github.com/Float-Capital",
+                          target: "_blank"
+                        }, React.createElement("img", {
+                              className: "h-5",
+                              src: "/icons/github.svg"
+                            })), tmp), React.createElement("div", {
                       className: "flex w-2/3 text-base items-center justify-end visible md:hidden"
                     }, React.createElement("div", {
                           className: "z-50 absolute top-0 right-0 p-3",
@@ -214,7 +221,7 @@ function Navigation(Props) {
                             }, React.createElement("div", {
                                   className: "px-3 bg-black m-2 " + activeHighlight("/app/markets"),
                                   onClick: (function (param) {
-                                      router.push("/");
+                                      router.push("/app/markets");
                                       return Curry._1(setIsOpen, (function (param) {
                                                     return false;
                                                   }));
@@ -247,7 +254,20 @@ function Navigation(Props) {
                                                     return false;
                                                   }));
                                     })
-                                }, "DOCS"), tmp$1)))));
+                                }, "DOCS"), React.createElement("a", {
+                                  className: "px-3 hover:opacity-60 m-4",
+                                  href: "https://github.com/float-capital/float-contracts",
+                                  rel: "noopener noreferrer",
+                                  target: "_",
+                                  onClick: (function (param) {
+                                      return Curry._1(setIsOpen, (function (param) {
+                                                    return false;
+                                                  }));
+                                    })
+                                }, React.createElement("img", {
+                                      className: "h-10",
+                                      src: "/icons/github.svg"
+                                    })), tmp$1)))));
 }
 
 var Link$1;

@@ -12,19 +12,13 @@ let calculateBeta = (
   ) {
     "0"
   } else if totalLockedLong->Ethers.BigNumber.eq(totalLockedShort) {
-    "300"
+    "100"
   } else if isLong && totalLockedShort->Ethers.BigNumber.lt(totalLockedLong) {
-    Globals.percentStr(
-      ~n=totalLockedShort->Ethers.BigNumber.mul(Ethers.BigNumber.fromUnsafe("3")),
-      ~outOf=totalLockedLong,
-    )
+    Globals.percentStr(~n=totalLockedShort, ~outOf=totalLockedLong)
   } else if !isLong && totalLockedLong->Ethers.BigNumber.lt(totalLockedShort) {
-    Globals.percentStr(
-      ~n=totalLockedLong->Ethers.BigNumber.mul(Ethers.BigNumber.fromUnsafe("3")),
-      ~outOf=totalLockedShort,
-    )
+    Globals.percentStr(~n=totalLockedLong, ~outOf=totalLockedShort)
   } else {
-    "300"
+    "100"
   }
 }
 
