@@ -500,7 +500,7 @@ module UserStakesCard = {
       let isLong = syntheticToken.tokenType->Obj.magic == "Long"
 
       <UserStakeBox key stake>
-        <UserFloatEarnedFromStake tokenAddress={addr} userId />
+        // <UserFloatEarnedFromStake tokenAddress={addr} userId />
         <UserMarketUnstake synthAddress={addr} userId isLong />
       </UserStakeBox>
     }, stakes)->React.array

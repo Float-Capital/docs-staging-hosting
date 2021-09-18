@@ -624,16 +624,13 @@ function UserUI$UserStakesCard(Props) {
         var isLong = syntheticToken.tokenType === "Long";
         return React.createElement(UserUI$UserStakeBox, {
                     stake: stake,
-                    children: null,
+                    children: React.createElement(UserUI$UserMarketUnstake, {
+                          synthAddress: addr,
+                          userId: userId,
+                          isLong: isLong
+                        }),
                     key: key
-                  }, React.createElement(UserUI$UserFloatEarnedFromStake, {
-                        userId: userId,
-                        tokenAddress: addr
-                      }), React.createElement(UserUI$UserMarketUnstake, {
-                        synthAddress: addr,
-                        userId: userId,
-                        isLong: isLong
-                      }));
+                  });
       });
   var totalStakedValue = getUsersTotalStakeValue(stakes);
   return React.createElement(UserUI$UserColumnCard, {
