@@ -14,6 +14,10 @@
   "polygonBridgeLink": "https://wallet.matic.network/bridge/",
   "web3PollingInterval": 5000,
   "apolloConnectToDevTools": false,
+  "floatToken": {
+    "floatTokenName": "Float",
+    "floatTokenImageUrl": ""
+  },
   "contracts": {
     "FloatToken": "",
     "FloatCapital_v0": "",

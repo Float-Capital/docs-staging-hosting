@@ -378,7 +378,7 @@ module UserFloatEarnedFromStake = {
     switch claimableFloat {
     | Response((totalClaimable, totalPredicted)) =>
       <div className="text-xs flex flex-col items-center justify-center">
-        <div className="text-gray-500"> {`${Config.floatTokenName} Accruing`->React.string} </div>
+        <div className="text-gray-500"> {`${Config.config.floatToken.floatTokenName} Accruing`->React.string} </div>
         {`~${totalClaimable
           ->Ethers.BigNumber.add(totalPredicted)
           ->Misc.NumberFormat.formatEther(~digits=5)}`->React.string}
@@ -546,7 +546,7 @@ module UserFloatCard = {
     <UserColumnCard>
       <UserColumnHeader>
         <div className="flex flex-row items-center justify-center">
-          <h3> {`${Config.floatTokenName} rewards`->React.string} </h3>
+          <h3> {`${Config.config.floatToken.floatTokenName} rewards`->React.string} </h3>
           <img src="/icons/alpha-float-token.svg" className="ml-2 h-5" />
         </div>
       </UserColumnHeader>
@@ -567,15 +567,15 @@ module UserFloatCard = {
             className=`w-11/12 px-2 mx-auto mb-2 border-2 border-light-purple rounded-lg z-10 shadow`>
             <UserColumnTextList>
               <div className="flex">
-                <UserColumnText head={`${Config.floatTokenName} accruing`} body={floatAccrued} />
+                <UserColumnText head={`${Config.config.floatToken.floatTokenName} accruing`} body={floatAccrued} />
                 <span className="ml-1">
                   <Tooltip
                     tip="This is an estimate at the current time, the amount issued may differ due to changes in market liquidity and asset prices."
                   />
                 </span>
               </div>
-              <UserColumnText head={`${Config.floatTokenName} balance`} body={floatBalance} />
-              <UserColumnText head={`${Config.floatTokenName} minted`} body={floatMinted} />
+              <UserColumnText head={`${Config.config.floatToken.floatTokenName} balance`} body={floatBalance} />
+              <UserColumnText head={`${Config.config.floatToken.floatTokenName} minted`} body={floatMinted} />
             </UserColumnTextList>
             {isCurrentUser
               ? <div className=`flex justify-around flex-row my-1`>
