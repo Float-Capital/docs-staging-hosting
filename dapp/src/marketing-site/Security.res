@@ -6,8 +6,7 @@ let make = () => {
       <div className="max-w-5xl flex flex-col justify-evenly items-center mx-auto">
         <Heading title="Security" suffixEmoji=`🔐` />
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 items-center justify-center my-4">
-          <div
-            className="mx-4 order-3 md:order-1 bg-white bg-opacity-70 md:p-4 p-1 rounded w-46">
+          <div className="mx-4 order-3 md:order-1 bg-white bg-opacity-70 md:p-4 p-1 rounded w-46">
             <a
               className="custom-cursor"
               target="_blank"
@@ -33,8 +32,7 @@ let make = () => {
               </p>
             </a>
           </div>
-          <div
-            className="mx-4 order-1 md:order-3 bg-white bg-opacity-70 md:p-4 p-1 rounded w-46 ">
+          <div className="mx-4 order-1 md:order-3 bg-white bg-opacity-70 md:p-4 p-1 rounded w-46 ">
             <a
               className="custom-cursor"
               target="_blank"
