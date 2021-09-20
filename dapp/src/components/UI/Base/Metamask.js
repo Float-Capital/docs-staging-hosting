@@ -61,7 +61,7 @@ var AddOrSwitchNetwork = {
   make: Metamask$AddOrSwitchNetwork
 };
 
-function requestStructure(tokenAddress, tokenSymbol) {
+function requestStructure(tokenAddress, tokenSymbol, tokenUrl) {
   return {
           method: "wallet_watchAsset",
           params: {
@@ -70,7 +70,7 @@ function requestStructure(tokenAddress, tokenSymbol) {
               address: tokenAddress,
               symbol: tokenSymbol.slice(0, 5),
               decimals: "18",
-              image: undefined
+              image: tokenUrl
             }
           }
         };
@@ -79,8 +79,10 @@ function requestStructure(tokenAddress, tokenSymbol) {
 function Metamask$AddToken(Props) {
   var tokenAddress = Props.tokenAddress;
   var tokenSymbol = Props.tokenSymbol;
+  var tokenUrlOpt = Props.tokenUrl;
   var callbackOpt = Props.callback;
   var childrenOpt = Props.children;
+  var tokenUrl = tokenUrlOpt !== undefined ? tokenUrlOpt : "";
   var callback = callbackOpt !== undefined ? callbackOpt : (function (param) {
         
       });
@@ -97,7 +99,7 @@ function Metamask$AddToken(Props) {
               className: "flex justify-start align-center",
               onClick: (function (_event) {
                   return Misc.onlyExecuteClientSide(function (param) {
-                              ethObj$1.request(requestStructure(tokenAddress, tokenSymbol));
+                              ethObj$1.request(requestStructure(tokenAddress, tokenSymbol, tokenUrl));
                               return Curry._1(callback, undefined);
                             });
                 })
@@ -112,10 +114,13 @@ var AddToken = {
 function Metamask$AddTokenButton(Props) {
   var token = Props.token;
   var tokenSymbol = Props.tokenSymbol;
+  var tokenUrlOpt = Props.tokenUrl;
+  var tokenUrl = tokenUrlOpt !== undefined ? tokenUrlOpt : "";
   if (InjectedEthereum.isMetamask(undefined)) {
     return React.createElement(Metamask$AddToken, {
                 tokenAddress: Ethers.Utils.ethAdrToStr(token),
                 tokenSymbol: tokenSymbol,
+                tokenUrl: tokenUrl,
                 children: React.createElement("button", {
                       className: "w-44 h-12 text-sm shadow-md rounded-lg border-2 focus:outline-none border-gray-200 hover:bg-gray-200 flex justify-center items-center mx-auto"
                     }, React.createElement("div", {

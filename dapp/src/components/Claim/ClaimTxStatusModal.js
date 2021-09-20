@@ -23,7 +23,7 @@ function useClaimTxModal(txState) {
             } else {
               Curry._1(startModalChain, React.createElement("div", {
                         className: "text-center m-3"
-                      }, React.createElement(Loader.Ellipses.make, {}), React.createElement("h1", undefined, "Confirm the transaction to claim Float")));
+                      }, React.createElement(Loader.Ellipses.make, {}), React.createElement("h1", undefined, "Confirm the transaction to claim " + Config.floatTokenName)));
             }
           } else {
             switch (txState.TAG | 0) {
@@ -46,7 +46,8 @@ function useClaimTxModal(txState) {
                                 className: "text-center m-3"
                               }, React.createElement(Tick.make, {}), React.createElement("p", undefined, "Transaction complete 🎉")), React.createElement(Metamask.AddTokenButton.make, {
                                 token: Config.config.contracts.FloatToken,
-                                tokenSymbol: "FLOAT"
+                                tokenSymbol: Config.config.floatToken.floatTokenName,
+                                tokenUrl: Config.config.floatToken.floatTokenImageUrl
                               })));
                   break;
               case /* Failed */3 :

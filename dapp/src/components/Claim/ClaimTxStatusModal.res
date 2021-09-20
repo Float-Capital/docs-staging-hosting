@@ -6,7 +6,7 @@ let useClaimTxModal = (~txState) => {
     | ContractActions.Created =>
       startModalChain(
         <div className="text-center m-3">
-          <Loader.Ellipses /> <h1> {`Confirm the transaction to claim Float`->React.string} </h1>
+          <Loader.Ellipses /> <h1> {`Confirm the transaction to claim ${Config.floatTokenName}`->React.string} </h1>
         </div>,
       )
     | ContractActions.SignedAndSubmitted(txHash) =>
@@ -22,7 +22,7 @@ let useClaimTxModal = (~txState) => {
         <div className="text-center m-3">
           <Tick /> <p> {`Transaction complete 🎉`->React.string} </p>
         </div>
-        <Metamask.AddTokenButton token={Config.config.contracts.floatToken} tokenSymbol={`FLOAT`} />
+        <Metamask.AddTokenButton token={Config.config.contracts.floatToken} tokenSymbol={Config.config.floatToken.floatTokenName} tokenUrl={Config.config.floatToken.floatTokenImageUrl}/>
       </>)
     | ContractActions.Declined(_message) =>
       showNextModalInChain(

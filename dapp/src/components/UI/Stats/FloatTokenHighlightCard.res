@@ -3,7 +3,7 @@ let make = (~totalFloatMinted) =>
   <div className={"bg-white w-full bg-opacity-75 rounded-lg shadow-lg mb-2 md:mb-5 p-6"}>
     <div className="flex flex-row items-center justify-center">
       <h1 className="font-bold text-center text-lg font-alphbeta">
-        {`${Config.floatTokenName} Token`->React.string}
+        {`${Config.config.floatToken.floatTokenName} Token`->React.string}
       </h1>
       <img src="/icons/alpha-float-token.svg" className="ml-2 h-4" />
     </div>

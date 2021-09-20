@@ -13,7 +13,7 @@ function FloatTokenHighlightCard(Props) {
                   className: "flex flex-row items-center justify-center"
                 }, React.createElement("h1", {
                       className: "font-bold text-center text-lg font-alphbeta"
-                    }, Config.floatTokenName + " Token"), React.createElement("img", {
+                    }, Config.config.floatToken.floatTokenName + " Token"), React.createElement("img", {
                       className: "ml-2 h-4",
                       src: "/icons/alpha-float-token.svg"
                     })), React.createElement("ul", {

@@ -73,7 +73,7 @@ module AddToken = {
     address: string,
     symbol: string,
     decimals: string,
-    image: option<string>,
+    image: string,
   }
 
   type reqParams = {
@@ -88,7 +88,7 @@ module AddToken = {
 
   @send external request: (InjectedEthereum.t, requestObj) => unit = "request"
 
-  let requestStructure = (~tokenAddress, ~tokenSymbol) => {
+  let requestStructure = (~tokenAddress, ~tokenSymbol, ~tokenUrl) => {
     method: "wallet_watchAsset",
     params: {
       type_: "ERC20",
@@ -96,7 +96,7 @@ module AddToken = {
         address: tokenAddress,
         symbol: tokenSymbol->Js.String.slice(~from=0, ~to_=5), // A ticker symbol, up to 5 chars.
         decimals: "18",
-        image: None,
+        image: tokenUrl,
       },
     },
   }
@@ -105,12 +105,13 @@ module AddToken = {
   let make = (
     ~tokenAddress,
     ~tokenSymbol,
+    ~tokenUrl="",
     ~callback=_ => (),
     ~children=<img src="/icons/metamask.svg" className="h-5 ml-1" />,
   ) => {
     let addToMetamask = ethObj =>
       Misc.onlyExecuteClientSide(() => {
-        request(ethObj, requestStructure(~tokenAddress, ~tokenSymbol))
+        request(ethObj, requestStructure(~tokenAddress, ~tokenSymbol, ~tokenUrl))
         callback()
       })
 
@@ -126,9 +127,9 @@ module AddToken = {
 
 module AddTokenButton = {
   @react.component
-  let make = (~token, ~tokenSymbol) => {
+  let make = (~token, ~tokenSymbol, ~tokenUrl="") => {
     if InjectedEthereum.isMetamask() {
-      <AddToken tokenAddress={token->Ethers.Utils.ethAdrToStr} tokenSymbol>
+      <AddToken tokenAddress={token->Ethers.Utils.ethAdrToStr} tokenSymbol tokenUrl>
         <button
           className="w-44 h-12 text-sm shadow-md rounded-lg border-2 focus:outline-none border-gray-200 hover:bg-gray-200 flex justify-center items-center mx-auto">
           <div className="mx-2 flex flex-row">
