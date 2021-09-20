@@ -7,7 +7,7 @@
   "torusName": "mumbai",
   "networkCurrencyName": "Test MATIC",
   "networkCurrencySymbol": "MATIC",
-  "rpcEndopint": "https://rpc-endpoints.superfluid.dev/mumbai",
+  "rpcEndopint": "https://rpc-mumbai.maticvigil.com/",
   "paymentTokenName": "DAI",
   "blockExplorer": "https://mumbai.polygonscan.com/",
   "blockExplorerName": "polygonscan",
