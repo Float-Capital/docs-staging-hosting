@@ -146,7 +146,9 @@ function AaveDaiFaucet$FaucetCard(Props) {
                           return Curry._2(contractExecutionHandler, (function (param) {
                                         return Contracts.Erc20.make(Config.dai, param);
                                       }), (function (param) {
-                                        return param.mint(CONSTANTS.oneThousandInWei);
+                                        return function (param$1) {
+                                          return param.mint(CONSTANTS.oneThousandInWei, param$1);
+                                        };
                                       }));
                         }),
                       children: "Mint testnet dai"

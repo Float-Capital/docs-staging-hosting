@@ -348,8 +348,7 @@ let onQuerySuccess = (data: userData) => {
         <UserBalancesCard userId={data.user} />
       </div>
       <div className={"w-full md:w-1/3 px-3 md:px-0 m-0 md:m-4"}>
-         <UserTotalDaiCard />
-        <UserStakesCard stakes={data.stakes} userId={data.user} />
+        <UserTotalDaiCard /> <UserStakesCard stakes={data.stakes} userId={data.user} />
       </div>
     </div>
   </UserContainer>

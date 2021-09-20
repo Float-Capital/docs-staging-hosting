@@ -76,3 +76,9 @@ Not all alphas are made the same. In many cases when a team refers to an alpha, 
 By launching as an alpha the aim is to field test the protocol before making any of its mechanisms immutable. This will help guarantee that the protocol has maximum utility for users.
 
 The alpha protocol has already passed a range of smart contract audits, including by community driven audit platform, [Code 423n4](https://code423n4.com/), and users will be able to inject capital and stake positions with confidence in the safety of their assets.
+
+## Where to start?📈
+
+Get ready to trade and ape in with our simple how to guide detailing everything you need to know on getting started with the Float Capital protocol:
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/videoseries?list=PL7RT-0ybd7jqbTHvG0O4rQfeR3yruypCf" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>

@@ -7,9 +7,9 @@ var config = (require('config_file'));
 
 var isPolygon = config.networkId === CONSTANTS.polygon.chainId;
 
-var floatTokenName = isPolygon ? "alphaFloat" : "Float";
-
 var match = config.contracts;
+
+var match$1 = config.floatToken;
 
 var graphEndpoint = config.graphEndpoint;
 
@@ -43,6 +43,10 @@ var web3PollingInterval = config.web3PollingInterval;
 
 var apolloConnectToDevTools = config.apolloConnectToDevTools;
 
+var floatTokenName = match$1.floatTokenName;
+
+var floatTokenImageUrl = match$1.floatTokenImageUrl;
+
 var longShort = match.LongShort;
 
 var staker = match.Staker;
@@ -53,7 +57,6 @@ var floatToken = match.FloatToken;
 
 exports.config = config;
 exports.isPolygon = isPolygon;
-exports.floatTokenName = floatTokenName;
 exports.graphEndpoint = graphEndpoint;
 exports.priceHistoryGraphEndpoint = priceHistoryGraphEndpoint;
 exports.aaveGraphEndpoint = aaveGraphEndpoint;
@@ -70,6 +73,8 @@ exports.discordInviteLink = discordInviteLink;
 exports.polygonBridgeLink = polygonBridgeLink;
 exports.web3PollingInterval = web3PollingInterval;
 exports.apolloConnectToDevTools = apolloConnectToDevTools;
+exports.floatTokenName = floatTokenName;
+exports.floatTokenImageUrl = floatTokenImageUrl;
 exports.longShort = longShort;
 exports.staker = staker;
 exports.dai = dai;

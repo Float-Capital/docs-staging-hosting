@@ -105,7 +105,9 @@ function Withdraw(Props) {
                   return Curry._2(contractExecutionHandler, (function (param) {
                                 return Contracts.LongShort.make(Config.longShort, param);
                               }), (function (param) {
-                                return param.executeOutstandingNextPriceSettlementsUser(user, marketIndex);
+                                return function (param$1) {
+                                  return param.executeOutstandingNextPriceSettlementsUser(user, marketIndex, param$1);
+                                };
                               }));
                 }),
               children: "Withdraw DAI"

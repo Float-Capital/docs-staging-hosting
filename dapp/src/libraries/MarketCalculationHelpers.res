@@ -1,3 +1,5 @@
+let {min: minBn, div, mul, sub, add, fromInt, eq, lt, lte, pow, abs} = module(Ethers.BigNumber)
+
 let calculateBeta = (
   ~totalValueLocked: Ethers.BigNumber.t,
   ~totalLockedLong,
@@ -6,16 +8,16 @@ let calculateBeta = (
 ) => {
   // TODO: NOT HARDCODE THE BETA AS WITH A LEVERAGE OF 3
   if (
-    totalValueLocked->Ethers.BigNumber.eq(CONSTANTS.zeroBN) ||
-    totalLockedLong->Ethers.BigNumber.eq(CONSTANTS.zeroBN) ||
-    totalLockedShort->Ethers.BigNumber.eq(CONSTANTS.zeroBN)
+    totalValueLocked->eq(CONSTANTS.zeroBN) ||
+    totalLockedLong->eq(CONSTANTS.zeroBN) ||
+    totalLockedShort->eq(CONSTANTS.zeroBN)
   ) {
     "0"
-  } else if totalLockedLong->Ethers.BigNumber.eq(totalLockedShort) {
+  } else if totalLockedLong->eq(totalLockedShort) {
     "100"
-  } else if isLong && totalLockedShort->Ethers.BigNumber.lt(totalLockedLong) {
+  } else if isLong && totalLockedShort->lt(totalLockedLong) {
     Globals.percentStr(~n=totalLockedShort, ~outOf=totalLockedLong)
-  } else if !isLong && totalLockedLong->Ethers.BigNumber.lt(totalLockedShort) {
+  } else if !isLong && totalLockedLong->lt(totalLockedShort) {
     Globals.percentStr(~n=totalLockedLong, ~outOf=totalLockedShort)
   } else {
     "100"
@@ -28,12 +30,12 @@ let kCalc = (
   initialTimestamp: Ethers.BigNumber.t,
   currentTimestamp: Ethers.BigNumber.t,
 ) => {
-  if currentTimestamp->Ethers.BigNumber.sub(initialTimestamp)->Ethers.BigNumber.lte(kperiod) {
-    kmultiplier->Ethers.BigNumber.sub(
+  if currentTimestamp->sub(initialTimestamp)->lte(kperiod) {
+    kmultiplier->sub(
       kmultiplier
-      ->Ethers.BigNumber.sub(CONSTANTS.tenToThe18)
-      ->Ethers.BigNumber.mul(currentTimestamp->Ethers.BigNumber.sub(initialTimestamp))
-      ->Ethers.BigNumber.div(kperiod),
+      ->sub(CONSTANTS.tenToThe18)
+      ->mul(currentTimestamp->sub(initialTimestamp))
+      ->div(kperiod),
     )
   } else {
     CONSTANTS.tenToThe18
@@ -56,8 +58,6 @@ let calcLongAndShortDollarFloatPerSecondUnscaled = (
   ~kmultiplier,
   ~balanceIncentiveExponent,
 ) => {
-  open Ethers.BigNumber
-
   let totalLocked = longVal->add(shortVal)
   let equibOffsetScaled =
     equibOffset->mul(totalLocked)->div(CONSTANTS.tenToThe18)->div(CONSTANTS.twoBN)
@@ -106,7 +106,6 @@ let calculateFloatAPY = (
   balanceIncentiveExponent,
   tokenType,
 ) => {
-  open Ethers.BigNumber
   let (longApy, shortApy) = calcLongAndShortDollarFloatPerSecondUnscaled(
     ~longVal,
     ~shortVal,
@@ -126,7 +125,6 @@ let calculateFloatAPY = (
 }
 
 let calculateFloatMintedOverPeriod = (~dollarFloatPerSecond, ~amount, ~period, ~price) => {
-  open Ethers.BigNumber
   dollarFloatPerSecond
   ->mul(price)
   ->div(CONSTANTS.tenToThe18)
@@ -161,7 +159,6 @@ let calculateStakeAPYS = (
       but it kinda makes sense to me that in perfect markets they'd be sort of the same
  */
 
-  open Ethers.BigNumber
   let totalTreasuryYieldAfterYear = ref(CONSTANTS.zeroBN)
   let totalFloatMintedAfterAYear = ref(global.totalFloatMinted)
   let tokenFloatMintedAfterAYearDict: HashMap.String.t<Ethers.BigNumber.t> = HashMap.String.make(
@@ -193,10 +190,10 @@ let calculateStakeAPYS = (
     let marketsShareOfYield =
       totalLockedLong
       ->sub(totalLockedShort)
-      ->Ethers.BigNumber.abs // compiler error if not fully qualified
+      ->abs // compiler error if not fully qualified
       ->mul(CONSTANTS.yieldGradientHardcode)
       ->div(totalValueLocked)
-      ->min(CONSTANTS.tenToThe18)
+      ->minBn(CONSTANTS.tenToThe18)
 
     totalTreasuryYieldAfterYear :=
       totalTreasuryYieldAfterYear.contents->add(

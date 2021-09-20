@@ -5,11 +5,11 @@ module LongShort = {
 
   let abi =
     [
-      "function mintLongNextPrice(uint32 marketIndex,uint256 amount) @1970000",
-      "function mintShortNextPrice(uint32 marketIndex,uint256 amount) @1970000",
-      "function redeemLongNextPrice(uint32 marketIndex,uint256 tokensToRedeem) @1100000",
-      "function redeemShortNextPrice(uint32 marketIndex,uint256 tokensToRedeem) @1100000",
-      "function executeOutstandingNextPriceSettlementsUser(address user,uint32 marketIndex) @130000",
+      "function mintLongNextPrice(uint32 marketIndex,uint256 amount) @1200000",
+      "function mintShortNextPrice(uint32 marketIndex,uint256 amount) @1200000",
+      "function redeemLongNextPrice(uint32 marketIndex,uint256 tokensToRedeem) @1200000",
+      "function redeemShortNextPrice(uint32 marketIndex,uint256 tokensToRedeem) @1200000",
+      "function executeOutstandingNextPriceSettlementsUser(address user,uint32 marketIndex) @1200000",
       "function updateSystemState()",
       "function updateSystemStateMulti(uint32[] marketIndexes)",
     ]->Ethers.makeAbi
@@ -22,38 +22,44 @@ module LongShort = {
     ~contract: t,
     ~marketIndex: Ethers.BigNumber.t,
     ~amount: Ethers.BigNumber.t,
+    'txOptions,
   ) => JsPromise.t<Ethers.txSubmitted> = "mintLongNextPrice"
   @send
   external mintShortNextPrice: (
     ~contract: t,
     ~marketIndex: Ethers.BigNumber.t,
     ~amount: Ethers.BigNumber.t,
+    'txOptions,
   ) => JsPromise.t<Ethers.txSubmitted> = "mintShortNextPrice"
   @send
   external redeemLongNextPrice: (
     ~contract: t,
     ~marketIndex: Ethers.BigNumber.t,
     ~tokensToRedeem: Ethers.BigNumber.t,
+    'txOptions,
   ) => JsPromise.t<Ethers.txSubmitted> = "redeemLongNextPrice"
   @send
   external redeemShortNextPrice: (
     ~contract: t,
     ~marketIndex: Ethers.BigNumber.t,
     ~tokensToRedeem: Ethers.BigNumber.t,
+    'txOptions,
   ) => JsPromise.t<Ethers.txSubmitted> = "redeemShortNextPrice"
   @send
   external executeOutstandingNextPriceSettlementsUser: (
     ~contract: t,
     ~user: Ethers.ethAddress,
     ~marketIndex: Ethers.BigNumber.t,
+    'txOptions,
   ) => JsPromise.t<Ethers.txSubmitted> = "executeOutstandingNextPriceSettlementsUser"
   @send
-  external updateSystemState: (~contract: t) => JsPromise.t<Ethers.txSubmitted> =
+  external updateSystemState: (~contract: t, 'txOptions) => JsPromise.t<Ethers.txSubmitted> =
     "updateSystemState"
   @send
   external updateSystemStateMulti: (
     ~contract: t,
     ~marketIndexes: array<Ethers.BigNumber.t>,
+    'txOptions,
   ) => JsPromise.t<Ethers.txSubmitted> = "updateSystemStateMulti"
 }
 
@@ -62,10 +68,9 @@ module Staker = {
 
   let abi =
     [
-      "function stake(address tokenAddress, uint256 amount)",
-      "function stakeAndEarnImmediately(address tokenAddress, uint256 amount)  @1200000",
-      "function withdraw(uint32, bool, uint256 amount) @5000000",
-      "function claimFloatCustom(uint32[] calldata marketIndexes) @2000000",
+      "function stake(address tokenAddress, uint256 amount) @6000000",
+      "function withdraw(uint32, bool, uint256 amount) @6000000",
+      "function claimFloatCustom(uint32[] calldata marketIndexes) @6000000",
     ]->Ethers.makeAbi
 
   let make = (~address, ~providerOrSigner): t =>
@@ -76,24 +81,21 @@ module Staker = {
     ~contract: t,
     ~tokenAddress: Ethers.ethAddress,
     ~amount: Ethers.BigNumber.t,
+    'txOptions,
   ) => JsPromise.t<Ethers.txSubmitted> = "stake"
-  @send
-  external stakeAndEarnImmediately: (
-    ~contract: t,
-    ~tokenAddress: Ethers.ethAddress,
-    ~amount: Ethers.BigNumber.t,
-  ) => JsPromise.t<Ethers.txSubmitted> = "stakeAndEarnImmediately"
   @send
   external withdraw: (
     ~contract: t,
     ~marketIndex: int,
     ~isWithdrawFromLong: bool,
     ~amount: Ethers.BigNumber.t,
+    'txOptions,
   ) => JsPromise.t<Ethers.txSubmitted> = "withdraw"
   @send
   external claimFloatCustom: (
     ~contract: t,
     ~marketIndexes: array<Ethers.BigNumber.t>,
+    'txOptions,
   ) => JsPromise.t<Ethers.txSubmitted> = "claimFloatCustom"
 }
 
@@ -102,7 +104,7 @@ module Erc20 = {
 
   let abi =
     [
-      "function approve(address spender, uint256 amount) @100000",
+      "function approve(address spender, uint256 amount) @52000",
       "function balanceOf(address owner) public view returns (uint256 balance)",
       "function allowance(address owner, address spender) public view returns (uint256 remaining)",
       "function mint(uint256 value) public virtual returns (bool)",
@@ -116,6 +118,7 @@ module Erc20 = {
     ~contract: t,
     ~spender: Ethers.ethAddress,
     ~amount: Ethers.BigNumber.t,
+    'txOptions,
   ) => JsPromise.t<Ethers.txSubmitted> = "approve"
 
   @send
@@ -130,8 +133,11 @@ module Erc20 = {
   ) => JsPromise.t<Ethers.BigNumber.t> = "allowance"
 
   @send
-  external mint: (~contract: t, ~amount: Ethers.BigNumber.t) => JsPromise.t<Ethers.txSubmitted> =
-    "mint"
+  external mint: (
+    ~contract: t,
+    ~amount: Ethers.BigNumber.t,
+    'txOptions,
+  ) => JsPromise.t<Ethers.txSubmitted> = "mint"
 }
 
 module Synth = {
@@ -139,10 +145,10 @@ module Synth = {
 
   let abi =
     [
-      "function approve(address spender, uint256 amount) @100000",
+      "function approve(address spender, uint256 amount) @52000",
       "function balanceOf(address owner) public view returns (uint256 balance)",
       "function allowance(address owner, address spender) public view returns (uint256 remaining)",
-      "function stake(uint256 amount) external",
+      "function stake(uint256 amount) external @500000",
     ]->Ethers.makeAbi
 
   let make = (~address, ~providerOrSigner): t =>
@@ -153,6 +159,7 @@ module Synth = {
     ~contract: t,
     ~spender: Ethers.ethAddress,
     ~amount: Ethers.BigNumber.t,
+    'txOptions,
   ) => JsPromise.t<Ethers.txSubmitted> = "approve"
 
   @send
@@ -167,6 +174,9 @@ module Synth = {
   ) => JsPromise.t<Ethers.BigNumber.t> = "allowance"
 
   @send
-  external stake: (~contract: t, ~amount: Ethers.BigNumber.t) => JsPromise.t<Ethers.txSubmitted> =
-    "stake"
+  external stake: (
+    ~contract: t,
+    ~amount: Ethers.BigNumber.t,
+    'txOptions,
+  ) => JsPromise.t<Ethers.txSubmitted> = "stake"
 }

@@ -55,15 +55,17 @@ type transactionState =
 let useContractFunction = (~signer: Ethers.Wallet.t) => {
   let (txState, setTxState) = React.useState(() => UnInitialised)
 
+  let gasPrice = DataFetchers.useRecommendedGasPrice()
+
   (
     (
       ~makeContractInstance,
-      ~contractFunction: (~contract: 'a) => JsPromise.t<Ethers.txSubmitted>,
+      ~contractFunction: (~contract: 'a, 'txOptions) => JsPromise.t<Ethers.txSubmitted>,
     ) => {
       setTxState(_ => Created)
 
       let contractInstance = makeContractInstance(~providerOrSigner=Ethers.Signer(signer))
-      let mintPromise = contractFunction(~contract=contractInstance)
+      let mintPromise = contractFunction(~contract=contractInstance, {"gasPrice": gasPrice})
       let _ = mintPromise->JsPromise.catch(error => {
         setTxState(_ => Declined(
           switch Js.Exn.message(error->Obj.magic) {

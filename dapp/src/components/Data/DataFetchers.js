@@ -3,9 +3,26 @@
 
 var Curry = require("rescript/lib/js/curry.js");
 var React = require("react");
+var Ethers = require("ethers");
 var Globals = require("../../libraries/Globals.js");
+var Js_math = require("rescript/lib/js/js_math.js");
 var Queries = require("../../data/Queries.js");
+var JsPromise = require("../../libraries/Js.Promise/JsPromise.js");
+var Belt_Option = require("rescript/lib/js/belt_Option.js");
+var Caml_option = require("rescript/lib/js/caml_option.js");
 var StateChangeMonitor = require("../../libraries/StateChangeMonitor.js");
+
+function mul(prim0, prim1) {
+  return prim0.mul(prim1);
+}
+
+function fromInt(prim) {
+  return Ethers.BigNumber.from(prim);
+}
+
+function toString(prim) {
+  return prim.toString();
+}
 
 function useUsersStakes(address) {
   var userId = Globals.ethAdrToStr(address).toLowerCase();
@@ -50,5 +67,58 @@ function useUsersStakes(address) {
             ]);
 }
 
+var oneGweiInWei = Ethers.BigNumber.from(1000000000);
+
+var defaultGasPriceInGwei = oneGweiInWei.mul(Ethers.BigNumber.from(95));
+
+function getGasPrice(param) {
+  return JsPromise.$$catch(fetch("https://gasstation-mainnet.matic.network").then(function (prim) {
+                    return prim.json();
+                  }).then(function (response) {
+                  return Belt_Option.map(response.fast, (function (gasInGWeiAsFloat) {
+                                return Ethers.BigNumber.from(Js_math.ceil_int(gasInGWeiAsFloat)).mul(oneGweiInWei);
+                              }));
+                }), (function (err) {
+                console.log("Error fetching gas price:", err);
+                return Promise.resolve(Caml_option.some(defaultGasPriceInGwei));
+              }));
+}
+
+function useRecommendedGasPrice(param) {
+  var match = React.useState(function () {
+        return defaultGasPriceInGwei;
+      });
+  var setGasPrice = match[1];
+  var getAndSetGasPrice = function (param) {
+    getGasPrice(undefined).then(function (optGasPrice) {
+          if (optGasPrice === undefined) {
+            return ;
+          }
+          var gasPrice = Caml_option.valFromOption(optGasPrice);
+          Curry._1(setGasPrice, (function (param) {
+                  return gasPrice;
+                }));
+          
+        });
+    
+  };
+  React.useEffect((function () {
+          getAndSetGasPrice(undefined);
+          var interval = setInterval(getAndSetGasPrice, 3000);
+          return (function (param) {
+                    clearInterval(interval);
+                    
+                  });
+        }), []);
+  return match[0];
+}
+
+exports.mul = mul;
+exports.fromInt = fromInt;
+exports.toString = toString;
 exports.useUsersStakes = useUsersStakes;
-/* react Not a pure module */
+exports.oneGweiInWei = oneGweiInWei;
+exports.defaultGasPriceInGwei = defaultGasPriceInGwei;
+exports.getGasPrice = getGasPrice;
+exports.useRecommendedGasPrice = useRecommendedGasPrice;
+/* oneGweiInWei Not a pure module */

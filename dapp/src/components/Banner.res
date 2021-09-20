@@ -4,25 +4,25 @@ let make = () => {
     <div className="text-center text-xxs md:text-sm text-white mx-12 w-full">
       {Config.isPolygon
         ? <>
-            {`🍾 Alpha launch is live on Polygon! `->React.string}
+            {`🍾 Alpha is live on Polygon! Come join in the fun on `->React.string}
             <a
               className="bg-white hover:bg-primary-light text-primary hover:text-white py-1 font-bold"
-              href="https://youtu.be/UFX-mQgV1JU"
+              href="https://discord.gg/zQZy6Ugxpt"
               target="_blank"
               rel="noopener noreferrer">
-              {`Launch party`->React.string}
+              {`discord`->React.string}
             </a>
-            {` on Fri 17th Sept, 2pm UTC 🍾`->React.string}
           </>
         : <>
-            {`Our Alpha launch is going live on Polygon this Friday 17th Sept (2pm UTC), join the event `->React.string}
+            {`This is the mumbai testnet, to view the live Alpha go `->React.string}
             <a
               className="bg-white hover:bg-primary-light text-primary hover:text-white py-1 font-bold"
-              href="https://youtu.be/UFX-mQgV1JU"
+              href="https://float.capital"
               target="_blank"
               rel="noopener noreferrer">
               {`here`->React.string}
             </a>
+            {`.`->React.string}
           </>}
     </div>
   </div>

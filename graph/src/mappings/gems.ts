@@ -6,6 +6,7 @@ import {
   getOrInitializeUser,
   getOrInitializeGems,
 } from "../generated/EntityHelpers";
+import { getOrCreateUser } from "../utils/globalStateManager";
 
 export function handleGemsCollected(event: GemsCollected): void {
   let userParam = event.params.user;
@@ -21,8 +22,7 @@ export function handleGemsCollected(event: GemsCollected): void {
 
   gems.save();
 
-  let userLoad = getOrInitializeUser(userParam.toHex());
-  let user = userLoad.entity;
+  let user = getOrCreateUser(userParam, event);
 
   user.gems = gems.id;
 

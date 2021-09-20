@@ -109,7 +109,7 @@ type dataInfo = {
 let extractGraphPriceInfo = (
   rawPriceData: array<Queries.PriceHistory.PriceHistory_inner.t_priceIntervalManager_prices>,
   graphZoomSetting,
-  oracleDecimals
+  oracleDecimals,
 ) => {
   let normalizeDecimals = Ethers.Utils.make18DecimalsNormalizer(~decimals=oracleDecimals)
   rawPriceData->Array.reduceReverse(
@@ -120,7 +120,8 @@ let extractGraphPriceInfo = (
       dateFormat: graphZoomSetting->dateFormattersFromGraphSetting,
     },
     (data, {startTimestamp, endPrice}) => {
-      let price = endPrice->normalizeDecimals->Ethers.Utils.formatEther->Float.fromString->Option.getExn
+      let price =
+        endPrice->normalizeDecimals->Ethers.Utils.formatEther->Float.fromString->Option.getExn
       {
         ...data,
         dataArray: data.dataArray->Array.concat([

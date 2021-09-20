@@ -71,6 +71,9 @@ module BigNumber = {
 
   @send external toNumber: t => int = "toNumber"
   @send external toNumberFloat: t => float = "toNumber"
+
+  let min = (a, b) => a->gt(b) ? b : a
+  let max = (a, b) => a->gt(b) ? a : b
 }
 
 type providerType
@@ -164,17 +167,15 @@ module Utils = {
   let formatEther = formatUnits(. _, #ether)
 
   let tenBN = BigNumber.fromInt(10)
- 
 
   let make18DecimalsNormalizer = (~decimals) => {
     open BigNumber
 
     let multiplierOrDivisor = tenBN->pow(Js.Math.abs_int(18 - decimals)->fromInt)
     switch decimals {
-    | d if d < 18 => (num) => num->mul(multiplierOrDivisor)
-    | d if d > 18 =>
-      (num) => num->div(multiplierOrDivisor)
-    | _ => (num) => (num)
+    | d if d < 18 => num => num->mul(multiplierOrDivisor)
+    | d if d > 18 => num => num->div(multiplierOrDivisor)
+    | _ => num => num
     }
   }
 

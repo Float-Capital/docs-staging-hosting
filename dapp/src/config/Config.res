@@ -4,6 +4,10 @@ type contractDetails = {
   @as("Dai") dai: Ethers.ethAddress,
   @as("FloatToken") floatToken: Ethers.ethAddress,
 }
+type floatTokenDetails = {
+  floatTokenName: string,
+  floatTokenImageUrl: string
+}
 type configShape = {
   graphEndpoint: string,
   priceHistoryGraphEndpoint: string,
@@ -21,6 +25,7 @@ type configShape = {
   polygonBridgeLink: string,
   web3PollingInterval: int,
   apolloConnectToDevTools: bool,
+  floatToken: floatTokenDetails,
   contracts: contractDetails,
 }
 let config: configShape = %raw(`require('config_file')`)
@@ -28,8 +33,6 @@ let config: configShape = %raw(`require('config_file')`)
 // NOTE: no validation happens on the config. IT IS NOT TYPE SAFE.
 
 let isPolygon = config.networkId == CONSTANTS.polygon.chainId
-
-let floatTokenName = isPolygon ? "alphaFloat" : "Float"
 
 let {
   graphEndpoint,
@@ -48,5 +51,9 @@ let {
   polygonBridgeLink,
   web3PollingInterval,
   apolloConnectToDevTools,
+  floatToken: {
+    floatTokenName,
+    floatTokenImageUrl
+  },
   contracts: {longShort, staker, dai, floatToken},
 } = config

@@ -15,6 +15,10 @@
   "polygonBridgeLink": "https://wallet.polygon.technology/bridge",
   "web3PollingInterval": 8000,
   "apolloConnectToDevTools": false,
+  "floatToken": {
+    "floatTokenName": "alphaFloat",
+    "floatTokenImageUrl": "https://float.capital/icons/alpha-float-token.svg"
+  },
   "contracts": {
     "FloatToken": "0x01309A1Ec476871760D9Ea454628500BCcc1E011",
     "FloatCapital_v0": "0xEe0c19f26b3B3A4fb82f466a6023DcD979c27a2F",
