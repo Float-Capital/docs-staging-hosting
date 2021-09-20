@@ -17,7 +17,6 @@ describe("All Tests", ({beforeAll, testAsync}) => {
         Js.log({"critical error fetching events": error})
         ()->Obj.magic
       })
-    Js.log2("Saving the promise", allStateChanges.contents)
   })
 
   describe("V1 event", ({testAsync}) => {
@@ -161,7 +160,6 @@ describe("All Tests", ({beforeAll, testAsync}) => {
                   expectEqual(longId, longTokenAddress)
                   expectEqual(shortId, shortTokenAddress)
                   expectEqual(systemStateId, marketIndex->BN.toString ++ "-0")
-                  Js.log({"paymentTokenId": paymentTokenId, "paymentAddress": paymentAddress})
                   expectEqual(paymentTokenId, paymentAddress)
                 }
 
