@@ -7,7 +7,7 @@
   "torusName": "matic",
   "networkCurrencyName": "MATIC",
   "networkCurrencySymbol": "MATIC",
-  "rpcEndopint": "https://rpc-endpoints.superfluid.dev/matic",
+  "rpcEndopint": "https://polygon-rpc.com",
   "paymentTokenName": "DAI",
   "blockExplorer": "https://polygonscan.com/",
   "blockExplorerName": "polygonscan",

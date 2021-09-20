@@ -16,6 +16,7 @@ var Web3Connectors = require("../bindings/web3-react/Web3Connectors.js");
 var InjectedEthereum = require("../ethereum/InjectedEthereum.js");
 var Caml_js_exceptions = require("rescript/lib/js/caml_js_exceptions.js");
 var TorusConnector = require("@web3-react/torus-connector");
+var WalletconnectConnector = require("@web3-react/walletconnect-connector");
 
 var connectors = [
   {
@@ -23,6 +24,20 @@ var connectors = [
     connector: Web3Connectors.injected,
     img: "/img/wallet-icons/metamask.svg",
     connectionPhrase: "Connect via MetaMask"
+  },
+  {
+    name: "WalletConnect",
+    connector: new WalletconnectConnector.WalletConnectConnector({
+          rpc: Js_dict.fromArray([[
+                  String(Config.networkId),
+                  Config.rpcEndopint
+                ]]),
+          bridge: "https://bridge.walletconnect.org",
+          qrcode: true,
+          pollingInterval: Config.web3PollingInterval
+        }),
+    img: "/img/wallet-icons/walletConnect.svg",
+    connectionPhrase: "Connect via WalletConnect"
   },
   {
     name: "Torus",
@@ -135,7 +150,7 @@ function Login(Props) {
                   }, "Connect with one of the wallets below. "), isMetamask ? null : React.createElement("p", {
                       className: "text-xs"
                     }, "Please make sure to connect to " + Config.networkName + "."), React.createElement("div", {
-                    className: "grid grid-cols-1 md:grid-cols-2 gap-4 items-center my-5"
+                    className: "grid grid-cols-1 md:grid-cols-3 gap-4 items-center my-5"
                   }, Belt_Array.mapWithIndex(connectors, (function (index, connector) {
                           return React.createElement("div", {
                                       key: String(index),
