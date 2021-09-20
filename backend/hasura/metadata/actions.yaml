@@ -1,14 +1,11 @@
 actions:
-- name: createUser
+- name: discountCode
   definition:
     kind: synchronous
-    handler: http://hasura-actions:9898/create-user
-    forward_client_headers: true
-  permissions:
-  - role: user
+    handler: http://hactions:9898/check-discount
 custom_types:
   enums: []
   input_objects: []
   objects:
-  - name: CreateUserOutput
+  - name: GeneratedDiscountCode
   scalars: []

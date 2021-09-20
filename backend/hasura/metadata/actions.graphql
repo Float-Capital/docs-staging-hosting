@@ -1,14 +1,20 @@
 type Mutation {
-  createUser (
-    username: String
-  ): CreateUserOutput
+  discountCode(
+    userAddress: String!
+    marketIndex: Int!
+    isWithdrawFromLong: Boolean!
+    withdrawAmount: String!
+  ): GeneratedDiscountCode!
 }
 
-
-
-
-type CreateUserOutput {
-  success : Boolean!
-  error : String
+type GeneratedDiscountCode {
+  eligibleForDiscount: Boolean!
+  error: String
+  expiry: String!
+  nonce: String!
+  discountWithdrawFee: String
+  v: Int!
+  r: String!
+  s: String!
 }
 
