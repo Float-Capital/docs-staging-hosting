@@ -4,7 +4,7 @@ let make = () => {
     <div className="text-center text-xxs md:text-sm text-white mx-12 w-full">
       {Config.isPolygon
         ? <>
-            {`🍾 Alpha is live on Polygon! Come join on the fun on `->React.string}
+            {`🍾 Alpha is live on Polygon! Come join in the fun on `->React.string}
             <a
               className="bg-white hover:bg-primary-light text-primary hover:text-white py-1 font-bold"
               href="https://discord.gg/zQZy6Ugxpt"
