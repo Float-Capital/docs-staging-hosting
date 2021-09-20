@@ -15,9 +15,10 @@ services:
       GRAPHQL_ENDPOINT: graphql-engine:8080/v1/graphql
     command: ${ACTIONS_START_COMMAND}
     restart: always
+
   postgres:
     # container_name: hasura-postgres
-    image: postgres:12
+    image: postgres:13
     restart: always
     ports:
       - "${POSTGRES_EXTERNAL_PORT}:5432"
@@ -28,7 +29,7 @@ services:
   graphql-engine:
     # name: graphql-engine
     container_name: graphql-engine
-    image: hasura/graphql-engine:v1.3.3
+    image: hasura/graphql-engine:v2.0.9
     ports:
       - "${HASURA_EXTERNAL_PORT}:8080"
     volumes:

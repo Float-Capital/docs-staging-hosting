@@ -4,9 +4,10 @@
 var Serbet = require("serbet/src/Serbet.bs.js");
 var Dotenv = require("dotenv");
 var AuthHook = require("./AuthHook.bs.js");
-var Pervasives = require("bs-platform/lib/js/pervasives.js");
-var Belt_Option = require("bs-platform/lib/js/belt_Option.js");
+var Pervasives = require("rescript/lib/js/pervasives.js");
+var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var UserManager = require("./UserManager.bs.js");
+var DiscountManager = require("./DiscountManager.bs.js");
 
 Dotenv.config();
 
@@ -14,7 +15,10 @@ var app = Serbet.application(Belt_Option.getWithDefault(Belt_Option.flatMap(proc
       hd: UserManager.createUser,
       tl: {
         hd: AuthHook.endpoint,
-        tl: /* [] */0
+        tl: {
+          hd: DiscountManager.checkDiscount,
+          tl: /* [] */0
+        }
       }
     });
 
