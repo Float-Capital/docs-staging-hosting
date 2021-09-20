@@ -9,7 +9,7 @@ function Banner(Props) {
               className: "absolute bg-primary p-1 mb-2 h-10 flex items-center w-full font-default"
             }, React.createElement("div", {
                   className: "text-center text-xxs md:text-sm text-white mx-12 w-full"
-                }, Config.isPolygon ? React.createElement(React.Fragment, undefined, "🍾 Alpha is live on Polygon! Come join on the fun on ", React.createElement("a", {
+                }, Config.isPolygon ? React.createElement(React.Fragment, undefined, "🍾 Alpha is live on Polygon! Come join in the fun on ", React.createElement("a", {
                             className: "bg-white hover:bg-primary-light text-primary hover:text-white py-1 font-bold",
                             href: "https://discord.gg/zQZy6Ugxpt",
                             rel: "noopener noreferrer",

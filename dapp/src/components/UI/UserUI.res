@@ -377,10 +377,13 @@ module UserFloatEarnedFromStake = {
     )
     switch claimableFloat {
     | Response((totalClaimable, totalPredicted)) =>
-      <div className="text-xs flex flex-col items-center justify-center">
-        <div className="text-gray-500"> {`${Config.config.floatToken.floatTokenName} Accruing`->React.string} </div>
+      <div className="text-xxxs flex flex-col items-center justify-center">
+        <div className="text-gray-500">
+          {`${Config.config.floatToken.floatTokenName} Accruing`->React.string}
+        </div>
         {`~${totalClaimable
           ->Ethers.BigNumber.add(totalPredicted)
+          ->Ethers.BigNumber.div(CONSTANTS.twoBN)
           ->Misc.NumberFormat.formatEther(~digits=5)}`->React.string}
       </div>
     | _ => <Loader.Tiny />
@@ -407,12 +410,12 @@ module UserStakeBox = {
 
     <div
       className=`flex justify-between w-11/12 mx-auto p-2 mb-2 border-2 border-light-purple rounded-lg z-10 shadow relative`>
-      <div className=`pl-3 text-sm self-center`>
+      <div className=`pl-3 text-xs self-center`>
         {name->React.string}
         <br className=`mt-1` />
         {(isLong ? `Long↗️` : `Short↘️`)->React.string}
       </div>
-      <div className=`text-sm text-center self-center`>
+      <div className=`text-sm text-center self-center mx-1`>
         <span className=`text-sm`> {tokens->React.string} </span>
         <span className=`text-xs`> {`tkns`->React.string} </span>
         <br className=`mt-1` />
@@ -500,7 +503,7 @@ module UserStakesCard = {
       let isLong = syntheticToken.tokenType->Obj.magic == "Long"
 
       <UserStakeBox key stake>
-        // <UserFloatEarnedFromStake tokenAddress={addr} userId />
+        <UserFloatEarnedFromStake tokenAddress={addr} userId />
         <UserMarketUnstake synthAddress={addr} userId isLong />
       </UserStakeBox>
     }, stakes)->React.array
@@ -567,15 +570,21 @@ module UserFloatCard = {
             className=`w-11/12 px-2 mx-auto mb-2 border-2 border-light-purple rounded-lg z-10 shadow`>
             <UserColumnTextList>
               <div className="flex">
-                <UserColumnText head={`${Config.config.floatToken.floatTokenName} accruing`} body={floatAccrued} />
+                <UserColumnText
+                  head={`${Config.config.floatToken.floatTokenName} accruing`} body={floatAccrued}
+                />
                 <span className="ml-1">
                   <Tooltip
                     tip="This is an estimate at the current time, the amount issued may differ due to changes in market liquidity and asset prices."
                   />
                 </span>
               </div>
-              <UserColumnText head={`${Config.config.floatToken.floatTokenName} balance`} body={floatBalance} />
-              <UserColumnText head={`${Config.config.floatToken.floatTokenName} minted`} body={floatMinted} />
+              <UserColumnText
+                head={`${Config.config.floatToken.floatTokenName} balance`} body={floatBalance}
+              />
+              <UserColumnText
+                head={`${Config.config.floatToken.floatTokenName} minted`} body={floatMinted}
+              />
             </UserColumnTextList>
             {isCurrentUser
               ? <div className=`flex justify-around flex-row my-1`>
