@@ -9,17 +9,12 @@ function Banner(Props) {
               className: "absolute bg-primary p-1 mb-2 h-10 flex items-center w-full font-default"
             }, React.createElement("div", {
                   className: "text-center text-xxs md:text-sm text-white mx-12 w-full"
-                }, Config.isPolygon ? React.createElement(React.Fragment, undefined, "🍾 Alpha is live on Polygon! View our ", React.createElement("a", {
+                }, Config.isPolygon ? React.createElement(React.Fragment, undefined, "🍾 Alpha is live on Polygon! Come join on the fun on ", React.createElement("a", {
                             className: "bg-white hover:bg-primary-light text-primary hover:text-white py-1 font-bold",
-                            href: "https://youtu.be/UFX-mQgV1JU",
+                            href: "https://discord.gg/zQZy6Ugxpt",
                             rel: "noopener noreferrer",
                             target: "_blank"
-                          }, "Launch party recording"), " 🍾 The testnet can be found ", React.createElement("a", {
-                            className: "bg-white hover:bg-primary-light text-primary hover:text-white py-1 font-bold",
-                            href: "https://testnet.float.capital",
-                            rel: "noopener noreferrer",
-                            target: "_blank"
-                          }, "here"), ".") : React.createElement(React.Fragment, undefined, "This is the Float testnet, to view the live Alpha go ", React.createElement("a", {
+                          }, "discord")) : React.createElement(React.Fragment, undefined, "This is the mumbai testnet, to view the live Alpha go ", React.createElement("a", {
                             className: "bg-white hover:bg-primary-light text-primary hover:text-white py-1 font-bold",
                             href: "https://float.capital",
                             rel: "noopener noreferrer",
