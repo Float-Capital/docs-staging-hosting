@@ -30,7 +30,26 @@ function makeAbi(abiArray) {
   return abiArray;
 }
 
-var BigNumber = {};
+function min(a, b) {
+  if (a.gt(b)) {
+    return b;
+  } else {
+    return a;
+  }
+}
+
+function max(a, b) {
+  if (a.gt(b)) {
+    return a;
+  } else {
+    return b;
+  }
+}
+
+var BigNumber = {
+  min: min,
+  max: max
+};
 
 var Wallet = {};
 

@@ -71,6 +71,9 @@ module BigNumber = {
 
   @send external toNumber: t => int = "toNumber"
   @send external toNumberFloat: t => float = "toNumber"
+
+  let min = (a, b) => a->gt(b) ? b : a
+  let max = (a, b) => a->gt(b) ? a : b
 }
 
 type providerType

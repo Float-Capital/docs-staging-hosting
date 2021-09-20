@@ -4,11 +4,52 @@
 var Ethers = require("../ethereum/Ethers.js");
 var Ethers$1 = require("ethers");
 var Globals = require("./Globals.js");
-var Caml_obj = require("rescript/lib/js/caml_obj.js");
 var CONSTANTS = require("../CONSTANTS.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var Belt_HashMapString = require("rescript/lib/js/belt_HashMapString.js");
+
+var minBn = Ethers.BigNumber.min;
+
+function div(prim0, prim1) {
+  return prim0.div(prim1);
+}
+
+function mul(prim0, prim1) {
+  return prim0.mul(prim1);
+}
+
+function sub(prim0, prim1) {
+  return prim0.sub(prim1);
+}
+
+function add(prim0, prim1) {
+  return prim0.add(prim1);
+}
+
+function fromInt(prim) {
+  return Ethers$1.BigNumber.from(prim);
+}
+
+function eq(prim0, prim1) {
+  return prim0.eq(prim1);
+}
+
+function lt(prim0, prim1) {
+  return prim0.lt(prim1);
+}
+
+function lte(prim0, prim1) {
+  return prim0.lte(prim1);
+}
+
+function pow(prim0, prim1) {
+  return prim0.pow(prim1);
+}
+
+function abs(prim) {
+  return prim.abs();
+}
 
 function calculateBeta(totalValueLocked, totalLockedLong, totalLockedShort, isLong) {
   if (totalValueLocked.eq(CONSTANTS.zeroBN) || totalLockedLong.eq(CONSTANTS.zeroBN) || totalLockedShort.eq(CONSTANTS.zeroBN)) {
@@ -89,7 +130,7 @@ function calculateStakeAPYS(syntheticMarkets, $$global, apy) {
           var totalLockedLong = match.totalLockedLong;
           var match$1 = market.syntheticShort;
           var match$2 = market.syntheticLong;
-          var marketsShareOfYield = Caml_obj.caml_min(totalLockedLong.sub(totalLockedShort).abs().mul(CONSTANTS.yieldGradientHardcode).div(totalValueLocked), CONSTANTS.tenToThe18);
+          var marketsShareOfYield = minBn(totalLockedLong.sub(totalLockedShort).abs().mul(CONSTANTS.yieldGradientHardcode).div(totalValueLocked), CONSTANTS.tenToThe18);
           totalTreasuryYieldAfterYear.contents = totalTreasuryYieldAfterYear.contents.add(CONSTANTS.tenToThe18.sub(marketsShareOfYield).mul(apy).mul(totalValueLocked).div(CONSTANTS.tenToThe18).div(CONSTANTS.tenToThe18));
           var match$3 = calcLongAndShortDollarFloatPerSecondUnscaled(totalLockedLong, totalLockedShort, CONSTANTS.equilibriumOffsetHardcode, market.timestampCreated, match.timestamp, CONSTANTS.kperiodHardcode, CONSTANTS.kmultiplierHardcode, CONSTANTS.balanceIncentiveExponentHardcode);
           var longFloatOverYear = calculateFloatMintedOverPeriod(match$3[0], match$2.totalStaked, Ethers$1.BigNumber.from(CONSTANTS.oneYearInSeconds), match$2.latestPrice.price.price);
@@ -168,6 +209,17 @@ function mapStakeApy(apyDict, key) {
   }
 }
 
+exports.minBn = minBn;
+exports.div = div;
+exports.mul = mul;
+exports.sub = sub;
+exports.add = add;
+exports.fromInt = fromInt;
+exports.eq = eq;
+exports.lt = lt;
+exports.lte = lte;
+exports.pow = pow;
+exports.abs = abs;
 exports.calculateBeta = calculateBeta;
 exports.kCalc = kCalc;
 exports.xoredAssignment = xoredAssignment;
