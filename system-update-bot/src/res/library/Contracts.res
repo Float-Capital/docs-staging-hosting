@@ -38,6 +38,6 @@ module LongShort = {
   external updateSystemStateMulti: (
     t,
     ~marketIndexes: array<int>,
-    ~gasOptions: txOptions,
+    ~gasOptions: 'txOptions,
   ) => JsPromise.t<Ethers.txSubmitted> = "updateSystemStateMulti"
 }

@@ -93,7 +93,7 @@ function runUpdateSystemStateMulti(marketsToUpdate) {
                 var contract = Contracts.LongShort.make(Config.config.longShortContractAddress, Ethers.getSigner(wallet.contents));
                 return getGasPrice(undefined).then(function (gasPrice) {
                             var transactionOptions = {
-                              gasPrice: gasPrice
+                              gasPrice: gasPrice.toString()
                             };
                             console.log(marketsToUpdate, gasPrice.toString());
                             return contract.functions.updateSystemStateMulti(marketsToUpdate, transactionOptions).then(function (update) {

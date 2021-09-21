@@ -81,7 +81,7 @@ let runUpdateSystemStateMulti = (~marketsToUpdate) => {
     )
 
     getGasPrice()->JsPromise.map(gasPrice => {
-      let transactionOptions = {gasPrice: gasPrice}
+      let transactionOptions = {"gasPrice": gasPrice->toString}
 
       Js.log2(marketsToUpdate, gasPrice->BigNumber.toString)
 
