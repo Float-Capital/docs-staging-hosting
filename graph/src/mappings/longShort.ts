@@ -410,27 +410,27 @@ export function handleSystemStateUpdated(event: SystemStateUpdated): void {
         At the time of finding the contracts had no NextPriceSyntheticPositionShift or ExecuteNextPriceMarketSideShiftSettlementUser events emitted 
       */
 
-      // if (tokensShiftedToLong.gt(ZERO)) {
-      //   // TODO: save this to the users shift history
-      //   updateUserBalance(
-      //     longTokenId,
-      //     user,
-      //     tokensShiftedToLong,
-      //     true,
-      //     timestamp
-      //   );
-      // }
+      if (tokensShiftedToLong.gt(ZERO)) {
+        // TODO: save this to the users shift history
+        updateUserBalance(
+          longTokenId,
+          user,
+          tokensShiftedToLong,
+          true,
+          timestamp
+        );
+      }
 
-      // if (tokensShiftedToShort.gt(ZERO)) {
-      //   // TODO: save this to the users shift history
-      //   updateUserBalance(
-      //     shortTokenId,
-      //     user,
-      //     tokensShiftedToShort,
-      //     true,
-      //     timestamp
-      //   );
-      // }
+      if (tokensShiftedToShort.gt(ZERO)) {
+        // TODO: save this to the users shift history
+        updateUserBalance(
+          shortTokenId,
+          user,
+          tokensShiftedToShort,
+          true,
+          timestamp
+        );
+      }
 
       if (tokensMintedLong.gt(ZERO)) {
         increaseUserMints(user, syntheticTokenLong, tokensMintedLong);
