@@ -95,7 +95,7 @@ function runUpdateSystemStateMulti(marketsToUpdate) {
                             var transactionOptions = {
                               gasPrice: gasPrice
                             };
-                            console.log(marketsToUpdate, transactionOptions);
+                            console.log(marketsToUpdate, gasPrice.toString());
                             return contract.functions.updateSystemStateMulti(marketsToUpdate, transactionOptions).then(function (update) {
                                             console.log("submitted transaction", update.hash);
                                             return update.wait();

@@ -13,18 +13,18 @@ let maxGasPriceInGwei: int = 250
 let getGasPrice = () => {
   Fetch.fetch("https://gasstation-mainnet.matic.network")
   ->JsPromise.then(Fetch.Response.json)
-    ->JsPromise.map(response => Obj.magic(response)["fast"])
-    ->JsPromise.catch(err => {
-      Js.log2("Error fetching gas price, falling back to default gas price. Error:", err)
-      Some(defaultGasPriceInGwei)->JsPromise.resolve
-    })
-    ->JsPromise.map(optGasPriceInGwei =>
-                    optGasPriceInGwei
-                    ->Option.getWithDefault(defaultGasPriceInGwei)
-                    ->Js.Math.ceil_int
-                    ->Js.Math.min_int(maxGasPriceInGwei)
-                    ->fromInt
-                    ->mul(oneGweiInWei)
+  ->JsPromise.map(response => Obj.magic(response)["fast"])
+  ->JsPromise.catch(err => {
+    Js.log2("Error fetching gas price, falling back to default gas price. Error:", err)
+    Some(defaultGasPriceInGwei)->JsPromise.resolve
+  })
+  ->JsPromise.map(optGasPriceInGwei =>
+    optGasPriceInGwei
+    ->Option.getWithDefault(defaultGasPriceInGwei)
+    ->Js.Math.ceil_int
+    ->Js.Math.min_int(maxGasPriceInGwei)
+    ->fromInt
+    ->mul(oneGweiInWei)
   )
 }
 
@@ -83,7 +83,7 @@ let runUpdateSystemStateMulti = (~marketsToUpdate) => {
     getGasPrice()->JsPromise.map(gasPrice => {
       let transactionOptions = {gasPrice: gasPrice}
 
-      Js.log2(marketsToUpdate, transactionOptions)
+      Js.log2(marketsToUpdate, gasPrice->BigNumber.toString)
 
       contract
       ->LongShort.updateSystemStateMulti(
