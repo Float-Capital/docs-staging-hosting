@@ -498,10 +498,10 @@ function UserUI$UserFloatEarnedFromStake(Props) {
   }
   var match = claimableFloat._0;
   return React.createElement("div", {
-              className: "text-xs flex flex-col items-center justify-center"
+              className: "text-xxxs flex flex-col items-center justify-center"
             }, React.createElement("div", {
                   className: "text-gray-500"
-                }, Config.config.floatToken.floatTokenName + " Accruing"), "~" + Misc.NumberFormat.formatEther(5, match[0].add(match[1])));
+                }, Config.config.floatToken.floatTokenName + " Accruing"), "~" + Misc.NumberFormat.formatEther(5, match[0].add(match[1]).div(CONSTANTS.twoBN)));
 }
 
 var UserFloatEarnedFromStake = {
@@ -522,11 +522,11 @@ function UserUI$UserStakeBox(Props) {
   return React.createElement("div", {
               className: "flex justify-between w-11/12 mx-auto p-2 mb-2 border-2 border-light-purple rounded-lg z-10 shadow relative"
             }, React.createElement("div", {
-                  className: "pl-3 text-sm self-center"
+                  className: "pl-3 text-xs self-center"
                 }, name, React.createElement("br", {
                       className: "mt-1"
                     }), isLong ? "Long↗️" : "Short↘️"), React.createElement("div", {
-                  className: "text-sm text-center self-center"
+                  className: "text-sm text-center self-center mx-1"
                 }, React.createElement("span", {
                       className: "text-sm"
                     }, tokens), React.createElement("span", {
@@ -624,13 +624,16 @@ function UserUI$UserStakesCard(Props) {
         var isLong = syntheticToken.tokenType === "Long";
         return React.createElement(UserUI$UserStakeBox, {
                     stake: stake,
-                    children: React.createElement(UserUI$UserMarketUnstake, {
-                          synthAddress: addr,
-                          userId: userId,
-                          isLong: isLong
-                        }),
+                    children: null,
                     key: key
-                  });
+                  }, React.createElement(UserUI$UserFloatEarnedFromStake, {
+                        userId: userId,
+                        tokenAddress: addr
+                      }), React.createElement(UserUI$UserMarketUnstake, {
+                        synthAddress: addr,
+                        userId: userId,
+                        isLong: isLong
+                      }));
       });
   var totalStakedValue = getUsersTotalStakeValue(stakes);
   return React.createElement(UserUI$UserColumnCard, {
