@@ -556,12 +556,13 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
   var txStateMint = Props.txStateMint;
   var resetFormButton = Props.resetFormButton;
   var isLong = Props.isLong;
-  var marketName = Props.marketName;
+  var market = Props.market;
   var tokenToMint = Props.tokenToMint;
   var buttonText = Props.buttonText;
   var buttonDisabled = Props.buttonDisabled;
   var needsToBeAccredited = Props.needsToBeAccredited;
   var contractFunction = Props.contractFunction;
+  var marketName = market.name;
   var randomMintTweetMessage = function (isLong, marketName) {
     var position = isLong ? "long" : "short";
     var possibleTweetMessages = [
@@ -669,7 +670,7 @@ function MintForm$SubmitButtonAndTxTracker(Props) {
                                                 })))), React.createElement(TweetButton.make, {
                                       message: randomMintTweetMessage(isLong, marketName)
                                     }), React.createElement(Metamask.AddTokenButton.make, {
-                                      token: Config.config.contracts.FloatToken,
+                                      token: isLong ? market.syntheticLong.tokenAddress : market.syntheticShort.tokenAddress,
                                       tokenSymbol: (
                                         isLong ? "↗️" : "↘️"
                                       ) + marketName
@@ -1098,7 +1099,7 @@ function MintForm$MintFormSignedIn(Props) {
                     txStateMint: txState,
                     resetFormButton: resetFormButton,
                     isLong: isLong,
-                    marketName: market.name,
+                    market: market,
                     tokenToMint: tokenToMint,
                     buttonText: match$7[1],
                     buttonDisabled: match$7[2],
