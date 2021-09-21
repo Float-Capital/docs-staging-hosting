@@ -128,13 +128,14 @@ module SubmitButtonAndTxTracker = {
     ~txStateMint,
     ~resetFormButton,
     ~isLong,
-    ~marketName,
+    ~market: Queries.SyntheticMarketInfo.t,
     ~tokenToMint,
     ~buttonText,
     ~buttonDisabled,
     ~needsToBeAccredited,
     ~contractFunction,
   ) => {
+    let marketName = market.name
     let randomMintTweetMessage = (isLong, marketName) => {
       let position = isLong ? "long" : "short"
       let possibleTweetMessages = [
@@ -232,7 +233,7 @@ module SubmitButtonAndTxTracker = {
             </div>
             <TweetButton message={randomMintTweetMessage(isLong, marketName)} />
             <Metamask.AddTokenButton
-              token={Config.config.contracts.floatToken}
+                token={isLong ? market.syntheticLong.tokenAddress : market.syntheticShort.tokenAddress}
               tokenSymbol={`${isLong ? `↗️` : `↘️`}${marketName}`}
             />
             <ViewProfileButton />
@@ -547,7 +548,7 @@ module MintFormSignedIn = {
         txStateMint=txState
         buttonDisabled
         isLong
-        marketName={market.name}
+        market
         needsToBeAccredited={!isAccredited && wantsToBeAccredited}
         contractFunction={makeContractFunction(formAmount->Option.getWithDefault(CONSTANTS.zeroBN))}
       />}
