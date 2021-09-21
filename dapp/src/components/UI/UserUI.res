@@ -383,7 +383,6 @@ module UserFloatEarnedFromStake = {
         </div>
         {`~${totalClaimable
           ->Ethers.BigNumber.add(totalPredicted)
-          ->Ethers.BigNumber.div(CONSTANTS.twoBN)
           ->Misc.NumberFormat.formatEther(~digits=5)}`->React.string}
       </div>
     | _ => <Loader.Tiny />
@@ -563,7 +562,6 @@ module UserFloatCard = {
           let floatAccrued =
             totalClaimable
             ->Ethers.BigNumber.add(totalPredicted)
-            ->Ethers.BigNumber.div(CONSTANTS.twoBN) // TODO: Hackiest hack of hacks temp solution to ensure its understated.
             ->Misc.NumberFormat.formatEther(~digits=6)
 
           <div
