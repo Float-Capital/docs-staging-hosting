@@ -193,30 +193,26 @@ function btnTextFromGraphSetting(graphSetting) {
 function getMaxTimeDateFormatter(timeMarketExists) {
   if (timeMarketExists < CONSTANTS.halfDayInSeconds) {
     return "ha";
-  } else if (timeMarketExists < CONSTANTS.oneWeekInSeconds) {
-    return "iii";
-  } else if (timeMarketExists < CONSTANTS.twoWeeksInSeconds || timeMarketExists < CONSTANTS.threeMonthsInSeconds) {
-    return "iii MMM";
+  } else if (timeMarketExists < CONSTANTS.oneWeekInSeconds || timeMarketExists < CONSTANTS.twoWeeksInSeconds || timeMarketExists < CONSTANTS.threeMonthsInSeconds) {
+    return "do MMM";
   } else {
     return "MMM";
   }
 }
 
 function dateFormattersFromGraphSetting(graphSetting) {
-  if (typeof graphSetting !== "number") {
-    return getMaxTimeDateFormatter(graphSetting._0);
-  }
-  switch (graphSetting) {
-    case /* Day */0 :
-        return "ha";
-    case /* Week */1 :
-    case /* Month */2 :
-        return "iii";
-    case /* ThreeMonth */3 :
-        return "iii MMM";
-    case /* Year */4 :
+  if (typeof graphSetting === "number") {
+    if (graphSetting !== 0) {
+      if (graphSetting >= 4) {
         return "MMM";
-    
+      } else {
+        return "do MMM";
+      }
+    } else {
+      return "ha";
+    }
+  } else {
+    return getMaxTimeDateFormatter(graphSetting._0);
   }
 }
 

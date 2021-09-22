@@ -8845,10 +8845,10 @@ re-debouncer@2.1.0:
   resolved "https://registry.yarnpkg.com/re-debouncer/-/re-debouncer-2.1.0.tgz#2eaf7994ba41590f4f80d4a363ae8905156b7dc1"
   integrity sha512-Iy9BecWF9X4V6zXfL3ROZpKGkCnpzYdjG/j6NIBxQn7gEwO2DzED5BsbfRUiPeqr7C0tAD0HPHF6tYIcQFEnyA==
 
-re-formality@4.0.0-beta.15:
-  version "4.0.0-beta.15"
-  resolved "https://registry.yarnpkg.com/re-formality/-/re-formality-4.0.0-beta.15.tgz#15c0633d86582e9e9278072d43a26fa3f3914916"
-  integrity sha512-quSXNqNTR0x04bWUcGcNqIMXAUcKyem4Tf0dzp/HNI9ONmMfdaurm+p11AbJFogM4Z+Fjz4NnIlEhKbx5iTI8Q==
+re-formality@4.0.0-beta.16:
+  version "4.0.0-beta.16"
+  resolved "https://registry.yarnpkg.com/re-formality/-/re-formality-4.0.0-beta.16.tgz#9783700bca768a133b8f51054dd370fa6bf4085e"
+  integrity sha512-wwJDeiOglRtEJkBfxSg8Sz9aFM5PndR/OXepCVGgREgCvuv1JaWaPt5HHy4yf+7mqfOF9TBomCNHmvnoDYMzAg==
   dependencies:
     re-debouncer "2.1.0"
 

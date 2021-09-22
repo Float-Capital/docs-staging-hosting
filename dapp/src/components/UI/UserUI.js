@@ -501,7 +501,7 @@ function UserUI$UserFloatEarnedFromStake(Props) {
               className: "text-xxxs flex flex-col items-center justify-center"
             }, React.createElement("div", {
                   className: "text-gray-500"
-                }, Config.config.floatToken.floatTokenName + " Accruing"), "~" + Misc.NumberFormat.formatEther(5, match[0].add(match[1]).div(CONSTANTS.twoBN)));
+                }, Config.config.floatToken.floatTokenName + " Accruing"), "~" + Misc.NumberFormat.formatEther(5, match[0].add(match[1])));
 }
 
 var UserFloatEarnedFromStake = {
@@ -683,7 +683,7 @@ function UserUI$UserFloatCard(Props) {
     var floatBalances$1 = match[0];
     var floatBalance = Misc.NumberFormat.formatEther(6, floatBalances$1.floatBalance);
     var floatMinted = Misc.NumberFormat.formatEther(6, floatBalances$1.floatMinted);
-    var floatAccrued = Misc.NumberFormat.formatEther(6, match$1[0].add(match$1[1]).div(CONSTANTS.twoBN));
+    var floatAccrued = Misc.NumberFormat.formatEther(6, match$1[0].add(match$1[1]));
     tmp = React.createElement("div", {
           className: "w-11/12 px-2 mx-auto mb-2 border-2 border-light-purple rounded-lg z-10 shadow"
         }, React.createElement(UserUI$UserColumnTextList, {

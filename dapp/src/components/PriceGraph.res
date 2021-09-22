@@ -58,9 +58,9 @@ let btnTextFromGraphSetting = graphSetting =>
 let getMaxTimeDateFormatter = timeMarketExists => {
   switch timeMarketExists {
   | time if time < CONSTANTS.halfDayInSeconds => #ha
-  | time if time < CONSTANTS.oneWeekInSeconds => #iii
-  | time if time < CONSTANTS.twoWeeksInSeconds => #"iii MMM"
-  | time if time < CONSTANTS.threeMonthsInSeconds => #"iii MMM"
+  | time if time < CONSTANTS.oneWeekInSeconds => #"do MMM"
+  | time if time < CONSTANTS.twoWeeksInSeconds => #"do MMM"
+  | time if time < CONSTANTS.threeMonthsInSeconds => #"do MMM"
   | time if time < CONSTANTS.oneYearInSeconds => #MMM
   | _ => #MMM
   }
@@ -71,9 +71,9 @@ let dateFormattersFromGraphSetting = graphSetting =>
   // https://date-fns.org/v2.19.0/docs/format
   | Max(timeMaketHasExisted) => timeMaketHasExisted->getMaxTimeDateFormatter
   | Day => #ha
-  | Week => #iii
-  | Month => #iii
-  | ThreeMonth => #"iii MMM"
+  | Week => #"do MMM"
+  | Month => #"do MMM"
+  | ThreeMonth => #"do MMM"
   | Year => #MMM
   }
 

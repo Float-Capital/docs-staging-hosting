@@ -15,6 +15,7 @@ type dateFormats = [
   | #ha
   | #iii
   | #"iii MMM"
+  | #"do MMM"
   | #MMM
 ]
 
