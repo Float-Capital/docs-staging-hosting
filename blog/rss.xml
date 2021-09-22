@@ -4,9 +4,16 @@
         <title>Float Capital | Docs Blog</title>
         <link>https://stagingdocs.float.capital/blog</link>
         <description>Float Capital | Docs Blog</description>
-        <lastBuildDate>Fri, 17 Sep 2021 00:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Wed, 22 Sep 2021 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
+        <item>
+            <title><![CDATA[Backtesting the Flipp3ning market: Visualizing market evolution]]></title>
+            <link>https://stagingdocs.float.capital/blog/flipp3ning-backetesting</link>
+            <guid>/flipp3ning-backetesting</guid>
+            <pubDate>Wed, 22 Sep 2021 00:00:00 GMT</pubDate>
+            <description><![CDATA[**Disclaimer**: The modelling process below was done ahead of the Alpha launch and so the results will be different to the Alpha Experience]]></description>
+        </item>
         <item>
             <title><![CDATA[Float Capital Presents: A New Era of Synthetic Assets]]></title>
             <link>https://stagingdocs.float.capital/blog/new-era-synthetic-assets</link>
