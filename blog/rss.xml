@@ -4,16 +4,9 @@
         <title>Float Capital | Docs Blog</title>
         <link>https://stagingdocs.float.capital/blog</link>
         <description>Float Capital | Docs Blog</description>
-        <lastBuildDate>Tue, 19 Oct 2021 00:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Wed, 22 Sep 2021 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
-        <item>
-            <title><![CDATA[Own our future with Reality Cards]]></title>
-            <link>https://stagingdocs.float.capital/blog/own-our-future-reality-cards</link>
-            <guid>/own-our-future-reality-cards</guid>
-            <pubDate>Tue, 19 Oct 2021 00:00:00 GMT</pubDate>
-            <description><![CDATA[Reality Cards is allowing users to own the future of Float Capital.]]></description>
-        </item>
         <item>
             <title><![CDATA[Backtesting the Flipp3ning market: Visualizing market evolution]]></title>
             <link>https://stagingdocs.float.capital/blog/flipp3ning-backetesting</link>
