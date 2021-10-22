@@ -2,11 +2,18 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://stagingdocs.float.capital/blog</id>
     <title>Float Capital | Docs Blog</title>
-    <updated>2021-09-22T00:00:00.000Z</updated>
+    <updated>2021-10-19T00:00:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://stagingdocs.float.capital/blog"/>
     <subtitle>Float Capital | Docs Blog</subtitle>
     <icon>https://stagingdocs.float.capital/favicons/favicon.ico</icon>
+    <entry>
+        <title type="html"><![CDATA[Own our future with Reality Cards]]></title>
+        <id>/own-our-future-reality-cards</id>
+        <link href="https://stagingdocs.float.capital/blog/own-our-future-reality-cards"/>
+        <updated>2021-10-19T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Reality Cards is allowing users to own the future of Float Capital.]]></summary>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Backtesting the Flipp3ning market: Visualizing market evolution]]></title>
         <id>/flipp3ning-backetesting</id>
