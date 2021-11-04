@@ -4,9 +4,16 @@
         <title>Float Capital | Docs Blog</title>
         <link>https://stagingdocs.float.capital/blog</link>
         <description>Float Capital | Docs Blog</description>
-        <lastBuildDate>Tue, 19 Oct 2021 00:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Tue, 02 Nov 2021 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
+        <item>
+            <title><![CDATA[Hedge your OHM position with Float Capital]]></title>
+            <link>https://stagingdocs.float.capital/blog/hedge-your-ohm-position</link>
+            <guid>/hedge-your-ohm-position</guid>
+            <pubDate>Tue, 02 Nov 2021 00:00:00 GMT</pubDate>
+            <description><![CDATA[Float Capital is launching an Olympus synthetic market, providing another diversification option for all OHM holders and giving Ohmies new strategies for interacting with OHM.]]></description>
+        </item>
         <item>
             <title><![CDATA[Own our future with Reality Cards]]></title>
             <link>https://stagingdocs.float.capital/blog/own-our-future-reality-cards</link>
