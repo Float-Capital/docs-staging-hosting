@@ -4,9 +4,16 @@
         <title>Float Capital | Docs Blog</title>
         <link>https://stagingdocs.float.capital/blog</link>
         <description>Float Capital | Docs Blog</description>
-        <lastBuildDate>Tue, 02 Nov 2021 00:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Sun, 28 Nov 2021 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
+        <item>
+            <title><![CDATA[More incentives for market balence]]></title>
+            <link>https://stagingdocs.float.capital/blog/more-incentives-for-market-balance</link>
+            <guid>/more-incentives-for-market-balance</guid>
+            <pubDate>Sun, 28 Nov 2021 00:00:00 GMT</pubDate>
+            <description><![CDATA[Float Capital has experienced explosive success with our OHM-USD market and our partnership with Olympus DAO. It has attracted so much capital that for a week during the last month we were the fastest growing derivatives protocol in all of DeFi.]]></description>
+        </item>
         <item>
             <title><![CDATA[Hedge your OHM position with Float Capital]]></title>
             <link>https://stagingdocs.float.capital/blog/hedge-your-ohm-position</link>

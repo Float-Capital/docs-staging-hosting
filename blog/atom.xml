@@ -2,11 +2,18 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://stagingdocs.float.capital/blog</id>
     <title>Float Capital | Docs Blog</title>
-    <updated>2021-11-02T00:00:00.000Z</updated>
+    <updated>2021-11-28T00:00:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://stagingdocs.float.capital/blog"/>
     <subtitle>Float Capital | Docs Blog</subtitle>
     <icon>https://stagingdocs.float.capital/favicons/favicon.ico</icon>
+    <entry>
+        <title type="html"><![CDATA[More incentives for market balence]]></title>
+        <id>/more-incentives-for-market-balance</id>
+        <link href="https://stagingdocs.float.capital/blog/more-incentives-for-market-balance"/>
+        <updated>2021-11-28T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Float Capital has experienced explosive success with our OHM-USD market and our partnership with Olympus DAO. It has attracted so much capital that for a week during the last month we were the fastest growing derivatives protocol in all of DeFi.]]></summary>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Hedge your OHM position with Float Capital]]></title>
         <id>/hedge-your-ohm-position</id>
