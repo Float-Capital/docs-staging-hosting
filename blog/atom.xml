@@ -8,6 +8,13 @@
     <subtitle>Float Capital | Docs Blog</subtitle>
     <icon>https://stagingdocs.float.capital/favicons/favicon.ico</icon>
     <entry>
+        <title type="html"><![CDATA[BRB, going multichain.]]></title>
+        <id>/deploying-to-avalanche</id>
+        <link href="https://stagingdocs.float.capital/blog/deploying-to-avalanche"/>
+        <updated>2021-12-07T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Avalanche" width="100%"/>]]></summary>
+    </entry>
+    <entry>
         <title type="html"><![CDATA[Why you won’t have nightmares about volatility decay on Float Capital.]]></title>
         <id>/volatility-decay-intro</id>
         <link href="https://stagingdocs.float.capital/blog/volatility-decay-intro"/>

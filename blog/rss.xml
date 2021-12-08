@@ -8,6 +8,13 @@
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <item>
+            <title><![CDATA[BRB, going multichain.]]></title>
+            <link>https://stagingdocs.float.capital/blog/deploying-to-avalanche</link>
+            <guid>/deploying-to-avalanche</guid>
+            <pubDate>Tue, 07 Dec 2021 00:00:00 GMT</pubDate>
+            <description><![CDATA[Avalanche" width="100%"/>]]></description>
+        </item>
+        <item>
             <title><![CDATA[Why you won’t have nightmares about volatility decay on Float Capital.]]></title>
             <link>https://stagingdocs.float.capital/blog/volatility-decay-intro</link>
             <guid>/volatility-decay-intro</guid>
