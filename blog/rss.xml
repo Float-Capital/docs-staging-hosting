@@ -4,30 +4,9 @@
         <title>Float Capital | Docs Blog</title>
         <link>https://stagingdocs.float.capital/blog</link>
         <description>Float Capital | Docs Blog</description>
-        <lastBuildDate>Thu, 16 Dec 2021 00:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Tue, 07 Dec 2021 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
-        <item>
-            <title><![CDATA[Go delta neutral on JOE for dank APR]]></title>
-            <link>https://stagingdocs.float.capital/blog/delta-neutral-joe</link>
-            <guid>/delta-neutral-joe</guid>
-            <pubDate>Thu, 16 Dec 2021 00:00:00 GMT</pubDate>
-            <description><![CDATA[“Have you heard of JOE?”]]></description>
-        </item>
-        <item>
-            <title><![CDATA[Hedging staked AXS with Float Capital]]></title>
-            <link>https://stagingdocs.float.capital/blog/hedging-staked-axs</link>
-            <guid>/hedging-staked-axs</guid>
-            <pubDate>Tue, 14 Dec 2021 00:00:00 GMT</pubDate>
-            <description><![CDATA[So, you’re an Axie Infinity expert.]]></description>
-        </item>
-        <item>
-            <title><![CDATA[AXS just got a magic internet asset]]></title>
-            <link>https://stagingdocs.float.capital/blog/axs-magic-internet-asset</link>
-            <guid>/axs-magic-internet-asset</guid>
-            <pubDate>Tue, 14 Dec 2021 00:00:00 GMT</pubDate>
-            <description><![CDATA[We’re bringing the metaverse to DeFi.]]></description>
-        </item>
         <item>
             <title><![CDATA[BRB, going multichain.]]></title>
             <link>https://stagingdocs.float.capital/blog/deploying-to-avalanche</link>
@@ -54,7 +33,7 @@
             <link>https://stagingdocs.float.capital/blog/hedge-your-ohm-position</link>
             <guid>/hedge-your-ohm-position</guid>
             <pubDate>Tue, 02 Nov 2021 00:00:00 GMT</pubDate>
-            <description><![CDATA[Float Capital is launching an Olympus market, providing another diversification option for all OHM holders and giving Ohmies new strategies for interacting with OHM.]]></description>
+            <description><![CDATA[Float Capital is launching an Olympus synthetic market, providing another diversification option for all OHM holders and giving Ohmies new strategies for interacting with OHM.]]></description>
         </item>
         <item>
             <title><![CDATA[Own our future with Reality Cards]]></title>
@@ -71,9 +50,9 @@
             <description><![CDATA[**Disclaimer**: The modelling process below was done ahead of the Alpha launch and so the results will be different to the Alpha Experience]]></description>
         </item>
         <item>
-            <title><![CDATA[Float Capital Presents: A New Era of Magic Internet Assets]]></title>
-            <link>https://stagingdocs.float.capital/blog/new-era-magic-internet-assets</link>
-            <guid>/new-era-magic-internet-assets</guid>
+            <title><![CDATA[Float Capital Presents: A New Era of Synthetic Assets]]></title>
+            <link>https://stagingdocs.float.capital/blog/new-era-synthetic-assets</link>
+            <guid>/new-era-synthetic-assets</guid>
             <pubDate>Fri, 17 Sep 2021 00:00:00 GMT</pubDate>
             <description><![CDATA[The Float Capital Alpha is going LIVE on the Polygon network!]]></description>
         </item>
