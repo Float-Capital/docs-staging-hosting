@@ -4,16 +4,9 @@
         <title>Float Capital | Docs Blog</title>
         <link>https://stagingdocs.float.capital/blog</link>
         <description>Float Capital | Docs Blog</description>
-        <lastBuildDate>Thu, 23 Dec 2021 00:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Thu, 16 Dec 2021 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
-        <item>
-            <title><![CDATA[Markets unpredictable? Trade volatility.]]></title>
-            <link>https://stagingdocs.float.capital/blog/markets-unpredictable-trade-volatility</link>
-            <guid>/markets-unpredictable-trade-volatility</guid>
-            <pubDate>Thu, 23 Dec 2021 00:00:00 GMT</pubDate>
-            <description><![CDATA[This is huge.]]></description>
-        </item>
         <item>
             <title><![CDATA[Go delta neutral on JOE for dank APR]]></title>
             <link>https://stagingdocs.float.capital/blog/delta-neutral-joe</link>
