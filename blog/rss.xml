@@ -4,9 +4,16 @@
         <title>Float Capital | Docs Blog</title>
         <link>https://stagingdocs.float.capital/blog</link>
         <description>Float Capital | Docs Blog</description>
-        <lastBuildDate>Wed, 12 Jan 2022 00:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Tue, 18 Jan 2022 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
+        <item>
+            <title><![CDATA[Align your qi, with leveraged QI exposure]]></title>
+            <link>https://stagingdocs.float.capital/blog/align-your-qi</link>
+            <guid>/align-your-qi</guid>
+            <pubDate>Tue, 18 Jan 2022 00:00:00 GMT</pubDate>
+            <description><![CDATA[The qi in BENQI, is pronounced “key”, but the qi in QI is pronounced “chi”. With that knowledge, the pun in the headline works.]]></description>
+        </item>
         <item>
             <title><![CDATA[We found the missing link. It was LINK.]]></title>
             <link>https://stagingdocs.float.capital/blog/we-found-the-missing-link</link>
@@ -29,18 +36,18 @@
             <description><![CDATA[“Have you heard of JOE?”]]></description>
         </item>
         <item>
-            <title><![CDATA[Hedging staked AXS with Float Capital]]></title>
-            <link>https://stagingdocs.float.capital/blog/hedging-staked-axs</link>
-            <guid>/hedging-staked-axs</guid>
-            <pubDate>Tue, 14 Dec 2021 00:00:00 GMT</pubDate>
-            <description><![CDATA[So, you’re an Axie Infinity expert.]]></description>
-        </item>
-        <item>
             <title><![CDATA[AXS just got a magic internet asset]]></title>
             <link>https://stagingdocs.float.capital/blog/axs-magic-internet-asset</link>
             <guid>/axs-magic-internet-asset</guid>
             <pubDate>Tue, 14 Dec 2021 00:00:00 GMT</pubDate>
             <description><![CDATA[We’re bringing the metaverse to DeFi.]]></description>
+        </item>
+        <item>
+            <title><![CDATA[Hedging staked AXS with Float Capital]]></title>
+            <link>https://stagingdocs.float.capital/blog/hedging-staked-axs</link>
+            <guid>/hedging-staked-axs</guid>
+            <pubDate>Tue, 14 Dec 2021 00:00:00 GMT</pubDate>
+            <description><![CDATA[So, you’re an Axie Infinity expert.]]></description>
         </item>
         <item>
             <title><![CDATA[BRB, going multichain.]]></title>
