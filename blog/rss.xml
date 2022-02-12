@@ -43,18 +43,18 @@
             <description><![CDATA[“Have you heard of JOE?”]]></description>
         </item>
         <item>
-            <title><![CDATA[Hedging staked AXS with Float Capital]]></title>
-            <link>https://stagingdocs.float.capital/blog/hedging-staked-axs</link>
-            <guid>/hedging-staked-axs</guid>
-            <pubDate>Tue, 14 Dec 2021 00:00:00 GMT</pubDate>
-            <description><![CDATA[So, you’re an Axie Infinity expert.]]></description>
-        </item>
-        <item>
             <title><![CDATA[AXS just got a magic internet asset]]></title>
             <link>https://stagingdocs.float.capital/blog/axs-magic-internet-asset</link>
             <guid>/axs-magic-internet-asset</guid>
             <pubDate>Tue, 14 Dec 2021 00:00:00 GMT</pubDate>
             <description><![CDATA[We’re bringing the metaverse to DeFi.]]></description>
+        </item>
+        <item>
+            <title><![CDATA[Hedging staked AXS with Float Capital]]></title>
+            <link>https://stagingdocs.float.capital/blog/hedging-staked-axs</link>
+            <guid>/hedging-staked-axs</guid>
+            <pubDate>Tue, 14 Dec 2021 00:00:00 GMT</pubDate>
+            <description><![CDATA[So, you’re an Axie Infinity expert.]]></description>
         </item>
         <item>
             <title><![CDATA[BRB, going multichain.]]></title>
