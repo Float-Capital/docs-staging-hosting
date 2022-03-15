@@ -4,9 +4,16 @@
         <title>Float Capital | Docs Blog</title>
         <link>https://stagingdocs.float.capital/blog</link>
         <description>Float Capital | Docs Blog</description>
-        <lastBuildDate>Tue, 08 Mar 2022 00:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Tue, 15 Mar 2022 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
+        <item>
+            <title><![CDATA[Float Capital raises $5 mil. Time to ship.]]></title>
+            <link>https://stagingdocs.float.capital/blog/float-capital-raises-5-mil</link>
+            <guid>/float-capital-raises-5-mil</guid>
+            <pubDate>Tue, 15 Mar 2022 00:00:00 GMT</pubDate>
+            <description><![CDATA[We are incredibly excited to announce that we have raised $5M in funding allowing us to continue the non-stop shipping of DeFi primitives.]]></description>
+        </item>
         <item>
             <title><![CDATA[Float Capital Integrates Chainlink Price Feeds to Help Secure Magic Internet Assets on Avalanche]]></title>
             <link>https://stagingdocs.float.capital/blog/chainlink-price-feeds-avalanche</link>
