@@ -57,13 +57,6 @@
             <description><![CDATA[“Have you heard of JOE?”]]></description>
         </item>
         <item>
-            <title><![CDATA[Hedging staked AXS with Float Capital]]></title>
-            <link>https://stagingdocs.float.capital/blog/hedging-staked-axs</link>
-            <guid>/hedging-staked-axs</guid>
-            <pubDate>Tue, 14 Dec 2021 00:00:00 GMT</pubDate>
-            <description><![CDATA[So, you’re an Axie Infinity expert.]]></description>
-        </item>
-        <item>
             <title><![CDATA[AXS just got a magic internet asset]]></title>
             <link>https://stagingdocs.float.capital/blog/axs-magic-internet-asset</link>
             <guid>/axs-magic-internet-asset</guid>
@@ -71,11 +64,11 @@
             <description><![CDATA[We’re bringing the metaverse to DeFi.]]></description>
         </item>
         <item>
-            <title><![CDATA[Why you won’t have nightmares about volatility decay on Float Capital.]]></title>
-            <link>https://stagingdocs.float.capital/blog/volatility-decay-intro</link>
-            <guid>/volatility-decay-intro</guid>
-            <pubDate>Tue, 07 Dec 2021 00:00:00 GMT</pubDate>
-            <description><![CDATA[In this blog we will explore the concept of volatility decay on leveraged assets, which often keeps investors up at night and why this won’t be the case for users on Float Capital.]]></description>
+            <title><![CDATA[Hedging staked AXS with Float Capital]]></title>
+            <link>https://stagingdocs.float.capital/blog/hedging-staked-axs</link>
+            <guid>/hedging-staked-axs</guid>
+            <pubDate>Tue, 14 Dec 2021 00:00:00 GMT</pubDate>
+            <description><![CDATA[So, you’re an Axie Infinity expert.]]></description>
         </item>
         <item>
             <title><![CDATA[BRB, going multichain.]]></title>
@@ -83,6 +76,13 @@
             <guid>/deploying-to-avalanche</guid>
             <pubDate>Tue, 07 Dec 2021 00:00:00 GMT</pubDate>
             <description><![CDATA[Avalanche" width="100%"/>]]></description>
+        </item>
+        <item>
+            <title><![CDATA[Why you won’t have nightmares about volatility decay on Float Capital.]]></title>
+            <link>https://stagingdocs.float.capital/blog/volatility-decay-intro</link>
+            <guid>/volatility-decay-intro</guid>
+            <pubDate>Tue, 07 Dec 2021 00:00:00 GMT</pubDate>
+            <description><![CDATA[In this blog we will explore the concept of volatility decay on leveraged assets, which often keeps investors up at night and why this won’t be the case for users on Float Capital.]]></description>
         </item>
         <item>
             <title><![CDATA[We’re shipping a funding rate. Here’s why and how.]]></title>
