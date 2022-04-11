@@ -57,13 +57,6 @@
         <summary type="html"><![CDATA[“Have you heard of JOE?”]]></summary>
     </entry>
     <entry>
-        <title type="html"><![CDATA[AXS just got a magic internet asset]]></title>
-        <id>/axs-magic-internet-asset</id>
-        <link href="https://stagingdocs.float.capital/blog/axs-magic-internet-asset"/>
-        <updated>2021-12-14T00:00:00.000Z</updated>
-        <summary type="html"><![CDATA[We’re bringing the metaverse to DeFi.]]></summary>
-    </entry>
-    <entry>
         <title type="html"><![CDATA[Hedging staked AXS with Float Capital]]></title>
         <id>/hedging-staked-axs</id>
         <link href="https://stagingdocs.float.capital/blog/hedging-staked-axs"/>
@@ -71,11 +64,11 @@
         <summary type="html"><![CDATA[So, you’re an Axie Infinity expert.]]></summary>
     </entry>
     <entry>
-        <title type="html"><![CDATA[BRB, going multichain.]]></title>
-        <id>/deploying-to-avalanche</id>
-        <link href="https://stagingdocs.float.capital/blog/deploying-to-avalanche"/>
-        <updated>2021-12-07T00:00:00.000Z</updated>
-        <summary type="html"><![CDATA[Avalanche" width="100%"/>]]></summary>
+        <title type="html"><![CDATA[AXS just got a magic internet asset]]></title>
+        <id>/axs-magic-internet-asset</id>
+        <link href="https://stagingdocs.float.capital/blog/axs-magic-internet-asset"/>
+        <updated>2021-12-14T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[We’re bringing the metaverse to DeFi.]]></summary>
     </entry>
     <entry>
         <title type="html"><![CDATA[Why you won’t have nightmares about volatility decay on Float Capital.]]></title>
@@ -83,6 +76,13 @@
         <link href="https://stagingdocs.float.capital/blog/volatility-decay-intro"/>
         <updated>2021-12-07T00:00:00.000Z</updated>
         <summary type="html"><![CDATA[In this blog we will explore the concept of volatility decay on leveraged assets, which often keeps investors up at night and why this won’t be the case for users on Float Capital.]]></summary>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[BRB, going multichain.]]></title>
+        <id>/deploying-to-avalanche</id>
+        <link href="https://stagingdocs.float.capital/blog/deploying-to-avalanche"/>
+        <updated>2021-12-07T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Avalanche" width="100%"/>]]></summary>
     </entry>
     <entry>
         <title type="html"><![CDATA[We’re shipping a funding rate. Here’s why and how.]]></title>
