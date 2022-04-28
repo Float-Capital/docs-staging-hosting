@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <rss version="2.0">
     <channel>
-        <title>Float | Docs Blog</title>
+        <title>Float Capital | Docs Blog</title>
         <link>https://stagingdocs.float.capital/blog</link>
-        <description>Float | Docs Blog</description>
+        <description>Float Capital | Docs Blog</description>
         <lastBuildDate>Tue, 15 Mar 2022 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
