@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://stagingdocs.float.capital/blog</id>
-    <title>Float Capital | Docs Blog</title>
+    <title>Float | Docs Blog</title>
     <updated>2022-03-15T00:00:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://stagingdocs.float.capital/blog"/>
-    <subtitle>Float Capital | Docs Blog</subtitle>
+    <subtitle>Float | Docs Blog</subtitle>
     <icon>https://stagingdocs.float.capital/favicons/favicon.ico</icon>
     <entry>
         <title type="html"><![CDATA[Float Capital raises $5 mil. Time to ship.]]></title>
