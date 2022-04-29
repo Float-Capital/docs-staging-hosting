@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <rss version="2.0">
     <channel>
-        <title>Float Capital | Docs Blog</title>
+        <title>Float | Docs Blog</title>
         <link>https://stagingdocs.float.capital/blog</link>
-        <description>Float Capital | Docs Blog</description>
+        <description>Float | Docs Blog</description>
         <lastBuildDate>Tue, 15 Mar 2022 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
@@ -71,18 +71,18 @@
             <description><![CDATA[So, you’re an Axie Infinity expert.]]></description>
         </item>
         <item>
-            <title><![CDATA[Why you won’t have nightmares about volatility decay on Float Capital.]]></title>
-            <link>https://stagingdocs.float.capital/blog/volatility-decay-intro</link>
-            <guid>/volatility-decay-intro</guid>
-            <pubDate>Tue, 07 Dec 2021 00:00:00 GMT</pubDate>
-            <description><![CDATA[In this blog we will explore the concept of volatility decay on leveraged assets, which often keeps investors up at night and why this won’t be the case for users on Float Capital.]]></description>
-        </item>
-        <item>
             <title><![CDATA[BRB, going multichain.]]></title>
             <link>https://stagingdocs.float.capital/blog/deploying-to-avalanche</link>
             <guid>/deploying-to-avalanche</guid>
             <pubDate>Tue, 07 Dec 2021 00:00:00 GMT</pubDate>
             <description><![CDATA[Avalanche" width="100%"/>]]></description>
+        </item>
+        <item>
+            <title><![CDATA[Why you won’t have nightmares about volatility decay on Float Capital.]]></title>
+            <link>https://stagingdocs.float.capital/blog/volatility-decay-intro</link>
+            <guid>/volatility-decay-intro</guid>
+            <pubDate>Tue, 07 Dec 2021 00:00:00 GMT</pubDate>
+            <description><![CDATA[In this blog we will explore the concept of volatility decay on leveraged assets, which often keeps investors up at night and why this won’t be the case for users on Float Capital.]]></description>
         </item>
         <item>
             <title><![CDATA[We’re shipping a funding rate. Here’s why and how.]]></title>
